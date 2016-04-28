@@ -73,22 +73,24 @@ class Dashboard extends React.Component {
 
     render() {
 
-console.log('=========================== examGuide == ', this.props.dashboard.examGuide.subjectCount);
-
-
         var containers = _.map(_.range(4), function(index) {
             return (null);
         });
-        var data = {
-            subjectCount: 3,
-            totoalProblemCount: 20,
-            classCount: 4,
-            totoalStudentCount: 34
-        };
+        // var data = {
+        //     subjectCount: 3,
+        //     totoalProblemCount: 20,
+        //     classCount: 4,
+        //     totoalStudentCount: 34
+        // };
+
+        var data = JSON.stringify(this.props.dashboard.examGuide);
+        var jsdata = JSON.parse(data);
+console.log('=========================== examGuide == ', JSON.parse(data).subjectCount);
+
         return (
             <div style={[styles.box, styles.common.radius]}>
                 <div style={[styles.container, styles.common.radius]}>
-                    <ExamGuideComponent data={data}/>
+                    <ExamGuideComponent data={jsdata}/>
                     <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}]}>
                         <div style={{fontWeight: 'blod', marginTop: 10}}>分数排行榜</div>
                     </div>

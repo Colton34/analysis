@@ -27,6 +27,10 @@ class GlobalGuideCom extends React.Component {
     }
 
     render() {
+
+console.log('data = ', this.props.data);
+
+
         return (
                 <div style={[styles.item, styles.common.radius]}>
                     <div style={{fontWeight: 'blod', marginTop: 10}}>考试总览</div>
