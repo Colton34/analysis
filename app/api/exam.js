@@ -2,19 +2,13 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-27 18:33:14
+* @Last Modified time: 2016-04-28 10:28:38
 */
 
 'use strict';
 
 
 import axios from 'axios';
-
-export function getMockUser() {
-    return Promise.resolve({
-        name: 'HellMagic'
-    });
-}
 
 export function getMockExamGuide() {
     return Promise.resolve({

@@ -11,7 +11,7 @@ import Footer from '../common/Footer';
 // import styles from 'css/main';
 // const cx = classNames.bind(styles);
 
-import {initUser} from '../reducers/global-app/action';
+import {initUser} from '../reducers/global-app/actions';
 
 
 import Radium from 'radium';

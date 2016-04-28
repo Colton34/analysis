@@ -81,9 +81,10 @@ export default function render(req, res) {
                     link: headconfig.link
                 }));
             })
-            .catch(() => {
+            .catch((err) => {
 
 console.log('+++++++++++++++++++++++++  Cache Error ');
+console.log('Error = ', err);
 
                 res.end(renderFullPage('', {}));
             });

@@ -16,7 +16,7 @@ export default function promiseMiddleware() {
     return promise
       .then(res => {
 
-console.log('promise success type = ', SUCCESS);
+console.log('================== promise success type = ', SUCCESS);
 
         next({ ...rest, res, type: SUCCESS });
         return true;

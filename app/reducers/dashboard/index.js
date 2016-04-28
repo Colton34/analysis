@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:16:06
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-27 21:51:24
+* @Last Modified time: 2016-04-28 10:36:40
 */
 
 'use strict';
@@ -28,7 +28,7 @@ export default function reducer(state, action) {
     switch(action.type) {
         case INIT_GLOBAL_GUIDE_SUCCESS:
             var nextState = state.set('examGuide', action.res);
-            console.log('examGuide  nextState = ', nextState.examGuide);
+console.log('=================================== examGuide  nextState = ', nextState.examGuide);
             return nextState;
         case SOME_HOME_ONE:
         case SOME_HOME_TWO:

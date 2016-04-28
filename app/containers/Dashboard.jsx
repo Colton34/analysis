@@ -23,6 +23,8 @@ import ExamGuideComponent from '../components/dashboard/exam-guide';
 
 import {initExamGuide} from '../reducers/dashboard/actions';
 
+import {Map} from 'immutable';
+
 // 　Bgcolor:″＃F1FAFA″——做正文的背景色好，淡雅
 // 　　Bgcolor:″＃E8FFE8″——做标题的背景色较好，与上面的颜色搭配很协调
 // 　　Bgcolor:″＃E8E8FF″——做正文的背景色较好，文字颜色配黑色
@@ -50,9 +52,19 @@ import {initExamGuide} from '../reducers/dashboard/actions';
 
 @Radium
 class Dashboard extends React.Component {
-    // static need = [
-    //     initExamGuide
-    // ];
+    static need = [
+        function() {
+            return {
+                type: 'INIT_GLOBAL_GUIDE',
+                promise: Promise.resolve({
+                    subjectCount: 3,
+                    totoalProblemCount: 20,
+                    classCount: 4,
+                    totoalStudentCount: 40
+                })
+            }
+        }
+    ];
 
     constructor(props) {
       super(props);
@@ -60,6 +72,10 @@ class Dashboard extends React.Component {
     }
 
     render() {
+
+console.log('=========================== examGuide == ', this.props.dashboard.examGuide.subjectCount);
+
+
         var containers = _.map(_.range(4), function(index) {
             return (null);
         });
