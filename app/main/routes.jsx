@@ -3,9 +3,9 @@ import { Route, IndexRoute } from 'react-router';
 
 //TODO：各种需要的router page
 import App from '../containers/App';
-import Home from '../containers/Home';
+import Dashboard from '../containers/Dashboard';
 
-import Test from '../containers/Test'
+// import Test from '../containers/Test'
 
 /*
 当Route内嵌的时候，使用相对path则会继承上一级的路由path，如果使用绝对path（即前面加上"/"），则不会继承上一级的path
@@ -13,8 +13,7 @@ import Test from '../containers/Test'
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Home} />
-            <Route path="/test" component={Test} />
+            <IndexRoute component={Dashboard} />
         </Route>
     );
 };

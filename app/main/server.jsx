@@ -28,7 +28,6 @@ function renderFullPage(renderedContent, initialState, head={
     meta: '<meta name="viewport" content="width=device-width, initial-scale=1" />',
     link: '<link rel="stylesheet" href="/assets/styles/main.css"/>'
 }) {
-    console.log('name ================== ', initialState.app.user.name);
     return `
         <!doctype html>
         <html lang="">
@@ -72,7 +71,6 @@ export default function render(req, res) {
                     </RadiumWrapper>
                 </Provider>
             );
-
             fetchComponentDataBeforeRender(store.dispatch, renderProps.components, renderProps.params)
             .then(() => {
                 const componentHTML = renderToString(InitialView);
@@ -84,6 +82,9 @@ export default function render(req, res) {
                 }));
             })
             .catch(() => {
+
+console.log('+++++++++++++++++++++++++  Cache Error ');
+
                 res.end(renderFullPage('', {}));
             });
         } else {

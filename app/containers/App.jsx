@@ -13,8 +13,6 @@ import Footer from '../common/Footer';
 
 import {initUser} from '../reducers/global-app/action';
 
-import {getData} from '../api/user';
-
 
 import Radium from 'radium';
 
@@ -31,6 +29,9 @@ class App extends React.Component {
     }
 
     render() {
+
+console.log('user = ', this.props.user);
+
         // var chart = new Highcharts.Chart({
         //     chart: {
         //         renderTo:

@@ -2,17 +2,19 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:16:06
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-15 16:01:36
+* @Last Modified time: 2016-04-27 21:51:24
 */
 
 'use strict';
 
-import InitialState from '../../states/home-state';
+import _ from 'lodash';
+
+import InitialState from '../../states/dashboard-state';
 
 var initialState = new InitialState;
 
 import {
-    INIT_HOME_SUCCESS,
+    INIT_GLOBAL_GUIDE_SUCCESS,
     SOME_HOME_ONE,
     SOME_HOME_TWO,
     SOME_HOME_THREE
@@ -20,11 +22,14 @@ import {
 
 
 export default function reducer(state, action) {
+    if(_.isUndefined(state)) return initialState;
     if(!(state instanceof InitialState)) return initialState.merge(state);
 
     switch(action.type) {
-        case INIT_HOME_SUCCESS:
-            return state.merge(action.payload.data);
+        case INIT_GLOBAL_GUIDE_SUCCESS:
+            var nextState = state.set('examGuide', action.res);
+            console.log('examGuide  nextState = ', nextState.examGuide);
+            return nextState;
         case SOME_HOME_ONE:
         case SOME_HOME_TWO:
         case SOME_HOME_THREE:

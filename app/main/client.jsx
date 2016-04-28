@@ -10,7 +10,7 @@ import configureStore from './store';
 
 const initialState = window.__INITIAL_STATE__;
 
-console.log('initialState : ', initialState.app.user.name);
+console.log('initialState : ', initialState);
 
 const store = configureStore(initialState, browserHistory);
 const history = syncHistoryWithStore(browserHistory, store);
