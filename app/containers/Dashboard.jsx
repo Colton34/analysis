@@ -53,17 +53,7 @@ import {Map} from 'immutable';
 @Radium
 class Dashboard extends React.Component {
     static need = [
-        function() {
-            return {
-                type: 'INIT_GLOBAL_GUIDE',
-                promise: Promise.resolve({
-                    subjectCount: 3,
-                    totoalProblemCount: 20,
-                    classCount: 4,
-                    totoalStudentCount: 40
-                })
-            }
-        }
+        initExamGuide
     ];
 
     constructor(props) {
@@ -78,6 +68,9 @@ class Dashboard extends React.Component {
 
         var data = JSON.stringify(this.props.dashboard.examGuide);
         var jsdata = JSON.parse(data);
+
+console.log('examGuide = ', data);
+
 
         return (
             <div style={[styles.box, styles.common.radius]}>

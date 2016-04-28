@@ -23,25 +23,9 @@ class GlobalGuideCom extends React.Component {
     //支持客户端路由异步获取数据
     componentDidMount() {
         // INIT_GLOBAL_GUIDE  -- 客户端路由过来怎么获取数据，此生命周期方法是否是在server render是没有的
-        // console.log('componentDidMount');
+        console.log('componentDidMount');
         // initExamGuide();
     }
-
-/*
-
-                    <div  style={{marginBottom: 30}}>
-                        <div>
-                            <div>{this.props.data.classCount}</div>
-                            <div>考试班级数</div>
-                        </div>
-                        <div>
-                            <div>{this.props.data.totoalStudentCount}</div>
-                            <div>考试学生数</div>
-                        </div>
-                    </div>
-
- */
-
 
     render() {
         return (
@@ -60,11 +44,11 @@ class GlobalGuideCom extends React.Component {
                     <div style={{clear: 'both'}}></div>
                     <div  style={{marginTop:30, marginBottom: 30}}>
                         <div style={{float: 'left', marginLeft: 40}}>
-                            <div style={{marginBottom: 20}}>{this.props.data.subjectCount}</div>
+                            <div style={{marginBottom: 20}}>{this.props.data.classCount}</div>
                             <div>考试班级数</div>
                         </div>
                         <div style={{float: 'right', marginRight: 40}}>
-                            <div style={{marginBottom: 20}}>{this.props.data.totoalProblemCount}</div>
+                            <div style={{marginBottom: 20}}>{this.props.data.totoalStudentCount}</div>
                             <div>考试学生数</div>
                         </div>
                     </div>
