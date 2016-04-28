@@ -6,55 +6,47 @@ import Radium from 'radium';
 
 import {initExamGuide} from '../../reducers/dashboard/actions';
 
-//从设计上考虑，Component都应该尽量是pure statless component
-@Radium
-class GlobalGuideCom extends React.Component {
-    // static propTypes = {
-    //     subjectCount: PropTypes.number.isRequired,
-    //     totoalProblemCount: PropTypes.number.isRequired,
-    //     classCount: PropTypes.number.isRequired,
-    //     totoalProblemCount: PropTypes.number.isRequired
-    // };
 
-    render() {
-        return (
-                <div style={[styles.item, styles.common.radius]}>
-                    <div style={{fontWeight: 'blod', marginTop: 10}}>考试总览</div>
-                    <div  style={{marginTop: 30, marginBottom: 30}}>
-                        <div style={{float: 'left', marginLeft: 40}}>
-                            <div style={{marginBottom: 20}}>{this.props.data.subjectCount}</div>
-                            <div>考试学科数</div>
-                        </div>
-                        <div style={{float: 'right', marginRight: 40}}>
-                            <div style={{marginBottom: 20}}>{this.props.data.totoalProblemCount}</div>
-                            <div>考试总题数</div>
-                        </div>
-                    </div>
-                    <div style={{clear: 'both'}}></div>
-                    <div  style={{marginTop:30, marginBottom: 30}}>
-                        <div style={{float: 'left', marginLeft: 40}}>
-                            <div style={{marginBottom: 20}}>{this.props.data.classCount}</div>
-                            <div>考试班级数</div>
-                        </div>
-                        <div style={{float: 'right', marginRight: 40}}>
-                            <div style={{marginBottom: 20}}>{this.props.data.totoalStudentCount}</div>
-                            <div>考试学生数</div>
-                        </div>
-                    </div>
+const GlobalGuideCom = ({data}) => {
+    return (
+        <div style={[styles.item, styles.common.radius]}>
+            <div style={{fontWeight: 'blod', marginTop: 10}}>考试总览</div>
+            <div  style={{marginTop: 30, marginBottom: 30}}>
+                <div style={{float: 'left', marginLeft: 40}}>
+                    <div style={{marginBottom: 20}}>{data.subjectCount}</div>
+                    <div>考试学科数</div>
                 </div>
-        );
-    }
+                <div style={{float: 'right', marginRight: 40}}>
+                    <div style={{marginBottom: 20}}>{data.totoalProblemCount}</div>
+                    <div>考试总题数</div>
+                </div>
+            </div>
+            <div style={{clear: 'both'}}></div>
+            <div  style={{marginTop:30, marginBottom: 30}}>
+                <div style={{float: 'left', marginLeft: 40}}>
+                    <div style={{marginBottom: 20}}>{data.classCount}</div>
+                    <div>考试班级数</div>
+                </div>
+                <div style={{float: 'right', marginRight: 40}}>
+                    <div style={{marginBottom: 20}}>{data.totoalStudentCount}</div>
+                    <div>考试学生数</div>
+                </div>
+            </div>
+        </div>
+    )
 }
 
-var styles = {
+GlobalGuideCom.propTypes = {
+    data: PropTypes.object.isRequired
+};
+
+export default Radium(GlobalGuideCom);
+
+const styles = {
     common: {
         radius: {
             borderRadius: 15
         }
     },
     item: {height: 260, backgroundColor: '#336699', flexGrow: 1, textAlign: 'center', color: '#ffffff', borderRadius: 15}
-}
-
-//display: 'flex', alignItems: 'center'
-
-export default GlobalGuideCom;
+};

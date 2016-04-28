@@ -1,6 +1,8 @@
 import React from 'react';
 import {Link} from 'react-router';
 
+import Radium from 'radium';
+
 const ReactHighcharts = require('react-highcharts');
 
 const config = {
