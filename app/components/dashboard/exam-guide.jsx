@@ -16,17 +16,6 @@ class GlobalGuideCom extends React.Component {
     //     totoalProblemCount: PropTypes.number.isRequired
     // };
 
-    constructor(props) {
-        super(props);
-    }
-
-    //支持客户端路由异步获取数据
-    componentDidMount() {
-        // INIT_GLOBAL_GUIDE  -- 客户端路由过来怎么获取数据，此生命周期方法是否是在server render是没有的
-        console.log('componentDidMount');
-        // initExamGuide();
-    }
-
     render() {
         return (
                 <div style={[styles.item, styles.common.radius]}>

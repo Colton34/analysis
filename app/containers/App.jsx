@@ -29,11 +29,6 @@ class App extends React.Component {
     }
 
     render() {
-        // var chart = new Highcharts.Chart({
-        //     chart: {
-        //         renderTo:
-        //     }
-        // })
         return (
             <div>
                 {this.props.children}

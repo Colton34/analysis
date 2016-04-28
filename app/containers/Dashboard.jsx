@@ -21,7 +21,7 @@ import _ from 'lodash';
 
 import ExamGuideComponent from '../components/dashboard/exam-guide';
 
-import {initExamGuide} from '../reducers/dashboard/actions';
+import {initExamGuide, hi} from '../reducers/dashboard/actions';
 
 import {Map} from 'immutable';
 
@@ -61,6 +61,11 @@ class Dashboard extends React.Component {
 
     }
 
+    componentDidMount() {
+        console.log('componentDidMount');
+        this.props.initExamGuide();
+    }
+
     render() {
         var containers = _.map(_.range(4), function(index) {
             return (null);
@@ -68,9 +73,6 @@ class Dashboard extends React.Component {
 
         var data = JSON.stringify(this.props.dashboard.examGuide);
         var jsdata = JSON.parse(data);
-
-console.log('examGuide = ', data);
-
 
         return (
             <div style={[styles.box, styles.common.radius]}>
@@ -121,12 +123,18 @@ console.log('examGuide = ', data);
     }
 }
 
-export default connect(mapStateToProps)(Dashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
 
 
 function mapStateToProps(state) {
     return {
         dashboard: state.dashboard
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        initExamGuide: bindActionCreators(initExamGuide, dispatch)
     }
 }
 
