@@ -82,10 +82,7 @@ export default function render(req, res) {
                 }));
             })
             .catch((err) => {
-
-console.log('+++++++++++++++++++++++++  Cache Error ');
-console.log('Error = ', err);
-
+                console.log('Cache Server Render Error ', err);
                 res.end(renderFullPage('', {}));
             });
         } else {

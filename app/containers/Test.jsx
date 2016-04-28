@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from 'react-router';
 
 const ReactHighcharts = require('react-highcharts');
 
@@ -34,7 +35,10 @@ class Test extends React.Component {
 
     render() {
         return (
-            <ReactHighcharts config={config}></ReactHighcharts>
+            <div>
+                <Link to="/dashboard">看板</Link>
+                <ReactHighcharts config={config}></ReactHighcharts>
+            </div>
         );
     }
 }

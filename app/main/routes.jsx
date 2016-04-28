@@ -5,7 +5,7 @@ import { Route, IndexRoute } from 'react-router';
 import App from '../containers/App';
 import Dashboard from '../containers/Dashboard';
 
-// import Test from '../containers/Test'
+import Test from '../containers/Test'
 
 /*
 当Route内嵌的时候，使用相对path则会继承上一级的路由path，如果使用绝对path（即前面加上"/"），则不会继承上一级的path
@@ -13,7 +13,8 @@ import Dashboard from '../containers/Dashboard';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Dashboard} />
+            <IndexRoute component={Test} />
+            <Route path='dashboard' component={Dashboard} />
         </Route>
     );
 };

@@ -27,36 +27,48 @@ class GlobalGuideCom extends React.Component {
         // initExamGuide();
     }
 
+/*
+
+                    <div  style={{marginBottom: 30}}>
+                        <div>
+                            <div>{this.props.data.classCount}</div>
+                            <div>考试班级数</div>
+                        </div>
+                        <div>
+                            <div>{this.props.data.totoalStudentCount}</div>
+                            <div>考试学生数</div>
+                        </div>
+                    </div>
+
+ */
+
+
     render() {
         return (
                 <div style={[styles.item, styles.common.radius]}>
                     <div style={{fontWeight: 'blod', marginTop: 10}}>考试总览</div>
-                    <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}>
-                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                            <div>
-                                <div>{this.props.data.subjectCount}</div>
-                                <div>考试学科数</div>
-                            </div>
-                            <div>
-                                <div>{this.props.data.totoalProblemCount}</div>
-                                <div>考试总题数</div>
-                            </div>
+                    <div  style={{marginTop: 30, marginBottom: 30}}>
+                        <div style={{float: 'left', marginLeft: 40}}>
+                            <div style={{marginBottom: 20}}>{this.props.data.subjectCount}</div>
+                            <div>考试学科数</div>
                         </div>
-                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                            <div>
-                                <div>{this.props.data.classCount}</div>
-                                <div>考试班级数</div>
-                            </div>
-                            <div>
-                                <div>{this.props.data.totoalStudentCount}</div>
-                                <div>考试学生数</div>
-                            </div>
+                        <div style={{float: 'right', marginRight: 40}}>
+                            <div style={{marginBottom: 20}}>{this.props.data.totoalProblemCount}</div>
+                            <div>考试总题数</div>
+                        </div>
+                    </div>
+                    <div style={{clear: 'both'}}></div>
+                    <div  style={{marginTop:30, marginBottom: 30}}>
+                        <div style={{float: 'left', marginLeft: 40}}>
+                            <div style={{marginBottom: 20}}>{this.props.data.subjectCount}</div>
+                            <div>考试班级数</div>
+                        </div>
+                        <div style={{float: 'right', marginRight: 40}}>
+                            <div style={{marginBottom: 20}}>{this.props.data.totoalProblemCount}</div>
+                            <div>考试学生数</div>
                         </div>
                     </div>
                 </div>
-
-
-
         );
     }
 }
@@ -69,5 +81,7 @@ var styles = {
     },
     item: {height: 260, backgroundColor: '#336699', flexGrow: 1, textAlign: 'center', color: '#ffffff', borderRadius: 15}
 }
+
+//display: 'flex', alignItems: 'center'
 
 export default GlobalGuideCom;
