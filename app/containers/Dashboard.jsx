@@ -72,20 +72,12 @@ class Dashboard extends React.Component {
     }
 
     render() {
-
         var containers = _.map(_.range(4), function(index) {
             return (null);
         });
-        // var data = {
-        //     subjectCount: 3,
-        //     totoalProblemCount: 20,
-        //     classCount: 4,
-        //     totoalStudentCount: 34
-        // };
 
         var data = JSON.stringify(this.props.dashboard.examGuide);
         var jsdata = JSON.parse(data);
-console.log('=========================== examGuide == ', JSON.parse(data).subjectCount);
 
         return (
             <div style={[styles.box, styles.common.radius]}>

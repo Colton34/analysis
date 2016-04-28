@@ -7,6 +7,7 @@ import Radium from 'radium';
 import {initExamGuide} from '../../reducers/dashboard/actions';
 
 //从设计上考虑，Component都应该尽量是pure statless component
+@Radium
 class GlobalGuideCom extends React.Component {
     // static propTypes = {
     //     subjectCount: PropTypes.number.isRequired,
@@ -27,10 +28,6 @@ class GlobalGuideCom extends React.Component {
     }
 
     render() {
-
-console.log('data = ', this.props.data);
-
-
         return (
                 <div style={[styles.item, styles.common.radius]}>
                     <div style={{fontWeight: 'blod', marginTop: 10}}>考试总览</div>
