@@ -6,6 +6,9 @@ import Radium from 'radium';
 import ReactHighcharts from 'react-highcharts';
 
 const SubjectReport = (data) => {
+
+console.log('subjectReport = ', data.data);
+
     const config = {
         chart: {
             polar: true,

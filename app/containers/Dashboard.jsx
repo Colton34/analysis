@@ -22,6 +22,8 @@ import {initExamGuide, initScoreRank, initClassReport, initLevelReport, initSubj
 
 import {Map} from 'immutable';
 
+import {convertJS} from '../lib/util';
+
 // 　Bgcolor:″＃F1FAFA″——做正文的背景色好，淡雅
 // 　　Bgcolor:″＃E8FFE8″——做标题的背景色较好，与上面的颜色搭配很协调
 // 　　Bgcolor:″＃E8E8FF″——做正文的背景色较好，文字颜色配黑色
@@ -50,7 +52,11 @@ import {Map} from 'immutable';
 @Radium
 class Dashboard extends React.Component {
     static need = [
-        initExamGuide
+        initExamGuide,
+        initScoreRank,
+        initClassReport,
+        initLevelReport,
+        initSubjectReport
     ];
 
     constructor(props) {
@@ -67,22 +73,25 @@ class Dashboard extends React.Component {
             return (null);
         });
 
-        var data = JSON.stringify(this.props.dashboard.examGuide);
-        var jsdata = JSON.parse(data);
+        var examGuide = convertJS(this.props.dashboard.examGuide);
+        var scoreRank = convertJS(this.props.dashboard.scoreRank);
+        var classReport = convertJS(this.props.dashboard.classReport);
+        var levelReport = convertJS(this.props.dashboard.levelReport);
+        var subjectReport = convertJS(this.props.dashboard.subjectReport);
 
         return (
             <div style={[styles.box, styles.common.radius]}>
                 <div style={[styles.container, styles.common.radius]}>
-                    <ExamGuideComponent data={jsdata}/>
-                    <ScoreRank />
+                    <ExamGuideComponent data={examGuide} />
+                    <ScoreRank data={scoreRank} />
                     <div key="test" style={[styles.item, styles.common.radius]}>
                         <div style={{fontWeight: 'blod', marginTop: 10}}>学校成绩总报告</div>
                     </div>
                 </div>
                 <div style={[styles.container, styles.common.radius]}>
-                    <LevelReport />
-                    <ClassReport />
-                    <SubjectReport />
+                    <LevelReport data={levelReport} />
+                    <ClassReport data={classReport} />
+                    <SubjectReport data={subjectReport} />
                 </div>
                 <div style={[styles.container, styles.common.radius]}>
                     <div style={[styles.item, styles.common.radius]}>

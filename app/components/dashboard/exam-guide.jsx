@@ -8,6 +8,9 @@ import {initExamGuide} from '../../reducers/dashboard/actions';
 
 
 const GlobalGuideCom = ({data}) => {
+
+console.log('examGuide = ', data);
+
     return (
         <div style={[styles.item, styles.common.radius]}>
             <div style={{fontWeight: 'blod', marginTop: 10}}>考试总览</div>

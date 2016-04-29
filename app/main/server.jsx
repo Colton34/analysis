@@ -24,7 +24,7 @@ var RadiumWrapper = require('./radium-wrapper');
 
 
 function renderFullPage(renderedContent, initialState, head={
-    title: 'React Webpack Node',
+    title: '云校分析',
     meta: '<meta name="viewport" content="width=device-width, initial-scale=1" />',
     link: '<link rel="stylesheet" href="/assets/styles/main.css"/>'
 }) {

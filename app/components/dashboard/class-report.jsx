@@ -6,6 +6,9 @@ import Radium from 'radium';
 import ReactHighcharts from 'react-highcharts';
 
 const ClassReport = (data) => {
+
+console.log('classReport = ', data.data);
+
     var config = {
         chart: {
             type: 'column'

@@ -4,9 +4,16 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import ReactHighcharts from 'react-highcharts';
-
+import _ from 'lodash';
 
 const LevelReport = (data) => {
+
+    const leveFlag = ['一档', '二挡', '三挡'];
+console.log('levelReport = ', data.data);
+    var categories = _.map(data.data.levels, function(value, index) {
+        return ''.concat(leveFlag[index]).concat(' ').concat(value[0]).concat('<br />').concat(' 大于').concat(value[1]).concat('分');
+    });
+
     const config = {
         chart: {
             type: 'bar'
@@ -15,8 +22,8 @@ const LevelReport = (data) => {
             text: '分档报告'
         },
         xAxis: {
-            categories: ['一档 15%<br /> 大于600分', '二挡 20%<br /> 大于520分','三挡 25%<br /> 大于480分'], //这个字符串可以在这里进行拼接，res.data中只提供raw number，比如15%和
-                                                                                                                // 600 等
+            //['一档 15%<br /> 大于600分', '二挡 20%<br /> 大于520分','三挡 25%<br /> 大于480分']
+            categories: categories, //这个字符串可以在这里进行拼接，res.data中只提供raw number，比如15%和600 等
             title: {
                 text: null
             }

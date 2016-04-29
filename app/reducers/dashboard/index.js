@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:16:06
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-29 14:48:06
+* @Last Modified time: 2016-04-29 15:08:10
 */
 
 'use strict';
@@ -40,7 +40,7 @@ export default function reducer(state, action) {
         case INIT_LEVEL_REPORT_SUCCESS:
             return state.set('levelReport', action.res);
         case INIT_SUBJECT_REPORT_SUCCESS:
-            return state.set('subjectReport', actions.res);
+            return state.set('subjectReport', action.res);
         case SOME_HOME_ONE:
         case SOME_HOME_TWO:
         case SOME_HOME_THREE:

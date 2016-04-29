@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:09:30
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-29 14:40:03
+* @Last Modified time: 2016-04-29 15:07:35
 */
 
 'use strict';
@@ -20,7 +20,7 @@ var InitialState = Record({
         totoalStudentCount: 0
     })(),
     scoreRank: {},
-    classReport: Map(),
+    classReport: {},
     levelReport: {},
     subjectReport: {}
 });

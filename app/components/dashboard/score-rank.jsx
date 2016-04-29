@@ -5,33 +5,18 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 import _ from 'lodash';
 
-var mdata = {
-        top: {
-            '魏旭': 688,
-            '肖赫': 670,
-            '朱倩': 666,
-            '徐鹏': 660,
-            '陈宇': 658,
-            '董琛': 656
-        },
-        low: {
-            '王然': 0,
-            '刘涛': 6,
-            '景甜': 8,
-            '范冰冰': 10,
-            '杨颖': 20,
-            '王艳': 26
-        }
-    };
 
 const ScoreRank = (data) => {
+
+// console.log('scoreRank = ', data.data.top);
+
     var flag = 0;
 
     var flagFirstColor = {backgroundColor: '#FF0033'};
     var flagSecondColor = {backgroundColor: '#FF9900'};
     var flagThirdColor = {backgroundColor: '#99CC00'};
 
-    var tops = _.map(mdata.top, function(score, name) {
+    var tops = _.map(data.data.top, function(score, name) {
         flag++;
 
         var flagColor = {};
@@ -40,7 +25,6 @@ const ScoreRank = (data) => {
         if(flag === 3) {flagColor.third = true};
 
         var result = ((flagColor.first && flagFirstColor) || (flagColor.second && flagSecondColor) || (flagColor.third && flagThirdColor));
-
 
         return (
             <div key={flag} style={[styles.container, result, styles.common.radius, {marginBottom: 2}]}>
@@ -51,7 +35,7 @@ const ScoreRank = (data) => {
     });
     flag = 0;
 
-    var lows = _.map(mdata.low, function(score, name) {
+    var lows = _.map(data.data.low, function(score, name) {
         flag++;
         return (
             <div key={flag} style={[styles.container, styles.common.radius, {marginBottom: 2}]}>
