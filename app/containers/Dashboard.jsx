@@ -14,6 +14,7 @@ import _ from 'lodash';
 
 import ExamGuideComponent from '../components/dashboard/exam-guide';
 import ScoreRank from '../components/dashboard/score-rank';
+import LevelReport from '../components/dashboard/level-report';
 
 import {initExamGuide} from '../reducers/dashboard/actions';
 
@@ -77,9 +78,7 @@ class Dashboard extends React.Component {
                     </div>
                 </div>
                 <div style={[styles.container, styles.common.radius]}>
-                    <div style={[styles.item, styles.common.radius]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>分档分析报告</div>
-                    </div>
+                    <LevelReport />
                     <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}]}>
                         <div style={{fontWeight: 'blod', marginTop: 10}}>班级分析报告</div>
                     </div>
