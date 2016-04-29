@@ -3,13 +3,14 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
+import _ from 'lodash';
 
 import {initExamGuide} from '../../reducers/dashboard/actions';
 
 
 const GlobalGuideCom = ({data}) => {
-
-console.log('examGuide = ', data);
+//     if(!data || !data.data || (_.size(_.keys(data))==0)) return (<div></div>);
+// console.log('examGuide = ', data);
 
     return (
         <div style={[styles.item, styles.common.radius]}>

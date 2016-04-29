@@ -4,9 +4,11 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import ReactHighcharts from 'react-highcharts';
+import _ from 'lodash';
 
 const SubjectReport = (data) => {
 
+    if(!data || !data.data || (_.size(_.keys(data))==0)) return (<div></div>);
 console.log('subjectReport = ', data.data);
 
     const config = {

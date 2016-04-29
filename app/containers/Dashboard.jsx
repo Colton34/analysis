@@ -19,6 +19,13 @@ import ClassReport from '../components/dashboard/class-report';
 import SubjectReport from '../components/dashboard/subject-report';
 
 import {initExamGuide, initScoreRank, initClassReport, initLevelReport, initSubjectReport} from '../reducers/dashboard/actions';
+var actionCreators = [
+    initExamGuide,
+    initScoreRank,
+    initClassReport,
+    initLevelReport,
+    initSubjectReport
+];
 
 import {Map} from 'immutable';
 
@@ -51,13 +58,7 @@ import {convertJS} from '../lib/util';
 
 @Radium
 class Dashboard extends React.Component {
-    static need = [
-        initExamGuide,
-        initScoreRank,
-        initClassReport,
-        initLevelReport,
-        initSubjectReport
-    ];
+    static need = actionCreators;
 
     constructor(props) {
       super(props);
@@ -65,7 +66,9 @@ class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-        this.props.initExamGuide();
+        _.each(this.props.actions, function(fn) {
+            fn();
+        });
     }
 
     render() {
@@ -131,7 +134,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        initExamGuide: bindActionCreators(initExamGuide, dispatch)
+        actions: bindActionCreators(actionCreators, dispatch)
     }
 }
 
