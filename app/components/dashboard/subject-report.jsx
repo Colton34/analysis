@@ -37,7 +37,10 @@ const config = {
         name: '科目',
         data: [43000, 19000, 60000, 35000, 17000, 10000],
         pointPlacement: 'on'
-    }]
+    }],
+    credits: {
+        enabled: false
+    }
 
 };
 

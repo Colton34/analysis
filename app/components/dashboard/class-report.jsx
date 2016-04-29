@@ -41,7 +41,10 @@ const config = {
         name: '班级',
         data: [330, 320, 310, 223, 286]
 
-    }]
+    }],
+    credits: {
+        enabled: false
+    }
 };
 
 const ClassReport = (data) => {

@@ -24,7 +24,10 @@ const config = {
     series: [{
         name: '分数',
         data: [40, 260, 480]
-    }]
+    }],
+    credits: {
+        enabled: false
+    }
 };
 
 const LevelReport = (data) => {
