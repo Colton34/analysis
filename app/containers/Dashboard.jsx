@@ -18,7 +18,7 @@ import LevelReport from '../components/dashboard/level-report';
 import ClassReport from '../components/dashboard/class-report';
 import SubjectReport from '../components/dashboard/subject-report';
 
-import {initExamGuide} from '../reducers/dashboard/actions';
+import {initExamGuide, initScoreRank, initClassReport, initLevelReport, initSubjectReport} from '../reducers/dashboard/actions';
 
 import {Map} from 'immutable';
 

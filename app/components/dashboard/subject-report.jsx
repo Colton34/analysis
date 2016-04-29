@@ -3,45 +3,45 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
-const ReactHighcharts = require('react-highcharts');
-
-const config = {
-    chart: {
-        polar: true,
-        type: 'line'
-    },
-
-    title: {
-        text: 'Budget vs spending',
-        x: -80
-    },
-
-    pane: {
-        size: '80%'
-    },
-
-    xAxis: {
-        categories: ['语文', '数学', '英语', '政治',
-                '历史', '地理'],
-        tickmarkPlacement: 'on',
-        lineWidth: 0
-    },
-
-    yAxis: {
-        gridLineInterpolation: 'polygon',
-        lineWidth: 0,
-        min: 0
-    },
-
-    series: [{
-        name: '科目',
-        data: [43000, 19000, 60000, 35000, 17000, 10000],
-        pointPlacement: 'on'
-    }]
-
-};
+import ReactHighcharts from 'react-highcharts';
 
 const SubjectReport = (data) => {
+    const config = {
+        chart: {
+            polar: true,
+            type: 'line'
+        },
+
+        title: {
+            text: '学科分析报告',
+            x: -80
+        },
+
+        pane: {
+            size: '80%'
+        },
+
+        xAxis: {
+            categories: ['语文', '数学', '英语', '政治',
+                    '历史', '地理'],  // data.subjects
+            tickmarkPlacement: 'on',
+            lineWidth: 0
+        },
+
+        yAxis: {
+            gridLineInterpolation: 'polygon',
+            lineWidth: 0,
+            min: 0
+        },
+
+        series: [{
+            name: '科目',
+            data: [43000, 19000, 60000, 35000, 17000, 10000], // data.weight
+            pointPlacement: 'on'
+        }]
+
+    };
+
     return (
         <div style={[styles.item, styles.common.radius]}>
             <ReactHighcharts config={config}></ReactHighcharts>

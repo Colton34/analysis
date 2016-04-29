@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-28 19:12:46
+* @Last Modified time: 2016-04-29 14:31:58
 */
 
 'use strict';
@@ -40,3 +40,30 @@ export function getMockScoreRank() {
         }
     })
 }
+
+export function getMockClassReport() {
+    return {
+        title: '初一年级',
+        sortedClass: ['3班', '4班', '5班', '1班', '2班'],
+        sortedScore: [330, 320, 310, 223, 286]
+    }
+}
+
+
+export function getMockLevelReport() {
+    return {
+        levels: [['15%', 600], ['20%', 520], ['25%', 480]],
+        levelCountItem: [40, 260, 480]
+    }
+}
+
+export function getMockSubjectReport() {
+    return {
+        subjects: ['语文', '数学', '英语', '政治', '历史', '地理'],
+        weight: [43000, 19000, 60000, 35000, 17000, 10000]
+    }
+}
+
+
+
+
