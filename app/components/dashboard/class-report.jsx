@@ -4,10 +4,11 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import ReactHighcharts from 'react-highcharts';
+import _ from 'lodash';
 
 const ClassReport = (data) => {
+    if(!data || !data.data || (_.size(_.keys(data.data))==0)) return (<div></div>);//所以这也是应该使用Immutable.Record的理由--有默认值就不会有下面的undefined bug
 
-console.log('classReport = ', data.data);
 
     var title = data.data.title.concat('班级分析报告');
     var subtitle = data.data.title.concat('平局分对比Top5');
