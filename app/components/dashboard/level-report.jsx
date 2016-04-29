@@ -14,6 +14,10 @@ console.log('levelReport = ', data.data);
         return ''.concat(leveFlag[index]).concat(' ').concat(value[0]).concat('<br />').concat(' 大于').concat(value[1]).concat('分');
     });
 
+
+console.log('levelCountItem = ', data.data.levelCountItem);
+
+
     const config = {
         chart: {
             type: 'bar'
@@ -33,7 +37,7 @@ console.log('levelReport = ', data.data);
         },
         series: [{
             name: '分数',
-            data: [40, 260, 480]
+            data: data.data.levelCountItem
         }]
     };
 

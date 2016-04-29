@@ -9,24 +9,20 @@ const ClassReport = (data) => {
 
 console.log('classReport = ', data.data);
 
+    var title = data.data.title.concat('班级分析报告');
+    var subtitle = data.data.title.concat('平局分对比Top5');
     var config = {
         chart: {
             type: 'column'
         },
         title: {
-            text: '班级分析报告' // data.title
+            text: title
         },
         subtitle: {
-            text: '初一年级平局分对比Top5'
+            text: subtitle
         },
         xAxis: {
-            categories: [ // data.sortedClass
-                '3班',
-                '4班',
-                '5班',
-                '1班',
-                '2班'
-            ],
+            categories: data.data.sortedClass,
             crosshair: true
         },
         yAxis: {
@@ -43,7 +39,7 @@ console.log('classReport = ', data.data);
         },
         series: [{
             name: '班级',
-            data: [330, 320, 310, 223, 286]  // data.sortedScore
+            data: data.data.sortedScore
 
         }]
     };

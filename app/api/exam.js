@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-29 14:59:52
+* @Last Modified time: 2016-04-29 16:14:33
 */
 
 'use strict';
@@ -41,6 +41,13 @@ export function getMockScoreRank() {
     });
 }
 
+export function getMockLevelReport() {
+    return Promise.resolve({
+        levels: [['15%', 600], ['20%', 520], ['25%', 480]],
+        levelCountItem: [40, 260, 480]
+    });
+}
+
 export function getMockClassReport() {
     return Promise.resolve({
         title: '初一年级',
@@ -49,13 +56,6 @@ export function getMockClassReport() {
     });
 }
 
-
-export function getMockLevelReport() {
-    return Promise.resolve({
-        levels: [['15%', 600], ['20%', 520], ['25%', 480]],
-        levelCountItem: [40, 260, 480]
-    });
-}
 
 export function getMockSubjectReport() {
     return Promise.resolve({

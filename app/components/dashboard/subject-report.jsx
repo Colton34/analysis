@@ -25,8 +25,7 @@ console.log('subjectReport = ', data.data);
         },
 
         xAxis: {
-            categories: ['语文', '数学', '英语', '政治',
-                    '历史', '地理'],  // data.subjects
+            categories: data.data.subjects,
             tickmarkPlacement: 'on',
             lineWidth: 0
         },
@@ -39,7 +38,7 @@ console.log('subjectReport = ', data.data);
 
         series: [{
             name: '科目',
-            data: [43000, 19000, 60000, 35000, 17000, 10000], // data.weight
+            data: data.data.weight,
             pointPlacement: 'on'
         }]
 
