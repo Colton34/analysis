@@ -46,8 +46,8 @@ const config = {
 
 const ClassReport = (data) => {
     return (
-        <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}]}>
-            <ReactHighcharts config={config}></ReactHighcharts>
+        <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}, {display: 'flex', padding: 10}]}>
+            <ReactHighcharts config={config} style={{margin: '0 auto'}}></ReactHighcharts>
         </div>
     )
 }

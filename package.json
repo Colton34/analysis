@@ -61,6 +61,7 @@
     "babel-preset-react": "6.5.0",
     "babel-preset-react-hmre": "1.1.1",
     "babel-preset-stage-0": "6.5.0",
+    "babel-runtime": "^6.6.1",
     "bcrypt-nodejs": "0.0.3",
     "bcryptjs": "2.3.0",
     "body-parser": "1.15.0",
@@ -112,7 +113,6 @@
     "passport": "0.3.2",
     "passport-google-oauth": "1.0.0",
     "passport-local": "1.0.0",
-    "peter": "git+ssh://git@code.iyunxiao.com:commonsgroup/peter.git#new",
     "postcss-import": "8.1.0",
     "postcss-loader": "0.8.2",
     "postcss-mixins": "4.0.1",
@@ -145,6 +145,7 @@
     "webpack": "1.12.14",
     "webpack-dev-middleware": "1.6.1",
     "webpack-hot-middleware": "2.10.0",
-    "when": "3.7.7"
+    "when": "3.7.7",
+    "peter": "git+ssh://git@code.iyunxiao.com:commonsgroup/peter.git#new"
   }
 }

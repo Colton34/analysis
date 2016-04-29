@@ -29,8 +29,8 @@ const config = {
 
 const LevelReport = (data) => {
     return (
-        <div style={[styles.item, styles.common.radius]}>
-            <ReactHighcharts config={config}></ReactHighcharts>
+        <div style={[styles.item, styles.common.radius].concat({display: 'flex', padding: 10})}>
+            <ReactHighcharts config={config} style={{margin: '0 auto'}}></ReactHighcharts>
         </div>
     )
 }

@@ -43,8 +43,8 @@ const config = {
 
 const SubjectReport = (data) => {
     return (
-        <div style={[styles.item, styles.common.radius]}>
-            <ReactHighcharts config={config}></ReactHighcharts>
+        <div style={[styles.item, styles.common.radius, {display: 'flex', padding: 10}]}>
+            <ReactHighcharts config={config} style={{margin: '0 auto'}}></ReactHighcharts>
         </div>
     )
 }
@@ -57,6 +57,6 @@ const styles = {
             borderRadius: 15
         }
     },
-    item: {height: 320, backgroundColor: '#336699', flexGrow: 1, textAlign: 'center', color: '#ffffff', borderRadius: 15, overflow: 'hidder'}
+    item: {height: 320, backgroundColor: '#336699', flexGrow: 1, textAlign: 'center', color: '#ffffff', borderRadius: 15, overflow: 'hidden'}
 };
 
