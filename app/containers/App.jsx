@@ -1,3 +1,9 @@
+// 　　Bgcolor:″＃6699CC″——配白色文字好看些，可以做标题
+// 　　Bgcolor:″＃66CCCC″——配白色文字好看些，可以做标题
+// 　　Bgcolor:″＃B45B3E″——配白色文字好看些，可以做标题
+// 　　Bgcolor:″＃479AC7″——配白色文字好看些，可以做标题
+// 　　Bgcolor:″＃00B271″——配白色文字好看些，可以做标题
+
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';

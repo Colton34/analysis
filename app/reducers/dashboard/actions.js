@@ -2,18 +2,19 @@
 * @Author: HellMagic
 * @Date:   2016-04-09 22:26:48
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-28 16:11:29
+* @Last Modified time: 2016-04-28 19:14:32
 */
 
 'use strict';
 
-import {
-    INIT_GLOBAL_GUIDE
-} from '../../lib/constants';
 
 import Immutable from 'immutable';
 
 import {getMockExamGuide} from '../../api/exam';
+import {
+    INIT_GLOBAL_GUIDE,
+    INIT_SCORE_RANK
+} from '../../lib/constants';
 
 export function initExamGuide() {
     return {
@@ -22,10 +23,9 @@ export function initExamGuide() {
     }
 }
 
-
-export function hi() {
+export function initScoreRank() {
     return {
-        type: 'hi',
-        data: 'gooooo'
+        type: INIT_SCORE_RANK,
+        promise:getMockScoreRank()
     }
 }

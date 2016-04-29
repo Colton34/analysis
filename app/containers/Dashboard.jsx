@@ -1,10 +1,3 @@
-/*
-* @Author: HellMagic
-* @Date:   2016-04-09 22:19:16
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-09 22:19:41
-*/
-
 'use strict';
 //路由container view，用来组织state object tree, 并connect redux and react
 
@@ -20,8 +13,9 @@ import Radium from 'radium';
 import _ from 'lodash';
 
 import ExamGuideComponent from '../components/dashboard/exam-guide';
+import ScoreRank from '../components/dashboard/score-rank';
 
-import {initExamGuide, hi} from '../reducers/dashboard/actions';
+import {initExamGuide} from '../reducers/dashboard/actions';
 
 import {Map} from 'immutable';
 
@@ -62,7 +56,6 @@ class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-        console.log('componentDidMount');
         this.props.initExamGuide();
     }
 
@@ -78,10 +71,8 @@ class Dashboard extends React.Component {
             <div style={[styles.box, styles.common.radius]}>
                 <div style={[styles.container, styles.common.radius]}>
                     <ExamGuideComponent data={jsdata}/>
-                    <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>分数排行榜</div>
-                    </div>
-                    <div style={[styles.item, styles.common.radius]}>
+                    <ScoreRank />
+                    <div key="test" style={[styles.item, styles.common.radius]}>
                         <div style={{fontWeight: 'blod', marginTop: 10}}>学校成绩总报告</div>
                     </div>
                 </div>
@@ -146,5 +137,17 @@ var styles = {
     },
     box: {height: 1500, backgroundColor: '#f5f5dc', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', margin: 30},
     container: {height: 300, marginLeft: 10, marginRight: 10, display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'nowrap'},
-    item: {height: 260, backgroundColor: '#336699', flexGrow: 1, textAlign: 'center', color: '#ffffff', borderRadius: 15}
+    item: {height: 320, backgroundColor: '#336699', flexGrow: 1, textAlign: 'center', color: '#ffffff', borderRadius: 15},
+    scalZoom: {
+        ':hover': {
+            backgroundColor: 'black'
+        }
+        // transitionProperty: '',
+        // transitionDuration: '',
+        // transitionTimingFunction: ''
+    }
 }
+
+
+// .grow { transition: all .2s ease-in-out; }
+// .grow:hover { transform: scale(1.1); }
