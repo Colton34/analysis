@@ -15,6 +15,9 @@ export default function promiseMiddleware() {
     next({ ...rest, type: REQUEST });
     return promise
       .then(res => {
+
+console.log('promise success type : ', SUCCESS);
+
         next({ ...rest, res, type: SUCCESS });
         return true;
       })
