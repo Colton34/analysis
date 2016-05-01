@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-22 21:10:41
+* @Last Modified time: 2016-05-01 10:54:38
 */
 
 'use strict';
@@ -15,6 +15,8 @@ var unless = require('express-unless');
 var url = require('url');
 var engines = require('consolidate');
 var cookieParser = require('cookie-parser');
+var bodyParser = require("body-parser");
+var expressValidator = require('express-validator');
 
 var config = require("./env");
 var rootPath = path.join(__dirname, '..', '..', 'index.html');
@@ -30,6 +32,9 @@ var compiled_app_module_path = path.resolve(__dirname, '../../', 'public', 'asse
 var App = require(compiled_app_module_path); // var App = require(compiled_app_module_path).default;
 
 var peterMgr = require('../lib/peter').Manager;
+
+
+
 var mongodb = require('mongodb');
 var ObjectId = mongodb.ObjectId;
 
@@ -42,10 +47,6 @@ module.exports = function(app) {
 
 //Init Peter
     var peter = require('../lib/peter');
-
-
-console.log('config.db = ', config.db);
-
     peter.bindDb(config.db, function(error) {
         if(error) {
             debug("Peter connection error");
@@ -60,9 +61,10 @@ console.log('config.db = ', config.db);
     //为了对login的时候使用cookie来存储token
     app.use(cookieParser());
 
-    var bodyParser = require("body-parser");
     app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded());
+    app.use(bodyParser.urlencoded({ extended: true }));
+
+    app.use(expressValidator());
 
     app.use(express.static(path.join(__dirname, '../..', 'public')));
 
@@ -83,6 +85,13 @@ console.log('config.db = ', config.db);
         next();
 
     });
+
+    //把unless的path都提到上面来
+
+    //app.use(auth.verify)
+
+    //下面的都是要受到保护的路由
+
 
     // Bootstrap routes（会添加各个版本不同的路由）
     require('../routes/v1')(app);

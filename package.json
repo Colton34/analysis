@@ -66,6 +66,7 @@
     "bcryptjs": "2.3.0",
     "body-parser": "1.15.0",
     "classnames": "2.2.3",
+    "common-errors": "0.5.3",
     "compression": "1.6.1",
     "connect-mongo": "1.1.0",
     "consolidate": "0.14.0",
@@ -113,6 +114,7 @@
     "passport": "0.3.2",
     "passport-google-oauth": "1.0.0",
     "passport-local": "1.0.0",
+    "peter": "git+ssh://git@code.iyunxiao.com:commonsgroup/peter.git#new",
     "postcss-import": "8.1.0",
     "postcss-loader": "0.8.2",
     "postcss-mixins": "4.0.1",
@@ -134,6 +136,7 @@
     "redux-devtools": "3.2.0",
     "redux-logger": "2.6.1",
     "redux-thunk": "2.0.1",
+    "request": "2.72.0",
     "response-time": "2.3.1",
     "rimraf": "2.5.2",
     "source-map-loader": "0.1.5",
@@ -145,7 +148,6 @@
     "webpack": "1.12.14",
     "webpack-dev-middleware": "1.6.1",
     "webpack-hot-middleware": "2.10.0",
-    "when": "3.7.7",
-    "peter": "git+ssh://git@code.iyunxiao.com:commonsgroup/peter.git#new"
+    "when": "3.7.7"
   }
 }

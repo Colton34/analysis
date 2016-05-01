@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-22 21:01:54
+* @Last Modified time: 2016-05-01 10:42:37
 */
 
 'use strict';
@@ -10,7 +10,8 @@
 var development = {
     db: process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://fx:fx123456@server4.yunxiao.com:8300/hfs-test',  //mongodb://localhost:27017/hfs-test
     "secret": "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
-    "alg": "HS256"
+    "alg": "HS256",
+    rankBaseUrl: 'http://ct.yunxiao.com:8156'
     // redis: { port: 6380, host: 'ct.yunxiao.com', max_attempts : 10, auth_pass: 'yunxiao_redis_@xxx', connect_timeout: 50000 },
 };
 

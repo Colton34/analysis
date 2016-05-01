@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-16 10:51:39
+* @Last Modified time: 2016-05-01 11:08:53
 */
 
 'use strict';
@@ -15,6 +15,7 @@ var jsonwebtoken = require("jsonwebtoken");
 var Router = require("express").Router;
 var murmur = require('murmur');
 var when = require('when');
+var errors = require('common-errors');
 var ObjectId = require('mongodb').ObjectId;
 // var md5 = crypto.createHash('md5');
 
@@ -76,7 +77,7 @@ exports.authenticate = function (req, res, next) {
 };
 
 
-module.exports.verify = function (req, res, next) {
+exports.verify = function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.authorization;
 
     if(!token) return next(new BadRequestError('400', { message: 'no token be passed'}));
@@ -92,10 +93,6 @@ module.exports.verify = function (req, res, next) {
                 if(err) return reject(new DBError('500', {message: 'find user error'}));
                 resolve(user);
             });
-            // peterMgr.get("56850d5d00000ac75857b77a", null, function(err, user) {
-            //     if(err) return reject(new DBError('500', { message: 'find user error' }));
-            //     resolve(user);
-            // });
         });
     }).then(function(user) {
         req.user = user;
@@ -105,5 +102,10 @@ module.exports.verify = function (req, res, next) {
     });
 };
 
+
+exports.validate = function(req, res, next) {
+    if(req.validationErrors()) next(req.validationErrors());
+    next();
+}
 
 
