@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:14:17
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-01 13:00:58
+* @Last Modified time: 2016-05-03 15:21:56
 */
 
 'use strict';
@@ -35,7 +35,8 @@ console.log('examId = ', id+'');
     })
 });
 
-router.get('/guide', exam.guide);
+router.get('/dashboard', exam.validateExam, exam.initExam, exam.guide, exam.level, exam.testLevel, exam.dashboard);
+router.get('/school/analysis', exam.validateExam, exam.initExam, exam.schoolAnalysis);
 
 router.get('/test', exam.test);
 
