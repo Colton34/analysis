@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-01 11:08:53
+* @Last Modified time: 2016-05-04 09:03:08
 */
 
 'use strict';
@@ -10,7 +10,7 @@
 var _ = require("lodash");
 var path = require('path');
 var bcrypt = require('bcryptjs');
-var utils = require("../../lib/util");
+var util = require('util');
 var jsonwebtoken = require("jsonwebtoken");
 var Router = require("express").Router;
 var murmur = require('murmur');
@@ -30,51 +30,36 @@ var DBError = require('../../errors/DBError');
 var config = require('../../config/env');
 var debug = require('debug')('app:routes:default' + process.pid);
 
+var authUitls = require('./util');
 
-exports.authenticate = function (req, res, next) {
-    debug("Processing authenticate middleware");
-    var value = req.body.value;//注意：body里面写value而不再是username
-    var password = req.body.password;//暂时还是明文传递过来，后面进行md5
+exports.authenticate = function(req, res, next) {
+    req.checkBody('value', '无效的value').notEmpty();
+    req.checkBody('password', '无效的password').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
 
-    //TODO:使用express-validator来处理各种验证的需求
-    if (_.isEmpty(value) || _.isEmpty(password)) {
-        return next(new UnauthorizedAccessError("401", {
+    var value = req.body.value.toLowerCase();
+    var password = req.body.password;
+
+    authUitls.getUserInfo(value).then(function(user) {
+        if(user && (!_.eq(user.pwd, password))) return when.reject(new UnauthorizedAccessError("401", {
             message: 'Invalid value or password'
         }));
-    }
-    value = value.toLowerCase();
-
-//1.验证User的usernmae和password是否有效：new UnauthorizedAccessError("401", { message: 'Invalid username or password' })
-    var hash = murmur.hash128(value).hex().substr(0, 24);
-
-    when.promise(function(resolve, reject) {
-        peterMgr.get('@UserIndex.' + hash, function(err, result) {
-            if(err) return reject(new DBError('500', { message: 'get user index error' }));
-            var target = _.find(result['[list]'], function(item) {
-                return value == item.key;
-            });
-            if(!target) return reject(new UnauthorizedAccessError('401', { message: 'not found user of value : ' + value }));
-            resolve(target);
-        });
-    }).then(function(target) {
-        return when.promise(function(resolve, reject) {
-            peterMgr.get(target.userid, ['_id', 'pass'], function(err, result) {
-                if(err) return reject(new DBError('500', { message: 'find user error' }));
-                if(!result) return reject(new UnauthorizedAccessError('401', { message: 'db not found user of value = ' + value}));
-
-                //md5.update(result.pass)
-                 result.pass == password ? resolve(result) : reject(new UnauthorizedAccessError('401', { message: 'invalid password' }));
-            });
-        });
+        if(!user) return authUitls.getUserInfo2(value, password);
+        return when.resolve(user);
     }).then(function(user) {
-        var token = jsonwebtoken.sign({ _id: user._id.toString() }, config.secret);
+        if(!user) return when.reject(new UnauthorizedAccessError("401", {
+            message: 'Invalid value or password'
+        }));
+        delete user.pwd;
+
+        var token = jsonwebtoken.sign({ user: user }, config.secret);
         user.token = token;
         req.user = user;
         next();
     }).catch(function(err) {
         next(err);
-    });
-};
+    })
+}
 
 
 exports.verify = function (req, res, next) {
@@ -108,4 +93,50 @@ exports.validate = function(req, res, next) {
     next();
 }
 
+
+
+// exports.authenticate = function (req, res, next) {
+//     debug("Processing authenticate middleware");
+//     var value = req.body.value;//注意：body里面写value而不再是username
+//     var password = req.body.password;//暂时还是明文传递过来，后面进行md5
+
+//     //TODO:使用express-validator来处理各种验证的需求
+//     if (_.isEmpty(value) || _.isEmpty(password)) {
+//         return next(new UnauthorizedAccessError("401", {
+//             message: 'Invalid value or password'
+//         }));
+//     }
+//     value = value.toLowerCase();
+
+// //1.验证User的usernmae和password是否有效：new UnauthorizedAccessError("401", { message: 'Invalid username or password' })
+//     var hash = murmur.hash128(value).hex().substr(0, 24);
+
+//     when.promise(function(resolve, reject) {
+//         peterMgr.get('@UserIndex.' + hash, function(err, result) {
+//             if(err) return reject(new DBError('500', { message: 'get user index error' }));
+//             var target = _.find(result['[list]'], function(item) {
+//                 return value == item.key;
+//             });
+//             if(!target) return reject(new UnauthorizedAccessError('401', { message: 'not found user of value : ' + value }));
+//             resolve(target);
+//         });
+//     }).then(function(target) {
+//         return when.promise(function(resolve, reject) {
+//             peterMgr.get(target.userid, ['_id', 'pass'], function(err, result) {
+//                 if(err) return reject(new DBError('500', { message: 'find user error' }));
+//                 if(!result) return reject(new UnauthorizedAccessError('401', { message: 'db not found user of value = ' + value}));
+
+//                 //md5.update(result.pass)
+//                  result.pass == password ? resolve(result) : reject(new UnauthorizedAccessError('401', { message: 'invalid password' }));
+//             });
+//         });
+//     }).then(function(user) {
+//         var token = jsonwebtoken.sign({ _id: user._id.toString() }, config.secret);
+//         user.token = token;
+//         req.user = user;
+//         next();
+//     }).catch(function(err) {
+//         next(err);
+//     });
+// };
 

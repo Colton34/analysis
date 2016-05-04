@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 12:08:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-16 11:15:26
+* @Last Modified time: 2016-05-04 09:03:06
 */
 
 'use strict';
@@ -10,7 +10,6 @@
 var path = require('path');
 var router = require('express').Router();
 var auth = require('auth');
-var util = require('../../lib/util');
 
 
 router.get('/login', function(req, res, next) {

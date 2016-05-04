@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-01 10:54:38
+* @Last Modified time: 2016-05-04 08:53:21
 */
 
 'use strict';
@@ -21,7 +21,6 @@ var expressValidator = require('express-validator');
 var config = require("./env");
 var rootPath = path.join(__dirname, '..', '..', 'index.html');
 
-var util = require('../lib/util');
 var NotFoundError = require('../errors/NotFoundError');
 
 var http_port = process.env.HTTP_PORT || 3000;
