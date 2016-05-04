@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-04 18:44:57
+* @Last Modified time: 2016-05-04 19:59:48
 */
 
 'use strict';
@@ -36,9 +36,6 @@ exports.validateExam = function(req, res, next) {
 
 exports.initExam = function(req, res, next) {
     res.result = {};
-
-console.log('validateExam ==========================req.query = ', req.query.examid);
-
     examUitls.getExamById(req.query.examid).then(function(exam) {
         req.exam = exam;
         return examUitls.getAllPapersByExam(exam);
@@ -46,7 +43,6 @@ console.log('validateExam ==========================req.query = ', req.query.exa
         req.papers = papers;
         return examUitls.getSchoolById(req.exam.schoolid);
     }).then(function(school) {
-console.log('school.name = ', school.name);
         req.school = school;
         next();
     }).catch(function(err) {
@@ -222,10 +218,6 @@ exports.test = function(req, res, next) {
 exports.schoolAnalysis = function(req, res, next) {
     try {
         var result = generateStudentScoreInfo(req.exam, req.papers, req.school);
-
-
-// console.log('result = ', result);
-
         res.status(200).json(result);
     } catch (e) {
         next(new errors.Error('schoolAnalysis 同步错误', e));

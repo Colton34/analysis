@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:27:20
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-04 18:45:24
+* @Last Modified time: 2016-05-04 19:59:05
 */
 
 'use strict';
@@ -23,14 +23,7 @@ export default function reducer(state, action) {
 
     switch(action.type) {
         case 'FETCH_SCHOOL_ANALYSIS_RAW_DATA_SUCCESS':
-            console.log('=================================================');
-            // console.log('action.res = ', action.res);
-// console.log('keys.length = ', _.keys(action.res.data).length);
-//不用反序列化了！
-console.log('action.res.data = ', _.keys(action.res.data.classInfo).length);
-            // var data = JSON.parse(action.res.data);
-            // console.log('size = ', _.size(JSON.parse(action.res.data).studentScoreInfoMap));
-            console.log('=================================================');
+// console.log('action.res.data = ', _.keys(action.res.data.classInfo).length);
             return state;
         case 'TESTDATA':
             console.log('TESTDATA OK');
