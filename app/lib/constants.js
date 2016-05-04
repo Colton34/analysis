@@ -1,3 +1,8 @@
+//================= Global ===========================
+export const SHOW_LOADING = 'SHOW_LOADING';
+export const HIDE_LOADING = 'HIDE_LOADING';
+//================= Dashboard ==========================
+
 export const GET_USER = 'GET_USER';
 export const GET_USER_SUCCESS = 'GET_USER_SUCCESS';
 export const GET_USER_FAIL = 'GET_USER__FAILURE';
@@ -25,3 +30,11 @@ export const SOME_EXAM_TOTAL_THREE = 'SOME_EXAM_TOTAL_THREE';
 export const SOME_EXAM_ANALYSIS_ONE = 'SOME_EXAM_ANALYSIS_ONE';
 export const SOME_EXAM_ANALYSIS_TWO = 'SOME_EXAM_ANALYSIS_TWO';
 export const SOME_EXAM_ANALYSIS_THREE = 'SOME_EXAM_ANALYSIS_THREE';
+
+
+//=============== SchoolAnalysis =============================
+export const INIT_SCHOOL_ANALYSIS_SUCCESS = 'INIT_SCHOOL_ANALYSIS_SUCCESS';
+
+export const FETCH_SCHOOL_ANALYSIS_RAW_DATA = 'FETCH_SCHOOL_ANALYSIS_RAW_DATA';
+export const FETCH_SCHOOL_ANALYSIS_RAW_DATA_SUCCESS = 'FETCH_SCHOOL_ANALYSIS_RAW_DATA_SUCCESS';
+export const FETCH_SCHOOL_ANALYSIS_RAW_DATA_FAILURE = 'FETCH_SCHOOL_ANALYSIS_RAW_DATA_FAILURE';

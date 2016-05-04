@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-03 15:43:03
+* @Last Modified time: 2016-05-04 18:44:57
 */
 
 'use strict';
@@ -36,13 +36,17 @@ exports.validateExam = function(req, res, next) {
 
 exports.initExam = function(req, res, next) {
     res.result = {};
+
+console.log('validateExam ==========================req.query = ', req.query.examid);
+
     examUitls.getExamById(req.query.examid).then(function(exam) {
         req.exam = exam;
         return examUitls.getAllPapersByExam(exam);
     }).then(function(papers) {
         req.papers = papers;
-        return examUitls.getScoresById(req.exam.schoolid);
+        return examUitls.getSchoolById(req.exam.schoolid);
     }).then(function(school) {
+console.log('school.name = ', school.name);
         req.school = school;
         next();
     }).catch(function(err) {
@@ -218,6 +222,10 @@ exports.test = function(req, res, next) {
 exports.schoolAnalysis = function(req, res, next) {
     try {
         var result = generateStudentScoreInfo(req.exam, req.papers, req.school);
+
+
+// console.log('result = ', result);
+
         res.status(200).json(result);
     } catch (e) {
         next(new errors.Error('schoolAnalysis 同步错误', e));
@@ -257,8 +265,8 @@ function generateStudentScoreInfo(exam, papers, school) {
     });
     //确定基数到底是此班级内参加此场paper考生的人数还是此班级所有学生的人数（应该是前者，否则计算所有的数据都有偏差，但是缺考人数还是需要
     //班级的总人数）
-    _.each(school.grades, function(grade) {
-        _.each(grade.classes, function(classItem) {
+    _.each(school['[grades]'], function(grade) {
+        _.each(grade['[classes]'], function(classItem) {
             classInfo[classItem.name] = {
                 studentsCount: (classItem.students ? classItem.students.length : 0),
                 grade: grade.name

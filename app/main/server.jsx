@@ -12,6 +12,8 @@ import initialState from '../states';
 
 var RadiumWrapper = require('./radium-wrapper');
 
+import _ from 'lodash';
+
 //TODO：没什么用的话可以删掉了-----------------------------------------------------
 // const clientConfig = {
 //     host: process.env.HOSTNAME || 'localhost',
@@ -71,7 +73,11 @@ export default function render(req, res) {
                     </RadiumWrapper>
                 </Provider>
             );
-            fetchComponentDataBeforeRender(store.dispatch, renderProps.components, renderProps.params)
+
+console.log('renderProps.keys = ', _.keys(renderProps));
+//TODO: 从renderProps中拿到需要的参数--如果query不行那就params -- 找location 属性key
+
+            fetchComponentDataBeforeRender(store.dispatch, renderProps.components, renderProps.params, renderProps.location)
             .then(() => {
                 const componentHTML = renderToString(InitialView);
                 const initialState = store.getState();

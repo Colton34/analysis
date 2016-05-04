@@ -36,9 +36,14 @@ class Test extends React.Component {
     }
 
     render() {
+        var exam = {id: 167}
+        var path = '/school/analysis'; //'' + 167 +
         return (
             <div>
                 <Link to="/dashboard">看板</Link>
+                <br />
+                <br />
+                <Link to={{ pathname: path, query: { examid: exam.id } }}>校级报告</Link>
                 <ReactHighcharts config={config}></ReactHighcharts>
             </div>
         );

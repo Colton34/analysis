@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-03 14:46:04
+* @Last Modified time: 2016-05-04 18:35:51
 */
 
 'use strict';
@@ -27,9 +27,6 @@ exports.getExamById = function(examid) {
 
 exports.getScoresById = function(examid) {
     var url = config.rankBaseUrl + '/scores' + '?' + 'examid=' + examid;
-
-console.log('url = ', url);
-
     return when.promise(function(resolve, reject) {
         client.get(url, {}, function(err, res, body) {
             if(err) return reject(new errors.URIError('查询rank server(scores)失败', err));
@@ -52,15 +49,12 @@ exports.getAllPapersByExam = function(exam) {
     return when.all(findPapersPromises);
 };
 
-exports.getExamClass = function(exam) {
+exports.getSchoolById = function(schoolid) {
     //通过exam.schoolid获取school实例，然后school.grades->classes reduce出来
     return when.promise(function(resolve, reject) {
-        peterMgr.get(exam.schoolid, function(err, school) {
-            if(err) return reject(new errors.data.MongoDBError('find school:'+exam.schoolid+' error', err));
-            var result = _.reduce(school.grades, function(sum, grade, index) {
-                return sum += (grade.classes ? grade.classes.length : 0);
-            }, 0);
-            resolve(result);
+        peterMgr.get('@School.'+schoolid, function(err, school) {
+            if(err || !school) return reject(new errors.data.MongoDBError('find school:'+schoolid+' error', err));
+            resolve(school);
         });
     });
 };
@@ -114,14 +108,5 @@ exports.getLevelByScore = function(score) {
         }
     }
 }
-
-exports.getSchoolById = function(schoolid) {
-    return when.promise(function(resolve, reject) {
-        peterMgr.get(schoolid, function(err, school) {
-            if(err) return rejct(new errors.data.MongoDBError('find school:' + schoolid+' error: ', err));
-            resolve(school);
-        });
-    });
-};
 
 

@@ -4,6 +4,7 @@ import { Route, IndexRoute } from 'react-router';
 //TODO：各种需要的router page
 import App from '../containers/App';
 import Dashboard from '../containers/Dashboard';
+import SchoolAnalysis from '../containers/SchoolAnalysis';
 
 import Test from '../containers/Test'
 
@@ -15,11 +16,14 @@ export default (store) => {
         <Route path="/" component={App}>
             <IndexRoute component={Test} />
             <Route path='dashboard' component={Dashboard} />
+            <Route path='school/analysis' component={SchoolAnalysis} />
         </Route>
     );
 };
 
 /*
+        /:examId/
+
         <Route path="/" component={App}>
             <IndexRoute component={Home}/>
             <Route path="/exams/:role/:class" component={KaoShiLieBiao}/>

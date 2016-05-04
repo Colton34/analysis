@@ -2,13 +2,16 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-29 16:14:33
+* @Last Modified time: 2016-05-04 15:39:42
 */
 
 'use strict';
 
 
 import axios from 'axios';
+var serverHost = "http://localhost:3000";
+var clientHost = "http://localhost:3000";
+var schoolAnalysisPath = '/api/v1/exam/school/analysis';
 
 export function getMockExamGuide() {
     return Promise.resolve({
@@ -63,7 +66,11 @@ export function getMockSubjectReport() {
         weight: [43000, 19000, 60000, 35000, 17000, 10000]
     });
 }
-
-
-
-
+// ?examid=167
+export function initSchoolAnalysisData(params) {
+    var baseURL = (params.isClient) ? clientHost : serverHost;
+    var url = baseURL + schoolAnalysisPath + '?examid=' + params.examid;
+    // var url = schoolAnalysisPath + '?examid=' + params.examid;
+    console.log('initSchoolAnalysisData url = ', url);
+    return axios.get(url);
+}
