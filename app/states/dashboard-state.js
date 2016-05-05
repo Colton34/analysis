@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:09:30
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-29 15:07:35
+* @Last Modified time: 2016-05-05 16:38:40
 */
 
 'use strict';
@@ -13,12 +13,7 @@ import Immutable, {Record, Map, List} from 'immutable';
 
 //1. 在state中创建对应的tree node
 var InitialState = Record({
-    examGuide: new Record({ //因为不牵涉到任何更新，所以可以考虑使用raw plain javascript
-        subjectCount: 0,
-        totoalProblemCount: 0,
-        classCount: 0,
-        totoalStudentCount: 0
-    })(),
+    examGuide: {},
     scoreRank: {},
     classReport: {},
     levelReport: {},

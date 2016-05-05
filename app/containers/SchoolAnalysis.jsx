@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 
-import {clientInitSchoolAnalysis, serverInitSchoolAnalysis} from '../reducers/schoolAnalysis/actions';
+import {clientInitSchoolAnalysisAction, serverInitSchoolAnalysisAction} from '../reducers/schoolAnalysis/actions';
 
 class SchoolTotalAnalysis extends React.Component {
     static need = [

@@ -105,6 +105,7 @@
     "less-loader": "2.2.3",
     "lodash": "4.8.2",
     "method-override": "2.3.5",
+    "moment": "2.13.0",
     "mongodb": "2.1.16",
     "mongoose": "4.4.11",
     "morgan": "1.7.0",

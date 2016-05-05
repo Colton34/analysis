@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-04 19:59:48
+* @Last Modified time: 2016-05-05 17:15:28
 */
 
 'use strict';
@@ -12,28 +12,31 @@ var when = require('when');
 var _ = require('lodash');
 var errors = require('common-errors');
 var examUitls = require('./util');
-
-//虽然这里写成guide、level等分开的api，但是还是可能尽量把他们作为一次请求(这样能尽量重用本次请求相同的数据)--但是要求响应时间尽量的短
-//这些都需要对参数进行验证，通过express validate
-//这里没有通过examid走DB，是因为通过peter.get(examid)不能直接get exam实例
+var moment = require('moment');
 
 
-/*
-方案一：尽量都放在一次ruquest里，通过request来达到缓存的效果
-方案二：使用redis
-*/
 
-
-//其实是一个dashboard API就获取了所有孩子的数据，即放在了一个request中
-
+/**
+ * 对API的参数进行校验
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.validateExam = function(req, res, next) {
     req.checkQuery('examid', '无效的examids').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
-//因为本身就是对一场考试的分析，所以就只接收一个examid（本身rank-server接收多个examid，所以是examids）
     if(req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err));
     next();
 }
 
+/**
+ * 建立后面所需要的各种元数据（来自DB）
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.initExam = function(req, res, next) {
     res.result = {};
     examUitls.getExamById(req.query.examid).then(function(exam) {
@@ -50,7 +53,54 @@ exports.initExam = function(req, res, next) {
     })
 }
 
-//其实这里几乎剩下的都是同步的数据清洗工作，放在前端后端都是一样的代码
+
+/**
+ * 获取当前用户所属的学校(req.school)，然后获取此学校所发生的所有考试(exam)，(但是当前Home不需要获取此exam下的所有papers)，
+ * 对papers进行分组。但是，很明显，后面的dashboard或者校级分析报告等都需要这么多信息，所以上缓存肯定能节省不少性能--
+ * 但是需要规划一下结构体
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.initSchool = function(req, res, next) {
+    examUitls.getSchoolById(req.user.schoolId)
+        .then(function(school) {
+            req.school = school;
+            return examUitls.getExamsBySchool(req.school);
+        }).then(function(exams) {
+            req.exams = exams;
+            next();
+        }).catch(function(err) {
+            next(err);
+        })
+    ;
+}
+
+/**
+ * 对Home需要的数据做格式化
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.home = function(req, res, next) {
+    try {
+        var result = examUitls.formatExams(req.exams);
+        res.status(200).json(result);
+    } catch(e) {
+        next(e);
+    }
+}
+
+//根据前端的模块，对前端的展示进行格式化数据--没有任何其他异步或者和服务端绑定的需求，所以这里的代码放在server或者client都是一样的
+/**
+ *
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.guide = function(req, res, next) {
     var result = {
         subjectCount: 0,
@@ -70,39 +120,21 @@ exports.guide = function(req, res, next) {
             return sum += classScore.length;
         }, 0)
     }));
-//但是为了获取totalQuestions还是要走获取所有的paper实例，因为rank-server的paper.score只是记录了学生当前科目的总分
+//但 examUitls.是为了获取totalQuestions还是要走获取所有的paper实例，因为rank-server的paper.score只是记录了学生当前科目的总分
     result.totalProblemCount = _.reduce(req.papers, function(sum, paper, index) {
         return sum += (paper["[questions]"] ? paper["[questions]"].length : 0);
     }, 0);
     res.result.guide = result;
     next();
-    // res.status(200).json(result);
 };
 
-/*
-AST:
-[<student>] -- 所有参加本次考试的学生，然后可以根据班级进行groupByClass
-    {
-        classId: [<student>] -->此数组已经按照score进行了排序
-    }
-
-
+/**
+ *
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
  */
-
-// 数组： [{<student info>, scores}]
-
-/*
-后面可能还需要以科目为维度，跨班级分析，以及以班级为维度，跨科目分析，应该建立比较通用的数组，然后后面可以根据不同的维度进行groupBy
-遍历req.papers
-    对paper.matrix进行reduce得到当前学生此科目的分数，通过paper["[students]"]和paper.matrix建立Map： {studentId: <当前科目分数>}
-    ...
-
-多个Map相同的key
-
-
- */
-
-//这里需要一个科目维度，可能还需要一个班级维度
 exports.level = function(req, res, next) {
 //每一个学生的总分-->每一个学生每一个门科目(paper)的总分-->每一个学生每门科目中所有题目的得分
     var studentTotalScoreMap = {};
@@ -129,6 +161,28 @@ exports.level = function(req, res, next) {
     next();
 }
 
+exports.dashboard = function(req, res, next) {
+    res.status(200).json(res.result);
+}
+
+exports.schoolAnalysis = function(req, res, next) {
+    try {
+        var result = examUitls.generateStudentScoreInfo(req.exam, req.papers, req.school);
+        res.status(200).json(result);
+    } catch (e) {
+        next(new errors.Error('schoolAnalysis 同步错误', e));
+    }
+}
+
+
+/**
+ * 对所给学校所发生的所有exam进行分组排序
+ * @param  {[type]} exams  此学校所发生过的所有exam
+ * @return {[type]}        按照exam发生时间分组并且排序好的，组内部按照exam发生时间进行排序好的数组
+ * @InterFaceFormat        [{timeKey: [{examName: xxx, eventTime: xxx, subjectCount: xx, fullMark: xxx, from: xxx}]}]，其中time字段只是为了排序用的
+ */
+
+
 //两个获得的数据一样！！！
 exports.testLevel = function(req, res, next) {
     var result = [];
@@ -154,37 +208,10 @@ exports.testLevel = function(req, res, next) {
         })
 }
 
+/*
 
-exports.dashboard = function(req, res, next) {
-    res.status(200).json(res.result);
-}
-
-exports.test = function(req, res, next) {
-    res.status(200).send('test over');
-    // peterMgr.get("5717ecc90000052174de5f7c", function(err, paper) {
-    //     if(err) {
-    //         console.log('paper find err: ', err);
-    //         res.status(500).send('paper find err');
-    //     }
-    //     console.log('paper.students.length = ', paper["[students]"].length);
-    //     console.log('paper.students.questions = ', paper["[questions]"].length);
-    //     res.status(200).send('ok');
-    // })
-}
-
-/**
- * 建立学生成绩的分析Map数据结构
- * @param  {[type]} exam   要分析的exam实例
- * @param  {[type]} papers 要分析的此exam下的所有parpers
- * @return Array<{
- *         id: ,
- *         totalScore: ,
- *         class: ,
- *         <paperId>: <score>...
- *
- * }>
- * 比如：
- * [
+DST1:
+[
     {
         'a1': {name: 'hellmagic', score: 40, class: 'A2' },
         totalScore: 40,
@@ -213,68 +240,6 @@ exports.test = function(req, res, next) {
         '098': 80,
     }
 ]
- */
-
-exports.schoolAnalysis = function(req, res, next) {
-    try {
-        var result = generateStudentScoreInfo(req.exam, req.papers, req.school);
-        res.status(200).json(result);
-    } catch (e) {
-        next(new errors.Error('schoolAnalysis 同步错误', e));
-    }
-}
-
-
-//其实分析结果只要出一次就可以了，后面考试一旦考完，数据肯定就是不变的，但是出数据的颗粒度需要设计，因为前端会有不同的维度--所以还是需要计算
-function generateStudentScoreInfo(exam, papers, school) {
-    //学生的信息；-- @Paper   id, name, totalScore(来自score的接口), class
-    //学科的信息  -- @Paper   <paper_score>
-    // var studentTotalScoreMap = {};
-    var studentScoreInfoMap = {};
-    var paperInfo = {};
-    var classInfo = {};
-    _.each(papers, function(paper) {
-        paperInfo[paper.id] = {
-            name: paper.name,
-            event_time: paper.event_time,
-            fullMark: paper.manfen
-        };
-        _.each(paper["[students]"], function(student) {
-        //确认：选用学生的id作为索引（虽然也可以用kaohao--因为是在同一场考试下）
-            if(!studentScoreInfoMap[student.id]) {
-                //TODO：重构--这个赋值的操作可以使用ES6的简单方式
-                var obj = {};
-                obj.id = student.id;
-                obj.kaohao = student.kaohao;
-                obj.name = student.name;
-                obj.class = student.class;
-                studentScoreInfoMap[student.id] = obj;
-            }
-            //这里赋给0默认值，就不能区分“缺考”（undefined）和真实考了0分
-            studentScoreInfoMap[student.id][paper.id] = student.score || 0;
-            studentScoreInfoMap[student.id].totalScore = (studentScoreInfoMap[student.id].totalScore) ? (studentScoreInfoMap[student.id].totalScore + studentScoreInfoMap[student.id][paper.id]) : (studentScoreInfoMap[student.id][paper.id]);
-        });
-    });
-    //确定基数到底是此班级内参加此场paper考生的人数还是此班级所有学生的人数（应该是前者，否则计算所有的数据都有偏差，但是缺考人数还是需要
-    //班级的总人数）
-    _.each(school['[grades]'], function(grade) {
-        _.each(grade['[classes]'], function(classItem) {
-            classInfo[classItem.name] = {
-                studentsCount: (classItem.students ? classItem.students.length : 0),
-                grade: grade.name
-            }
-        });
-    });
-    return {
-        studentScoreInfoMap: studentScoreInfoMap,
-        paperInfo: paperInfo,
-        classInfo: classInfo
-    };
-}
-
-/*
-
-
 
 DST2：
 {

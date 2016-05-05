@@ -18,18 +18,11 @@ import LevelReport from '../components/dashboard/level-report';
 import ClassReport from '../components/dashboard/class-report';
 import SubjectReport from '../components/dashboard/subject-report';
 
-import {initExamGuide, initScoreRank, initClassReport, initLevelReport, initSubjectReport} from '../reducers/dashboard/actions';
-var actionCreators = [
-    initExamGuide,
-    initScoreRank,
-    initClassReport,
-    initLevelReport,
-    initSubjectReport
-];
+import {clientInitDashboardAction, serverInitDashboardAction} from '../reducers/dashboard/actions';
+import {convertJS} from '../lib/util';
 
 import {Map} from 'immutable';
 
-import {convertJS} from '../lib/util';
 
 // 　Bgcolor:″＃F1FAFA″——做正文的背景色好，淡雅
 // 　　Bgcolor:″＃E8FFE8″——做标题的背景色较好，与上面的颜色搭配很协调
@@ -58,17 +51,15 @@ import {convertJS} from '../lib/util';
 
 @Radium
 class Dashboard extends React.Component {
-    static need = actionCreators;
-
-    constructor(props) {
-      super(props);
-
-    }
+    static need = [
+        serverInitDashboardAction
+    ];
 
     componentDidMount() {
-        _.each(this.props.actions, function(fn) {
-            fn();
-        });
+        var params = this.props.params || {};
+        var query = this.props.location.query || {};
+        params = _.merge(params, query);
+        this.props.initDashboard(params);
     }
 
     render() {
@@ -76,25 +67,26 @@ class Dashboard extends React.Component {
             return (null);
         });
 
-        var examGuide = convertJS(this.props.dashboard.examGuide);
-        var scoreRank = convertJS(this.props.dashboard.scoreRank);
-        var classReport = convertJS(this.props.dashboard.classReport);
-        var levelReport = convertJS(this.props.dashboard.levelReport);
-        var subjectReport = convertJS(this.props.dashboard.subjectReport);
+        // var examGuide = convertJS(this.props.dashboard.examGuide);
+        // var scoreRank = convertJS(this.props.dashboard.scoreRank);
+        // var classReport = convertJS(this.props.dashboard.classReport);
+        // var levelReport = convertJS(this.props.dashboard.levelReport);
+        // var subjectReport = convertJS(this.props.dashboard.subjectReport);
 
+//TODO：这个接口应该是缺少东西。。。
         return (
             <div style={[styles.box, styles.common.radius]}>
                 <div style={[styles.container, styles.common.radius]}>
-                    <ExamGuideComponent data={examGuide} />
-                    <ScoreRank data={scoreRank} />
+                    <ExamGuideComponent data={this.props.dashboard.examGuide} />
+                    <ScoreRank data={this.props.dashboard.scoreRank} />
                     <div key="test" style={[styles.item, styles.common.radius]}>
                         <div style={{fontWeight: 'blod', marginTop: 10}}>学校成绩总报告</div>
                     </div>
                 </div>
                 <div style={[styles.container, styles.common.radius]}>
-                    <LevelReport data={levelReport} />
-                    <ClassReport data={classReport} />
-                    <SubjectReport data={subjectReport} />
+                    <LevelReport data={this.props.dashboard.levelReport} />
+                    <ClassReport data={this.props.dashboard.classReport} />
+                    <SubjectReport data={this.props.dashboard.subjectReport} />
                 </div>
                 <div style={[styles.container, styles.common.radius]}>
                     <div style={[styles.item, styles.common.radius]}>
@@ -125,7 +117,6 @@ class Dashboard extends React.Component {
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
 
-
 function mapStateToProps(state) {
     return {
         dashboard: state.dashboard
@@ -134,7 +125,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators(actionCreators, dispatch)
+        initDashboard: bindActionCreators(clientInitDashboardAction, dispatch)
     }
 }
 

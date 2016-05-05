@@ -77,7 +77,7 @@ export default function render(req, res) {
 console.log('renderProps.keys = ', _.keys(renderProps));
 //TODO: 从renderProps中拿到需要的参数--如果query不行那就params -- 找location 属性key
 
-            fetchComponentDataBeforeRender(store.dispatch, renderProps.components, renderProps.params, renderProps.location)
+            fetchComponentDataBeforeRender(store.dispatch, renderProps.components, renderProps.params, renderProps.location, req)
             .then(() => {
                 const componentHTML = renderToString(InitialView);
                 const initialState = store.getState();

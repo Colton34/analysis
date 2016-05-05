@@ -2,18 +2,21 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:27:28
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-04 15:52:56
+* @Last Modified time: 2016-05-05 17:22:02
 */
 
 'use strict';
-import {initSchoolAnalysisData} from '../../api/exam';
+
 import _ from 'lodash';
+
+import {fetchSchoolAnalysisData} from '../../api/exam';
+import {serverInitSchoolAnalysis} from '../../../server/server-render';
 import {
-    FETCH_SCHOOL_ANALYSIS_RAW_DATA
+    FETCH_SCHOOL_ANALYSIS_DATA
 } from '../../lib/constants';
 
 /*
-initSchoolAnalysisData: 返回的接口格式：
+fetchSchoolAnalysisData: 返回的接口格式：
 {
     studentScoreInfoMap: studentScoreInfoMap,
     paperInfo: paperInfo,
@@ -39,31 +42,33 @@ About Class
 }
  */
 
-export function clientInitSchoolAnalysis(params) {
-    params.isClient = true;
+export function clientInitSchoolAnalysisAction(params) {
     return {
-        type: FETCH_SCHOOL_ANALYSIS_RAW_DATA,
-        promise: fetchSchoolAnalysisRawData(params)
+        type: FETCH_SCHOOL_ANALYSIS_DATA,
+        promise: fetchSchoolAnalysisData(params)
     }
 }
 
-export function serverInitSchoolAnalysis(params) {
+export function serverInitSchoolAnalysisAction(params) {
     params.isClient = false;
     return {
-        type: FETCH_SCHOOL_ANALYSIS_RAW_DATA,
-        promise: fetchSchoolAnalysisRawData(params)
+        type: FETCH_SCHOOL_ANALYSIS_DATA,
+        promise: serverInitSchoolAnalysis(params)
     }
 }
 
-function fetchSchoolAnalysisRawData(params) {
-    return initSchoolAnalysisData(params);
-}
 
-export function testData(examid) {
-    return (dispatch) => {
-        return initSchoolAnalysisData(examid).then(function(res) {
-console.log('size = ', _.size(resRawData.studentScoreInfoMap));
-            dispatch({type: 'TESTDATA'})
-        })
-    }
-}
+//下面都是各种组织数据结构的算法，当前是为了初始化，后面一些交互改变其实也差不多
+
+
+
+//=============================
+
+// export function testData(examid) {
+//     return (dispatch) => {
+//         return fetchSchoolAnalysisData(examid).then(function(res) {
+// console.log('size = ', _.size(resRawData.studentScoreInfoMap));
+//             dispatch({type: 'TESTDATA'})
+//         })
+//     }
+// }

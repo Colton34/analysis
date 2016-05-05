@@ -5,6 +5,7 @@ import { Route, IndexRoute } from 'react-router';
 import App from '../containers/App';
 import Dashboard from '../containers/Dashboard';
 import SchoolAnalysis from '../containers/SchoolAnalysis';
+import Home from '../containers/Home';
 
 import Test from '../containers/Test'
 
@@ -14,7 +15,7 @@ import Test from '../containers/Test'
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Test} />
+            <IndexRoute component={Home} />
             <Route path='dashboard' component={Dashboard} />
             <Route path='school/analysis' component={SchoolAnalysis} />
         </Route>

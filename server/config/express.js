@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-04 08:53:21
+* @Last Modified time: 2016-05-05 11:56:27
 */
 
 'use strict';
@@ -91,12 +91,13 @@ module.exports = function(app) {
 
     //下面的都是要受到保护的路由
 
-
+    app.use(require('../routes/unless'));
+    app.use(auth.verify);
     // Bootstrap routes（会添加各个版本不同的路由）
     require('../routes/v1')(app);
     // ...其他版本的路由
 
-    app.all("*",  auth.verify, function (req, res, next) {
+    app.all("*", function (req, res, next) {
         App(req, res);
     });
 

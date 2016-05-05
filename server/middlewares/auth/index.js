@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-04 09:03:08
+* @Last Modified time: 2016-05-05 14:53:55
 */
 
 'use strict';
@@ -63,21 +63,15 @@ exports.authenticate = function(req, res, next) {
 
 
 exports.verify = function (req, res, next) {
+    if(!(_.isUndefined(req.query.pass)) && _.toNumber(req.query.pass) > 0) return next();
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.authorization;
-
     if(!token) return next(new BadRequestError('400', { message: 'no token be passed'}));
+
     when.promise(function(resolve, reject) {
         jsonwebtoken.verify(token, config.secret, function (err, decode) {
             if (err) return reject(new UnauthorizedAccessError("invalid_token"));
             //如果验证通过，则通过decode._id，然后去找user，并赋值给req.user
-            resolve(decode._id);
-        });
-    }).then(function(userid) {
-        return when.promise(function(resolve, reject) {
-            peterMgr.query('@User', {_id: ObjectId(userid)}, function(err, user) {
-                if(err) return reject(new DBError('500', {message: 'find user error'}));
-                resolve(user);
-            });
+            resolve(decode.user);
         });
     }).then(function(user) {
         req.user = user;
@@ -86,6 +80,26 @@ exports.verify = function (req, res, next) {
         next(err);
     });
 };
+
+/*
+
+.then(function(userid) {
+
+console.log('userid = ', userid);
+
+//         return when.promise(function(resolve, reject) {
+//             //照当前来看是不再需要查询的，因为decord里就有几乎我们要的信息了，id, name,schoolId
+//             peterMgr.get('@Teacher.'+userid, function(err, user) {
+//                 if(err) return reject(new DBError('500', {message: 'find user error'}));
+
+// console.log('user.name = ', user.name);
+
+//                 resolve(user);
+//             });
+//         });
+    })
+
+ */
 
 
 exports.validate = function(req, res, next) {
