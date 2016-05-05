@@ -1,0 +1,38 @@
+.instruction-book {
+    width: 240px;
+    height: 40px;
+    margin-top: 10px;
+    background-image: url(../../images/shuomingshu.png); 
+    background-size:  contain;
+}
+
+.instruction-video {
+    width: 240px;
+    height: 160px;
+    margin-top: 10px;
+    background-image:  url(../../images/video.png);
+    background-size: contain;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: bold;
+    border-bottom:  1px solid #bfbfbf;
+    padding: 40px 0 20px 0;
+}
+
+.thumbup {
+    background-image: url(../../images/thumbup.png);
+    background-size: contain; 
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+}
+
+.ul {
+     margin-top: 10px; 
+     padding-left: 15px; 
+     line-height: 23px; 
+}
