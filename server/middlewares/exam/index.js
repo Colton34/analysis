@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 12:49:08
+* @Last Modified time: 2016-05-06 14:59:38
 */
 
 'use strict';
@@ -140,7 +140,7 @@ exports.home = function(req, res, next) {
  */
 exports.dashboard = function(req, res, next) {
 
-console.log('dashboard 返回');
+console.log('dashboard 返回!!!!!!!!!!!');
 
     res.status(200).json({
         exam: req.exam,

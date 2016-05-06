@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 14:34:47
+* @Last Modified time: 2016-05-06 15:17:32
 */
 
 'use strict';
@@ -40,15 +40,22 @@ export function fetchHomeData(params) {
  */
 export function fetchDashboardData(params) {
     var url = examPath + '/dashboard?examid=' + params.examid;
+
+console.log('fetchDashboardData url = ', url);
+
     return params.request.get(url)
         .then(function(res) {
             var result = {};
             try {
+
+console.log('fetchDashboardData 返回！！！！！！！！！！！');
+
                 result.examGuide = guide(res.data.exam, res.data.papers);
                 result.levelReport = level(res.data.papers);
                 result.topScores = res.data.topScores;
                 return Promise.resolve(result);
             } catch(e) {
+                console.log('fetchDashboardData error ', e);//错误的error可以保留
                 return Promise.reject('fetchDashboardData Format error');
             }
         })
@@ -137,7 +144,7 @@ function formatExams(exams) {
  * @param  {Function} next [description]
  * @return {[type]}        [description]
  */
-exports.guide = function(exam, papers) {
+function guide(exam, papers) {
 
 console.log('guide ....');
 
@@ -178,7 +185,7 @@ console.log('guide 成功！！！');
  * @param  {Function} next [description]
  * @return {[type]}        [description]
  */
-exports.level = function(papers) {
+function level(papers) {
 //每一个学生的总分-->每一个学生每一个门科目(paper)的总分-->每一个学生每门科目中所有题目的得分
 
 console.log('level ...');

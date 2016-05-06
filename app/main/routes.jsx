@@ -15,7 +15,8 @@ import Test from '../containers/Test'
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Home} />
+            <IndexRoute component={Test} />
+            <Route path='home' component={Home} />
             <Route path='dashboard' component={Dashboard} />
             <Route path='school/analysis' component={SchoolAnalysis} />
         </Route>

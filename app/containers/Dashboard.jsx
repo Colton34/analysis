@@ -56,8 +56,14 @@ class Dashboard extends React.Component {
     ];
 
     componentDidMount() {
+
+console.log('dashboard componentDidMount....');
+
         var params = initParams(this.props.params, this.props.location, {'request': window.request});
         this.props.initDashboard(params);
+
+console.log('dashboard componentDidMount...');
+
     }
 
     render() {
@@ -67,24 +73,39 @@ class Dashboard extends React.Component {
 
         // var examGuide = convertJS(this.props.dashboard.examGuide);
         // var scoreRank = convertJS(this.props.dashboard.scoreRank);
-        // var classReport = convertJS(this.props.dashboard.classReport);
         // var levelReport = convertJS(this.props.dashboard.levelReport);
+        // var classReport = convertJS(this.props.dashboard.classReport);
         // var subjectReport = convertJS(this.props.dashboard.subjectReport);
+
+
+console.log('examGuide = ', this.props.dashboard.examGuide);
+console.log('topScores = ', this.props.dashboard.topScores);
+console.log('levelReport = ', this.props.dashboard.levelReport);
+// console.log('classReport = ', classReport);
+// console.log('subjectReport = ', subjectReport);
+
 
 //TODO：这个接口应该是缺少东西。。。
         return (
+            <div></div>
+        );
+    }
+}
+
+/*
+
             <div style={[styles.box, styles.common.radius]}>
                 <div style={[styles.container, styles.common.radius]}>
-                    <ExamGuideComponent data={this.props.dashboard.examGuide} />
-                    <ScoreRank data={this.props.dashboard.scoreRank} />
+                    <ExamGuideComponent data={examGuide} />
+                    <ScoreRank data={scoreRank} />
                     <div key="test" style={[styles.item, styles.common.radius]}>
                         <div style={{fontWeight: 'blod', marginTop: 10}}>学校成绩总报告</div>
                     </div>
                 </div>
                 <div style={[styles.container, styles.common.radius]}>
-                    <LevelReport data={this.props.dashboard.levelReport} />
-                    <ClassReport data={this.props.dashboard.classReport} />
-                    <SubjectReport data={this.props.dashboard.subjectReport} />
+                    <LevelReport data={levelReport} />
+                    <ClassReport data={classReport} />
+                    <SubjectReport data={subjectReport} />
                 </div>
                 <div style={[styles.container, styles.common.radius]}>
                     <div style={[styles.item, styles.common.radius]}>
@@ -109,9 +130,8 @@ class Dashboard extends React.Component {
                     </div>
                 </div>
             </div>
-        );
-    }
-}
+
+ */
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
 

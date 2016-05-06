@@ -9,7 +9,7 @@ import _ from 'lodash';
 const ScoreRank = (data) => {
 
 // console.log('scoreRank = ', data.data.top);
-    if(!data || !data.data || (_.size(_.keys(data))==0)) return (<div></div>);// 这个时候显示loading动画
+    if(!data || !data.data || (_.size(_.keys(data))==0) || data.data.size == 0) return (<div></div>);// 这个时候显示loading动画
     var flag = 0;
 
     var flagFirstColor = {backgroundColor: '#FF0033'};

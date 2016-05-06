@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 20:39:14
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 10:41:38
+* @Last Modified time: 2016-05-06 17:58:28
 */
 
 'use strict';
@@ -23,7 +23,7 @@ export default function reducer(state, action) {
 
     switch(action.type) {
         case 'INIT_HOME_SUCCESS':
-            return state.set('examList', action.res);
+            return state.set('examList', action.res).set('haveInit', true);
     }
 
     return state;

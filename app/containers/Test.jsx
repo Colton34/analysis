@@ -40,6 +40,9 @@ class Test extends React.Component {
         var path = '/school/analysis'; //'' + 167 +
         return (
             <div>
+                <Link to="/home">主页</Link>
+                <br />
+                <br />
                 <Link to="/dashboard">看板</Link>
                 <br />
                 <br />

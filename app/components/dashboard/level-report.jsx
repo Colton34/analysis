@@ -7,7 +7,7 @@ import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
 
 const LevelReport = (data) => {
-    if(!data || !data.data || (_.size(_.keys(data))==0)) return (<div></div>);
+    if(!data || !data.data || (_.size(_.keys(data))==0) || data.data.size == 0) return (<div></div>);
     const leveFlag = ['一档', '二挡', '三挡'];
 console.log('levelReport = ', data.data);
     var categories = _.map(data.data.levels, function(value, index) {

@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 const SubjectReport = (data) => {
 
-    if(!data || !data.data || (_.size(_.keys(data))==0)) return (<div></div>);
+    if(!data || !data.data || (_.size(_.keys(data))==0) || data.data.size == 0) return (<div></div>);
 console.log('subjectReport = ', data.data);
 
     const config = {
