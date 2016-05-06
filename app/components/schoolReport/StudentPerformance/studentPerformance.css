@@ -1,0 +1,25 @@
+.first-ten {
+    background-image: url(./firstTen.png);
+    width: 220px;
+    height: 140px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    margin: 0 auto;
+}
+
+.last-ten {
+    background-image: url(./lastTen.png);
+    width: 220px;
+    height: 140px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    margin: 0 auto;
+}
+
+.student-box{
+   display: inline-block;
+    width: 50px;
+    height: 25px;
+    margin: 13px;
+    text-align: center;
+}
