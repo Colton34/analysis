@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 21:11:57
+* @Last Modified time: 2016-05-06 08:49:37
 */
 
 'use strict';
@@ -10,7 +10,7 @@
 
 import axios from 'axios';
 // var host = "http://localhost:3000";
-var examPath = "/api/v1/exam";
+var examPath = "/exam";
 
 // var baseURL = host + examPath;
 

@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 08:46:27
+* @Last Modified time: 2016-05-06 08:51:11
 */
 
 'use strict';
@@ -37,20 +37,14 @@ exports.authenticate = function(req, res, next) {
     req.checkBody('password', '无效的password').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
 
-
     var value = req.body.value.toLowerCase();
     var password = req.body.password;
-
-
-console.log('value = ', value);
 
     authUitls.getUserInfo(value).then(function(user) {
         if(user && (!_.eq(user.pwd, password))) return when.reject(new UnauthorizedAccessError("401", {
             message: 'Invalid value or password'
         }));
         if(!user) return authUitls.getUserInfo2(value, password);
-
-console.log('get user from other server....');
 
         return when.resolve(user);
     }).then(function(user) {
@@ -71,8 +65,6 @@ console.log('get user from other server....');
 
 exports.verify = function (req, res, next) {
     if(!(_.isUndefined(req.query.pass)) && _.toNumber(req.query.pass) > 0) return next();
-
-console.log('req.headers = ', req.headers);
 
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.authorization;
     if(!token) return next(new BadRequestError('400', { message: 'no token be passed'}));
