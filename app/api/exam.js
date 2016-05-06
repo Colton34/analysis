@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 10:05:21
+* @Last Modified time: 2016-05-06 10:50:14
 */
 
 'use strict';
@@ -10,15 +10,16 @@
 
 import axios from 'axios';
 import _ from 'lodash';
-// var host = "http://localhost:3000";
+import moment from 'moment';
+require('moment/locale/zh-cn');//这是moment.local()方法的bug：http://momentjs.com/docs/#/use-it/browserify/
+
 var examPath = "/exam";
-var moment = require('moment');
-require('moment/locale/zh-cn');
-// var baseURL = host + examPath;
 
-
-console.log(moment.locale());
-
+/**
+ * 从服务端获取Home View数据并且初始化格式化数据
+ * @param  {[type]} params [description]
+ * @return {[type]}        [description]
+ */
 export function fetchHomeData(params) {
     var url = examPath + '/home';
     return params.request.get(url)
@@ -32,16 +33,25 @@ export function fetchHomeData(params) {
         })
 }
 
+/**
+ * 从服务端获取Dashboard View数据并且初始化格式化数据
+ * @param  {[type]} params [description]
+ * @return {[type]}        [description]
+ */
 export function fetchDashboardData(params) {
     var url = examPath + '/dashboard?examid=' + params.examid;
     return params.request.get(url);
 }
 
+/**
+ * 从服务端获取SchoolAnalysis View数据并且初始化格式化数据
+ * @param  {[type]} params [description]
+ * @return {[type]}        [description]
+ */
 export function fetchSchoolAnalysisData(params) {
     var url = examPath + '/school/analysis?examid=' + params.examid;
     return params.request.get(url);
 }
-
 
 /**
  * 对exams进行排序格式化，从而符合首页的数据展示
@@ -63,9 +73,6 @@ function formatExams(exams) {
 
     _.each(examsGroupByEventTime, function(examsItem, timeKey) {
         //resultOrder是为了建立排序顺序的临时数据结构
-
-        //按照年级区分，同一个exam下不同年级算作不同的exam
-        // var allPapersFromOneTimeKey = _.concat(...(_.map(examsItem, (exam) => exam['[papers]'])));
         var temp = {};
         _.each(examsItem, function(exam) {
             var flag = {key: timeKey, value: moment(exam['event_time']).valueOf() };
@@ -102,12 +109,10 @@ function formatExams(exams) {
         finallyResult.push({timeKey: item.key, value: result[item.key]});
     });
 
-// console.log('finallyResult[0] = ', finallyResult[0]);
-
     return finallyResult;
 }
 
-
+// Mock Data:
 // export function getMockExamGuide() {
 //     return Promise.resolve({
 //         subjectCount: 3,
