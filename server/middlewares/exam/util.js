@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 17:15:45
+* @Last Modified time: 2016-05-05 19:59:32
 */
 
 'use strict';
@@ -15,7 +15,11 @@ var client = require('request');
 
 var config = require('../../config/env');
 
-
+/**
+ * 通过schoolid获取学校
+ * @param  {[type]} schoolid [description]
+ * @return {[type]}          [description]
+ */
 exports.getSchoolById = function(schoolid) {
     //通过exam.schoolid获取school实例，然后school.grades->classes reduce出来
     return when.promise(function(resolve, reject) {
@@ -26,7 +30,11 @@ exports.getSchoolById = function(schoolid) {
     });
 };
 
-
+/**
+ * 获取此学校所发生过的所有exam的具体实例
+ * @param  {[type]} school [description]
+ * @return {[type]}        [description]
+ */
 exports.getExamsBySchool = function(school) {
     var examPromises = _.map(school["[exams]"], function(item) {
         return fetchExamPromise(item.id);
@@ -43,21 +51,11 @@ function fetchExamPromise(examid) {
     });
 }
 
-
-/*
-    请求rank-server "/schools"的API接口：
-    var url = config.rankBaseUrl + '/schools?ids=' + schoolId;
-    return when.promise(function(resolve, reject) {
-        client.get(url, {}, function(err, res, body) {
-            if(err) return reject(new errors.URIError('查询rank server(schools)失败', err));
-            resolve(JSON.parse(body)[schoolId]);
-        })
-    })
-
+/**
+ * 通过examid查询获取一个exam实例
+ * @param  {[type]} examid [description]
+ * @return {[type]}        [description]
  */
-
-
-
 exports.getExamById = function(examid) {
     var url = config.rankBaseUrl + '/exams' + '?' + 'examids=' + examid;
     return when.promise(function(resolve, reject) {
@@ -99,13 +97,13 @@ exports.getAllStudentsByExam = function(exam) {
 };
 
 
+
+
 /**
  * 根据固定的分档规则惊醒区分分数段（因为分数段较多，且学生更多，所以采用二分法去分段而没有采用遍历group的方式--虽然代码可读性更高）
  * @param  {[type]} score [description]
  * @return {[type]}       [description]
- */
-
-/*
+ *
 测试用例：
 var result = {};
 _.each(_.range(30), function() {
@@ -113,8 +111,7 @@ _.each(_.range(30), function() {
     var key = getLevelByScore(score);
     result[key] = score;
 })
-//拿到result后可以根据key进行group
- */
+*/
 exports.getLevelByScore = function(score) {
     if(score > 350) {
         if(score > 500) {
@@ -142,6 +139,11 @@ exports.getLevelByScore = function(score) {
     }
 }
 
+/**
+ * 对exams进行排序格式化，从而符合首页的数据展示
+ * @param  {[type]} exams [description]
+ * @return {[type]}       [description]
+ */
 exports.formatExams = function(exams) {
     //先对所有exams中每一个exam中的papers进行年级划分：
     var examsGroupByEventTime = _.groupBy(exams, function(exam) {
@@ -187,6 +189,13 @@ exports.formatExams = function(exams) {
 }
 
 //其实分析结果只要出一次就可以了，后面考试一旦考完，数据肯定就是不变的，但是出数据的颗粒度需要设计，因为前端会有不同的维度--所以还是需要计算
+/**
+ * 为SchoolAnalysis提供设计好的方便灵活的数据结构
+ * @param  {[type]} exam   [description]
+ * @param  {[type]} papers [description]
+ * @param  {[type]} school [description]
+ * @return {[type]}        [description]
+ */
 exports.generateStudentScoreInfo = function(exam, papers, school) {
     //学生的信息；-- @Paper   id, name, totalScore(来自score的接口), class
     //学科的信息  -- @Paper   <paper_score>
@@ -234,3 +243,17 @@ exports.generateStudentScoreInfo = function(exam, papers, school) {
 }
 
 
+
+
+
+/*
+    请求rank-server "/schools"的API接口：
+    var url = config.rankBaseUrl + '/schools?ids=' + schoolId;
+    return when.promise(function(resolve, reject) {
+        client.get(url, {}, function(err, res, body) {
+            if(err) return reject(new errors.URIError('查询rank server(schools)失败', err));
+            resolve(JSON.parse(body)[schoolId]);
+        })
+    })
+
+ */

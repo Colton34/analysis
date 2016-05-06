@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 11:56:27
+* @Last Modified time: 2016-05-05 20:21:58
 */
 
 'use strict';
@@ -112,10 +112,10 @@ module.exports = function(app) {
             case "UnauthorizedError":
                 code = err.status;
                 msg = undefined;
-                return res.redirect('/api/v1/auth/login');
+                return res.redirect('/login');
             case "BadRequestError":
             case "UnauthorizedAccessError":
-                return res.redirect('/api/v1/auth/login');
+                return res.redirect('/login');
             case "NotFoundError":
                 code = err.status;
                 msg = err.inner;

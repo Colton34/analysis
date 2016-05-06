@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-09 22:26:48
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 17:21:29
+* @Last Modified time: 2016-05-05 21:08:54
 */
 
 'use strict';
@@ -11,22 +11,14 @@
 import Immutable from 'immutable';
 
 import {fetchDashboardData} from '../../api/exam';
-import {serverInitDashboard} from '../../../server/server-render';
 import {
     INIT_DASHBOARD
 } from '../../lib/constants';
 
-export function clientInitDashboardAction(params) {
+export function initDashboardAction(params) {
     return {
         type: INIT_DASHBOARD,
         promise:fetchDashboardData(params)
-    }
-}
-
-export function serverInitDashboardAction(params) {
-    return {
-        type: INIT_DASHBOARD,
-        promise: serverInitDashboard(params)
     }
 }
 

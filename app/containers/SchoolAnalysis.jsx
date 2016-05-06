@@ -4,22 +4,16 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 
-import {clientInitSchoolAnalysisAction, serverInitSchoolAnalysisAction} from '../reducers/schoolAnalysis/actions';
+import {initSchoolAnalysisAction} from '../reducers/schoolAnalysis/actions';
 
 class SchoolTotalAnalysis extends React.Component {
     static need = [
-        serverInitSchoolAnalysis
+        initSchoolAnalysisAction
     ];
 
     componentDidMount() {
         console.log('SchoolAnalysis componentDidMount');
-
-        // var {examid} = this.props.params;
-        var params = this.props.params || {};
-        var query = this.props.location.query || {};
-        params = _.merge(params, query); //因此params中的key不能喝query中的key有重复！
-        // var {query} = this.props.location;
-        // var examid = query && query.examid ? query.examid : '';
+        var params = initParams(this.props.params, this.props.location, {'request': window.request});
         this.props.initSchoolAnalysis(params);
     }
 
@@ -41,7 +35,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        initSchoolAnalysis: bindActionCreators(clientInitSchoolAnalysis, dispatch)
+        initSchoolAnalysis: bindActionCreators(initSchoolAnalysisAction, dispatch)
     }
 }
 

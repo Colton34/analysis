@@ -2,12 +2,13 @@
 * @Author: HellMagic
 * @Date:   2016-05-05 11:51:30
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 11:52:58
+* @Last Modified time: 2016-05-06 08:20:03
 */
 
 'use strict';
 
 var router = require('express').Router();
+var auth = require('auth');
 
 router.get('/login', function(req, res, next) {
     res.render('login');

@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 14:53:55
+* @Last Modified time: 2016-05-05 20:23:37
 */
 
 'use strict';
@@ -75,6 +75,7 @@ exports.verify = function (req, res, next) {
         });
     }).then(function(user) {
         req.user = user;
+        req.user.token = token;
         next();
     }).catch(function(err) {
         next(err);

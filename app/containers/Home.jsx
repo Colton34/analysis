@@ -4,17 +4,17 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 
-import {clientInitHomeAction, serverInitHomeAction} from '../reducers/home/actions';
+import {initHomeAction} from '../reducers/home/actions';
+import {initParams} from '../lib/util';
 
 class Home extends React.Component {
     static need = [
-        serverInitHomeAction
+        initHomeAction
     ];
 
     componentDidMount() {
-        var params = this.props.params || {};
-        var query = this.props.location.query || {};
-        params = _.merge(params, query);
+        //因为服务端不会走这个方法，所以可以在这里安全的使用window变量
+        var params = initParams(this.props.params, this.props.location, {'request': window.request});
         this.props.initHome(params);
     }
 
@@ -35,7 +35,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        initHome: bindActionCreators(clientInitHomeAction, dispatch)
+        initHome: bindActionCreators(initHomeAction, dispatch)
     }
 }
 

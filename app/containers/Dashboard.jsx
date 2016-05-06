@@ -18,8 +18,8 @@ import LevelReport from '../components/dashboard/level-report';
 import ClassReport from '../components/dashboard/class-report';
 import SubjectReport from '../components/dashboard/subject-report';
 
-import {clientInitDashboardAction, serverInitDashboardAction} from '../reducers/dashboard/actions';
-import {convertJS} from '../lib/util';
+import {initDashboardAction} from '../reducers/dashboard/actions';
+import {convertJS, initParams} from '../lib/util';
 
 import {Map} from 'immutable';
 
@@ -52,13 +52,11 @@ import {Map} from 'immutable';
 @Radium
 class Dashboard extends React.Component {
     static need = [
-        serverInitDashboardAction
+        initDashboardAction
     ];
 
     componentDidMount() {
-        var params = this.props.params || {};
-        var query = this.props.location.query || {};
-        params = _.merge(params, query);
+        var params = initParams(this.props.params, this.props.location, {'request': window.request});
         this.props.initDashboard(params);
     }
 
@@ -125,7 +123,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        initDashboard: bindActionCreators(clientInitDashboardAction, dispatch)
+        initDashboard: bindActionCreators(initDashboardAction, dispatch)
     }
 }
 

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 17:15:28
+* @Last Modified time: 2016-05-05 19:54:58
 */
 
 'use strict';
@@ -95,7 +95,7 @@ exports.home = function(req, res, next) {
 
 //根据前端的模块，对前端的展示进行格式化数据--没有任何其他异步或者和服务端绑定的需求，所以这里的代码放在server或者client都是一样的
 /**
- *
+ * 格式化“考试总览”模块的数据
  * @param  {[type]}   req  [description]
  * @param  {[type]}   res  [description]
  * @param  {Function} next [description]
@@ -129,7 +129,7 @@ exports.guide = function(req, res, next) {
 };
 
 /**
- *
+ *格式化"分档"模块的数据格式
  * @param  {[type]}   req  [description]
  * @param  {[type]}   res  [description]
  * @param  {Function} next [description]
@@ -161,10 +161,27 @@ exports.level = function(req, res, next) {
     next();
 }
 
+
+/**
+ * 返回dashboard数据结构的结果
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.dashboard = function(req, res, next) {
     res.status(200).json(res.result);
 }
 
+
+/**
+ * 返回SchoolAnalysis的基本数据结构。不同于Home和Dashboard，因为schoolAnalysis有许多交互改变条件从而改变展示数据的场景，所以
+ * 没有直接返回格式化程度高的数据格式
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.schoolAnalysis = function(req, res, next) {
     try {
         var result = examUitls.generateStudentScoreInfo(req.exam, req.papers, req.school);
