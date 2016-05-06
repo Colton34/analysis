@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 09:41:31
+* @Last Modified time: 2016-05-06 12:51:31
 */
 
 'use strict';
@@ -67,16 +67,23 @@ exports.getExamById = function(examid) {
     });
 };
 
-exports.getScoresById = function(examid) {
-    var url = config.rankBaseUrl + '/scores' + '?' + 'examid=' + examid;
-    return when.promise(function(resolve, reject) {
-        client.get(url, {}, function(err, res, body) {
-            if(err) return reject(new errors.URIError('查询rank server(scores)失败', err));
-            var data = JSON.parse(body);
-            var keys = _.keys(data);
-            resolve(data[keys[0]]);
-        });
-    });
+exports.getScoresByExamid = function(examid) {
+    //Mock Data
+    var arr = {
+            'A': [{name: 'aa', score: 12, class: 'A'}, {name: 'bb', score: 20, class: 'A'}],
+            'B': [{name: 'cc', score: 2, class: 'B'}, {name: 'dd', score: 50, class: 'B'}]
+        };
+    return when.resolve(arr);
+
+    // var url = config.rankBaseUrl + '/scores' + '?' + 'examid=' + examid;
+    // return when.promise(function(resolve, reject) {
+    //     client.get(url, {}, function(err, res, body) {
+    //         if(err) return reject(new errors.URIError('查询rank server(scores)失败', err));
+    //         var data = JSON.parse(body);
+    //         var keys = _.keys(data);
+    //         resolve(data[keys[0]]);
+    //     });
+    // });
 };
 
 exports.getAllPapersByExam = function(exam) {
@@ -91,11 +98,6 @@ exports.getAllPapersByExam = function(exam) {
     return when.all(findPapersPromises);
 };
 
-exports.getAllStudentsByExam = function(exam) {
-    return when.promise(function(resolve, reject) {
-        //参加本场考试的所有studnetIds，然后得到studentsPromises
-    })
-};
 
 
 

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:16:06
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 16:46:20
+* @Last Modified time: 2016-05-06 12:58:11
 */
 
 'use strict';
@@ -24,8 +24,11 @@ export default function reducer(state, action) {
 //TODO:注意，因为这里还没有替换成通过axois去异步获取数据，当使用axois的时候解析服务端的数据是 action.res.data而不是 action.res
     switch(action.type) {
         case INIT_DASHBOARD_SUCCESS:
+
+console.log('INIT_DASHBOARD_SUCCESS ...');
+
             var nextState;
-            _.each(action.res.data, function(value, key) {
+            _.each(action.res, function(value, key) {
                 nextState = (nextState) ? nextState.set(key, value) : state.set(key, value);
             });
             return nextState;

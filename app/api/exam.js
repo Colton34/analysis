@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 10:50:14
+* @Last Modified time: 2016-05-06 14:34:47
 */
 
 'use strict';
@@ -28,7 +28,7 @@ export function fetchHomeData(params) {
                 var result = formatExams(res.data);
                 return Promise.resolve(result);
             } catch(e) {
-                return Promise.reject('fetchHomeData Error');
+                return Promise.reject('fetchHomeData Format Error');
             }
         })
 }
@@ -40,7 +40,19 @@ export function fetchHomeData(params) {
  */
 export function fetchDashboardData(params) {
     var url = examPath + '/dashboard?examid=' + params.examid;
-    return params.request.get(url);
+    return params.request.get(url)
+        .then(function(res) {
+            var result = {};
+            try {
+                result.examGuide = guide(res.data.exam, res.data.papers);
+                result.levelReport = level(res.data.papers);
+                result.topScores = res.data.topScores;
+                return Promise.resolve(result);
+            } catch(e) {
+                return Promise.reject('fetchDashboardData Format error');
+            }
+        })
+    ;
 }
 
 /**
@@ -87,10 +99,15 @@ function formatExams(exams) {
 
         if(!result[timeKey]) result[timeKey] = [];
 
+
+//TODO: 注意后面也要跟着这里的papers走，而不再是从数据库中直接获取的exam的papers了！！！那分析一场考试所有的单位都是走这里的，也不再需要什么examid了？或者是examid&grade
+//所以后面走分析要传递examid和grade两个参数
         _.each(temp, function(value, key) {
             _.each(value.papersMap, function(papers, gradeKey) {
                 var obj = {};
                 obj.examName = value.exam.name + "(年级：" + gradeKey + ")";
+                obj.grade = gradeKey;
+                obj.id = key;
                 obj.time = moment(value.exam['event_time']).valueOf();
                 obj.eventTime = moment(value.exam['event_time']).format('ll');
                 obj.subjectCount = papers.length;
@@ -99,7 +116,7 @@ function formatExams(exams) {
 
                 result[timeKey].push(obj);
             });
-        })
+        });
 
         result[timeKey] = _.orderBy(result[timeKey], [(obj) => obj.time], ['desc']);
     });
@@ -110,6 +127,85 @@ function formatExams(exams) {
     });
 
     return finallyResult;
+}
+
+
+/**
+ * 格式化“考试总览”模块的数据
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.guide = function(exam, papers) {
+
+console.log('guide ....');
+
+    var result = {
+        subjectCount: 0,
+        totalProblemCount: 0,
+        classCount: 0,
+        totalStudentCount: 0
+    };
+
+    result.subjectCount = exam["[papers]"] ? exam["[papers]"].length : 0;
+//所有场次考试参加班级的最大数目：
+    result.classCount = _.max(_.map(exam["[papers]"], function(paper) {
+        return _.size(paper.scores);
+    }));
+//所有场次不同班级所有的人数总和的最大数目
+    result.totalStudentCount = _.max(_.map(exam["[papers]"], function(paper) {
+        return _.reduce(paper.scores, function(sum, classScore, classIndex) {
+            return sum += classScore.length;
+        }, 0)
+    }));
+//但 examUitls.是为了获取totalQuestions还是要走获取所有的paper实例，因为rank-server的paper.score只是记录了学生当前科目的总分
+    result.totalProblemCount = _.reduce(papers, function(sum, paper, index) {
+        return sum += (paper["[questions]"] ? paper["[questions]"].length : 0);
+    }, 0);
+
+console.log('guide 成功！！！');
+
+    return result;
+
+};
+
+
+/**
+ *格式化"分档"模块的数据格式
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.level = function(papers) {
+//每一个学生的总分-->每一个学生每一个门科目(paper)的总分-->每一个学生每门科目中所有题目的得分
+
+console.log('level ...');
+    var studentTotalScoreMap = {};
+    _.each(papers, function(paper) {
+        _.each(paper["[students]"], function(student) {
+            if(_.isUndefined(studentTotalScoreMap[student.kaohao])) {
+                studentTotalScoreMap[student.kaohao] = 0;
+            }
+            studentTotalScoreMap[student.kaohao] += (student.score ? student.score : 0);
+        });
+    });
+    //按照给的分档标准进行分档
+    //这里得到以groupKey为key，value是所有满足分档条件的分数所组成的数组
+    var levelScore = _.groupBy(studentTotalScoreMap, function(score, kaohao) {
+        if(score >= 600) return 'first';
+        if(score >= 520) return 'second';
+        if(score >= 400) return 'third';
+        return 'other';
+    });
+    var result = {};
+    _.each(levelScore, function(value, key) {
+        result[key] = value.length;
+    });
+
+console.log('level 成功！！！');
+    return result;
 }
 
 // Mock Data:

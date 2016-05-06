@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 20:10:02
+* @Last Modified time: 2016-05-06 10:52:49
 */
 
 'use strict';
@@ -11,8 +11,6 @@ import _ from 'lodash';
 
 export function convertJS(data) {
     return JSON.parse(JSON.stringify(data));
-    // var data = JSON.stringify(this.props.dashboard.examGuide);
-    // var jsdata = JSON.parse(data);
 }
 
 export function initParams(params, location, other) {

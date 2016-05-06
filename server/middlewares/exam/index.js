@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 10:05:45
+* @Last Modified time: 2016-05-06 12:49:08
 */
 
 'use strict';
@@ -62,6 +62,34 @@ console.log('initExam 成功');
     })
 }
 
+exports.initExamTotalScore = function(req, res, next) {
+console.log('initExamTotalScore ....');
+//要所有学生的top6，那么可以只取每一个班级的top6，这样从这些top6中获取总的top6
+    return examUitls.getScoresByExamid(req.query.examid).then(function(allTotalScoreGroupByClssName) {
+        try {
+            req.topScores = filterTopScores(allTotalScoreGroupByClssName);
+            next();
+        } catch(e) {
+            return when.reject(new errors.Error('initExamTotalScore Format Error', e));
+        }
+    }).catch(function(err) {
+        next(err);
+    })
+}
+
+function filterTopScores(totalScoreGroup) {
+    var topScoresArr = _.chain(totalScoreGroup)
+        .map((scores) => _.take(scores, 6))
+        .value()
+    ;
+    topScoresArr = _.concat(...topScoresArr);
+    return _.chain(topScoresArr)
+        .orderBy(['score'], ['desc'])
+        .take(6)
+        .value()
+    ;
+}
+
 
 /**
  * 获取当前用户所属的学校(req.school)，然后获取此学校所发生的所有考试(exam)，(但是当前Home不需要获取此exam下的所有papers)，
@@ -103,86 +131,6 @@ exports.home = function(req, res, next) {
     res.status(200).json(req.exams);
 }
 
-//根据前端的模块，对前端的展示进行格式化数据--没有任何其他异步或者和服务端绑定的需求，所以这里的代码放在server或者client都是一样的
-/**
- * 格式化“考试总览”模块的数据
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
- * @return {[type]}        [description]
- */
-exports.guide = function(req, res, next) {
-
-console.log('guide ....');
-
-    var result = {
-        subjectCount: 0,
-        totalProblemCount: 0,
-        classCount: 0,
-        totalStudentCount: 0
-    };
-
-    result.subjectCount = req.exam["[papers]"] ? req.exam["[papers]"].length : 0;
-//所有场次考试参加班级的最大数目：
-    result.classCount = _.max(_.map(req.exam["[papers]"], function(paper) {
-        return _.size(paper.scores);
-    }));
-//所有场次不同班级所有的人数总和的最大数目
-    result.totalStudentCount = _.max(_.map(req.exam["[papers]"], function(paper) {
-        return _.reduce(paper.scores, function(sum, classScore, classIndex) {
-            return sum += classScore.length;
-        }, 0)
-    }));
-//但 examUitls.是为了获取totalQuestions还是要走获取所有的paper实例，因为rank-server的paper.score只是记录了学生当前科目的总分
-    result.totalProblemCount = _.reduce(req.papers, function(sum, paper, index) {
-        return sum += (paper["[questions]"] ? paper["[questions]"].length : 0);
-    }, 0);
-    res.result.guide = result;
-
-console.log('guide 成功！！！');
-
-    next();
-};
-
-/**
- *格式化"分档"模块的数据格式
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
- * @return {[type]}        [description]
- */
-exports.level = function(req, res, next) {
-//每一个学生的总分-->每一个学生每一个门科目(paper)的总分-->每一个学生每门科目中所有题目的得分
-
-console.log('level ...');
-    var studentTotalScoreMap = {};
-    _.each(req.papers, function(paper) {
-        _.each(paper["[students]"], function(student) {
-            if(_.isUndefined(studentTotalScoreMap[student.kaohao])) {
-                studentTotalScoreMap[student.kaohao] = 0;
-            }
-            studentTotalScoreMap[student.kaohao] += (student.score ? student.score : 0);
-        });
-    });
-    //按照给的分档标准进行分档
-    //这里得到以groupKey为key，value是所有满足分档条件的分数所组成的数组
-    var levelScore = _.groupBy(studentTotalScoreMap, function(score, kaohao) {
-        if(score >= 600) return 'first';
-        if(score >= 520) return 'second';
-        if(score >= 400) return 'third';
-        return 'other';
-    });
-    res.result.level = {};
-    _.each(levelScore, function(value, key) {
-        res.result.level[key] = value.length;
-    });
-
-console.log('level 成功！！！');
-
-    next();
-}
-
-
 /**
  * 返回dashboard数据结构的结果
  * @param  {[type]}   req  [description]
@@ -194,7 +142,12 @@ exports.dashboard = function(req, res, next) {
 
 console.log('dashboard 返回');
 
-    res.status(200).json(res.result);
+    res.status(200).json({
+        exam: req.exam,
+        papers: req.papers,
+        school: req.school,
+        topScores: req.topScores
+    });
 }
 
 

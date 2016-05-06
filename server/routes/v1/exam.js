@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:14:17
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 14:27:33
+* @Last Modified time: 2016-05-06 11:55:35
 */
 
 'use strict';
@@ -18,7 +18,7 @@ var auth = require('../../middlewares/auth');
 var exam = require('../../middlewares/exam');
 
 router.get('/home', auth.verify, exam.initSchool, exam.home);
-router.get('/dashboard', auth.verify, exam.validateExam, exam.initExam, exam.guide, exam.level, exam.dashboard);
+router.get('/dashboard', auth.verify, exam.validateExam, exam.initExam, exam.initExamTotalScore, exam.dashboard);
 router.get('/school/analysis', auth.verify, exam.validateExam, exam.initExam, exam.schoolAnalysis);
 
 module.exports = router;
