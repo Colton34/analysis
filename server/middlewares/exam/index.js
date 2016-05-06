@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 19:54:58
+* @Last Modified time: 2016-05-06 08:30:26
 */
 
 'use strict';
@@ -27,6 +27,9 @@ exports.validateExam = function(req, res, next) {
     req.checkQuery('examid', '无效的examids').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
     if(req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err));
+
+console.log('validateExam 成功！！！');
+
     next();
 }
 
@@ -38,6 +41,9 @@ exports.validateExam = function(req, res, next) {
  * @return {[type]}        [description]
  */
 exports.initExam = function(req, res, next) {
+
+console.log('initExam...');
+
     res.result = {};
     examUitls.getExamById(req.query.examid).then(function(exam) {
         req.exam = exam;
@@ -47,6 +53,9 @@ exports.initExam = function(req, res, next) {
         return examUitls.getSchoolById(req.exam.schoolid);
     }).then(function(school) {
         req.school = school;
+
+console.log('initExam 成功');
+
         next();
     }).catch(function(err) {
         next(err);
@@ -64,12 +73,18 @@ exports.initExam = function(req, res, next) {
  * @return {[type]}        [description]
  */
 exports.initSchool = function(req, res, next) {
+
+console.log('initSchool....');
+
     examUitls.getSchoolById(req.user.schoolId)
         .then(function(school) {
             req.school = school;
             return examUitls.getExamsBySchool(req.school);
         }).then(function(exams) {
             req.exams = exams;
+
+console.log('initSchool 成功！！！');
+
             next();
         }).catch(function(err) {
             next(err);
@@ -87,6 +102,9 @@ exports.initSchool = function(req, res, next) {
 exports.home = function(req, res, next) {
     try {
         var result = examUitls.formatExams(req.exams);
+
+console.log('home 返回');
+
         res.status(200).json(result);
     } catch(e) {
         next(e);
@@ -102,6 +120,9 @@ exports.home = function(req, res, next) {
  * @return {[type]}        [description]
  */
 exports.guide = function(req, res, next) {
+
+console.log('guide ....');
+
     var result = {
         subjectCount: 0,
         totalProblemCount: 0,
@@ -125,6 +146,9 @@ exports.guide = function(req, res, next) {
         return sum += (paper["[questions]"] ? paper["[questions]"].length : 0);
     }, 0);
     res.result.guide = result;
+
+console.log('guide 成功！！！');
+
     next();
 };
 
@@ -137,6 +161,8 @@ exports.guide = function(req, res, next) {
  */
 exports.level = function(req, res, next) {
 //每一个学生的总分-->每一个学生每一个门科目(paper)的总分-->每一个学生每门科目中所有题目的得分
+
+console.log('level ...');
     var studentTotalScoreMap = {};
     _.each(req.papers, function(paper) {
         _.each(paper["[students]"], function(student) {
@@ -158,6 +184,9 @@ exports.level = function(req, res, next) {
     _.each(levelScore, function(value, key) {
         res.result.level[key] = value.length;
     });
+
+console.log('level 成功！！！');
+
     next();
 }
 
@@ -170,6 +199,9 @@ exports.level = function(req, res, next) {
  * @return {[type]}        [description]
  */
 exports.dashboard = function(req, res, next) {
+
+console.log('dashboard 返回');
+
     res.status(200).json(res.result);
 }
 
@@ -185,6 +217,9 @@ exports.dashboard = function(req, res, next) {
 exports.schoolAnalysis = function(req, res, next) {
     try {
         var result = examUitls.generateStudentScoreInfo(req.exam, req.papers, req.school);
+
+console.log('schoolAnalysis 返回');
+
         res.status(200).json(result);
     } catch (e) {
         next(new errors.Error('schoolAnalysis 同步错误', e));

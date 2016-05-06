@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 08:18:41
+* @Last Modified time: 2016-05-06 08:44:03
 */
 import _ from 'lodash';
 
@@ -23,6 +23,7 @@ export function fetchComponentDataBeforeRender(dispatch, components, params, loc
       .concat(prev);
     }, []);
 
+    if(!request.defaults.headers) request.defaults.headers = { common: {} };
     request.defaults.headers.common['x-access-token'] = req.user.token;
     params = initParams(params, location, {"_user": req.user, 'request': request});
 
