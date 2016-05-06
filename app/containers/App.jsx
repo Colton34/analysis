@@ -8,6 +8,8 @@ import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
+import Radium from 'radium';
+import {Map} from 'immutable';
 
 //自定义组件
 import Header from '../common/Header';
@@ -18,9 +20,8 @@ import Footer from '../common/Footer';
 // const cx = classNames.bind(styles);
 
 import {initUser} from '../reducers/global-app/actions';
+import {convertJS} from '../lib/util';
 
-
-import Radium from 'radium';
 
 
 //模式：所有的router view都会有need来提前获取首屏数据。这时返回到前端的时候state中就是有数据的initial state
@@ -28,16 +29,15 @@ import Radium from 'radium';
 class App extends React.Component {
     static need = [
         initUser
-    ];//这里的分号一定不要忘记！！！
-
-    constructor(props) {
-        super(props);
-    }
+    ];
 
     render() {
+        var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
         return (
             <div>
-                {this.props.children}
+                <Header user={user} />
+                    {this.props.children}
+                <Footer />
             </div>
         );
     }

@@ -1,7 +1,7 @@
 //================= Global ===========================
-export const GET_USER = 'GET_USER';
-export const GET_USER_SUCCESS = 'GET_USER_SUCCESS';
-export const GET_USER_FAIL = 'GET_USER__FAILURE';
+export const INIT_USER_ME = 'INIT_USER_ME';
+export const INIT_USER_ME_SUCCESS = 'INIT_USER_ME_SUCCESS';
+export const INIT_USER_ME_FAILURE = 'INIT_USER_ME_FAILURE';
 
 export const SHOW_LOADING = 'SHOW_LOADING';
 export const HIDE_LOADING = 'HIDE_LOADING';

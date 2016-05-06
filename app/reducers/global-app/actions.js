@@ -2,23 +2,21 @@
 * @Author: HellMagic
 * @Date:   2016-04-11 19:41:24
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-04-11 19:53:47
+* @Last Modified time: 2016-05-06 18:26:35
 */
 
 'use strict';
 
 import {
-    GET_USER
+    INIT_USER_ME
 } from '../../lib/constants';
 
-import {getMockUser} from '../../api/user';
+import {fetchMe} from '../../api/user';
 
-
-//模式：这种action是针对need使用的。此action creator function一定返回一个带有promise属性的object
-export function initUser() {
+export function initUser(params) {
     return {
-        type: GET_USER,
-        promise: getMockUser()
+        type: INIT_USER_ME,
+        promise: fetchMe(params)
     }
 }
 
