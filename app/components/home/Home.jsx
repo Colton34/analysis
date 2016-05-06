@@ -13,14 +13,25 @@ const Welcome = () => {
     )
 }
 
-let examList = [{}];
-const ExamItem = () => {
+let examList = [
+    {
+        name: '遵义二十校联考',
+        time: '2016-01-02',
+        subjectNum: 3,
+        fullScore: 300,
+        from: '阅卷'
+    }
+];
+const ExamItem = ({item}) => {
     return (
         <div style={{ height: 50, padding: '40px 0', borderBottom: '1px solid #bfbfbf' }}>
             <div>
                 <div style={{ display: 'inline-block' }}>
-                    <div style={{ fontSize: 16, marginBottom: 20 }}>遵义二十校联考</div>
-                    <div style={{ fontSize: 12, color: '#c5c5c5' }}>创建时间： 2016-01-02    考试科目：3    试卷满分：300    来自：阅卷</div>
+                    <div style={{ fontSize: 16, marginBottom: 20 }}>{item.name}</div>
+                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>创建时间: {item.time}</span>
+                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>考试科目： {item.subjectNum}</span>
+                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>试卷满分： {item.fullScore}</span>
+                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>来自：    {item['from']}</span>
                 </div>
                 <a href="javascript:void(0)" style={{ display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#5ab2f9', color: '#fff', float: 'right', textDecoration: 'none', borderRadius: '8px' }}>
                     查看分析
@@ -46,7 +57,7 @@ const NoExamList = () => {
 
 const List = () => {
     return (
-        <div style={{ display: 'inline-block', width: 800, height: 1000, position: 'relative' }}>
+        <div style={{ display: 'inline-block', width: 800, position: 'relative' }}>
             <div style={{ borderBottom: '1px solid #bfbfbf', width: '100%', height: 70, position: 'relative', right: 0, padding: '10px 0 0 0', lineHeight: '70px' }}>
                 <a style={{ display: 'inline-block', width: 130, height: 40, backgroundColor: '#009966', color: '#fff', borderRadius: 5, lineHeight: '40px', textAlign: 'center' }}>
                     创建分析
@@ -55,7 +66,7 @@ const List = () => {
             </div>
             
             {
-                examList.length? _.range(5).map((num) => {return <ExamItem/>}) : <NoExamList />
+                examList.length? _.range(5).map((num) => {return <ExamItem item={examList[0]}/>}) : <NoExamList />
             }
         </div>
     )
@@ -125,7 +136,7 @@ const Questionnaire = () => {
 
 const Sidebar = () => {
     return (
-        <div style={{ width: 240, height: 1000, backgroundColor: '#fafafa', display: 'inline-block', float: 'right', padding: '0 60px 0 80px' }}>
+        <div style={{ width: 240, backgroundColor: '#fafafa', display: 'inline-block', float: 'right', padding: '0 60px 0 80px' }}>
             <TeacherHelper/>
             <CommonQuestions/>
             <Questionnaire/>
@@ -135,7 +146,7 @@ const Sidebar = () => {
 
 const Content = () => {
     return (
-        <div style={{ width: 1200, height: 1000, margin: '0 auto' }}>
+        <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#fff' }}>
             <List/>
             <Sidebar/>
         </div>
