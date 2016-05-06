@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 09:33:04
+* @Last Modified time: 2016-05-06 09:41:31
 */
 
 'use strict';
@@ -138,78 +138,6 @@ exports.getLevelByScore = function(score) {
             return '[0, 50]';
         }
     }
-}
-
-/**
- * 对exams进行排序格式化，从而符合首页的数据展示
- * @param  {[type]} exams [description]
- * @return {[type]}       [description]
- */
-exports.formatExams = function(exams) {
-    //先对所有exams中每一个exam中的papers进行年级划分：
-    var examsGroupByEventTime = _.groupBy(exams, function(exam) {
-        var time = moment(exam["event_time"]);
-        var year = time.get('year') + '';
-        var month = time.get('month') + 1;
-        month = (month > 9) ? (month + '') : ('0' + month);
-        var key = year + '.' + month;
-        return key;
-    });
-
-
-// console.log('keys = ', _.keys(examsGroupByEventTime));
-
-
-    var result = {}, resultOrder = [];
-
-    _.each(examsGroupByEventTime, function(examsItem, timeKey) {
-        //resultOrder是为了建立排序顺序的临时数据结构
-
-// console.log('exam  = ', exam);
-// console.log('exam.name = ', exam.name + '   exam.papers.length = ', exam['[papers]'].length, ' exam._id = ', exam._id);
-
-
-        //按照年级区分，同一个exam下不同年级算作不同的exam
-        // var allPapersFromOneTimeKey = _.concat(...(_.map(examsItem, (exam) => exam['[papers]'])));
-        var temp = {};
-        _.each(examsItem, function(exam) {
-            var flag = {key: timeKey, value: moment(exam['event_time']).valueOf() };
-            resultOrder.push(flag);
-
-            temp[exam._id] = {exam: exam};
-            var papersFromExamGroupByGrade = _.groupBy(exam["[papers]"], function(paper) {
-                return paper.grade;
-            });
-            temp[exam._id].papersMap = papersFromExamGroupByGrade;
-        });
-
-        if(!result[timeKey]) result[timeKey] = [];
-
-        _.each(temp, function(value, key) {
-            _.each(value.papersMap, function(papers, gradeKey) {
-                var obj = {};
-                obj.examName = value.exam.name + "(年级：" + gradeKey + ")";
-                obj.time = moment(value.exam['event_time']).valueOf();
-                // obj.eventTime = moment(value.exam['event_time']).format('ll'); -- 这个到前端去转换: moment(obj.time).format('ll')
-                obj.subjectCount = papers.length;
-                obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
-                obj.from = value.exam.from; //TODO: 这里数据库里只是存储的是数字，但是显示需要的是文字，所以需要有一个map转换
-
-                result[timeKey].push(obj);
-            });
-        })
-
-        result[timeKey] = _.orderBy(result[timeKey], [(obj) => obj.time], ['desc']);
-    });
-    resultOrder = _.orderBy(resultOrder, ['value'], ['desc']);
-    var finallyResult = [];
-    _.each(resultOrder, function(item) {
-        finallyResult.push({timeKey: item.key, value: result[item.key]});
-    });
-
-console.log('finallyResult[0] = ', finallyResult[0]);
-
-    return finallyResult;
 }
 
 //其实分析结果只要出一次就可以了，后面考试一旦考完，数据肯定就是不变的，但是出数据的颗粒度需要设计，因为前端会有不同的维度--所以还是需要计算

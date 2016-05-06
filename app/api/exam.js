@@ -2,21 +2,34 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 08:49:37
+* @Last Modified time: 2016-05-06 10:05:21
 */
 
 'use strict';
 
 
 import axios from 'axios';
+import _ from 'lodash';
 // var host = "http://localhost:3000";
 var examPath = "/exam";
-
+var moment = require('moment');
+require('moment/locale/zh-cn');
 // var baseURL = host + examPath;
+
+
+console.log(moment.locale());
 
 export function fetchHomeData(params) {
     var url = examPath + '/home';
-    return params.request.get(url);
+    return params.request.get(url)
+        .then(function(res) {
+            try {
+                var result = formatExams(res.data);
+                return Promise.resolve(result);
+            } catch(e) {
+                return Promise.reject('fetchHomeData Error');
+            }
+        })
 }
 
 export function fetchDashboardData(params) {
@@ -27,6 +40,71 @@ export function fetchDashboardData(params) {
 export function fetchSchoolAnalysisData(params) {
     var url = examPath + '/school/analysis?examid=' + params.examid;
     return params.request.get(url);
+}
+
+
+/**
+ * 对exams进行排序格式化，从而符合首页的数据展示
+ * @param  {[type]} exams [description]
+ * @return {[type]}       [description]
+ */
+function formatExams(exams) {
+    //先对所有exams中每一个exam中的papers进行年级划分：
+    var examsGroupByEventTime = _.groupBy(exams, function(exam) {
+        var time = moment(exam["event_time"]);
+        var year = time.get('year') + '';
+        var month = time.get('month') + 1;
+        month = (month > 9) ? (month + '') : ('0' + month);
+        var key = year + '.' + month;
+        return key;
+    });
+
+    var result = {}, resultOrder = [];
+
+    _.each(examsGroupByEventTime, function(examsItem, timeKey) {
+        //resultOrder是为了建立排序顺序的临时数据结构
+
+        //按照年级区分，同一个exam下不同年级算作不同的exam
+        // var allPapersFromOneTimeKey = _.concat(...(_.map(examsItem, (exam) => exam['[papers]'])));
+        var temp = {};
+        _.each(examsItem, function(exam) {
+            var flag = {key: timeKey, value: moment(exam['event_time']).valueOf() };
+            resultOrder.push(flag);
+
+            temp[exam._id] = {exam: exam};
+            var papersFromExamGroupByGrade = _.groupBy(exam["[papers]"], function(paper) {
+                return paper.grade;
+            });
+            temp[exam._id].papersMap = papersFromExamGroupByGrade;
+        });
+
+        if(!result[timeKey]) result[timeKey] = [];
+
+        _.each(temp, function(value, key) {
+            _.each(value.papersMap, function(papers, gradeKey) {
+                var obj = {};
+                obj.examName = value.exam.name + "(年级：" + gradeKey + ")";
+                obj.time = moment(value.exam['event_time']).valueOf();
+                obj.eventTime = moment(value.exam['event_time']).format('ll');
+                obj.subjectCount = papers.length;
+                obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
+                obj.from = value.exam.from; //TODO: 这里数据库里只是存储的是数字，但是显示需要的是文字，所以需要有一个map转换
+
+                result[timeKey].push(obj);
+            });
+        })
+
+        result[timeKey] = _.orderBy(result[timeKey], [(obj) => obj.time], ['desc']);
+    });
+    resultOrder = _.orderBy(resultOrder, ['value'], ['desc']);
+    var finallyResult = [];
+    _.each(resultOrder, function(item) {
+        finallyResult.push({timeKey: item.key, value: result[item.key]});
+    });
+
+// console.log('finallyResult[0] = ', finallyResult[0]);
+
+    return finallyResult;
 }
 
 

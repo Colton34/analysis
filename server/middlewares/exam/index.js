@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 08:30:26
+* @Last Modified time: 2016-05-06 10:05:45
 */
 
 'use strict';
@@ -100,15 +100,7 @@ console.log('initSchool 成功！！！');
  * @return {[type]}        [description]
  */
 exports.home = function(req, res, next) {
-    try {
-        var result = examUitls.formatExams(req.exams);
-
-console.log('home 返回');
-
-        res.status(200).json(result);
-    } catch(e) {
-        next(e);
-    }
+    res.status(200).json(req.exams);
 }
 
 //根据前端的模块，对前端的展示进行格式化数据--没有任何其他异步或者和服务端绑定的需求，所以这里的代码放在server或者client都是一样的
