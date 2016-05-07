@@ -7,9 +7,9 @@ const HeaderMenu = () => {
     return (
         <ul className={style.menu}>
             {
-                headerLinks.map(link => {
+                headerLinks.map((link, index) => {
                     return (
-                        <li className={style['menu-li']}>
+                        <li key={index} className={style['menu-li']}>
                             <a href="javascript:void(0)" className={style['menu-nav']} title={link}>{link}</a>
                         </li>
                     )
@@ -35,7 +35,7 @@ const HeaderUser = () => {
 }
 
 
-const CommentModal = ({modalActiveStatus, actions}) => { 
+const CommentModal = ({modalActiveStatus, actions}) => {
     console.log('inside modal:' + JSON.stringify(modalActiveStatus));
     return (
         <Modal show={modalActiveStatus.active} onHide={actions.alterCommentDialogStatus}>
@@ -43,7 +43,7 @@ const CommentModal = ({modalActiveStatus, actions}) => {
             <Modal.Title></Modal.Title>
           </Modal.Header>
           <Modal.Body>
-          
+
           </Modal.Body>
           <Modal.Footer>
             <Button>发送</Button>
@@ -52,7 +52,7 @@ const CommentModal = ({modalActiveStatus, actions}) => {
         </Modal>
     )
 }
- 
+
 const Header = ({user,commentActive, actions}) => {
     console.log('user:' + JSON.stringify(user));
     return (
@@ -65,7 +65,7 @@ const Header = ({user,commentActive, actions}) => {
                 <HeaderUser/>
                 <a href="javascript:void(0)"  style={{float: 'right', textDecoration: 'none',color: '#5a5a5a', paddingLeft: 40, paddingTop:30}}>我要吐槽</a>
 
-                
+
             </div>
         </div>
     )

@@ -4,8 +4,8 @@ import { Route, IndexRoute } from 'react-router';
 //TODO：各种需要的router page
 import App from '../containers/App';
 import Dashboard from '../containers/Dashboard';
-import SchoolAnalysis from '../containers/SchoolAnalysis';
-import Home from '../containers/Home';
+// import SchoolAnalysis from '../containers/SchoolAnalysis';
+// import Home from '../containers/Home';
 
 import Test from '../containers/Test'
 import Home from '../components/home/Home';
@@ -19,7 +19,7 @@ export default (store) => {
             <IndexRoute component={Test} />
             <Route path='home' component={Home} />
             <Route path='dashboard' component={Dashboard} />
-            <Route path='school/analysis' component={SchoolAnalysis} />
+            <Route path='school/report' component={SchoolReport} />
         </Route>
     );
 };
