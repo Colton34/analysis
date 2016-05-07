@@ -2,6 +2,10 @@ import React, {PropTypes} from 'react';
 import {Modal, Button} from 'react-bootstrap'
 import style from './Header.css';
 
+//直接使用<Modal.Header />语法则会有“Property object of JSXMemberExpression expected node to be of。。。”的错误，因为
+//babel-transform对此编译支持的原因，详见：https://phabricator.babeljs.io/T6662，所以一律写成这种语法
+var {Header, Title, Body, Footer} = Modal;
+
 let headerLinks = ['首页', '分析'];
 const HeaderMenu = () => {
     return (
@@ -39,21 +43,21 @@ const CommentModal = ({modalActiveStatus, actions}) => {
     console.log('inside modal:' + JSON.stringify(modalActiveStatus));
     return (
         <Modal show={modalActiveStatus.active} onHide={actions.alterCommentDialogStatus}>
-            <Modal.Header closeButton>
-            <Modal.Title></Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+            <Header closeButton>
+            <Title></Title>
+          </Header>
+          <Body>
 
-          </Modal.Body>
-          <Modal.Footer>
+          </Body>
+          <Footer>
             <Button>发送</Button>
             <Button>取消</Button>
-          </Modal.Footer>
+          </Footer>
         </Modal>
     )
 }
 
-const Header = ({user,commentActive, actions}) => {
+const HeaderComponent = ({user,commentActive, actions}) => {
     console.log('user:' + JSON.stringify(user));
     return (
         <div className={style.header}>
@@ -75,5 +79,5 @@ Header.propTypes = {
     user: PropTypes.object.isRequired
 };
 
-export default Header;
+export default HeaderComponent;
 
