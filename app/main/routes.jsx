@@ -8,7 +8,7 @@ import Dashboard from '../containers/Dashboard';
 // import Home from '../containers/Home';
 
 import Test from '../containers/Test'
-import Home from '../components/home/Home';
+import Home from '../containers/Home';
 import SchoolReport from '../containers/SchoolReport';
 /*
 当Route内嵌的时候，使用相对path则会继承上一级的路由path，如果使用绝对path（即前面加上"/"），则不会继承上一级的path

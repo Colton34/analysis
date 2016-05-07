@@ -6,6 +6,12 @@ import style from './Header.css';
 //babel-transform对此编译支持的原因，详见：https://phabricator.babeljs.io/T6662，所以一律写成这种语法
 var {Header, Title, Body, Footer} = Modal;
 
+
+/*
+TODO: 清理这里没用的代码
+
+ */
+
 let headerLinks = ['首页', '分析'];
 const HeaderMenu = () => {
     return (
@@ -58,7 +64,6 @@ const CommentModal = ({modalActiveStatus, actions}) => {
 }
 
 const HeaderComponent = ({user,commentActive, actions}) => {
-    console.log('user:' + JSON.stringify(user));
     return (
         <div className={style.header}>
             <div className={style.wrapper}>

@@ -37,7 +37,7 @@ class Test extends React.Component {
 
     render() {
         var exam = {id: 167}
-        var path = '/school/analysis'; //'' + 167 +
+        var path = '/school/report'; //'' + 167 +
         return (
             <div>
                 <Link to="/home">主页</Link>

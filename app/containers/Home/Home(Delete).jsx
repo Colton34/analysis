@@ -40,7 +40,7 @@ const ExamItem = ({item}) => {
         </div>
 
     )
-} 
+}
 const NoExamList = () => {
     return (
         <div>
@@ -53,7 +53,7 @@ const NoExamList = () => {
             <p>同时，你还可以创建自定义分析。</p>
         </div>
     )
-} 
+}
 
 const List = () => {
     return (
@@ -64,7 +64,7 @@ const List = () => {
                 </a>
                 <span style={{ color: '#aeaeae', position: 'absolute', bottom: -7, marginLeft: 10, fontSize: 14 }}>根据学校实际情况，自定义数据进行分析。比如：文理拆分、文理合并等</span>
             </div>
-            
+
             {
                 examList.length? _.range(5).map((num) => {return <ExamItem item={examList[0]}/>}) : <NoExamList />
             }
@@ -80,7 +80,7 @@ const TeacherHelper = () => {
             <div className={styles['instruction-video']}></div>
         </div>
     )
-} 
+}
 let questionList = [
     '多校联考，怎么查看数据？',
     '什么场景下使用自定义分析？',
