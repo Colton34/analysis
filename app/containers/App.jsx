@@ -12,7 +12,7 @@ import Radium from 'radium';
 import {Map} from 'immutable';
 
 //自定义组件
-import Header from '../common/Header/Header';
+import Header from '../common/Header';
 import Footer from '../common/Footer';
 
 //引入样式

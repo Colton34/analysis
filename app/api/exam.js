@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 15:17:32
+* @Last Modified time: 2016-05-07 18:01:47
 */
 
 'use strict';
@@ -51,8 +51,11 @@ console.log('fetchDashboardData url = ', url);
 console.log('fetchDashboardData 返回！！！！！！！！！！！');
 
                 result.examGuide = guide(res.data.exam, res.data.papers);
-                result.levelReport = level(res.data.papers);
-                result.topScores = res.data.topScores;
+                result.scoreRank = res.data.scoreRank;
+                result.levelReport = res.data.levelReport;
+
+console.log('dashboard 格式化数据完成');
+
                 return Promise.resolve(result);
             } catch(e) {
                 console.log('fetchDashboardData error ', e);//错误的error可以保留
@@ -185,35 +188,35 @@ console.log('guide 成功！！！');
  * @param  {Function} next [description]
  * @return {[type]}        [description]
  */
-function level(papers) {
-//每一个学生的总分-->每一个学生每一个门科目(paper)的总分-->每一个学生每门科目中所有题目的得分
+// function level(papers) {
+// //每一个学生的总分-->每一个学生每一个门科目(paper)的总分-->每一个学生每门科目中所有题目的得分
 
-console.log('level ...');
-    var studentTotalScoreMap = {};
-    _.each(papers, function(paper) {
-        _.each(paper["[students]"], function(student) {
-            if(_.isUndefined(studentTotalScoreMap[student.kaohao])) {
-                studentTotalScoreMap[student.kaohao] = 0;
-            }
-            studentTotalScoreMap[student.kaohao] += (student.score ? student.score : 0);
-        });
-    });
-    //按照给的分档标准进行分档
-    //这里得到以groupKey为key，value是所有满足分档条件的分数所组成的数组
-    var levelScore = _.groupBy(studentTotalScoreMap, function(score, kaohao) {
-        if(score >= 600) return 'first';
-        if(score >= 520) return 'second';
-        if(score >= 400) return 'third';
-        return 'other';
-    });
-    var result = {};
-    _.each(levelScore, function(value, key) {
-        result[key] = value.length;
-    });
+// console.log('level ...');
+//     var studentTotalScoreMap = {};
+//     _.each(papers, function(paper) {
+//         _.each(paper["[students]"], function(student) {
+//             if(_.isUndefined(studentTotalScoreMap[student.kaohao])) {
+//                 studentTotalScoreMap[student.kaohao] = 0;
+//             }
+//             studentTotalScoreMap[student.kaohao] += (student.score ? student.score : 0);
+//         });
+//     });
+//     //按照给的分档标准进行分档
+//     //这里得到以groupKey为key，value是所有满足分档条件的分数所组成的数组
+//     var levelScore = _.groupBy(studentTotalScoreMap, function(score, kaohao) {
+//         if(score >= 600) return 'first';
+//         if(score >= 520) return 'second';
+//         if(score >= 400) return 'third';
+//         return 'other';
+//     });
+//     var result = {};
+//     _.each(levelScore, function(value, key) {
+//         result[key] = value.length;
+//     });
 
-console.log('level 成功！！！');
-    return result;
-}
+// console.log('level 成功！！！');
+//     return result;
+// }
 
 // Mock Data:
 // export function getMockExamGuide() {

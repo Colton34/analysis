@@ -6,41 +6,32 @@ import Radium from 'radium';
 import _ from 'lodash';
 
 
-const ScoreRank = (data) => {
-
-// console.log('scoreRank = ', data.data.top);
-    if(!data || !data.data || (_.size(_.keys(data))==0) || data.data.size == 0) return (<div></div>);// 这个时候显示loading动画
-    var flag = 0;
-
+const ScoreRank = ({data}) => {
     var flagFirstColor = {backgroundColor: '#FF0033'};
     var flagSecondColor = {backgroundColor: '#FF9900'};
     var flagThirdColor = {backgroundColor: '#99CC00'};
 
-    var tops = _.map(data.data.top, function(score, name) {
-        flag++;
-
+    var tops = _.map(data.top, function(obj, index) {
         var flagColor = {};
-        if(flag === 1) {flagColor.first = true};
-        if(flag === 2) {flagColor.second = true};
-        if(flag === 3) {flagColor.third = true};
+        if(index === 0) {flagColor.first = true};
+        if(index === 1) {flagColor.second = true};
+        if(index === 2) {flagColor.third = true};
 
         var result = ((flagColor.first && flagFirstColor) || (flagColor.second && flagSecondColor) || (flagColor.third && flagThirdColor));
 
         return (
-            <div key={flag} style={[styles.container, result, styles.common.radius, {marginBottom: 2}]}>
-                <div>{name}</div>
-                <div>{score}</div>
+            <div key={index} style={[styles.container, result, styles.common.radius, {marginBottom: 2}]}>
+                <div>{obj.name}</div>
+                <div>{obj.score}</div>
             </div>
         )
     });
-    flag = 0;
 
-    var lows = _.map(data.data.low, function(score, name) {
-        flag++;
+    var lows = _.map(data.low, function(obj, index) {
         return (
-            <div key={flag} style={[styles.container, styles.common.radius, {marginBottom: 2}]}>
-                <div>{name}</div>
-                <div>{score}</div>
+            <div key={index} style={[styles.container, styles.common.radius, {marginBottom: 2}]}>
+                <div>{obj.name}</div>
+                <div>{obj.score}</div>
             </div>
         )
     });

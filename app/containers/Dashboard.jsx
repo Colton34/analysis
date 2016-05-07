@@ -1,8 +1,4 @@
 'use strict';
-//路由container view，用来组织state object tree, 并connect redux and react
-
-
-//Dashboard的Mock版本：
 
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
@@ -21,7 +17,7 @@ import SubjectReport from '../components/dashboard/subject-report';
 import {initDashboardAction} from '../reducers/dashboard/actions';
 import {convertJS, initParams} from '../lib/util';
 
-import {Map} from 'immutable';
+import {Map, List} from 'immutable';
 
 
 // 　Bgcolor:″＃F1FAFA″——做正文的背景色好，淡雅
@@ -56,44 +52,30 @@ class Dashboard extends React.Component {
     ];
 
     componentDidMount() {
+        if(this.props.dashboard.haveInit) return;
 
 console.log('dashboard componentDidMount....');
 
         var params = initParams(this.props.params, this.props.location, {'request': window.request});
         this.props.initDashboard(params);
-
-console.log('dashboard componentDidMount...');
-
     }
 
     render() {
-        var containers = _.map(_.range(4), function(index) {
-            return (null);
-        });
-
-        // var examGuide = convertJS(this.props.dashboard.examGuide);
-        // var scoreRank = convertJS(this.props.dashboard.scoreRank);
-        // var levelReport = convertJS(this.props.dashboard.levelReport);
-        // var classReport = convertJS(this.props.dashboard.classReport);
-        // var subjectReport = convertJS(this.props.dashboard.subjectReport);
+        var examGuide = (Map.isMap(this.props.dashboard.examGuide)) ? this.props.dashboard.examGuide.toJS() : this.props.dashboard.examGuide;
+        var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
+        var levelReport = (Map.isMap(this.props.dashboard.levelReport)) ? this.props.dashboard.levelReport.toJS() : this.props.dashboard.levelReport;
+        // var classReport = (Map.isMap(this.props.dashboard.classReport)) ? this.props.dashboard.classReport.toJS() : this.props.dashboard.classReport;
+        // var subjectReport = (Map.isMap(this.props.dashboard.subjectReport)) ? this.props.dashboard.subjectReport.toJS() : this.props.dashboard.subjectReport;
 
 
-console.log('examGuide = ', this.props.dashboard.examGuide);
-console.log('topScores = ', this.props.dashboard.topScores);
-console.log('levelReport = ', this.props.dashboard.levelReport);
-// console.log('classReport = ', classReport);
-// console.log('subjectReport = ', subjectReport);
+        if((!examGuide || _.size(examGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
+            (!levelReport || _.size(levelReport) == 0)) return (<div></div>);
 
+// console.log('examGuide = ', examGuide);
+// console.log('scoreRank = ', scoreRank);
+console.log('levelReport = ', levelReport);
 
-//TODO：这个接口应该是缺少东西。。。
         return (
-            <div></div>
-        );
-    }
-}
-
-/*
-
             <div style={[styles.box, styles.common.radius]}>
                 <div style={[styles.container, styles.common.radius]}>
                     <ExamGuideComponent data={examGuide} />
@@ -104,8 +86,12 @@ console.log('levelReport = ', this.props.dashboard.levelReport);
                 </div>
                 <div style={[styles.container, styles.common.radius]}>
                     <LevelReport data={levelReport} />
-                    <ClassReport data={classReport} />
-                    <SubjectReport data={subjectReport} />
+                    <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}]}>
+                        <div style={{fontWeight: 'blod', marginTop: 10}}>班级分析报告</div>
+                    </div>
+                    <div style={[styles.item, styles.common.radius]}>
+                        <div style={{fontWeight: 'blod', marginTop: 10}}>学科分析报告</div>
+                    </div>
                 </div>
                 <div style={[styles.container, styles.common.radius]}>
                     <div style={[styles.item, styles.common.radius]}>
@@ -130,8 +116,9 @@ console.log('levelReport = ', this.props.dashboard.levelReport);
                     </div>
                 </div>
             </div>
-
- */
+        );
+    }
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
 

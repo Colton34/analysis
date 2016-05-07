@@ -21,7 +21,7 @@ const GlobalGuideCom = ({data}) => {
                     <div>考试学科数</div>
                 </div>
                 <div style={{float: 'right', marginRight: 40}}>
-                    <div style={{marginBottom: 20}}>{data.totoalProblemCount}</div>
+                    <div style={{marginBottom: 20}}>{data.totalProblemCount}</div>
                     <div>考试总题数</div>
                 </div>
             </div>
@@ -32,7 +32,7 @@ const GlobalGuideCom = ({data}) => {
                     <div>考试班级数</div>
                 </div>
                 <div style={{float: 'right', marginRight: 40}}>
-                    <div style={{marginBottom: 20}}>{data.totoalStudentCount}</div>
+                    <div style={{marginBottom: 20}}>{data.totalStudentCount}</div>
                     <div>考试学生数</div>
                 </div>
             </div>

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 14:59:38
+* @Last Modified time: 2016-05-07 18:50:01
 */
 
 'use strict';
@@ -67,7 +67,9 @@ console.log('initExamTotalScore ....');
 //要所有学生的top6，那么可以只取每一个班级的top6，这样从这些top6中获取总的top6
     return examUitls.getScoresByExamid(req.query.examid).then(function(allTotalScoreGroupByClssName) {
         try {
-            req.topScores = filterTopScores(allTotalScoreGroupByClssName);
+            var result = scoreFilter(allTotalScoreGroupByClssName);
+            req.scoreRank = result.scoreRank;
+            req.levelReport = result.levelReport;
             next();
         } catch(e) {
             return when.reject(new errors.Error('initExamTotalScore Format Error', e));
@@ -77,18 +79,35 @@ console.log('initExamTotalScore ....');
     })
 }
 
-function filterTopScores(totalScoreGroup) {
-    var topScoresArr = _.chain(totalScoreGroup)
+function scoreFilter(totalScoreGroup) {
+    var orderedScores = _.chain(totalScoreGroup)
         .map((scores) => _.take(scores, 6))
         .value()
     ;
-    topScoresArr = _.concat(...topScoresArr);
-    return _.chain(topScoresArr)
-        .orderBy(['score'], ['desc'])
-        .take(6)
-        .value()
-    ;
+    orderedScores = _.orderBy(_.concat(...orderedScores), ['score'], ['desc']);
+
+    var scoreRank = {
+        top: _.take(orderedScores, 6),
+        low: _.takeRight(orderedScores, 6)
+    };
+
+    var totalCount = orderedScores.length;
+    var firstValues = _.filter(orderedScores, (obj) => obj.score>600);
+    var secondValues = _.filter(orderedScores, (obj) => obj.score>520);
+    var thirdValues = _.filter(orderedScores, (obj) => obj.score>480);
+
+    var levelReport = {
+        'first': {flag: 600, percentage:_.round(_.multiply(_.divide(firstValues.length, totalCount), 100), 1), count: firstValues.length},
+        'second': {flag: 520, percentage: _.round(_.multiply(_.divide(secondValues.length, totalCount), 100), 1), count: secondValues.length},
+        'third': {flag: 480, percentage: _.round(_.multiply(_.divide(thirdValues.length, totalCount), 100), 1), count: thirdValues.length}
+    };
+
+    return {
+        scoreRank: scoreRank,
+        levelReport: levelReport
+    }
 }
+
 
 
 /**
@@ -146,7 +165,8 @@ console.log('dashboard 返回!!!!!!!!!!!');
         exam: req.exam,
         papers: req.papers,
         school: req.school,
-        topScores: req.topScores
+        scoreRank: req.scoreRank,
+        levelReport: req.levelReport
     });
 }
 

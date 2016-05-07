@@ -103,6 +103,7 @@ const NoExamList = () => {
 }
 
 const ExamItem = ({item}) => {
+    var examid = item.id.slice(item.id.lastIndexOf('0')+1);
     return (
         <div style={{ height: 50, padding: '40px 0', borderBottom: '1px solid #bfbfbf' }}>
             <div>
@@ -113,9 +114,9 @@ const ExamItem = ({item}) => {
                     <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>试卷满分： {item.fullMark}</span>
                     <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>来自：    {item['from']}</span>
                 </div>
-                <a href="javascript:void(0)" style={{ display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#5ab2f9', color: '#fff', float: 'right', textDecoration: 'none', borderRadius: '8px' }}>
+                <Link to={{ pathname: '/dashboard', query: { examid: examid, grade: encodeURI(item.grade) } }} style={{ display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#5ab2f9', color: '#fff', float: 'right', textDecoration: 'none', borderRadius: '8px' }}>
                     查看分析
-                </a>
+                </Link>
             </div>
         </div>
 

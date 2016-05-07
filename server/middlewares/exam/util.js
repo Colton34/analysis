@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 12:51:31
+* @Last Modified time: 2016-05-07 18:39:51
 */
 
 'use strict';
@@ -69,21 +69,31 @@ exports.getExamById = function(examid) {
 
 exports.getScoresByExamid = function(examid) {
     //Mock Data
-    var arr = {
-            'A': [{name: 'aa', score: 12, class: 'A'}, {name: 'bb', score: 20, class: 'A'}],
-            'B': [{name: 'cc', score: 2, class: 'B'}, {name: 'dd', score: 50, class: 'B'}]
-        };
-    return when.resolve(arr);
+    // var arr = {
+    //         'A': [{name: 'aa', score: 12, class: 'A'}, {name: 'bb', score: 20, class: 'A'}],
+    //         'B': [{name: 'cc', score: 2, class: 'B'}, {name: 'dd', score: 50, class: 'B'}],
+    //         'C': [{name: 'aa', score: 100, class: 'A'}, {name: 'bb', score: 39, class: 'A'}],
+    //         'D': [{name: 'cc', score: 65, class: 'B'}, {name: 'dd', score: 5, class: 'B'}],
+    //         'E': [{name: 'aa', score: 1, class: 'A'}, {name: 'bb', score: 180, class: 'A'}],
+    //         'F': [{name: 'cc', score: 200, class: 'B'}, {name: 'dd', score: 0, class: 'B'}],
+    //         'G': [{name: 'aa', score: 111, class: 'A'}, {name: 'bb', score: 24, class: 'A'}],
+    //         'H': [{name: 'cc', score: 90, class: 'B'}, {name: 'dd', score: 76, class: 'B'}],
+    //         'I': [{name: 'aa', score: 500, class: 'A'}, {name: 'bb', score: 390, class: 'A'}],
+    //         'G': [{name: 'cc', score: 165, class: 'B'}, {name: 'dd', score: 75, class: 'B'}],
+    //         'K': [{name: 'aa', score: 16, class: 'A'}, {name: 'bb', score: 20, class: 'A'}],
+    //         'L': [{name: 'cc', score: 300, class: 'B'}, {name: 'dd', score: 60, class: 'B'}]
+    //     };
+    // return when.resolve(arr);
 
-    // var url = config.rankBaseUrl + '/scores' + '?' + 'examid=' + examid;
-    // return when.promise(function(resolve, reject) {
-    //     client.get(url, {}, function(err, res, body) {
-    //         if(err) return reject(new errors.URIError('查询rank server(scores)失败', err));
-    //         var data = JSON.parse(body);
-    //         var keys = _.keys(data);
-    //         resolve(data[keys[0]]);
-    //     });
-    // });
+    var url = config.testRankBaseUrl + '/scores' + '?' + 'examid=' + examid;
+    return when.promise(function(resolve, reject) {
+        client.get(url, {}, function(err, res, body) {
+            if(err) return reject(new errors.URIError('查询rank server(scores)失败', err));
+            var data = JSON.parse(body);
+            var keys = _.keys(data);
+            resolve(data[keys[0]]);
+        });
+    });
 };
 
 exports.getAllPapersByExam = function(exam) {

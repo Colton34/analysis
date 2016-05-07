@@ -6,16 +6,26 @@ import Radium from 'radium';
 import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
 
-const LevelReport = (data) => {
-    if(!data || !data.data || (_.size(_.keys(data))==0) || data.data.size == 0) return (<div></div>);
-    const leveFlag = ['一档', '二挡', '三挡'];
-console.log('levelReport = ', data.data);
-    var categories = _.map(data.data.levels, function(value, index) {
-        return ''.concat(leveFlag[index]).concat(' ').concat(value[0]).concat('<br />').concat(' 大于').concat(value[1]).concat('分');
+
+/*
+
+有个问题：当所考科目不多的时候--即总分不高的时候，比如总共才3科总分才360--这个时候去划分三挡线是480肯定是不合适的，所以分档线应该跟着总分走
+
+ */
+const LevelReport = ({data}) => {
+    // if(!data || !data.data || (_.size(_.keys(data))==0) || data.data.size == 0) return (<div></div>);
+    // const leveFlag = ['一档', '二挡', '三挡'];
+    const leveFlag = {
+        'first': '一档',
+        'second': '二挡',
+        'third': '三挡'
+    };
+
+    var counts = [];
+    var categories = _.map(data, function(value, key) {
+        counts.push(value.count);
+        return ''.concat(leveFlag[key]).concat(' ').concat(value.percentage).concat('<br />').concat(' 大于').concat(value.flag).concat('分');
     });
-
-
-console.log('levelCountItem = ', data.data.levelCountItem);
 
 
     const config = {
@@ -40,7 +50,7 @@ console.log('levelCountItem = ', data.data.levelCountItem);
         },
         series: [{
             name: '分数',
-            data: data.data.levelCountItem
+            data: counts
         }]
     };
 

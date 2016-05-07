@@ -16,8 +16,7 @@ import SchoolReport from '../containers/SchoolReport';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Test} />
-            <Route path='home' component={Home} />
+            <IndexRoute component={Home} />
             <Route path='dashboard' component={Dashboard} />
             <Route path='school/report' component={SchoolReport} />
         </Route>
