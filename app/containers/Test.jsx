@@ -1,6 +1,8 @@
 import React from 'react';
 import {Link} from 'react-router';
 
+import { Button } from 'react-bootstrap';
+
 import Radium from 'radium';
 
 const ReactHighcharts = require('react-highcharts');
@@ -41,6 +43,9 @@ class Test extends React.Component {
         return (
             <div>
                 <Link to="/home">主页</Link>
+                <br />
+                <br />
+                <Button bsStyle="primary">Primary</Button>
                 <br />
                 <br />
                 <Link to="/dashboard">看板</Link>

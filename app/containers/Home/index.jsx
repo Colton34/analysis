@@ -10,7 +10,7 @@ import {initHomeAction} from '../../reducers/home/actions';
 import {initParams, convertJS} from '../../lib/util';
 
 import styles from './Home.css';
-
+import _ from 'lodash';
 /*
 TODO: 以时间戳为groupKey分组显示
  */
