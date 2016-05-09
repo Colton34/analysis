@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-07 18:50:01
+* @Last Modified time: 2016-05-09 13:11:25
 */
 
 'use strict';
@@ -28,7 +28,7 @@ exports.validateExam = function(req, res, next) {
     if(req.validationErrors()) return next(req.validationErrors());
     if(req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err));
 
-console.log('validateExam 成功！！！');
+// console.log('validateExam 成功！！！');
 
     next();
 }
@@ -42,7 +42,7 @@ console.log('validateExam 成功！！！');
  */
 exports.initExam = function(req, res, next) {
 
-console.log('initExam...');
+// console.log('initExam...');
 
     res.result = {};
     examUitls.getExamById(req.query.examid).then(function(exam) {
@@ -54,7 +54,7 @@ console.log('initExam...');
     }).then(function(school) {
         req.school = school;
 
-console.log('initExam 成功');
+// console.log('initExam 成功');
 
         next();
     }).catch(function(err) {
@@ -63,7 +63,7 @@ console.log('initExam 成功');
 }
 
 exports.initExamTotalScore = function(req, res, next) {
-console.log('initExamTotalScore ....');
+// console.log('initExamTotalScore ....');
 //要所有学生的top6，那么可以只取每一个班级的top6，这样从这些top6中获取总的top6
     return examUitls.getScoresByExamid(req.query.examid).then(function(allTotalScoreGroupByClssName) {
         try {

@@ -5,6 +5,7 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 
 import {initSchoolAnalysisAction} from '../reducers/schoolAnalysis/actions';
+import {initParams, convertJS} from '../lib/util';
 
 class SchoolTotalAnalysis extends React.Component {
     static need = [

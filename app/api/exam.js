@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-07 18:01:47
+* @Last Modified time: 2016-05-09 20:36:27
 */
 
 'use strict';
@@ -40,22 +40,13 @@ export function fetchHomeData(params) {
  */
 export function fetchDashboardData(params) {
     var url = examPath + '/dashboard?examid=' + params.examid;
-
-console.log('fetchDashboardData url = ', url);
-
     return params.request.get(url)
         .then(function(res) {
             var result = {};
             try {
-
-console.log('fetchDashboardData 返回！！！！！！！！！！！');
-
                 result.examGuide = guide(res.data.exam, res.data.papers);
                 result.scoreRank = res.data.scoreRank;
                 result.levelReport = res.data.levelReport;
-
-console.log('dashboard 格式化数据完成');
-
                 return Promise.resolve(result);
             } catch(e) {
                 console.log('fetchDashboardData error ', e);//错误的error可以保留
@@ -72,8 +63,110 @@ console.log('dashboard 格式化数据完成');
  */
 export function fetchSchoolAnalysisData(params) {
     var url = examPath + '/school/analysis?examid=' + params.examid;
-    return params.request.get(url);
+
+    var grade = decodeURI(params.grade);
+
+    return params.request.get(url).then(function(res) {
+        return theTrender(res.data.studentScoreInfoMap);
+    });
 }
+
+//====================== theExamHeader ======================
+function theExamHeader(data, params) {
+    var eventTime = ''; //如何获得考试时间段
+    var grade = params.grade;
+    var classCount = _.size(data.classInfo);
+    var studentsCount = _.size(data.studentScoreInfoMap);
+    var subjectArr = _.map(data.paperInfo, function(paper) {
+        return paper.name;
+    });
+    return Promise.resolve({
+        eventTime: eventTime,
+        grade: grade,
+        classCount: classCount,
+        studentsCount: studentsCount,
+        subjectArr: subjectArr,
+        subjectCount: subjectArr.length
+    });
+}
+
+//====================== theTrender ======================
+function theTrender(studentScoreInfoMap) {
+    //1.要根据不同的分布显示不同的说明文案（不同的分布通过定义什么是多，什么是少来定义。。。）
+}
+
+
+//=====================theToalScoreLevel ====================
+function theTotalScoreLevel() {
+
+}
+
+function checkScoreLevel(score, levelMap) {
+    var target = _.find(levelMap, function(item) {
+        return score >= item.value;
+    });
+    if(target) return target.key;
+    return 'other';
+}
+
+/**
+ *
+ * @param  {[type]} studentScoreInfoMap [description]
+ * @param  {[type]} levelMap            [description]
+ * @return {[type]}                     [description]
+ */
+//注意：levelMap是可以根据设置不同的档次改变的
+function scoreFilter(studentScoreInfoMap, levelMap) {
+    var studentsGroupByClass = _.groupBy(studentScoreInfoMap, 'class');
+    var result = {};
+    _.each(studentsGroupByClass, function(studentsInClass, className) {
+        var levelGroup = _.groupBy(studentsInClass, function(student) {
+            return checkScoreLevel(student.totalScore, levelMap);
+        });
+        result[className] = levelGroup;
+    });
+    return result;
+}
+
+//根据总分，每50分，化为一档，确定每一档的分数
+function getLevelScore(fullMark) {
+    return _.range(0, fullMark+1, 50);
+}
+
+//根据Array进行二分法分档 or [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700]
+//建立对应的levelKey:
+function getLevelKey(levelArr) {
+    return _.map(_.range(levelArr.length - 1), function(index) {
+        var prefix = (index == 0) ? '[' : '(';
+        return prefix + levelArr[index] + ', ' + levelArr[index+1] + ']'
+    });
+}
+
+
+function BinarySearch(srcArray, des) {
+    var low = 0;
+　   var high = srcArray.length-1;
+　　while(low <= high) {
+　　    var middle = (low + high)/2;
+　　    if(des == srcArray[middle]) {
+　　        return (des == 0) ? {low: middle, high: middle} : {low: middle-1, high: middle-1}
+　　    }else if(des <srcArray[middle]) {
+　　        high = middle - 1;
+　　    }else {
+　　        low = middle + 1;
+　　    }
+　　}
+　　return {low: low, high: high};
+}
+
+
+    // var levelScore = getLevelScore(fullMark);
+    // var levelKey = getLevelKey(levelScore);
+    // return levelKey[BinarySearch(levelScore, score).high];
+
+
+
+
 
 /**
  * 对exams进行排序格式化，从而符合首页的数据展示
@@ -94,11 +187,13 @@ function formatExams(exams) {
     var result = {}, resultOrder = [];
 
     _.each(examsGroupByEventTime, function(examsItem, timeKey) {
+        var flag = {key: timeKey, value: moment(timeKey.split('.')).valueOf() };
+        resultOrder.push(flag);
         //resultOrder是为了建立排序顺序的临时数据结构
         var temp = {};
         _.each(examsItem, function(exam) {
-            var flag = {key: timeKey, value: moment(exam['event_time']).valueOf() };
-            resultOrder.push(flag);
+            // var flag = {key: timeKey, value: moment(exam['event_time']).valueOf() };
+            // resultOrder.push(flag);
 
             temp[exam._id] = {exam: exam};
             var papersFromExamGroupByGrade = _.groupBy(exam["[papers]"], function(paper) {
@@ -148,9 +243,6 @@ function formatExams(exams) {
  * @return {[type]}        [description]
  */
 function guide(exam, papers) {
-
-console.log('guide ....');
-
     var result = {
         subjectCount: 0,
         totalProblemCount: 0,
@@ -271,6 +363,49 @@ console.log('guide 成功！！！');
 //         subjects: ['语文', '数学', '英语', '政治', '历史', '地理'],
 //         weight: [43000, 19000, 60000, 35000, 17000, 10000]
 //     });
+// }
+
+
+
+/**
+ * 根据固定的分档规则惊醒区分分数段（因为分数段较多，且学生更多，所以采用二分法去分段而没有采用遍历group的方式--虽然代码可读性更高）
+ * @param  {[type]} score [description]
+ * @return {[type]}       [description]
+ *
+测试用例：
+var result = {};
+_.each(_.range(30), function() {
+    var score = _.random(600);
+    var key = getLevelByScore(score);
+    result[key] = score;
+})
+*/
+//缺乏灵活性！！！
+// exports.getLevelByScore = function(score) {
+//     if(score > 350) {
+//         if(score > 500) {
+//             if(score > 550) return '(550, 600]'; //注意这里满分就只能是600
+//             return '(500, 550]';
+//         } else if(score > 400) {
+//             if(score > 450) return '(450, 500]';
+//             return '(400, 450]';
+//         } else {
+//             return '(350, 400]'
+//         }
+//     } else {
+//         if(score > 200) {
+//             if(score > 300) return '(300, 350]';
+//             if(score > 250) return '(250, 300]';
+//             return '(200, 250]';
+//         } else if(score > 100) {
+//             if(score > 150) return '(150, 200]';
+//             return '(100, 150]';
+//         } else if(score > 50) {
+//             return '(50, 100]';
+//         } else {
+//             return '[0, 50]';
+//         }
+//     }
 // }
 
 

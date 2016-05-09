@@ -3,7 +3,7 @@
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import {Link} from 'react-router';
+import {Link, browserHistory} from 'react-router';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import _ from 'lodash';
@@ -54,10 +54,15 @@ class Dashboard extends React.Component {
     componentDidMount() {
         if(this.props.dashboard.haveInit) return;
 
-console.log('dashboard componentDidMount....');
-
         var params = initParams(this.props.params, this.props.location, {'request': window.request});
         this.props.initDashboard(params);
+    }
+
+    toViewSchoolAnalysis() {
+        var examid = this.props.location.query ? this.props.location.query.examid : '';
+        var grade = this.props.location.query ? this.props.location.query.grade : '';
+        if(!examid || !grade) return;
+        browserHistory.push('/school/report?examid=' + examid + '&grade=' + encodeURI(grade));
     }
 
     render() {
@@ -71,16 +76,12 @@ console.log('dashboard componentDidMount....');
         if((!examGuide || _.size(examGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
             (!levelReport || _.size(levelReport) == 0)) return (<div></div>);
 
-// console.log('examGuide = ', examGuide);
-// console.log('scoreRank = ', scoreRank);
-console.log('levelReport = ', levelReport);
-
         return (
             <div style={[styles.box, styles.common.radius]}>
                 <div style={[styles.container, styles.common.radius]}>
                     <ExamGuideComponent data={examGuide} />
                     <ScoreRank data={scoreRank} />
-                    <div key="test" style={[styles.item, styles.common.radius]}>
+                    <div key="test" style={[styles.item, styles.common.radius]} onClick={this.toViewSchoolAnalysis.bind(this)}>
                         <div style={{fontWeight: 'blod', marginTop: 10}}>学校成绩总报告</div>
                     </div>
                 </div>
