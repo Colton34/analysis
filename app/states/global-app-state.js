@@ -26,8 +26,7 @@ const InitialState = Record({
         onHide: '',
         shapeStyle:'',
         okButton: true,
-        okLabel: '确认'
-        
+        okLabel: '确认'        
     }
 });
 

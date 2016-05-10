@@ -14,10 +14,10 @@ import InitialState from '../../states/global-app-state';
 
 //引入和自己的state数据相关的常量
 import {
-
     INIT_USER_ME_SUCCESS,
-    ALTER_COMMENT_DIALOG_STATUS
-
+    ALTER_COMMENT_DIALOG_STATUS,
+    SHOW_DIALOG,
+    HIDE_DIALOG
 } from '../../lib/constants';
 
 var initialState = new InitialState;
@@ -37,6 +37,12 @@ export default function reducer(state, action) {
         case ALTER_COMMENT_DIALOG_STATUS:
             var needShow = state.get('dialog').show;
             return state.set('dialog', Object.assign({},state.get('dialog'), {show: !needShow}, _.omit(action, 'type')));
+        case SHOW_DIALOG:
+            var needShow = state.get('dialog').show;
+            return state.set('dialog', Object.assign({},state.get('dialog'), {show: !needShow}, _.omit(action, 'type')));
+                     
+        case HIDE_DIALOG:
+            return state.set('dialog', Object.assign({},state.get('dialog'), {show: false}));
 
     }
     return state;
