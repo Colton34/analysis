@@ -25,7 +25,7 @@ class Dialog extends React.Component {
         var dialog = this.props.dialog;
         var _this = this;
         return (
-            <Modal show={ dialog.show } ref="dialog"  onHide={this.props.onHide}>
+            <Modal show={ dialog.show } ref="dialog"  onHide={this.props.onHide.bind(this,{})}>
                 <Header closeButton style={{textAlign: 'center'}}>
                     {dialog.title && <Title>{dialog.title}</Title>}
                 </Header>
