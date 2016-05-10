@@ -38,7 +38,7 @@ const HeaderUser = () => {
 
 let dialogProps = {
     title: '我要吐槽',
-    content: <div contenteditable="true" style={{width: 730, height:240}}></div>
+    content: <textarea  style={{width: 550, height:200}}></textarea>
 }
 
 const HeaderComponent = ({user, actions}) => {
@@ -58,7 +58,7 @@ const HeaderComponent = ({user, actions}) => {
     )
 };
 
-Header.propTypes = {
+HeaderComponent.propTypes = {
     user: PropTypes.object.isRequired
 };
 

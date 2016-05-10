@@ -1,3 +1,4 @@
+
 import React from 'react';
 //import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -10,28 +11,39 @@ import styles from './common.css';
 var {Header, Title, Body, Footer} = Modal;
 
 let localStyle= {
-    okBtn: {
-        width: 200,
-        height: 50
-    }
+    btn: {lineHeight: '50px', width: 150, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',margin: '0 30px'},
 }
 class Dialog extends React.Component {
     constructor(props) {
         super(props);
     }
+    clickCancel() {
+        this.props.onHide();
+    }
     render() {
         console.log('Dialog receive:' + JSON.stringify(this.props));
         var dialog = this.props.dialog;
+        var _this = this;
         return (
-            <Modal show={ dialog.show } ref="dialog"  onHide={this.props.onHide} className={dialog.className?dialog.className+" yx-modal":"yx-modal"}>
-                <Header closeButton={true}>
+            <Modal show={ dialog.show } ref="dialog"  onHide={this.props.onHide}>
+                <Header closeButton style={{textAlign: 'center'}}>
                     {dialog.title && <Title>{dialog.title}</Title>}
                 </Header>
                 <Body className="apply-content">
                     {dialog.content}
                 </Body>
                 
-                {dialog.okButton&&<Footer className="text-center"><a href="javascript:void(0)" style={{width: 200, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2'}} onClick={this.okClickHandler}>{dialog.okLabel}</a></Footer>}
+                {
+                    dialog.okButton && 
+                    <Footer className="text-center" style={{textAlign: 'center',borderTop: 0}}>
+                        <a href="javascript:void(0)" style={localStyle.btn} onClick={this.okClickHandler}>
+                            {dialog.okLabel}
+                        </a>
+                        <a href="javascript:void(0)" style={localStyle.btn} onClick={this.clickCancel.bind(_this)}>
+                            取消
+                        </a>                        
+                     </Footer>
+                }
 
             </Modal>
         )
