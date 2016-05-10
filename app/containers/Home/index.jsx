@@ -80,7 +80,7 @@ const TeacherHelper = () => {
 
 const Sidebar = () => {
     return (
-        <div style={{ width: 240, backgroundColor: '#fafafa', display: 'inline-block', float: 'right', padding: '0 60px 0 80px' }}>
+        <div style={{ width: 380, backgroundColor: '#fafafa', display: 'inline-block', float: 'right', padding: '0 60px 0 80px' }}>
             <TeacherHelper/>
             <CommonQuestions/>
             <Questionnaire/>
@@ -102,10 +102,12 @@ const NoExamList = () => {
     )
 }
 
-const ExamItem = ({item}) => {
+const ExamItem = ({timeKey, item}) => {
     var examid = item.id.slice(item.id.lastIndexOf('0')+1);
     return (
-        <div style={{ height: 50, padding: '40px 0', borderBottom: '1px solid #bfbfbf' }}>
+        <div>
+        <div style={{ width: 100, height: 130, padding: '40px 0', fontSize: 16, display: 'inline-block', position: 'absolute', left: -100 }}>{timeKey === undefined ? '' : timeKey}</div>
+        <div style={{ height: 130, padding: '40px 0', borderBottom: '1px solid #bfbfbf' }}>
             <div>
                 <div style={{ display: 'inline-block' }}>
                     <div style={{ fontSize: 16, marginBottom: 20 }}>{item.examName}</div>
@@ -119,12 +121,13 @@ const ExamItem = ({item}) => {
                 </Link>
             </div>
         </div>
-
+        </div>
     )
 }
 
 
 const ExamList = ({examList}) => {
+    console.log('================== examList:' + JSON.stringify(examList));
     return (
         <div style={{ display: 'inline-block', width: 800, position: 'relative' }}>
             <div style={{ borderBottom: '1px solid #bfbfbf', width: '100%', height: 70, position: 'relative', right: 0, padding: '10px 0 0 0', lineHeight: '70px' }}>
@@ -135,7 +138,15 @@ const ExamList = ({examList}) => {
             </div>
 
             {
-                examList.length > 0 ? _.map(examList, (item, index) => <ExamItem key={index} item={item} />) : <NoExamList />
+                examList.length ? examList.map((obj) => {
+                    return obj.list.map((item, index) => {
+                        if (index === 0) {
+                            return <ExamItem key={index} timeKey={obj.timeKey} item={item}/>
+                        } else {
+                            return <ExamItem key={index} item={item}/>
+                        }
+                    })
+                }) : <NoExamList />
             }
         </div>
     )

@@ -28,10 +28,4 @@ const Header = () => {
         </div>
     )
 }
-const Headers = () => {
-  return (
-      <div></div>
-  )  
-} 
-
 export default Header;

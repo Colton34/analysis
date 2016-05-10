@@ -8,7 +8,8 @@
 'use strict';
 
 import {
-    INIT_USER_ME
+    INIT_USER_ME,
+    ALTER_COMMENT_DIALOG_STATUS
 } from '../../lib/constants';
 
 import {fetchMe} from '../../api/user';
@@ -20,4 +21,7 @@ export function initUser(params) {
     }
 }
 
+export function alterCommentDialogStatus(dialogProps) {
+    return Object.assign({type: ALTER_COMMENT_DIALOG_STATUS}, dialogProps);
+}
 

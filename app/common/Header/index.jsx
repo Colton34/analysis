@@ -1,11 +1,6 @@
 import React, {PropTypes} from 'react';
-import {Modal, Button} from 'react-bootstrap';//这个只是为了测试dialog用的，如果不用的话可以考虑删除并且uninstall。
 import style from './Header.css';
 import {Link} from 'react-router';
-
-//直接使用<Modal.Header />语法则会有“Property object of JSXMemberExpression expected node to be of。。。”的错误，因为
-//babel-transform对此编译支持的原因，详见：https://phabricator.babeljs.io/T6662，所以一律写成这种语法
-var {Header, Title, Body, Footer} = Modal;
 
 
 /*
@@ -33,7 +28,7 @@ const HeaderUser = () => {
                     <div className={style['user-avatar']}>
                         <div className={style['user-avatar-img']} />
                     </div>
-                    <div className='caret' style={{marginLeft: 50}}>v</div>
+                    <div className='' style={{ width: 20,height: 20, marginLeft: 50 }}>v</div>
                 </a>
             </li>
         </ul>
@@ -41,25 +36,14 @@ const HeaderUser = () => {
 }
 
 
-const CommentModal = ({modalActiveStatus, actions}) => {
-    console.log('inside modal:' + JSON.stringify(modalActiveStatus));
-    return (
-        <Modal show={modalActiveStatus.active} onHide={actions.alterCommentDialogStatus}>
-            <Header closeButton>
-            <Title></Title>
-          </Header>
-          <Body>
-
-          </Body>
-          <Footer>
-            <Button>发送</Button>
-            <Button>取消</Button>
-          </Footer>
-        </Modal>
-    )
+let dialogProps = {
+    title: '我要吐槽',
+    content: <div contenteditable="true" style={{width: 730, height:240}}></div>
 }
 
-const HeaderComponent = ({user,commentActive, actions}) => {
+const HeaderComponent = ({user, actions}) => {
+    console.log('actions;' + actions);
+    var _this = this;
     return (
         <div className={style.header}>
             <div className={style.wrapper}>
@@ -68,9 +52,7 @@ const HeaderComponent = ({user,commentActive, actions}) => {
                 </h1>
                 <HeaderMenu />
                 <HeaderUser/>
-                <a href="javascript:void(0)"  style={{float: 'right', textDecoration: 'none',color: '#5a5a5a', paddingLeft: 40, paddingTop:30}}>我要吐槽</a>
-
-
+                <a href="javascript:void(0)"  onClick={actions.bind(_this, dialogProps)} style={{ float: 'right', textDecoration: 'none', color: '#5a5a5a', paddingLeft: 40, paddingTop: 30 }}>我要吐槽</a>
             </div>
         </div>
     )
