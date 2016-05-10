@@ -2,7 +2,7 @@ node_modules
 npm-debug.log
 .tmp
 .idea
-public
+public/assets
 .swp
 need*
 TODO.md
