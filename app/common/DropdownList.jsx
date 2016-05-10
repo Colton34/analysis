@@ -6,7 +6,7 @@ let style = {
         display: 'none'
     },
     btn: {
-        display: 'inline-block', width:135,height:40,color:'#fff',lineHeight: '40px',textDecoration: 'none',textAlign:'center'
+        display: 'inline-block', width:130,height:30,color:'#fff',lineHeight: '30px',textDecoration: 'none',textAlign:'center'
     },
     list: {
         listStyleType: 'none',

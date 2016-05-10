@@ -2,6 +2,7 @@ import React from 'react';
 import styles from '../../common/common.css';
 import ReactHighcharts from 'react-highcharts';
 import Table from '../../common/Table';
+import DropdownList from '../../common/DropdownList';
 
 let td_averageScoreRate = {
     ths: [
@@ -54,6 +55,7 @@ const ClassPerformance = () => {
                     班级有：1班、3班，高分学生人数比低分学生人数较少的班级有6班、5班。
                 </p>
                 <p>（3）从平均水平看，全校和班级的各学科平均得分率见下表所示：</p>
+                <span style={{position: 'absolute', right: 0, marginTop:40}}><DropdownList list={['平均得分率','平均分']}/></span>
                 <Table tableData={td_averageScoreRate}/>
                 <a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
                     点击查看更多班级数据 V
