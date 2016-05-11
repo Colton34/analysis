@@ -13,7 +13,6 @@ const HeaderMenu = () => {
         <ul className={style.menu}>
             <li className={style['menu-li']}>
                 <Link to="/" className={style['menu-nav']}>首页</Link>
-                <Link to="/" className={style['menu-nav']}>分析</Link>
             </li>
         </ul>
     )
