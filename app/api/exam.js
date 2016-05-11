@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-10 14:33:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-09 20:36:27
+* @Last Modified time: 2016-05-11 11:19:16
 */
 
 'use strict';
@@ -25,6 +25,9 @@ export function fetchHomeData(params) {
     return params.request.get(url)
         .then(function(res) {
             try {
+
+console.log('exams.length = ', res.data.length);
+
                 var result = formatExams(res.data);
                 return Promise.resolve(result);
             } catch(e) {
@@ -228,7 +231,7 @@ function formatExams(exams) {
     resultOrder = _.orderBy(resultOrder, ['value'], ['desc']);
     var finallyResult = [];
     _.each(resultOrder, function(item) {
-        finallyResult.push({timeKey: item.key, value: result[item.key]});
+        finallyResult.push({timeKey: item.key, values: result[item.key]});
     });
 
     return finallyResult;

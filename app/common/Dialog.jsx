@@ -32,16 +32,16 @@ class Dialog extends React.Component {
                 <Body className="apply-content">
                     {dialog.content}
                 </Body>
-                
+
                 {
-                    dialog.okButton && 
+                    dialog.okButton &&
                     <Footer className="text-center" style={{textAlign: 'center',borderTop: 0}}>
                         <a href="javascript:void(0)" style={localStyle.btn} onClick={this.okClickHandler}>
                             {dialog.okLabel}
                         </a>
                         <a href="javascript:void(0)" style={localStyle.btn} onClick={this.clickCancel.bind(_this)}>
                             取消
-                        </a>                        
+                        </a>
                      </Footer>
                 }
 
@@ -49,11 +49,13 @@ class Dialog extends React.Component {
         )
     }
 }
+
 function mapStateToProps(state) {
     return {
         dialog: state.app.dialog
     }
 }
+
 function mapDispatchToProps(dispatch) {
     return{
          onHide: bindActionCreators(alterCommentDialogStatus, dispatch)

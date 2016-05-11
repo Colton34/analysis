@@ -11,9 +11,6 @@ import {initParams, convertJS} from '../../lib/util';
 
 import styles from './Home.css';
 import _ from 'lodash';
-/*
-TODO: 以时间戳为groupKey分组显示
- */
 
 let questionnaireItem = [
     '非常喜欢',
@@ -127,7 +124,6 @@ const ExamItem = ({timeKey, item}) => {
 
 
 const ExamList = ({examList}) => {
-    console.log('================== examList:' + JSON.stringify(examList));
     return (
         <div style={{ display: 'inline-block', width: 800, position: 'relative' }}>
             <div style={{ borderBottom: '1px solid #bfbfbf', width: '100%', height: 70, position: 'relative', right: 0, padding: '10px 0 0 0', lineHeight: '70px' }}>
@@ -138,12 +134,12 @@ const ExamList = ({examList}) => {
             </div>
 
             {
-                examList.length ? examList.map((obj) => {
-                    return obj.list.map((item, index) => {
+                examList.length ? _.map(examList, (obj) => {
+                    return _.map(obj.values, (exam, index) => {
                         if (index === 0) {
-                            return <ExamItem key={index} timeKey={obj.timeKey} item={item}/>
+                            return <ExamItem key={index} timeKey={obj.timeKey} item={exam}/>
                         } else {
-                            return <ExamItem key={index} item={item}/>
+                            return <ExamItem key={index} item={exam}/>
                         }
                     })
                 }) : <NoExamList />
@@ -154,19 +150,9 @@ const ExamList = ({examList}) => {
 
 const Content = ({examList}) => {
 
-let mockExamList = [
-    {
-        name: '遵义二十校联考',
-        time: '2016-01-02',
-        subjectNum: 3,
-        fullScore: 300,
-        from: '阅卷'
-    }
-];
-
     return (
         <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#fff' }}>
-            <ExamList examList={examList[0].value} />
+            <ExamList examList={examList} />
             <Sidebar/>
         </div>
     )
@@ -198,6 +184,7 @@ class Home extends React.Component {
         var examList = (List.isList(this.props.home.examList)) ? this.props.home.examList.toJS() : this.props.home.examList;
         if(!examList || examList.length == 0) return (<div></div>); //其实这个时候应该显示loading....
 
+
         return (
             <div >
                 <Welcome/>
@@ -220,4 +207,3 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
-//*/
