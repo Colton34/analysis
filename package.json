@@ -8,7 +8,7 @@
     "babel": "babel --presets es2015,stage-0 --ignore node_modules,public",
     "babel-node": "babel-node --presets es2015,stage-0 --ignore node_modules,public",
     "lint": "eslint app",
-    "clean": "rimraf public && rimraf compiled",
+    "clean": "rimraf public/assets && rimraf compiled",
     "start": "cross-env NODE_ENV=production NODE_PATH=./server/middlewares node compiled/index.js",
     "dev": "cross-env NODE_ENV=development NODE_PATH=./server/middlewares nodemon",
     "build:dev": "cross-env NODE_ENV=development NODE_PATH=./server/middlewares webpack --colors --display-error-details --config ./webpack/webpack.config.dev-server.js",
