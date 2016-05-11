@@ -8,7 +8,10 @@
 'use strict';
 
 import {
-    INIT_USER_ME
+    INIT_USER_ME,
+    ALTER_COMMENT_DIALOG_STATUS,
+    SHOW_DIALOG,
+    HIDE_DIALOG
 } from '../../lib/constants';
 
 import {fetchMe} from '../../api/user';
@@ -20,4 +23,16 @@ export function initUser(params) {
     }
 }
 
+export function alterCommentDialogStatus(dialogProps) {
+    return Object.assign({type: ALTER_COMMENT_DIALOG_STATUS}, dialogProps);
+}
 
+export function showDialog(dialogProps) {
+    return Object.assign({type: SHOW_DIALOG}, dialogProps);
+}
+
+export function hideDialog() {
+    return {
+        type: HIDE_DIALOG
+    }
+}

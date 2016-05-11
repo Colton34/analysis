@@ -15,9 +15,19 @@ Header肯定是一直需要user的，而Header是所有的View都需要的，而
 import Immutable, {Record} from 'immutable';
 
 const InitialState = Record({
+
     haveInit: false,
     user: {},//前端需要知道user的基本信息，而且还需要匹配权限
-    isLoading: false
+    isLoading: false,
+    dialog: {
+        show: false,
+        title: '',
+        content: '',
+        onHide: '',
+        shapeStyle:'',
+        okButton: true,
+        okLabel: '确认'        
+    }
 });
 
 export default InitialState;

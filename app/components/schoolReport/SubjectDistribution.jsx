@@ -3,6 +3,7 @@ import styles from '../../common/common.css';
 import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
 import Table from '../../common/Table.jsx';
+import DropdownList from '../../common/DropdownList';
 //todo: 各档上线信息展示区域可以专门提出来做一个组件。
 
 let tableData = {
@@ -94,6 +95,7 @@ const SubjectDistribution = () => {
                     <p>5班、3班、4班对数学学科贡献较大， 2班、1班、6班对数学学科贡献较小</p>
                 </div>
                 <p>具体各班级学科一档分布图表如下：</p>
+                <span style={{position: 'absolute', right: 0, marginTop:40}}><DropdownList list={['语文','数学','英语','物理','化学']}/></span>
                 <ReactHighcharts config={config}></ReactHighcharts>
 
                 <p>学校各学科二档上线学生人数表：</p>
@@ -108,6 +110,7 @@ const SubjectDistribution = () => {
                     <p>5班、3班、4班对数学学科贡献较大， 2班、1班、6班对数学学科贡献较小</p>
                 </div>
                 <p>具体各班级学科一档分布图表如下：</p>
+                <span style={{position: 'absolute', right: 0, marginTop:40}}><DropdownList list={['语文','数学','英语','物理','化学']}/></span>
                 <ReactHighcharts config={config}></ReactHighcharts>
 
                 <p>学校各学科三档上线学生人数表：</p>
@@ -122,6 +125,7 @@ const SubjectDistribution = () => {
                     <p>5班、3班、4班对数学学科贡献较大， 2班、1班、6班对数学学科贡献较小</p>
                 </div>
                 <p>具体各班级学科一档分布图表如下：</p>
+                <span style={{position: 'absolute', right: 0, marginTop:40}}><DropdownList list={['语文','数学','英语','物理','化学']}/></span>
                 <ReactHighcharts config={config}></ReactHighcharts>
 
                 <div className={styles.tips}>

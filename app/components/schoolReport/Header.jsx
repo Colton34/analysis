@@ -1,11 +1,11 @@
 import React from 'react';
 import styles from '../../common/common.css';
 
-
 const Header = () => {
+    
     return (
         <div>
-            <div style={{ height: 50, padding: '40px 0 20px 0', backgroundColor: '#fcfcfc', position: 'relative' }}>
+            <div style={{ height: 110, padding: '40px 0 20px 0', backgroundColor: '#fcfcfc', position: 'relative' }}>
                 <span style={{ float: 'left' }}>{String.fromCharCode(60) } 返回</span>
                 <div style={{ margin: "0 auto", fontSize: 20, width: 600 }}>
                     <div style={{ textAlign: 'center' }}>遵义县2016年下高二期末考试</div>
@@ -28,10 +28,4 @@ const Header = () => {
         </div>
     )
 }
-const Headers = () => {
-  return (
-      <div></div>
-  )  
-} 
-
 export default Header;

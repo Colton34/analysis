@@ -14,14 +14,16 @@ import {Map} from 'immutable';
 //自定义组件
 import Header from '../common/Header';
 import Footer from '../common/Footer';
-
+import Dialog from '../common/Dialog';
 //引入样式
 // import styles from 'css/main';
 // const cx = classNames.bind(styles);
 
-import {initUser} from '../reducers/global-app/actions';
+import {initUser, alterCommentDialogStatus} from '../reducers/global-app/actions';
 import {convertJS} from '../lib/util';
 
+
+//let actionCreators = [alterCommentDialogStatus];
 
 
 //模式：所有的router view都会有need来提前获取首屏数据。这时返回到前端的时候state中就是有数据的initial state
@@ -34,8 +36,9 @@ class App extends React.Component {
     render() {
         var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
         return (
-            <div>
-                <Header user={user} />
+            <div style={{backgroundColor: '#f2f2f2'}}>
+                <Header user={user} actions={this.props.actions}/>
+                <Dialog />
                     {this.props.children}
                 <Footer />
             </div>
@@ -43,14 +46,19 @@ class App extends React.Component {
     }
 
 }
-
-
+ 
 function mapStateToProps(state) {
     return {
         user: state.app.user
     }
 }
 
-export default connect(mapStateToProps)(App);
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(alterCommentDialogStatus, dispatch)
+    }
+    
+}
+export default connect(mapStateToProps, mapDispatchToProps)(App);
 // export default connect(mapStateToProps)(Radium(App)); -- 或者这么写
 
