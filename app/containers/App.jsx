@@ -40,7 +40,6 @@ class App extends React.Component {
                 <Header user={user} actions={this.props.actions}/>
                 <Dialog />
                     {this.props.children}
-                <Footer />
             </div>
         );
     }
