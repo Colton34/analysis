@@ -125,7 +125,7 @@ const ExamItem = ({timeKey, item}) => {
 
 const ExamList = ({examList}) => {
     return (
-        <div style={{ display: 'inline-block', width: 800, position: 'relative' }}>
+        <div style={{ display: 'inline-block', width: 800, position: 'absolute', right: 380 }}>
             <div style={{ borderBottom: '1px solid #bfbfbf', width: '100%', height: 70, position: 'relative', right: 0, padding: '10px 0 0 0', lineHeight: '70px' }}>
                 <a style={{ display: 'inline-block', width: 130, height: 40, backgroundColor: '#009966', color: '#fff', borderRadius: 5, lineHeight: '40px', textAlign: 'center' }}>
                     创建分析
@@ -151,7 +151,7 @@ const ExamList = ({examList}) => {
 const Content = ({examList}) => {
 
     return (
-        <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#fff' }}>
+        <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#fff', position:'relative'}}>
             <ExamList examList={examList} />
             <Sidebar/>
         </div>
