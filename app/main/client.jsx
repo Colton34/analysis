@@ -15,7 +15,7 @@ const http_port = window.http_port;
 const client = window.client;
 
 window.request = axios.create({
-  baseURL: 'http://' + client.hostname + ':' + http_port + '/api/v1',
+  baseURL: (client.hostname == 'localhost') ? 'http://' + client.hostname + ':' + http_port + '/api/v1' : 'http://' + client.hostname + '/api/v1',
   // timeout: 1000,
   headers: {'x-access-token': Cookies.get('authorization')}
 });

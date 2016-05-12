@@ -109,10 +109,6 @@ module.exports = [
                 jQuery: 'jquery',
                 'window.jQuery': 'jquery',
                 'root.jQuery': 'jquery'
-            }),
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'vendors',
-                minChunks: 3
             })
         ],
         postcss: postCSSConfig

@@ -36,6 +36,11 @@ function renderFullPage(renderedContent, initialState, head={
     meta: '<meta name="viewport" content="width=device-width, initial-scale=1" />',
     link: '<link rel="stylesheet" href="/assets/styles/main.css"/>'
 }) {
+    var scripts = (!process.env.NODE_ENV || process.env.NODE_ENV == 'development') ? '' : `
+        <script type="text/javascript" charset="utf-8" src="/assets/vendor.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/assets/app.js"></script>
+    `;
+
     return `
         <!doctype html>
         <html lang="">
@@ -54,8 +59,9 @@ function renderFullPage(renderedContent, initialState, head={
           window.http_port = ${http_port};
           window.client = ${JSON.stringify(client)};
         </script>
-        <script type="text/javascript" charset="utf-8" src="/assets/vendors.js"></script>
-        <script type="text/javascript" charset="utf-8" src="/assets/app.js"></script>
+    `
+    + scripts +
+    `
         </body>
         </html>
     `;
