@@ -14,6 +14,9 @@ var RadiumWrapper = require('./radium-wrapper');
 
 import _ from 'lodash';
 
+var config = require('../../server/config/env');
+var http_port = process.env.HTTP_PORT || config.port;
+
 //TODO：没什么用的话可以删掉了-----------------------------------------------------
 // const clientConfig = {
 //     host: process.env.HOSTNAME || 'localhost',
@@ -45,6 +48,7 @@ function renderFullPage(renderedContent, initialState, head={
         <div id="app">${renderedContent}</div>
         <script>
           window.__INITIAL_STATE__ = ${JSON.stringify(initialState)};
+          window.http_port = ${http_port};
         </script>
         <script type="text/javascript" charset="utf-8" src="/assets/vendors.js"></script>
         <script type="text/javascript" charset="utf-8" src="/assets/app.js"></script>

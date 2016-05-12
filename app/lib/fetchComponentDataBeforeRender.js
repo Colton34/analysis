@@ -2,15 +2,18 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-12 16:41:31
+* @Last Modified time: 2016-05-12 17:03:16
 */
 import _ from 'lodash';
 
 import {initParams} from '../lib/util';
 import axios from 'axios';
 
+var config = require('../../server/config/env');
+var http_port = process.env.HTTP_PORT || config.port;
+
 var request = axios.create({
-  baseURL: 'http://localhost:8666/api/v1'
+  baseURL: 'http://localhost:' + http_port + '/api/v1'
   // timeout: 1000,
   // headers: {'x-access-token': Cookies.get('authorization')}
 });
