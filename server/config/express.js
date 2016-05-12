@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 20:21:58
+* @Last Modified time: 2016-05-12 16:51:44
 */
 
 'use strict';
@@ -23,7 +23,7 @@ var rootPath = path.join(__dirname, '..', '..', 'index.html');
 
 var NotFoundError = require('../errors/NotFoundError');
 
-var http_port = process.env.HTTP_PORT || 3000;
+var http_port = process.env.HTTP_PORT || config.port;
 
 var debug = require('debug')('app:' + process.pid);
 
@@ -70,7 +70,7 @@ module.exports = function(app) {
     app.engine('html', engines.swig);
     app.engine('jade', engines.jade);
     app.set('view engine', 'html');
-    app.set('views', path.join(__dirname, '..', 'views'));
+    app.set('views', path.join(__dirname, '../..', 'server/views'));
 
     app.use(require('compression')());
     app.use(require('response-time')());
