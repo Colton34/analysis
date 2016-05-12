@@ -16,6 +16,9 @@ import _ from 'lodash';
 
 var config = require('../../server/config/env');
 var http_port = process.env.HTTP_PORT || config.port;
+var hostname = process.env.HOSTNAME || config['client_host'];
+var client = {};
+client.hostname = hostname;
 
 //TODO：没什么用的话可以删掉了-----------------------------------------------------
 // const clientConfig = {
@@ -49,6 +52,7 @@ function renderFullPage(renderedContent, initialState, head={
         <script>
           window.__INITIAL_STATE__ = ${JSON.stringify(initialState)};
           window.http_port = ${http_port};
+          window.client = ${JSON.stringify(client)};
         </script>
         <script type="text/javascript" charset="utf-8" src="/assets/vendors.js"></script>
         <script type="text/javascript" charset="utf-8" src="/assets/app.js"></script>

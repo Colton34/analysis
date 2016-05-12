@@ -11,9 +11,11 @@ import Cookies from 'cookies-js';
 
 const initialState = window.__INITIAL_STATE__;
 const http_port = window.http_port;
+// const hostname = window.hostname;
+const client = window.client;
 
 window.request = axios.create({
-  baseURL: 'http://localhost:' + http_port + '/api/v1',
+  baseURL: 'http://' + client.hostname + ':' + http_port + '/api/v1',
   // timeout: 1000,
   headers: {'x-access-token': Cookies.get('authorization')}
 });
