@@ -28,8 +28,7 @@ import _ from 'lodash';
 function renderFullPage(renderedContent, initialState, head={
     title: '云校分析',
     meta: '<meta name="viewport" content="width=device-width, initial-scale=1" />',
-    link: '<link rel="stylesheet" href="/assets/styles/main.css"/>',
-    linkBootstrap: '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css"/>'
+    link: '<link rel="stylesheet" href="/assets/styles/main.css"/>'
 }) {
     return `
         <!doctype html>
@@ -41,8 +40,6 @@ function renderFullPage(renderedContent, initialState, head={
             ${head.meta}
 
             ${head.link}
-            
-            ${head.linkBootstrap}
         </head>
         <body>
         <div id="app">${renderedContent}</div>
@@ -80,7 +77,7 @@ export default function render(req, res) {
             fetchComponentDataBeforeRender(store.dispatch, renderProps.components, renderProps.params, renderProps.location, req)
             .then(() => {
                 const componentHTML = renderToString(InitialView);
-                const initialState = store.getState();               
+                const initialState = store.getState();
                 res.status(200).end(renderFullPage(componentHTML, initialState, {
                     title: headconfig.title,
                     meta: headconfig.meta,
@@ -88,6 +85,9 @@ export default function render(req, res) {
                 }));
             })
             .catch((err) => {
+
+console.log('=================================================');
+
                 console.log('Cache Server Render Error ', err);
                 res.end(renderFullPage('', {}));
             });
