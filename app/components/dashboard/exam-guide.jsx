@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import _ from 'lodash';
+import dashboardStyle from './dashboard.css';
 
 import {initExamGuide} from '../../reducers/dashboard/actions';
 
@@ -13,26 +14,26 @@ const GlobalGuideCom = ({data}) => {
 // console.log('examGuide = ', data);
 
     return (
-        <div style={[styles.item, styles.common.radius]}>
-            <div style={{fontWeight: 'blod', marginTop: 10}}>考试总览</div>
+        <div className={dashboardStyle.card}>
+            <div className={dashboardStyle['card-title']}>考试总览</div>
             <div  style={{marginTop: 30, marginBottom: 30}}>
                 <div style={{float: 'left', marginLeft: 40}}>
-                    <div style={{marginBottom: 20}}>{data.subjectCount}</div>
+                    <div style={styles.dataNum}>{data.subjectCount}</div>
                     <div>考试学科数</div>
                 </div>
                 <div style={{float: 'right', marginRight: 40}}>
-                    <div style={{marginBottom: 20}}>{data.totalProblemCount}</div>
+                    <div style={styles.dataNum}>{data.totalProblemCount}</div>
                     <div>考试总题数</div>
                 </div>
             </div>
             <div style={{clear: 'both'}}></div>
             <div  style={{marginTop:30, marginBottom: 30}}>
                 <div style={{float: 'left', marginLeft: 40}}>
-                    <div style={{marginBottom: 20}}>{data.classCount}</div>
+                    <div style={styles.dataNum}>{data.classCount}</div>
                     <div>考试班级数</div>
                 </div>
                 <div style={{float: 'right', marginRight: 40}}>
-                    <div style={{marginBottom: 20}}>{data.totalStudentCount}</div>
+                    <div style={styles.dataNum}>{data.totalStudentCount}</div>
                     <div>考试学生数</div>
                 </div>
             </div>
@@ -47,10 +48,10 @@ GlobalGuideCom.propTypes = {
 export default Radium(GlobalGuideCom);
 
 const styles = {
-    common: {
-        radius: {
-            borderRadius: 15
-        }
-    },
-    item: {height: 320, backgroundColor: '#336699', flexGrow: 1, textAlign: 'center', color: '#ffffff', borderRadius: 15}
+    dataNum: {
+        textAlign: 'center', 
+        color: '#0f6afc', 
+        fontSize: 24,
+        marginBottom: 20
+    }
 };

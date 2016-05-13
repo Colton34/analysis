@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import _ from 'lodash';
+import dashboardStyle from './dashboard.css';
 
 
 const ScoreRank = ({data}) => {
@@ -22,7 +23,7 @@ const ScoreRank = ({data}) => {
         return (
             <div key={index} style={[styles.container, result, styles.common.radius, {marginBottom: 2}]}>
                 <div>{obj.name}</div>
-                <div>{obj.score}</div>
+                <div>{obj.score}分</div>
             </div>
         )
     });
@@ -31,24 +32,29 @@ const ScoreRank = ({data}) => {
         return (
             <div key={index} style={[styles.container, styles.common.radius, {marginBottom: 2}]}>
                 <div>{obj.name}</div>
-                <div>{obj.score}</div>
+                <div>{obj.score}分</div>
             </div>
         )
     });
     return (
-        <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}]}>
-            <div style={{fontWeight: 'blod', marginTop: 10, marginBottom: 10}}>分数排行榜</div>
-            <div style={{flexGrow: 1, display: 'flex'}}>
-                <div style={[styles.box, styles.common.radius, {borderRight: 'solid 2px black', marginLeft: 5}]}>
+        <div className={dashboardStyle.card}>
+            <div className={dashboardStyle['card-title']}>分数排行榜</div>
+            <div style={{flexGrow: 1, display: 'flex', marginTop: 30}}>
+                <div style={[styles.box,{borderRight: 'solid 2px #cac9ca', marginLeft: 5}]}>
+                    <p style={{textAlign: 'center', marginBottom: 20}}>最高分排行榜top6</p>
                     {tops}
                 </div>
                 <div style={[styles.box, styles.common.radius, {marginRight: 5}]}>
+                    <p style={{textAlign: 'center', marginBottom: 20}}>最低分排行榜top6</p>
                     {lows}
                 </div>
             </div>
-            <div style={{fontWeight: 'bolder', marginTop: 10, marginBottom: 10, alignSelf: 'flex-end', marginRight: 20}}>查看详情</div>
+            <div className={dashboardStyle['detail-btn']}>
+                查看详情
+            </div>
         </div>
     )
+    
 }
 
 export default Radium(ScoreRank);
@@ -62,7 +68,7 @@ const styles = {
     },
     item: {height: 320, backgroundColor: '#336699', flexGrow: 1, textAlign: 'center', color: '#ffffff', borderRadius: 15, display: 'flex', flexDirection: 'column'},
     box: {
-        flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around', backgroundColor: '#999999'
+        flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-around'
     },
     container: {
         display: 'flex',

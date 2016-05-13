@@ -1,0 +1,59 @@
+.analysis-report {
+    background-image: url(../../images/analysisReport.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 100% 100%;
+}
+
+.subject-data {
+    background-image: url(../../images/subjectDataSurface.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+
+.knowledge-point {
+    background-image: url(../../images/knowledgePointSurface.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.teacher-report {
+     background-image: url(../../images/teacherReportSurface.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.card {
+    width: 350px;
+    height: 300px;
+    background-color: #fff;
+    color: #333;
+    flex-grow: 1;
+    margin: 0 20px;
+    position: relative;
+}
+
+.card-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.card-image {
+    width: 85%;
+    height: 65%;
+    margin: 0 auto; 
+}
+
+.detail-btn {
+    cursor: pointer;
+    font-weight: bolder;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 20px;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}

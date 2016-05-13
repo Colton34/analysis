@@ -13,12 +13,16 @@ import ScoreRank from '../components/dashboard/score-rank';
 import LevelReport from '../components/dashboard/level-report';
 import ClassReport from '../components/dashboard/class-report';
 import SubjectReport from '../components/dashboard/subject-report';
+import PaperComment from '../components/dashboard/paper-comment';
+import PaperQuality from '../components/dashboard/paper-quality';
+import StudentReport from '../components/dashboard/student-report';
 
 import {initDashboardAction} from '../reducers/dashboard/actions';
 import {convertJS, initParams} from '../lib/util';
 
 import {Map, List} from 'immutable';
 
+import dashboardStyle from '../components/dashboard/dashboard.css';
 
 // 　Bgcolor:″＃F1FAFA″——做正文的背景色好，淡雅
 // 　　Bgcolor:″＃E8FFE8″——做标题的背景色较好，与上面的颜色搭配很协调
@@ -52,16 +56,16 @@ class Dashboard extends React.Component {
     ];
 
     componentDidMount() {
-        if(this.props.dashboard.haveInit) return;
+        if (this.props.dashboard.haveInit) return;
 
-        var params = initParams(this.props.params, this.props.location, {'request': window.request});
+        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initDashboard(params);
     }
 
     toViewSchoolAnalysis() {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
-        if(!examid || !grade) return;
+        if (!examid || !grade) return;
         browserHistory.push('/school/report?examid=' + examid + '&grade=' + encodeURI(grade));
     }
 
@@ -72,48 +76,69 @@ class Dashboard extends React.Component {
         // var classReport = (Map.isMap(this.props.dashboard.classReport)) ? this.props.dashboard.classReport.toJS() : this.props.dashboard.classReport;
         // var subjectReport = (Map.isMap(this.props.dashboard.subjectReport)) ? this.props.dashboard.subjectReport.toJS() : this.props.dashboard.subjectReport;
 
-
-        if((!examGuide || _.size(examGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
+        var classReport = {
+            data: {
+                title: '',
+                sortedClass: ['1班', '2班', '3班', '4班', '5班'],
+                averageScore: 90,
+                sortedScore: [49.9, 71.5, 106.4, 129.2, 144.0]
+            }
+        }
+        if ((!examGuide || _.size(examGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
             (!levelReport || _.size(levelReport) == 0)) return (<div></div>);
 
         return (
-            <div style={[styles.box, styles.common.radius]}>
-                <div style={[styles.container, styles.common.radius]}>
-                    <ExamGuideComponent data={examGuide} />
-                    <ScoreRank data={scoreRank} />
-                    <div key="test" style={[styles.item, styles.common.radius]} onClick={this.toViewSchoolAnalysis.bind(this)}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>学校成绩总报告</div>
-                    </div>
+            <div>
+                <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: 'auto', paddingLeft: 20,fontSize: 16, marginTop: 35, marginBottom: 20}}>
+                    遵义清华中学2016年1月月考
                 </div>
-                <div style={[styles.container, styles.common.radius]}>
-                    <LevelReport data={levelReport} />
-                    <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>班级分析报告</div>
+                <div style={[styles.box, styles.common.radius]}>
+                    <div style={[styles.container, styles.common.radius]}>
+                        <ExamGuideComponent data={examGuide} />
+                        <ScoreRank data={scoreRank} />
+                        <div key="test"  className={dashboardStyle['card']} onClick={this.toViewSchoolAnalysis.bind(this) }>
+                            <div className={dashboardStyle['card-title']}>学校成绩总报告</div>
+                            <div className={dashboardStyle['analysis-report'] + ' ' + dashboardStyle['card-image']}></div>
+                        </div>
                     </div>
-                    <div style={[styles.item, styles.common.radius]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>学科分析报告</div>
+                    <div style={[styles.container, styles.common.radius]}>
+                        <LevelReport data={levelReport} />
+                        <div className={dashboardStyle['card']}>
+                            <div className={dashboardStyle['card-title']}>班级分析报告</div>
+                            <ClassReport data={classReport}/>
+                        </div>
+                        <div className={dashboardStyle.card}>
+                            <div className={dashboardStyle['card-title']}>学科数据报告</div>
+                            <div className={dashboardStyle['subject-data'] + ' ' + dashboardStyle['card-image']} style={{ marginTop: 20 }}></div>
+                            <div className={dashboardStyle['detail-btn']}>查看详情</div>
+                        </div>
                     </div>
-                </div>
-                <div style={[styles.container, styles.common.radius]}>
-                    <div style={[styles.item, styles.common.radius]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>学生个人报告</div>
+                    <div style={[styles.container, styles.common.radius]}>
+                        <div className={dashboardStyle.card}>
+                            <div className={dashboardStyle['card-title']}>学生个人报告</div>
+                            <StudentReport/>
+                        </div>
+                        <div className={dashboardStyle.card}>
+                            <div className={dashboardStyle['card-title']}>知识点分析情况</div>
+                            <div className={dashboardStyle['knowledge-point'] + ' ' + dashboardStyle['card-image']} style={{ marginTop: 20 }}></div>
+                            <div style={{ fontSize: 5, color: '#a2a2a2', position: 'absolute', bottom: 0, margin: '0 0 10px 10px' }}>查看知识点对不同学业水平学生的区分能力</div>
+                            <div className={dashboardStyle['detail-btn']}>查看详情</div>
+                        </div>
+                        <div className={dashboardStyle.card}>
+                            <div className={dashboardStyle['card-title']}>试卷质量分析</div>
+                            <PaperQuality/>
+                        </div>
                     </div>
-                    <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>知识点分析情况</div>
-                    </div>
-                    <div style={[styles.item, styles.common.radius]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>试卷质量分析</div>
-                    </div>
-                </div>
-                <div style={[styles.container, styles.common.radius]}>
-                    <div style={[styles.item, styles.common.radius]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>试卷讲评</div>
-                    </div>
-                    <div style={[styles.item, styles.common.radius, {marginLeft: 20, marginRight: 20}]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>老师个人报告</div>
-                    </div>
-                    <div style={[styles.item, styles.common.radius]}>
-                        <div style={{fontWeight: 'blod', marginTop: 10}}>考试总成绩</div>
+                    <div style={[styles.container, styles.common.radius]}>
+                        <div className={dashboardStyle.card}>
+                            <div className={dashboardStyle['card-title']}>试卷讲评</div>
+                            <PaperComment />
+                        </div>
+                        <div className={dashboardStyle.card}>
+                            <div className={dashboardStyle['card-title']}>老师个人报告</div>
+                            <div className={dashboardStyle['teacher-report'] + ' ' + dashboardStyle['card-image']}  style={{ marginTop: 20 }}></div>
+                            <div className={dashboardStyle['detail-btn']}>查看详情</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -141,9 +166,10 @@ var styles = {
             borderRadius: 15
         }
     },
-    box: {height: 1500, backgroundColor: '#f5f5dc', display: 'flex', flexDirection: 'column', justifyContent: 'space-around', margin: 30},
-    container: {height: 300, marginLeft: 10, marginRight: 10, display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'nowrap'},
-    item: {height: 320, backgroundColor: '#336699', flexGrow: 1, textAlign: 'center', color: '#ffffff', borderRadius: 15},
+    box: { height: 1350, width: 1200, backgroundColor: '#f2f2f2', display: 'flex', alignContent: 'space-around', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', margin: '0 auto' },
+    container: { display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'nowrap' },
+    item: { height: 320, backgroundColor: '#fff', flexGrow: 1, color: '#333', borderRadius: 15 },
+    cardImage: { width: '85%', height: '65%', margin: '0 auto' },
     scalZoom: {
         ':hover': {
             backgroundColor: 'black'
