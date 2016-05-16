@@ -38,7 +38,6 @@ function renderFullPage(renderedContent, initialState, head={
 }) {
     var scripts = (!process.env.NODE_ENV || process.env.NODE_ENV == 'development') ? '' : `
         <script type="text/javascript" charset="utf-8" src="/assets/vendor.js"></script>
-        <script type="text/javascript" charset="utf-8" src="/assets/app.js"></script>
     `;
 
     return `
@@ -62,6 +61,7 @@ function renderFullPage(renderedContent, initialState, head={
     `
     + scripts +
     `
+        <script type="text/javascript" charset="utf-8" src="/assets/app.js"></script>
         </body>
         </html>
     `;
