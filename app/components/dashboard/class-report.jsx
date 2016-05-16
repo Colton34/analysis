@@ -54,7 +54,8 @@ const ClassReport = ({data}) => {
                     style: {
                         fontSize: '14px'
                     }
-                }
+                },
+                zIndex: 5
             }]
         },
         plotOptions: {

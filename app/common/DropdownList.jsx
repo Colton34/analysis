@@ -39,9 +39,9 @@ class DropdownList extends React.Component {
                 {this.props.list ? (
                     <ul style={this.state.active? style.list : style.hide}>
                         {
-                            _this.state.coveredItems.map(item => {
+                            _this.state.coveredItems.map((item,index) => {
                                 return (
-                                    <li>
+                                    <li key={index}>
                                         <a style={Object.assign({},style.btn,{backgroundColor:'#f2f2f2',color: '#333'})} href="javascript:void(0)" onClick={this.chooseItem.bind(this,item)}>
                                         {item}
                                         </a>

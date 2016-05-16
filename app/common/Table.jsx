@@ -24,21 +24,21 @@ const Table = ({tableData}) => {
             <tbody>
                 <tr style={{ backgroundColor: '#f4faee' }}>
                     {
-                        tableData['ths'].map(th => {
+                        tableData['ths'].map((th,index) => {
                             return (
-                                <th className={styles['table-unit']}>{th}</th>
+                                <th key={index} className={styles['table-unit']}>{th}</th>
                             )
                         })
                     }
                 </tr>
                 {   
-                    tableData['tds'].map(tdList => {
+                    tableData['tds'].map((tdList,index) => {
                         return (
-                            <tr>
+                            <tr key={'tr' + index}>
                                 {
-                                    tdList.map( td => {
+                                    tdList.map((td,index) => {
                                         return (
-                                            <td className={styles['table-unit']}>
+                                            <td key={'td' + index}className={styles['table-unit']}>
                                                 {td}
                                             </td>
                                         )

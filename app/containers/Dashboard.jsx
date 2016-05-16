@@ -89,14 +89,14 @@ class Dashboard extends React.Component {
 
         return (
             <div>
-                <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: 'auto', paddingLeft: 20,fontSize: 16, marginTop: 35, marginBottom: 20}}>
+                <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: '35px auto 20px auto', paddingLeft: 20,fontSize: 16}}>
                     遵义清华中学2016年1月月考
                 </div>
                 <div style={[styles.box, styles.common.radius]}>
                     <div style={[styles.container, styles.common.radius]}>
                         <ExamGuideComponent data={examGuide} />
                         <ScoreRank data={scoreRank} />
-                        <div key="test"  className={dashboardStyle['card']} onClick={this.toViewSchoolAnalysis.bind(this) }>
+                        <div key="test"   style={{cursor: 'pointer'}}className={dashboardStyle['card']} onClick={this.toViewSchoolAnalysis.bind(this) }>
                             <div className={dashboardStyle['card-title']}>学校成绩总报告</div>
                             <div className={dashboardStyle['analysis-report'] + ' ' + dashboardStyle['card-image']}></div>
                         </div>
