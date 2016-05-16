@@ -16,7 +16,8 @@ var development = {
     "testRankBaseUrl": 'http://ct.yunxiao.com:8157',
     "yjServer": "http://testyue.yunxiao.com",
     "yj2Server": "http://ct.yunxiao.com:8110",
-    "casServer": "http://testpassport.yunxiao.com"
+    "casServer": "http://testpassport.yunxiao.com",
+    "client_host": 'localhost'
     // redis: { port: 6380, host: 'ct.yunxiao.com', max_attempts : 10, auth_pass: 'yunxiao_redis_@xxx', connect_timeout: 50000 },
 };
 
