@@ -21,6 +21,11 @@
     margin-top: 50px;
 }
 
+.school-report-dynamic {
+    color: #214dff;
+    font-size: 18px;
+    margin: 0 10px;
+}
 .table-unit {
      border: 1px solid #d7d7d7;
      text-align: center;

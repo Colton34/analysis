@@ -14,6 +14,11 @@ let style = {
         margin: 0
     }
 }
+/**
+ * props:
+ * list: 下拉菜单列表
+ * onClickDropdownList: 点击菜单项目时的回调
+ */
 class DropdownList extends React.Component {
     constructor(props) {
         super(props);
@@ -28,6 +33,7 @@ class DropdownList extends React.Component {
     }
     chooseItem (content) {
         this.setState({current: content, active: false, coveredItems: _.without(this.props.list, content)});
+        this.props.onClickDropdownList(content);
     }
     render() {
         var _this = this;
