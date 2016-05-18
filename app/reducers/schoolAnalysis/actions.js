@@ -11,7 +11,8 @@ import _ from 'lodash';
 
 import {fetchSchoolAnalysisData} from '../../api/exam';
 import {
-    FETCH_SCHOOL_ANALYSIS_DATA
+    FETCH_SCHOOL_ANALYSIS_DATA,
+    CHANGE_LEVEL
 } from '../../lib/constants';
 
 /*
@@ -63,3 +64,10 @@ export function initSchoolAnalysisAction(params) {
 //         })
 //     }
 // }
+
+export function changeLevelAction(levelList) {
+    return {
+        type: CHANGE_LEVEL,
+        levelList: levelList
+    }
+}

@@ -14,7 +14,8 @@ var initialState = new InitialState;
 
 import {
     FETCH_SCHOOL_ANALYSIS_DATA_SUCCESS,
-    INIT_SCHOOL_ANALYSIS_SUCCESS
+    INIT_SCHOOL_ANALYSIS_SUCCESS,
+    CHANGE_LEVEL
 } from '../../lib/constants';
 
 export default function reducer(state, action) {
@@ -28,6 +29,8 @@ export default function reducer(state, action) {
         case 'TESTDATA':
             console.log('TESTDATA OK');
             return state;
+        case CHANGE_LEVEL: 
+            return state.set('totalScoreLevel', action.levelList)
     }
 
     return state;
