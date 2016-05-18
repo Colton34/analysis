@@ -13,7 +13,23 @@ var InitialState = Record({
     haveInit: false,
     examHeader: Map({}),
     totalScoreTrend: List([]),
-    totalScoreLevel: List([]),
+    totalScoreLevel: List([
+        {
+            score: 520,
+            rate: 15,
+            num: 100
+        },
+        {
+            score: 480,
+            rate: 35,
+            num: 360
+        },
+        {
+            score: 360,
+            rate: 50,
+            num: 890
+        }
+    ]),
     subjectLevel: Map({}),
     classExamReport: List([]),
     subjectExamReport: List([]),
