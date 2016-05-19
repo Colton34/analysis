@@ -39,8 +39,7 @@ var commonLoaders = [
     { test: /\.css$/,
         loader: ExtractTextPlugin.extract('style-loader', 'css-loader?module!postcss-loader')
     },
-    {test: /\.less$/, loaders: ['style', 'css', 'autoprefixer', 'less']},
-    {test: require.resolve('jquery'), loader: 'expose?jquery'}
+    {test: /\.less$/, loaders: ['style', 'css', 'autoprefixer', 'less']}
 ];
 
 var postCSSConfig = function() {

@@ -44,8 +44,7 @@ module.exports = {
                 test: /\.css$/,
                 loader: 'css/locals?module&localIdentName=[name]__[local]___[hash:base64:5]'
             },
-            {test: /\.less$/, loaders: ['style', 'css', 'autoprefixer', 'less']},
-            {test: require.resolve('jquery'), loader: 'expose?jquery'}
+            {test: /\.less$/, loaders: ['style', 'css', 'autoprefixer', 'less']}
         ])
     },
     resolve: {

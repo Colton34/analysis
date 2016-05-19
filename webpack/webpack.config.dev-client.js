@@ -69,8 +69,7 @@ module.exports = {
                 test: /\.css$/,
                 loader: 'style!css?module&localIdentName=[name]__[local]___[hash:base64:5]!postcss-loader'
             },
-            {test: /\.less$/, loaders: ['style', 'css', 'autoprefixer', 'less']},
-            {test: require.resolve('jquery'), loader: 'expose?jquery'}
+            {test: /\.less$/, loaders: ['style', 'css', 'autoprefixer', 'less']}
         ])
         // noParse: [pathToReact]
     },
