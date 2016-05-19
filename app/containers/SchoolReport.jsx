@@ -63,11 +63,12 @@ class SchoolReport extends React.Component {
         return (
             <div style={{ width: 1000, margin: '0 auto', marginTop: 20, backgroundColor: '#fff' }}>
                 <Header headerInfo={headerInfo}/>
+                <FullScoreTrend/>
                 <ScoreDistribution totalScoreLevel={totalScoreLevel} changeLevels={this.props.changeLevels}/>
                 <SubjectDistribution totalScoreLevel={totalScoreLevel}/>
-                <ClassPerformance/>
+                <ClassPerformance totalScoreLevel={totalScoreLevel}/>
                 <SubjectPerformance/>
-                <GroupAnalysis/>
+                <GroupAnalysis totalScoreLevel={totalScoreLevel}/>
                 <StudentPerformance/>
             </div>
         )
