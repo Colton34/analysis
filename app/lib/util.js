@@ -9,6 +9,19 @@
 
 import _ from 'lodash';
 
+var numberMapper = {
+    1: '一',
+    2: '二',
+    3: '三',
+    4: '四',
+    5: '五',
+    6: '六',
+    7: '七',
+    8: '八',
+    9: '九',
+    10: '十'
+
+}
 export function convertJS(data) {
     return JSON.parse(JSON.stringify(data));
 }
@@ -19,4 +32,9 @@ export function initParams(params, location, other) {
     params = _.merge(params, query);
     if(other && _.isObject(other)) params = _.merge(params, other);
     return params;
+}
+
+export function getNumberCharacter(num) {
+    if (!parseInt(num)) return ;
+    return numberMapper[num.toString()];
 }
