@@ -244,7 +244,7 @@ class Dialog extends React.Component {
                 break;
             case 'rate':
                 //$('#score-' + num).val( parseInt(Math.random() * 1000));
-                this.refs['score' + num].value = parseInt(Math.random() * 1000); 
+                this.refs['score-' + num].value = parseInt(Math.random() * 1000); 
                 break;
         }
     }
