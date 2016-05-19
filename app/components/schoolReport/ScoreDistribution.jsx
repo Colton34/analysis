@@ -193,81 +193,6 @@ let numberMapper = {
 
 }
 /**
- * props:
- * fullScore: 满分;
- * highScore: 最高分;
- */
-class GradeSetting extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            grades: 3
-        }
-    }
-
-    adjustGrades() {
-        var value = this.refs.gradeInput.value;
-        if (!value) {
-            return;
-        }
-        this.setState({ grades: value });
-    }
-    onChange(ref, event) {
-        //this.refs[ref].value = event.target.value;
-        $('#' + ref).val(event.target.value);
-
-    }
-    //todo: 调用接口获取相应数据,暂时随机生成
-    onInputBlur(id, event) {
-        var value = event.target.value;
-        if (!value || value < 0) return;
-        var arr = id.split('-');
-        var type = arr[0];
-        var num = arr[1];
-        switch (type) {
-            case 'score':
-                $('#rate-' + num).val(parseInt(Math.random() * 100));
-                break;
-            case 'rate':
-                $('#score-' + num).val( parseInt(Math.random() * 1000));
-                break;
-        }
-    }
-    render() {
-        var {fullScore, highScore} = this.props;
-        var _this = this;
-        return (
-            <div style={{ minHeight: 230 }}>
-                <span style={{ float: 'right' }}>总分： {fullScore}  最高分: {highScore}</span>
-                <div style={{ clear: 'both' }}>
-                    <div>
-                        整体分档为：<input id='gradeInput' ref='gradeInput' onBlur={this.adjustGrades.bind(this) } style={{ width: 150, height: 30 }} onChange={_this.onChange.bind(_this, 'gradeInput') }/>
-                    </div>
-                    <div>
-                        {
-                            _.range(this.state.grades).map(num => {
-                                return (
-                                    <div key={num}>
-                                        <div style={{ display: 'inline-block' }}>{numberMapper[(num + 1).toString()]}档：
-                                            <input id={'score-' + num} ref={'score-' + num} onBlur={_this.onInputBlur.bind(_this, 'score-' + num) } onChange={_this.onChange.bind(_this, 'score-' + num) } style={localStyle.dialogInput}/>
-                                        </div>
-                                        <div style={{ display: 'inline-block' }}>上线率：
-                                            <input id={'rate-' + num} ref={'rate-' + num} onBlur={_this.onInputBlur.bind(_this, 'rate-' + num) } onChange={_this.onChange.bind(_this, 'rate-' + num) } style={localStyle.dialogInput}/>
-                                            %
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                </div>
-            </div>
-        )
-    }
-}
-
-/**
  * props: 
  * show: 是否打开的状态
  * onHide: 关闭时调用的父组件方法
@@ -459,7 +384,7 @@ class ScoreDistribution extends React.Component {
                         {
                             totalScoreLevel.map((levelInfo, index) => {
                                 return (
-                                    <span>
+                                    <span key={index}>
                                         {numberMapper[(index + 1).toString()]} 档分数线为 
                                         <span className={style['school-report-dynamic']}>{levelInfo.score}</span>
                                         分{index === totalScoreLevel.length -1 ? '' : '，'}
@@ -511,7 +436,7 @@ class ScoreDistribution extends React.Component {
                                 _.range(totalScoreLevel.length).map(num => {
                                     var level = numberMapper[(num+1).toString()];
                                     return(
-                                        <p>
+                                        <p key={num}>
                                             {level}档线
                                             <span style={{color:'#a384ce'}}>上线率高</span>的班级有
                                             <span className={style['school-report-dynamic']}>初一1班、初一2班；</span>
