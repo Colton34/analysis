@@ -99,7 +99,7 @@ class StudentPerformanceTable extends React.Component {
         var value = event.target.value;
         if (!value || value <= 0) return;
         this.setState({
-            inputNum : value
+            inputNum: value
         })
     }
     render() {
@@ -107,14 +107,14 @@ class StudentPerformanceTable extends React.Component {
         return (
             <div>
                 {/* 下拉列表 */}
-                <div style={{position: 'absolute', right: 180}}>
+                <div style={{ position: 'absolute', right: 180 }}>
                     <a className={localStyle.btn} href="javascript:void(0)" onClick={this.toggleList.bind(this) }>
                         {this.state.current}
                     </a >
                     {this.props.dropList ? (
                         <ul className={this.state.active ? localStyle.list : localStyle.hide}>
                             {
-                                _this.state.coveredItems.map((item,index) => {
+                                _this.state.coveredItems.map((item, index) => {
                                     return (
                                         <li key={index}>
                                             <a style={Object.assign({}, localStyle.btn, { backgroundColor: '#f2f2f2', color: '#333' }) } href="javascript:void(0)" onClick={this.chooseItem.bind(this, item) }>
@@ -128,8 +128,8 @@ class StudentPerformanceTable extends React.Component {
                     ) : ''}
                 </div>
                 {/* 名次/比例输入框  */}
-                <div style={{float: 'right', marginRight: -90, marginBottom: 10}}>
-                    年级前<input onBlur={_this.onInputChange.bind(_this)} style={{ display: 'inline-block', width: 45, height: 22, lineHeight: '22px' }}/> {_this.state.current === '名次统计' ? '名' : '%'}
+                <div style={{ float: 'right', marginRight: -90, marginBottom: 10 }}>
+                    年级前<input onBlur={_this.onInputChange.bind(_this) } style={{ display: 'inline-block', width: 45, height: 22, lineHeight: '22px' }}/> {_this.state.current === '名次统计' ? '名' : '%'}
                 </div>
 
                 <table  style={{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', width: '100%' }}>
@@ -137,7 +137,7 @@ class StudentPerformanceTable extends React.Component {
                         <tr >
                             <th rowSpan="2" className={styles['table-unit']}>班级</th>
                             {
-                                _this.props.subjectList.map((th,index) => {
+                                _this.props.subjectList.map((th, index) => {
                                     return (
                                         <th key={index} className={styles['table-unit']}>{th}</th>
                                     )
@@ -154,12 +154,12 @@ class StudentPerformanceTable extends React.Component {
                             }
                         </tr>
                         {
-                            Object.keys(_this.props.classData).map((className,index) => {
+                            Object.keys(_this.props.classData).map((className, index) => {
                                 return (
                                     <tr key={index}>
                                         <td className={styles['table-unit']}>{className}</td>
                                         {
-                                            _this.props.classData[className].map((data,index2) => {
+                                            _this.props.classData[className].map((data, index2) => {
                                                 return (
                                                     <td key={index2} className={styles['table-unit']}>
                                                         {data}
@@ -187,7 +187,7 @@ var classData = {
 }
 const StudentPerformance = () => {
     return (
-        <div className={styles['school-report-layout']}>
+        <div className={styles['school-report-layout']} style={{paddingBottom: 100}}>
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
             <div style={{ padding: '0 10px', position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 300 }}>
                 学校有必要知道的学生重点信息
@@ -200,7 +200,7 @@ const StudentPerformance = () => {
                             <div className={localStyle['first-ten']}></div>
                             <div style={{ width: 155, height: 260, border: '1px solid #6dd0a8', margin: '0 auto' }}>
                                 {
-                                    studentList.firstTen.map((s,index) => {
+                                    studentList.firstTen.map((s, index) => {
                                         return (
                                             <div key={index} className={localStyle['student-box']}>
                                                 <div style={{ fontSize: 14, color: '#3bba80' }}>{s.name}</div>
@@ -215,7 +215,7 @@ const StudentPerformance = () => {
                             <div className={localStyle['last-ten']}></div>
                             <div style={{ width: 155, height: 260, border: '1px solid #f9b4a2', margin: '0 auto' }}>
                                 {
-                                    studentList.lastTen.map((s,index) => {
+                                    studentList.lastTen.map((s, index) => {
                                         return (
                                             <div key={index} className={localStyle['student-box']}>
                                                 <div style={{ fontSize: 14, color: '#f68a72' }}>{s.name}</div>
@@ -228,16 +228,19 @@ const StudentPerformance = () => {
                         </div>
                     </div>
                 </div>
-                <div style={{marginTop: 60}}>
+                <div style={{ marginTop: 60 }}>
                     <p>（2）全校各个班级在各个学科优秀的学生人数，见下表：</p>
                     <StudentPerformanceTable studentPosition={'前'} subjectList={['总分', '语文', '数学', '英语', '化学', '物理', '生物']}  classData={classData} dropList={['名次统计', '比例统计']}/>
                 </div>
-                <div style={{marginTop: 40}}>
+                <div style={{ marginTop: 40 }}>
                     <p>（3）全校各班级在各学科欠佳的学生数，如下表所示。希望相应班级任课教师多多帮助他们进步。</p>
                     <StudentPerformanceTable studentPosition={'后'} subjectList={['总分', '语文', '数学', '英语', '化学', '物理', '生物']}  classData={classData}  dropList={['名次统计', '比例统计']}/>
                 </div>
+                <div style={{ marginTop: 30 }}>
+                    注：每个学生都有精准的个人学业诊断分析报告，学生或家长可免费通过“好分数网”查阅个人考试的基本情况。网址：
+                    <a href="http://hfs.yunxiao.com">hfs.yunxiao.com</a>, 账户名为学生本人学号，初始密码为学生家长的电话号码。
+                </div>
             </div>
-
         </div>
     )
 

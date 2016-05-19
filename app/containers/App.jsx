@@ -36,7 +36,7 @@ class App extends React.Component {
     render() {
         var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
         return (
-            <div style={{backgroundColor: '#f2f2f2'}}>
+            <div style={{backgroundColor: '#f2f2f2',paddingBottom: 30}}>
                 <Header user={user} actions={this.props.actions}/>
                 <Dialog />
                     {this.props.children}
