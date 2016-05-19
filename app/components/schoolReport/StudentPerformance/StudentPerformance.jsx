@@ -154,14 +154,14 @@ class StudentPerformanceTable extends React.Component {
                             }
                         </tr>
                         {
-                            Object.keys(_this.props.classData).map(className => {
+                            Object.keys(_this.props.classData).map((className,index) => {
                                 return (
-                                    <tr>
+                                    <tr key={index}>
                                         <td className={styles['table-unit']}>{className}</td>
                                         {
-                                            _this.props.classData[className].map((data,index) => {
+                                            _this.props.classData[className].map((data,index2) => {
                                                 return (
-                                                    <td key={index} className={styles['table-unit']}>
+                                                    <td key={index2} className={styles['table-unit']}>
                                                         {data}
                                                     </td>
                                                 )
