@@ -24,50 +24,43 @@ let tableData = {
 
 
 const SubjectDistribution = ({totalScoreLevel}) => {
-    let config = {
+    var config = {
         chart: {
             type: 'column'
         },
         title: {
-            text: ''
+        	text: ''
+        },
+        legend: {
+        	enabled: false
         },
         xAxis: {
-            categories: [
-                '初一1班',
-                '初一2班',
-                '初一3班',
-                '初一4班',
-                '初一5班',
-                '初一6班'
-            ]
+            categories: ['初一1班', '初一2班', '初一3班', '初一4班', '初一5班']
         },
         yAxis: {
-            min: 0,
-            title: {
-                text: '人数'
-            }
-        },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.1f} 人</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
+        	title: ''
         },
         plotOptions: {
             column: {
-                pointPadding: 0.2,
-                borderWidth: 0
+                stacking: 'normal'
             }
         },
-        series: [{
-            name: '人数',
-            data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0]
-
-        }],
+        tooltip: {
+            pointFormat: '<b>{point.name}:{point.y:.1f}</b>'
+        },
+        series: [
+            {
+                data: [{name: '语文',y:29.9},{name:'英语',y:71.5},{name:'英语',y:106.4},{name:'化学',y:129.2},{name:'语文',y: 144}],
+                color: '#74c13b',
+                stack: 0
+            }, {
+                data:  [{name: '物理',y:-29.9},{name:'生物',y:-71.5},{name:'生物',y:-106.4},{name:'数学',y:-129.2},{name:'数学',y: -144}],
+                color: '#f2cd45',
+                stack: 0
+            }
+        ],
         credits: {
-            enabled: false
+        	enabled: false
         }
     };
     var levelCommonInfo = _.range(totalScoreLevel.length).map(num => {
@@ -121,7 +114,6 @@ const SubjectDistribution = ({totalScoreLevel}) => {
                                     各班级{level}档上线贡献率最大和最小学科如下图所示：
                                 </p>
                                 <p>学科上线率离差：</p>
-                                <span style={{ position: 'absolute', right: 0, marginTop: 40 }}><DropdownList list={['语文', '数学', '英语', '物理', '化学']}/></span>
                                 <ReactHighcharts config={config}></ReactHighcharts>
                                 <div style={{ backgroundColor: '#e7f9f0', padding: '15px 0', marginTop: 15,fontSize: 12}}>
                                     班级学科上线率离差： 指班级的学科上线率与全校各班级该学科的平均上线率之间的差值，反映了班级该学科对上线贡献的大小。
