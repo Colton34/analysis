@@ -35,8 +35,10 @@ class App extends React.Component {
 
     render() {
         var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
+        
+        var currentPath = this.props.location.pathname;
         return (
-            <div style={{backgroundColor: '#f2f2f2',paddingBottom: 30}}>
+            <div style={[{backgroundColor: '#f2f2f2'},(currentPath === '/' ? {}: {paddingBottom: 30})]}>
                 <Header user={user} actions={this.props.actions}/>
                 <Dialog />
                     {this.props.children}
