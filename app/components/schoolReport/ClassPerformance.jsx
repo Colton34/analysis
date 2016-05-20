@@ -92,8 +92,38 @@ const AverageTable = ({tableData}) => {
     )
 }
 
-const ClassPerformance = ({totalScoreLevel}) => {
-     var config = {
+var lineChartMockData ={
+    '全校': [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
+    '初一1班':  [11.2, 9.6, 19.5, 85.5, 21.8, 12.5, 87.5, 78.5, 33.3, 8.3, 23.9, 5.6],
+    '初一2班':  [11.2, 77.6, 92.5, 15.5, 8.8, 21.5, 58.5, 70.5, 31.3, 38.3, 23.9, 9.9]
+}
+
+var lineChartRenderData = [{
+                name: '全校',
+                data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+            },{
+                name: '初一1班',
+                data: [11.2, 9.6, 19.5, 85.5, 21.8, 12.5, 87.5, 78.5, 33.3, 8.3, 23.9, 5.6]
+            }];
+/**
+ * props:
+ * totalScoreLevel: 分档信息
+ */
+class ClassPerformance extends React.Component {
+        
+    constructor(props) {
+        super(props);
+    }
+    onClickDropdownList(chosenClass) {
+        if(!lineChartMockData[chosenClass]) return ;
+        var obj = {};
+        obj.name = chosenClass;
+        obj.data = lineChartMockData[chosenClass];
+        lineChartRenderData = [].concat([lineChartRenderData[1], obj]);
+        this.forceUpdate();
+    }
+    render() {
+        var config = {
         title: {
             text: '',
             x: -20 //center
@@ -120,17 +150,12 @@ const ClassPerformance = ({totalScoreLevel}) => {
             verticalAlign: 'middle',
             borderWidth: 0
         },
-        series: [{
-            name: '初一1班',
-            data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-        },{
-            name: '初一2班',
-            data: [11.2, 9.6, 19.5, 85.5, 21.8, 12.5, 87.5, 78.5, 33.3, 8.3, 23.9, 5.6]
-        }],
+        series: lineChartRenderData,
         credits: {
             enabled: false
         }
     }
+    var {totalScoreLevel} = this.props;
     return (
         <div className={styles['school-report-layout']}>
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
@@ -165,8 +190,8 @@ const ClassPerformance = ({totalScoreLevel}) => {
                       ，说明改版机还没有充分挖掘出学生的潜力。）
                 </p>
                 <p>班级学生总分分布趋势图：</p>
-                <span style={{position: 'absolute', right: 0, marginTop:40}}>
-                    <DropdownList list={['全校','初一1班']}/>
+                <span style={{position: 'absolute', right: 0}}>
+                    <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} list={Object.keys(lineChartMockData)}/>
                 </span>
                 <ReactHighcharts config={config} style={{ margin: '0 auto', marginTop: 40 }}></ReactHighcharts>
                 
@@ -204,7 +229,9 @@ const ClassPerformance = ({totalScoreLevel}) => {
                 </div>
             </div>
         </div>
-    )
+        )   
+    }
+     
 }
 
 
