@@ -380,6 +380,9 @@ class ScoreDistribution extends React.Component {
                 <span onClick={_this.onShowDialog.bind(_this)} style={{ cursor: 'pointer', color: '#b686c9', float: 'right', margin: '30px 5px 30px 0', display: 'inline-block', width: 130, height: 30 }}>?设置分档参数</span>
                 <div style={{ width: 720, margin: '0 auto', clear: 'both' }}>
                     <p style={{ marginBottom: 20 }}>
+                        了解总分分布趋势后，还需要对总分进行分档分析。设置总分分数线，可以分析得到学生学业综合水平的分层表现，还可以引导出对学科教学贡献的分析。
+                    </p>
+                    <p style={{ marginBottom: 20 }}>
                         将总分划为<span className={style['school-report-dynamic']}>{totalScoreLevel.length}</span>条分数线（
                         {
                             totalScoreLevel.map((levelInfo, index) => {
