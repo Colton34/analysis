@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:14:13
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 16:24:33
+* @Last Modified time: 2016-05-22 20:58:33
 */
 
 'use strict';
@@ -16,6 +16,9 @@ var InitialState = Record({
     examStudentsInfo: [],
     examPapersInfo: {},
     examClassesInfo: {},
+    studentsGroupByClass: {},
+    allStudentsPaperMap: {},
+    headers: [],
     levels: {}
 });
 

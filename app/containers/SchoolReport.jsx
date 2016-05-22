@@ -30,37 +30,31 @@ class SchoolReport extends React.Component {
     componentDidMount() {
         if (this.props.haveInit) return;
 
-        console.log('SchoolAnalysis componentDidMount');
+        console.log('***********************   SchoolAnalysis componentDidMount');
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initSchoolAnalysis(params);
     }
 
     render() {
-        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, levels} = this.props;
+        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, headers, levels} = this.props;
 
         examInfo = (Map.isMap(examInfo)) ? examInfo.toJS() : examInfo;
         examStudentsInfo = (List.isList(examStudentsInfo)) ? examStudentsInfo.toJS() : examStudentsInfo;
         examPapersInfo = (Map.isMap(examPapersInfo)) ? examPapersInfo.toJS() : examPapersInfo;
         examClassesInfo = (Map.isMap(examClassesInfo)) ? examClassesInfo.toJS() : examClassesInfo;
+        studentsGroupByClass = (Map.isMap(studentsGroupByClass)) ? studentsGroupByClass.toJS() : studentsGroupByClass;
+        allStudentsPaperMap = (Map.isMap(allStudentsPaperMap)) ? allStudentsPaperMap.toJS() : allStudentsPaperMap;
+        headers = (List.isList(headers)) ? headers.toJS() : headers;
         levels = (Map.isMap(levels)) ? levels.toJS() : levels;
 
         if((!examInfo || _.size(examInfo) == 0) || (!examStudentsInfo || examStudentsInfo.length == 0) ||
             (!examPapersInfo || _.size(examPapersInfo) == 0) || (!examClassesInfo || _.size(examClassesInfo) == 0) ||
-            (!levels || _.size(levels) == 0)) return (<div></div>) //显示 loading
+            (!studentsGroupByClass || _.size(studentsGroupByClass) == 0) || (!allStudentsPaperMap || _.size(allStudentsPaperMap) == 0) ||
+             (!headers || _.size(headers) == 0) || (!levels || _.size(levels) == 0)) return (<div></div>) //显示 loading
 
-        var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
-        var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
 
-        var headers = [];
-        _.each(examPapersInfo, (paper, pid) => {
-            var index = _.findIndex(subjectWeight, (s) => (s == paper.subject));
-            if(index >= 0) {
-                headers.push({ index: index, subject: paper.subject, id: pid });
-            }
-        });
-        headers = _.sortBy(headers, 'index');
-        headers.unshift({subject: '总分', id: 'totalScore' });
 
+console.log('成功');
 
 debugger;
 
@@ -92,6 +86,9 @@ function mapStateToProps(state) {
         examStudentsInfo: state.schoolAnalysis.examStudentsInfo,
         examPapersInfo: state.schoolAnalysis.examPapersInfo,
         examClassesInfo: state.schoolAnalysis.examClassesInfo,
+        studentsGroupByClass: state.schoolAnalysis.studentsGroupByClass,
+        allStudentsPaperMap: state.schoolAnalysis.allStudentsPaperMap,
+        headers: state.schoolAnalysis.headers,
         levels: state.schoolAnalysis.levels
     }
 }

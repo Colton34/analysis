@@ -21,7 +21,6 @@ class Dialog extends React.Component {
         this.props.onHide();
     }
     render() {
-        console.log('Dialog receive:' + JSON.stringify(this.props));
         var dialog = this.props.dialog;
         var _this = this;
         return (

@@ -41,7 +41,6 @@ let dialogProps = {
 }
 
 const HeaderComponent = ({user, actions}) => {
-    console.log('actions;' + actions);
     var _this = this;
     return (
         <div className={style.header}>

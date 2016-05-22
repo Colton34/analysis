@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-12 17:03:16
+* @Last Modified time: 2016-05-22 21:08:44
 */
 import _ from 'lodash';
 
@@ -31,9 +31,6 @@ export function fetchComponentDataBeforeRender(dispatch, components, params, loc
     params = initParams(params, location, {"_user": req.user, 'request': request});
 
     const promises = needs.map(need => dispatch(need(params)));
-
-console.log('promise.length = ', promises.length);
-
     return Promise.all(promises);
 }
 

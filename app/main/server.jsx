@@ -99,10 +99,9 @@ export default function render(req, res) {
                 }));
             })
             .catch((err) => {
-
-console.log('=================================================');
-
-                console.log('Cache Server Render Error ', err);
+console.log('=================== Cache Server Render Error ==============================');
+                console.log(err);
+console.log('=================== Cache Server Render Error ==============================');
                 res.end(renderFullPage('', {}));
             });
         } else {

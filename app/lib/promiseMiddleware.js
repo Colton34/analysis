@@ -15,13 +15,13 @@ export default function promiseMiddleware() {
     next({ ...rest, type: REQUEST });
     return promise
       .then(res => {
-
-console.log('promise success type : ', SUCCESS);
-
         next({ ...rest, res, type: SUCCESS });
         return true;
       })
       .catch(error => {
+
+console.log('=========================== 捕获到Promise Error: ', error);
+
         next({ ...rest, error, type: FAILURE });
         return false;
       });

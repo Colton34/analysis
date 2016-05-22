@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:27:20
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 16:51:31
+* @Last Modified time: 2016-05-22 20:15:19
 */
 
 'use strict';
@@ -23,7 +23,7 @@ export default function reducer(state, action) {
     if(!(state instanceof InitialState)) return initialState.merge(state);
 
     switch(action.type) {
-        case 'FETCH_SCHOOL_ANALYSIS_DATA_SUCCESS':
+        case FETCH_SCHOOL_ANALYSIS_DATA_SUCCESS:
             var nextState;
             _.each(action.res, function(value, key) {
                 nextState = (nextState) ? nextState.set(key, value) : state.set(key, value);

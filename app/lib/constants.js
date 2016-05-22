@@ -46,12 +46,32 @@ export const INIT_DASHBOARD_FAILURE = 'INIT_DASHBOARD_FAILURE';
 
 
 //=============== SchoolAnalysis =============================
-export const INIT_SCHOOL_ANALYSIS = 'INIT_SCHOOL_ANALYSIS';
-export const INIT_SCHOOL_ANALYSIS_SUCCESS = 'INIT_SCHOOL_ANALYSIS_SUCCESS';
-export const INIT_SCHOOL_ANALYSIS_FAILURE = 'INIT_SCHOOL_ANALYSIS_FAILURE';
+export const FETCH_SCHOOL_ANALYSIS_DATA = 'FETCH_SCHOOL_ANALYSIS_DATA';
+export const FETCH_SCHOOL_ANALYSIS_DATA_SUCCESS = 'FETCH_SCHOOL_ANALYSIS_DATA_SUCCESS';
+export const FETCH_SCHOOL_ANALYSIS_DATA_FAILURE = 'FETCH_SCHOOL_ANALYSIS_DATA_FAILURE';
 
-export const FETCH_SCHOOL_ANALYSIS_DATA = 'FETCH_SCHOOL_ANALYSIS_RAW_DATA';
-export const FETCH_SCHOOL_ANALYSIS_DATA_SUCCESS = 'FETCH_SCHOOL_ANALYSIS_RAW_DATA_SUCCESS';
-export const FETCH_SCHOOL_ANALYSIS_DATA_FAILURE = 'FETCH_SCHOOL_ANALYSIS_RAW_DATA_FAILURE';
+export const CHANGE_LEVEL = 'CHANGE_LEVEL';
 
-export const CHANGE_LEVEL = 'CHANGE_LEVEL'; 
+export const SUBJECTS_WEIGHT = ['语文', '数学', '英语', '物理', '化学', '生物', '政治', '历史', '地理' ];
+export const NUMBER_MAP = {
+    1: '一',
+    2: '二',
+    3: '三',
+    4: '四',
+    5: '五',
+    6: '六',
+    7: '七',
+    8: '八',
+    9: '九',
+    10: '十'
+};
+
+export const LETTER_MAP = {
+    0: 'A',
+    1: 'B',
+    2: 'C',
+    3: 'D',
+    4: 'E',
+    5: 'F',
+    6: 'G'
+};

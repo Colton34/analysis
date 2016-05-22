@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 15:09:49
+* @Last Modified time: 2016-05-22 20:42:50
 */
 
 'use strict';
@@ -69,10 +69,6 @@ exports.verify = function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.authorization;
     if(!token) return next(new BadRequestError('400', { message: 'no token be passed'}));
 
-
-console.log('请求带有token...');
-
-
     when.promise(function(resolve, reject) {
         jsonwebtoken.verify(token, config.secret, function (err, decode) {
             if (err) return reject(new UnauthorizedAccessError("invalid_token"));
@@ -80,9 +76,6 @@ console.log('请求带有token...');
             resolve(decode.user);
         });
     }).then(function(user) {
-
-console.log('token是有效的...');
-
         req.user = user;
         req.user.token = token;
         next();

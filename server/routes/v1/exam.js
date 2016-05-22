@@ -2,12 +2,10 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:14:17
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 11:55:35
+* @Last Modified time: 2016-05-22 20:31:16
 */
 
 'use strict';
-
-//TODO: auth后面统一加，方便测试
 
 var router = require('express').Router();
 var peterMgr = require('../../lib/peter').Manager;
@@ -17,9 +15,15 @@ var errors = require('common-errors');
 var auth = require('../../middlewares/auth');
 var exam = require('../../middlewares/exam');
 
-router.get('/home', auth.verify, exam.initSchool, exam.home);
-router.get('/dashboard', auth.verify, exam.validateExam, exam.initExam, exam.initExamTotalScore, exam.dashboard);
-router.get('/school/analysis', auth.verify, exam.validateExam, exam.initExam, exam.schoolAnalysis);
+
+//因为在express config中对该保护的路由做了verify（验证）所以就免去了在具体路由里重复的添加（TODO：但是现在权限控制还没有添加）
+router.get('/home', exam.home);
+
+//TODO: dashboard的重构
+router.get('/dashboard', exam.validateExam, exam.initExam, exam.dashboard);
+
+
+router.get('/school/analysis',  exam.validateExam, exam.initExam, exam.schoolAnalysis);
 
 module.exports = router;
 

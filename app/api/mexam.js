@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 16:56:13
+* @Last Modified time: 2016-05-22 20:58:02
 */
 
 
@@ -197,8 +197,7 @@ function formatExams(exams) {
 
 //********************************************************* Dashboard *********************************************************
 export function fetchDashboardData(params) {
-    var grade = decodeURI(params.grade);
-    var url = examPath + '/dashboard?examid=' + params.examid + '&grade=' + grade;
+    var url = examPath + '/dashboard?examid=' + params.examid + '&grade=' + params.grade;
 
     return params.request.get(url).then(function(res) {
 // console.log('=======================  dashboard res.data.keys = ', _.keys(res.data));
@@ -211,8 +210,7 @@ export function fetchDashboardData(params) {
 
 
 export function fetchSchoolAnalysisData(params) {
-    var grade = decodeURI(params.grade);
-    var url = examPath + '/school/analysis?examid=' + params.examid + '&grade=' + grade;
+    var url = examPath + '/school/analysis?examid=' + params.examid + '&grade=' + params.grade;//必须是通过URI编码过的
 
     var examInfo, examStudentsInfo, examPapersInfo, examClassesInfo;
     var studentsGroupByClass, allStudentsPaperMap;
@@ -224,12 +222,27 @@ export function fetchSchoolAnalysisData(params) {
         var examStudentsInfo = res.data.examStudentsInfo;
         var examPapersInfo = res.data.examPapersInfo;
         var examClassesInfo = res.data.examClassesInfo;
+        var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
+        var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
+        var headers = [];
+        _.each(examPapersInfo, (paper, pid) => {
+            var index = _.findIndex(subjectWeight, (s) => (s == paper.subject));
+            if(index >= 0) {
+                headers.push({ index: index, subject: paper.subject, id: pid });
+            }
+        });
+        headers = _.sortBy(headers, 'index');
+        headers.unshift({subject: '总分', id: 'totalScore' });
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         return Promise.resolve({
+            haveInit: true,
             examInfo: examInfo,
             examStudentsInfo: examStudentsInfo,
             examPapersInfo: examPapersInfo,
             examClassesInfo: examClassesInfo,
+            studentsGroupByClass: studentsGroupByClass,
+            allStudentsPaperMap: allStudentsPaperMap,
+            headers: headers,
             levels: levels
         });
     });
