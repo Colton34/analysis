@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 20:58:02
+* @Last Modified time: 2016-05-22 21:34:09
 */
 
 
@@ -1229,7 +1229,7 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
  * @param  {Number} count [description]
  * @return {[type]}       [description]
  */
-function makeSegments(end, start=0, count=12) {
+export function makeSegments(end, start=0, count=12) {
     var step = _.ceil(_.divide(_.subtract(end, start), count));
     var result = _.range(start, end+1, step);
     if(_.takeRight(result) < end) result.push(end);
@@ -1242,7 +1242,7 @@ function makeSegments(end, start=0, count=12) {
  * @param  {[type]} segments [description]
  * @return 和segments形成的区间段一一对应的分布数数组
  */
-function makeSegmentsStudentsCount(students, segments) {
+export function makeSegmentsStudentsCount(students, segments) {
     var groupStudentsBySegments = _.groupBy(students, function(item) {
         return findScoreSegmentIndex(segments, item.score);
     });
@@ -1315,7 +1315,7 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
     return levels;
 }
 
-function makeFactor(originalMatrix) {
+export function makeFactor(originalMatrix) {
     var tempMatrix = [];//不用map是因为避免占位
     //1.行相减
     _.each(originalMatrix, (classRow, rowIndex) => {

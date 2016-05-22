@@ -2,11 +2,9 @@ import React from 'react';
 import styles from '../../common/common.css';
 import moment from 'moment';
 
-//{examlName, examTime, grade, classNum, studentNum, subjectList}
-
 const Header = ({examInfo}) => {
+//自定义Module数据结构
     var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
-console.log('startTime = ', startTime);
 
     return (
         <div>

@@ -2,15 +2,19 @@ import React from 'react';
 import styles from '../../common/common.css';
 import ReactHighcharts from 'react-highcharts';
 
+import {makeSegments, makeSegmentsStudentsCount} from '../../api/mexam';
 
-const FullScoreTrend = () => {
+const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
+//算法数据结构：
+    var result = theTotalScoreTrenderChart(examInfo, examStudentsInfo);
+//自定义Module数据结构
     var config = {
         title: {
             text: '',
             x: -20 //center
         },
         xAxis: {
-            categories: [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700]
+            categories: result['x-axon']
         },
         yAxis: {
             title: {
@@ -33,7 +37,7 @@ const FullScoreTrend = () => {
         },
         series: [{
             name: 'school',
-            data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+            data: result['y-axon']
         }],
         credits: {
             enabled: false
@@ -60,3 +64,19 @@ const FullScoreTrend = () => {
 
 
 export default FullScoreTrend;
+
+function theTotalScoreTrenderChart(examInfo, examStudentsInfo) {
+    var segments = makeSegments(examInfo.fullMark);
+
+debugger;
+
+    var xAxons = _.slice(segments, 1);
+    var yAxons = makeSegmentsStudentsCount(examStudentsInfo, segments);
+
+debugger;
+
+    return {
+        'x-axon': xAxons,
+        'y-axon': yAxons
+    }
+}
