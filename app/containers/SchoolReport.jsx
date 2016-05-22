@@ -52,15 +52,11 @@ class SchoolReport extends React.Component {
             (!studentsGroupByClass || _.size(studentsGroupByClass) == 0) || (!allStudentsPaperMap || _.size(allStudentsPaperMap) == 0) ||
              (!headers || _.size(headers) == 0) || (!levels || _.size(levels) == 0)) return (<div></div>) //显示 loading
 
-
-
-console.log('成功');
-
-debugger;
+// debugger;
 
         return (
             <div style={{ width: 1000, margin: '0 auto', marginTop: 20, backgroundColor: '#fff' }}>
-                <h1>This School Analysis</h1>
+                <Header examInfo={examInfo}/>
             </div>
         )
     }
