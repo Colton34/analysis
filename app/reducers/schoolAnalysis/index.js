@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:27:20
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 17:03:38
+* @Last Modified time: 2016-05-22 16:51:31
 */
 
 'use strict';
@@ -24,15 +24,14 @@ export default function reducer(state, action) {
 
     switch(action.type) {
         case 'FETCH_SCHOOL_ANALYSIS_DATA_SUCCESS':
-// console.log('action.res.data = ', _.keys(action.res.data.classInfo).length);
-            return state;
-        case 'TESTDATA':
-            console.log('TESTDATA OK');
-            return state;
-        case CHANGE_LEVEL: 
-            return state.set('totalScoreLevel', action.levelList)
+            var nextState;
+            _.each(action.res, function(value, key) {
+                nextState = (nextState) ? nextState.set(key, value) : state.set(key, value);
+            });
+            return nextState;
+        case CHANGE_LEVEL:
+            return state.set('levels', action.levels);
     }
-
     return state;
 }
 

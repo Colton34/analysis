@@ -2,14 +2,14 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:27:28
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 21:10:28
+* @Last Modified time: 2016-05-22 16:28:59
 */
 
 'use strict';
 
 import _ from 'lodash';
 
-import {fetchSchoolAnalysisData} from '../../api/exam';
+import {fetchSchoolAnalysisData} from '../../api/mexam';
 import {
     FETCH_SCHOOL_ANALYSIS_DATA,
     CHANGE_LEVEL
