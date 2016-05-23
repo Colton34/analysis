@@ -68,12 +68,8 @@ export default FullScoreTrend;
 function theTotalScoreTrenderChart(examInfo, examStudentsInfo) {
     var segments = makeSegments(examInfo.fullMark);
 
-debugger;
-
     var xAxons = _.slice(segments, 1);
     var yAxons = makeSegmentsStudentsCount(examStudentsInfo, segments);
-
-debugger;
 
     return {
         'x-axon': xAxons,

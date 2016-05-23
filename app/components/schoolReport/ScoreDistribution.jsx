@@ -1,12 +1,16 @@
 import React from 'react';
 import style from '../../common/common.css';
 import ReactHighcharts from 'react-highcharts';
-import _ from 'lodash';
-//import Dialog from '../../common/Dialog';//todo: deletable
-import { Modal } from 'react-bootstrap';
-import {showDialog, hideDialog} from '../../reducers/global-app/actions';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import { Modal } from 'react-bootstrap';
+import _ from 'lodash';
+
+import {showDialog, hideDialog} from '../../reducers/global-app/actions';//TODO: 设计思路？？？
+import {NUMBER_MAP as numberMap} from '../../lib/constants';
+
+import {makeSegmentsStudentsCount} from '../../api/mexam';
+
 import DropdownList from '../../common/DropdownList';
 
 var {Header, Title, Body, Footer} = Modal;
@@ -15,6 +19,7 @@ let localStyle = {
     dialogInput: {width: 150,height: 50},
     btn: {lineHeight: '50px', width: 150, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',margin: '0 30px'}
 }
+
 let tableData_example = {
     tds: [
         ['全部', 100, 120, '15%', 360, 460, '15%', 360, 120, '15%'],
@@ -92,13 +97,13 @@ var tableData = {
             num: 890
         }
     ]
-    
+
 }
 
-const Table = ({tableData}) => {
-    var levelNum = tableData[Object.keys(tableData)[0]].length;
+const Table = ({tableData, levels}) => {
+    var levTotal = _.size(levels);
     var widthProp = {};
-    if (levelNum > 3) {
+    if (levTotal > 3) {
         widthProp = {
             minWidth: 1000
         }
@@ -107,32 +112,17 @@ const Table = ({tableData}) => {
             width: '100%'
         }
     }
-   
-    //转换格式成tableData_example的模样
-    var tableRows = [];
-    _.forEach(tableData, (levelInfos, className) => {
-        var row = [];
-        row.push(className);
-        var accumulateNum = 0;
-        var accumulateRate = 0;
-        _.forEach(levelInfos, levelInfo => {
-            row.push(levelInfo.num);
-            accumulateNum += levelInfo.num;
-            accumulateRate += levelInfo.rate;
-            row = row.concat([accumulateNum, accumulateRate]);
-        })
-        tableRows.push(row);
-    })
+
     return (
         <table  style={Object.assign({},{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', overflow: 'scroll'}, widthProp)}>
             <tbody>
                 <tr style={{ backgroundColor: '#f4faee' }}>
                     <th rowSpan="2" className={style['table-unit']}>班级</th>
                     {
-                        _.range(levelNum).map((num,index) =>{
+                        _.map(_.range(levTotal), (index) =>{
                             return (
                                 <th key={index} colSpan="3" className={style['table-unit']} style={{minWidth: 180}}>
-                                     {numberMapper[(index + 1).toString()]}档
+                                     {numberMap[(index + 1)]}档
                                 </th>
                             )
                         })
@@ -140,28 +130,28 @@ const Table = ({tableData}) => {
                 </tr>
                 <tr style={{ backgroundColor: '#f4faee' }}>
                     {
-                        _.range(levelNum).map(() =>{
-                            return  _.range(3).map(num =>  {
-                                switch(num ) {
+                        _.map(_.range(levTotal), () =>{
+                            return  _.map(_.range(3), (index) =>  {
+                                switch(index ) {
                                     case 0:
-                                        return <th key={num} className={style['table-unit']}>人数</th>
-                                    case 1: 
-                                        return  <th key={num} className={style['table-unit']}>累计人数</th>
+                                        return <th key={index} className={style['table-unit']}>人数</th>
+                                    case 1:
+                                        return  <th key={index} className={style['table-unit']}>累计人数</th>
                                     case 2:
-                                        return <th key={num} className={style['table-unit']}>累计占比</th>    
+                                        return <th key={index} className={style['table-unit']}>累计占比</th>
                                 }
                             })
                         })
                     }
                 </tr>
                 {
-                    tableRows.map((row,index) => {
+                    _.map(tableData, (rowData,index) => {
                         return (
                             <tr key={index}>
                             {
-                                row.map((td, index) =>{
+                                _.map(rowData, (data, index) =>{
                                     return (
-                                        <td key={index} className={style['table-unit']}>{td}</td>
+                                        <td key={index} className={style['table-unit']}>{data}</td>
                                     )
                                 })
                             }
@@ -193,63 +183,131 @@ let numberMapper = {
 
 }
 /**
- * props: 
+ * props:
  * show: 是否打开的状态
  * onHide: 关闭时调用的父组件方法
  * fullScore: 考试总分
  * highscore: 考试最高分
  * changeLevels: 修改状态树的actionCreator
- * 
+ *
  */
 class Dialog extends React.Component {
     constructor(props) {
         super(props);
+        this.levels = props.levels;
+        this.levLastIndex = _.size(this.levels) - 1;
         this.state = {
-            levelNum: this.props.totalScoreLevel.length
-        }
+            levelNum: _.size(this.levels)
+        };
     }
     onChange(ref, event) {
         this.refs[ref].value = event.target.value;
     }
     adjustGrades() {
         var value = this.refs.levelInput.value;
-        if (!value) {
+        if (!(value && _.isNumber(value) && value > 0)) {
+            console.log('value 分档个数必须是正数');
             return;
         }
+        this.levLastIndex = value - 1;
         this.setState({ levelNum: value });
-    } 
+    }
+
     okClickHandler() {
-        var levelNum = this.refs.levelInput.value;
-        var levelScores = [];
-        for (var i = 0; i < levelNum; i++) {
-            var level = {};
-            level.score = parseFloat(this.refs[('score-' + i)].value);
-            level.rate = parseFloat(this.refs[('rate-'+ i)].value);
-            level.num = parseInt(Math.random() * 110);
-            levelScores.push(level);
+//         var levelNum = this.refs.levelInput.value;
+//         var levels = {};
+
+//         if(!(levelNum && _.isNumber(levelNum) && levelNum > 0)) {
+//             console.log('levelNum 分档个数必须是正数');
+//             return;
+//         } //显示Tips
+// //做校验--暂时先用Tips来给出Error信息；填充的时候是从后往前填充的
+// //this.refs[('score-' + i)].value
+// //this.refs[('rate-'+ i)].value
+//         var isValid = true;
+//         _.each(_.range(levelNum), (index) => {
+//             var temp = {}, score = this.refs[('score-' + i)].value, percentage = this.refs[('rate-'+ i)].value;
+//             if(!(_.isNumber(score) && _.isNumber(percentage))) {
+//                 isValid = false;
+//                 return;
+//             }
+//             temp.score = score;
+//             temp.percentage = percentage;
+//             temp.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
+//             levels[(levelNum-index)+''] = temp;
+//         });
+
+//         if(!isValid) {
+//             console.log('分档线不符合规则，请修改');
+//             return;
+//         }
+
+        //this.levels的个数和input的值是一样的；所有的input都不为空
+        var levTotal = this.refs.levelInput.value;
+        var isValid = _.every(_.range(levTotal), (index) => (!_.isUndefined(this.refs[('score-' + i)].value) && !_.isUndefined(this.refs[('rate-'+ i)].value)));
+        if(_.keys(this.levels).length !== levTotal) isValid = false;
+
+        if(!isValid) {
+            console.log('levels 表单验证不通过');
+            return;
         }
-        this.props.changeLevels(levelScores);
+
+        this.props.changeLevels(this.levels);
         this.props.onHide();
     }
+
+/*
+低档次的 score 一定要比高档次的 score 低，比档次的要高（相对的，低档次的percentage和count都会比高档次的高）
+ */
     onInputBlur(id, event) {
         var value = event.target.value;
-        if (!value || value < 0) return;
+        if (!(value && _.isNumber(value) && value >= 0)) return;
         var arr = id.split('-');
         var type = arr[0];
-        var num = arr[1];
+        var num = arr[1]; //是第一个（高档次） 还是 最后一个（低档次），但是赋值给levels的时候就应该颠倒过来了
+
+//num = 0, 1, 2(levlTotal)
+        var higherLevObj = this.levels[(this.levLastIndex-num+1)+''];
+        var lowerLevObj = this.levels[(this.levLastIndex-num-1)+''];
+        var temp = {score: 0, percentage: 0, count: 0};
         switch (type) {
             case 'score':
-                //$('#rate-' + num).val(parseInt(Math.random() * 100));
-                this.refs['rate-' + num].value = parseInt(Math.random() * 100);
+            //根据给出的分数，计算在此分数以上的人数，然后求出百分比
+                //要么没有，如果有则一定符合规则
+                if((!value) || (_.isNumber(value) && (!higherLevObj || (value<higherLevObj.score)) && (!lowerLevObj || (value>lowerLevObj.score)))) {
+                    console.log('所给的score不符合规则');
+                    return;
+                }
+                var targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= value);//因为examStudentsInfo是有序的，所以可以用二分
+                var count = examStudentsInfo.length - targetIndex;
+                var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);
+
+                temp.score = value;
+                temp.percentage = percentage;
+                temp.count = count;
+
+                this.refs['rate-' + num].value = percentage;
                 break;
             case 'rate':
-                //$('#score-' + num).val( parseInt(Math.random() * 1000));
-                this.refs['score-' + num].value = parseInt(Math.random() * 1000); 
+            //根据给出的百分比，得到学生的位置，然后此学生的分数即为分数线
+                if((!value) || (_.isNumber(value) && (!higherLevObj || (value>higherLevObj.percentage)) && (!lowerLevObj || (value<lowerLevObj.percentage)))) {
+                    console.log('所给的percentage不符合规则');
+                    return;
+                }
+                var targetCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
+                var targetStudent = _.takeRight(examStudentsInfo, count)[0];
+
+                temp.score = targetStudent.score;
+                temp.percentage = value;
+                temp.count = targetCount;
+
+                this.refs['score-' + num].value = targetStudent.score;
                 break;
         }
+        this.levels[(this.levLastIndex-num)+''] = temp;
     }
     render() {
-        var {totalScoreLevel} = this.props; 
+        var {totalScoreLevel} = this.props;
         var _this = this;
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this,{})}>
@@ -291,7 +349,7 @@ class Dialog extends React.Component {
                             取消
                         </a>
                      </Footer>
-                
+
 
             </Modal>
         )
@@ -305,9 +363,15 @@ class Dialog extends React.Component {
 class ScoreDistribution extends React.Component {
     constructor(props) {
         super(props);
+        var {studentsGroupByClass, examInfo} = this.props;
+        var classList = _.map(_.keys(studentsGroupByClass), (className) => {
+            return {key: className, value: examInfo.gradeName+className+'班'};
+        });
+        classList.unshift({key: 'totalSchool', value: '全校'});
+        this.classList = classList;
         this.state = {
             showDialog: false,
-            currentClass: Object.keys(tableData)[0]
+            currentClass: classList[0]
         }
     }
     onShowDialog() {
@@ -320,20 +384,39 @@ class ScoreDistribution extends React.Component {
             showDialog: false
         })
     }
-    onClickDropdownList(className) {
+    onClickDropdownList(item) {
         this.setState({
-            currentClass: className
+            currentClass: item
         })
     }
     render() {
-        var {changeLevels, totalScoreLevel} = this.props;
-        console.log('================== totalScoreLevel:'+ JSON.stringify(totalScoreLevel)); 
-        var pieChartData = tableData[this.state.currentClass].map((levelInfo, index)=> {
+    //Props数据结构：
+        var {examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, changeLevels} = this.props;
+
+        //算法数据结构
+        var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
+        var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
+        var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels);
+
+        //自定义Moudle数据结构
+        var _this = this;
+        var levTotal = _.size(levels);
+
+//饼图的数据和select放在一起。是受当前组件的状态值而改变的。通过totalScroeLevelInfo来获取
+// 通过 levelTotalScoreInfo[theKey] 即可获得此scope下所有学生的分档情况
+
+//TODO:把和饼图相关的东西抽出去，自己host state，而不是放在ScoreDistribution中，避免没必要的计算（意味一旦改变当前component的state就会导致再次运行render方法）
+
+        var levelInfo = totalScoreLevelInfo[this.state.currentClass.key];
+        var pieChartData = _.map(levelInfo, (levelObj, levelKey)=> {
             var obj = {};
-            obj.name = numberMapper[(index+1).toString()] + '档';
-            obj.y = levelInfo.rate;
+            obj.name = numberMap[(parseInt(levelKey)+1)] + '档';
+            obj.y = levelInfo[(levTotal-1-levelKey)+''].count;  //当前scope下当前档次的人数
             return obj;
-        })      
+        });
+        var baseCount = (this.state.currentClass.key == 'totalSchool') ? examInfo.realStudentsCount : examClassesInfo[this.state.currentClass.key].realStudentsCount;
+        pieChartData.push({name: '其他', y: (baseCount - totalScoreLevelInfo[this.state.currentClass.key]['0'].sumCount)});
+
         let config = {
             chart: {
                 plotBackgroundColor: null,
@@ -370,92 +453,82 @@ class ScoreDistribution extends React.Component {
             }
 
         };
-        var _this = this;
+
         return (
             <div style={{ position: 'relative' }}>
                 <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
+
                 <div style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 280 }}>
                     总分分档上线学生人数分布
                 </div>
+
                 <span onClick={_this.onShowDialog.bind(_this)} style={{ cursor: 'pointer', color: '#b686c9', float: 'right', margin: '30px 5px 30px 0', display: 'inline-block', width: 130, height: 30 }}>?设置分档参数</span>
+
                 <div style={{ width: 720, margin: '0 auto', clear: 'both' }}>
                     <p style={{ marginBottom: 20 }}>
                         了解总分分布趋势后，还需要对总分进行分档分析。设置总分分数线，可以分析得到学生学业综合水平的分层表现，还可以引导出对学科教学贡献的分析。
                     </p>
+
+                    {/*--------------------------------  总分分档上线学生Header -------------------------------------*/}
                     <p style={{ marginBottom: 20 }}>
-                        将总分划为<span className={style['school-report-dynamic']}>{totalScoreLevel.length}</span>条分数线（
+                        将总分划为<span className={style['school-report-dynamic']}>{_.size(levels)}</span>条分数线(
                         {
-                            totalScoreLevel.map((levelInfo, index) => {
+                            _.map(levels, (levObj, levelKey) => {
                                 return (
-                                    <span key={index}>
-                                        {numberMapper[(index + 1).toString()]} 档分数线为 
-                                        <span className={style['school-report-dynamic']}>{levelInfo.score}</span>
-                                        分{index === totalScoreLevel.length -1 ? '' : '，'}
+                                    <span key={levelKey}>
+                                        {numberMap[(levelKey + 1)]} 档分数线为
+                                        <span className={style['school-report-dynamic']}>{levels[(levTotal-1-levelKey)+''].score}</span>
+                                        分{levelKey == levTotal - 1 ? '' : '，'}
                                     </span>
                                 )
-                                
                             })
-                        }），
-                        全校
-                        {
-                            totalScoreLevel.map((levelInfo, index) => {
-                                return (
-                                    numberMapper[(index+1).toString()] + (index !== totalScoreLevel.size -1 ? '、': '')
-                                )
-                            })   
-                        }档上线人数分别为： 
+                        })，
+                        全校{_.join(_.map(_.range(_.size(levels)), (index) => numberMap[index+1]), '、')}档上线人数分别为：
                         <span className={style['school-report-dynamic']}>
-                        {
-                            totalScoreLevel.map((levelInfo, index) => {
-                                return (
-                                    levelInfo.num + '人' + (index !== totalScoreLevel.length -1 ? '、': '')
-                                )
-                            })
-                        }
+                        {_.join(_.map(levels, (levObj, levelKey) => levels[(levTotal-1-levelKey)].count + '人'), '、')}
                         </span>
                         ，上线率分别为：
                         <span className={style['school-report-dynamic']}>
-                        {
-                             totalScoreLevel.map((levelInfo, index) => {
-                                return (
-                                    levelInfo.rate + '%' + (index !== totalScoreLevel.length -1 ? '、': '')
-                                )
-                            })
-                        }
+                        {_.join(_.map(levels, (levObj, levelKey) => levels[(levTotal-1-levelKey)].percentage + '%'), '、')}
                         </span>。
                     </p>
+                    {/*--------------------------------  总分分档上线学生表格 -------------------------------------*/}
+
                     <p style={{ marginBottom: 20 }}>各班的上线情况见下表：</p>
                     <div style={{width: '100%', overflow: 'scroll'}}>
-                        <Table tableData={tableData}/>
+                        <Table tableData={tableData} levels={levels} />
                     </div>
-                    <a  href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
+
+                    {/*  TODO: 当前没有对多于5个的时候有收缩，所以这里也就没有必要展现全部的按钮了，因为已经是全部了   {_.keys(studentsGroupByClass).length > 5 ? (<a  href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
                         点击查看更多班级数据 V
-                    </a>
-                    <span style={{ position: 'absolute', right: 0, marginTop: 40 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this)} list={Object.keys(tableData)}/></span>
+                    </a>) : ''} */}
+                    {/*--------------------------------  饼图的select -------------------------------------*/}
+                    <span style={{ position: 'absolute', right: 0, marginTop: 40 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this)} classList={_this.classList}/></span>
+
+                    {/*--------------------------------  总分分档上线学生分析说明 -------------------------------------*/}
                     <div style={{ marginTop: 30 }}>
                         <div style={{ display: 'inline-block', width: 330, backgroundColor: '#e9f7f0', paddingRight: 30,fontSize: 14 }}>
                             <p>表中显示了全校及各班各档上线人数。上线人数的多少一目了然。考虑到各班级学生总人数会存在有差异，要用上线率来比较：</p>
                             {
-                                _.range(totalScoreLevel.length).map(num => {
-                                    var level = numberMapper[(num+1).toString()];
+                                _.map(_.range(levTotal), (index) => {
+                                    var levelStr = numberMap[(index+1)], levObj = disData[(levTotal-1-index)];
                                     return(
-                                        <p key={num}>
-                                            {level}档线
+                                        <p key={index}>
+                                            {levelStr}档线
                                             <span style={{color:'#a384ce'}}>上线率高</span>的班级有
-                                            <span className={style['school-report-dynamic']}>初一1班、初一2班；</span>
-                                            {level}档线
+                                            <span className={style['school-report-dynamic']}>{_.join(_.map(levObj.high, (className) => examInfo.gradeName+className+'班'), '、')+'；'}</span>
+                                            {levelStr}档线
                                             <span style={{color:'#a48382'}}>上线率低</span>的班级有
-                                            <span className={style['school-report-dynamic']}>初一5班、初一7班；</span>
-                                        </p>    
+                                            <span className={style['school-report-dynamic']}>{_.join(_.map(levObj.low, (className) => examInfo.gradeName+className+'班'), '、')+'；'}</span>
+                                        </p>
                                     )
-                                    
                                 })
                             }
                         </div>
+                    {/*--------------------------------  总分分档上线学生饼图 -------------------------------------*/}
                         <ReactHighcharts config={config} style={{ display: 'inline-block', width: 360, height: 250, float: 'right' }}></ReactHighcharts>
                     </div>
                 </div>
-                <Dialog changeLevels={changeLevels} totalScoreLevel={totalScoreLevel} show={_this.state.showDialog} onHide={_this.onHideDialog.bind(_this)} fullScore={750} highScore={680}/>
             </div>
         )
     }
@@ -463,3 +536,200 @@ class ScoreDistribution extends React.Component {
 }
 
 export default ScoreDistribution;
+
+
+//算法：按照分档标准创建对应的segments。segments最小值是最低档线，最大值是满分（即，一档线区间是(一档线score, fullMark]）
+/**
+ * 用来画Table的info数据结构
+ * @param  {[type]} totalScoreLevelInfo [description]
+ * @return {[type]}                     table的matrix。这里是夹心header，所以不提供header，从levels中获取行排列（夹心栏就按照图表给的顺序：['人数',
+ *   '累计人数', '累计占比']）
+ */
+function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
+    var table = [];
+    var totalSchoolObj = totalScoreLevelInfo.totalSchool;
+
+    //全校信息总是table的第一行
+    var totalSchoolRow = makeLevelTableRow(totalSchoolObj);
+    // debugger;
+    totalSchoolRow.unshift('全校');
+    table.push(totalSchoolRow);
+
+    _.each(totalScoreLevelInfo, (levInfoItem, theKey) => {
+        if(theKey == 'totalSchool') return;
+        var totalClassRow = makeLevelTableRow(levInfoItem);
+        totalClassRow.unshift(theKey+'班');
+        table.push(totalClassRow);
+    });
+
+    return table;
+}
+
+function makeLevelTableRow(rowInfo) {
+    //rowInfo每一个levelKey都有对应的对象，而且顺序是对应levels的（即和segments是一样的，都是从低到高，而显示的时候是从高到底，所以这里需要反转）
+    // debugger;
+    var tempMap = _.map(rowInfo, (rowObj, levelKey) => [rowObj.count, rowObj.sumCount, rowObj.sumPercentage+'%']);
+    // debugger;
+    // vat tempMap = _.map(rowInfo, (rowObj, levelKey) => [rowObj.count, rowObj.sumCount, rowObj.sumPercentage + '%']);
+    return _.concat(..._.reverse(tempMap));
+}
+
+
+/**
+ * 由档次的维度来找出此档次上线率高和低的班级，取多少位的排名取决于总共有多少个班级
+ * @param  {[type]} totalScoreLevelInfo [description]
+ * @return {[type]}                     [description]
+ */
+/*
+首先要去掉totalSchool
+{
+    <className>: {
+        <levelKey>: {
+            count:
+            sumCount:
+            sumPercentage:
+        }
+    }
+}
+
+==>
+[
+    {levelKey: , class: , sumPercentage: }
+]
+==>
+对上面的数组按照levelKey进行groupBy
+{
+    <levelKey>: [<obj>]
+}
+
+按照规则得到结果
+ */
+/**
+ * 总分分档上线学生模块的分析描述文案
+ * @param  {[type]} totalScoreLevelInfo [description]
+ * @return {[type]}                     [description]
+ * {
+ *     <levelKey>: {
+ *         low: [<className>]
+ *         high: [<className>]
+ *     }
+ * }
+ */
+function theTotalScoreLevelDiscription(totalScoreLevelInfo, levels) {
+//找出各个档次各个班级的累积上线率，并按照levelKey进行分组
+    var totalScoreLevelInfoGroupByLevel = _.groupBy(_.concat(..._.map(totalScoreLevelInfo, (theObj, theKey) => {
+        if(theKey == 'totalSchool') return [];
+        return _.map(theObj, (levObj, levelKey) => {
+            return {levelKey: levelKey, sumPercentage: levObj.sumPercentage, 'class': theKey}
+        })
+    })), 'levelKey');
+
+    var levelClassCount = _.size(totalScoreLevelInfo) - 1;
+    //根据规则得到每个档次高低的班级名称：这里是和levels中的顺序是一一对应的，即'0'是一档。。。
+    var result = {}, low, high;
+    _.each(levels, (levObj, levelKey) => {
+        var orderLevelTotalScore = _.sortBy(totalScoreLevelInfoGroupByLevel[levelKey], 'sumPercentage');//从低到高
+        if(orderLevelTotalScore.length == 0) return;
+
+        if(levelClassCount == 2 || levelClassCount == 3) {
+            low = _.map(_.take(orderLevelTotalScore, 1), (item) => item.class);
+            high = _.map(_.takeRight(orderLevelTotalScore, 1), (item) => item.class);
+        } else if(levelClassCount >= 4 && levelClassCount < 7) {
+            low = _.map(_.take(orderLevelTotalScore, 2), (item) => item.class);
+            high = _.map(_.takeRight(orderLevelTotalScore, 2), (item) => item.class);
+        } else if(levelClassCount >= 7) {
+            low = _.map(_.take(orderLevelTotalScore, 3), (item) => item.class);
+            high = _.map(_.takeRight(orderLevelTotalScore, 3), (item) => item.class);
+        }
+        result[levelKey] = {
+            low: low,
+            high: high
+        }
+    });
+    return result;
+}
+
+
+function theTotalScoreLevelChart(levelTotalScoreInfo, theKey) {
+// 通过 levelTotalScoreInfo[theKey] 即可获得此scope下所有学生的分档情况
+}
+
+function chageStudentsScope(theKey) {
+//改变观察的学生范围
+}
+
+/**
+ * 获取总分分档的info数据结构（info数据结构是一种具有典型格式的数据结构： {totalSchool: {...}, <className>: {...} } ）每一个key中的value对象中的key就是横向扫描
+ * 的属性，个数和顺序都一样！！！这里totalSchool和<className>其实就是列的key，所以info是一个二重的Map，按照需要的matrixTable创建，横向扫描，一重key是列的key，二
+ * 重key是行的key。列key没有顺序，行key有顺序。（比如如果是分档，则高档在前，依次排列，如果是科目，则语数外在前，按照subjectWeight排列）
+ * @param  {[type]} examInfo             [description]
+ * @param  {[type]} examStudentsInfo     [description]
+ * @param  {[type]} examClassesInfo      [description]
+ * @param  {[type]} studentsGroupByClass [description]
+ * @param  {[type]} levels               [description]
+ * @return 这里横向轴是分档所以对象就是分档信息
+ *     {
+ *         totalSchool: {
+ *
+ *         },
+ *         <className>: {
+ *
+ *         }
+ * }
+ */
+function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels) {
+    //因为levels中是高档次（即score值大的）在前面，所以需要反转顺序
+    var levelSegments = _.map(levels, (levObj) => levObj.score);
+    //用来获取全校各档次的人数  -- segments的最后一个肯定是fullMark，而第一个是最低档的分数
+    levelSegments.push(examInfo.fullMark);
+
+    var result = {};
+
+    //获取到分档Map并且过滤到-1的情况（因为最小值是最低分档线，而又学生的成绩会低于最低分档线）
+    //{<levelKey>: <students>} 其中levelKey是String类型的，并且值小代表的是低分段（但是levels中）
+    //从makeSegmentsStudentsCount得到的 countsMap中的 levelKey的个数一定是 segments.length-1 个，所以省去了后面判断没有某一个levelKey对应的数据则要补充。
+
+//makeSegmentsStudentsCount 获取的是：1.和segments顺序对应的key的count，也就是说低的levelKey对应的是低分段的count  2.包含[0, segments.length-2]共
+//segments.length-1个有效值
+
+    var countsGroupByLevel = makeSegmentsStudentsCount(examStudentsInfo, levelSegments);
+
+    //开始创建标准的resultInfo数据结构：
+    result.totalSchool = {};
+
+    _.each(countsGroupByLevel, (count, levelKey) => {
+        result.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount);
+    });
+
+    _.each(studentsGroupByClass, (studentsFromClass, className) => {
+        var classCountsGroupByLevel = makeSegmentsStudentsCount(studentsFromClass, levelSegments);
+        var temp = {};
+        _.each(classCountsGroupByLevel, (count, levelKey) => {
+            temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[className].realStudentsCount);
+        });
+        result[className] = temp;
+    });
+
+    return result;
+}
+
+function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
+    var levItem = {};
+
+    levItem.count = countsGroupByLevel[levelKey];
+    //各档的累计人数等于=上一个高档次的累计人数+当前档次的人数（最高档的累计人数和人数是相等的）
+    levItem.sumCount = _.sum(_.map(_.pickBy(countsGroupByLevel, (v, k) => k >= levelKey), (count) => count));
+    levItem.sumPercentage = _.round(_.multiply(_.divide(levItem.sumCount, baseCount), 100), 2);
+
+    return levItem;
+}
+
+/**
+ * 通过dialog修改levels
+ * @param  {[type]} examInfo         [description]
+ * @param  {[type]} examStudentsInfo [description]
+ * @return {[type]}                  [description]
+ */
+function changeLevels(examInfo, examStudentsInfo) {
+    //满分：
+}

@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 21:34:09
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-05-23 14:27:47
 */
 
 
@@ -258,7 +258,7 @@ export function fetchSchoolAnalysisData(params) {
 // var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels); //Done
 //需要高档在前的话就自己在展示遍历的时候反转
 // var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels); //Done
-// var chartData = theTotalScoreLevelChart(totalScoreLeveInfo, theKey)
+// var chartData = theTotalScoreLevelChart(totalScoreLevelInfo, theKey)
 
 
 // var subjectHeader = theSubjectLevelTotalHeader(levels);
@@ -1047,7 +1047,9 @@ function theSubjectLevelExamTable(examStudentsInfo, examPapersInfo, allStudentsP
 }
 
 function theSubjectExamDiscription() {
-//TODO: PM--给出具体的规则
+//TODO: PM--给出具体的规则。第三个文案可以写写其他简单的
+//第二个算法：各个学科各个班级的平均得分率，然后max-min，然后从中选出哪几个学科的差值较大或较小
+    //班级考试基本表现中有关于 各个班级各个学科平均得分率的数据结构，可以拿来用！！！
 }
 
 // 各个学科的总分；然后四个档次的百分比，得出分段区间  fullMark: 100%  A: 85%  b: 70%  c: 60%  D: 0%

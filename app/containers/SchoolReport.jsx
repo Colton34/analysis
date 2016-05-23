@@ -1,3 +1,10 @@
+/*
+1.总分分档分析的说明就是按照dis1--即人数来算，而不是靠离差结果那么麻烦
+2.学科考试表现第一个文案的计算方法：
+    各个学科的平均得分率；某学科中最大班级的平均得分率减去最小班级的平均得分率（其实就是max-min的差值）
+3.学科考试表现第二个文案不再计算了
+ */
+
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -56,8 +63,15 @@ class SchoolReport extends React.Component {
 
         return (
             <div style={{ width: 1000, margin: '0 auto', marginTop: 20, backgroundColor: '#fff' }}>
-                <Header examInfo={examInfo}/>
-                <FullScoreTrend examInfo={examInfo} examStudentsInfo={examStudentsInfo} />
+                <Header examInfo = {examInfo}/>
+                <FullScoreTrend examInfo = {examInfo} examStudentsInfo = {examStudentsInfo} />
+                <ScoreDistribution
+                examInfo = {examInfo}
+                examStudentsInfo = {examStudentsInfo}
+                examClassesInfo = {examClassesInfo}
+                studentsGroupByClass = {studentsGroupByClass}
+                levels = {levels}
+                changeLevels = {this.props.changeLevels} />
             </div>
         )
     }
@@ -65,7 +79,7 @@ class SchoolReport extends React.Component {
 
 /*
 
-                <ScoreDistribution totalScoreLevel={totalScoreLevel} changeLevels={this.props.changeLevels}/>
+
                 <SubjectDistribution totalScoreLevel={totalScoreLevel}/>
                 <ClassPerformance totalScoreLevel={totalScoreLevel}/>
                 <SubjectPerformance/>

@@ -24,36 +24,36 @@ class DropdownList extends React.Component {
         super(props);
         this.state = {
             active: false,
-            current: this.props.list? this.props.list[0] : '无数据',
-            coveredItems: this.props.list? this.props.list.slice(1) : []
+            current: this.props.classList? this.props.classList[0] : '无数据',
+            coveredItems: this.props.classList? this.props.classList.slice(1) : []
         }
     }
     toggleList () {
         this.setState({active: !this.state.active})
     }
-    chooseItem (content) {
-        this.setState({current: content, active: false, coveredItems: _.without(this.props.list, content)});
-        this.props.onClickDropdownList(content);
+    chooseItem (item) {
+        this.setState({current: item, active: false, coveredItems: _.without(this.props.classList, item)});
+        this.props.onClickDropdownList(item);
     }
     render() {
         var _this = this;
         return (
             <div>
                 <a style={Object.assign({},style.btn,{backgroundColor:'#00c076'})} href="javascript:void(0)" onClick={this.toggleList.bind(this)}>
-                    {this.state.current}
+                    {this.state.current.value}
                 </a >
-                {this.props.list ? (
+                {this.props.classList ? (
                     <ul style={this.state.active? style.list : style.hide}>
                         {
-                            _this.state.coveredItems.map((item,index) => {
+                            _.map(_this.state.coveredItems, (item,index) => {
                                 return (
                                     <li key={index}>
                                         <a style={Object.assign({},style.btn,{backgroundColor:'#f2f2f2',color: '#333'})} href="javascript:void(0)" onClick={this.chooseItem.bind(this,item)}>
-                                        {item}
+                                        {item.value}
                                         </a>
                                     </li>
                                 )
-                            })    
+                            })
                         }
                     </ul>
                 ) : ''}
@@ -61,6 +61,6 @@ class DropdownList extends React.Component {
             </div>
         )
     }
-} 
+}
 
 export default DropdownList;

@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-21 16:25:07
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-05-23 14:27:30
 */
 
 
@@ -253,7 +253,7 @@ var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, ex
 // var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels); //Done
 //需要高档在前的话就自己在展示遍历的时候反转
 // var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels); //Done
-// var chartData = theTotalScoreLevelChart(totalScoreLeveInfo, theKey)
+// var chartData = theTotalScoreLevelChart(totalScoreLevelInfo, theKey)
 
 
 // var subjectHeader = theSubjectLevelTotalHeader(levels);
