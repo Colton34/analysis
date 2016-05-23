@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:27:28
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 21:49:29
+* @Last Modified time: 2016-05-23 20:25:02
 */
 
 'use strict';
@@ -23,6 +23,8 @@ export function initSchoolAnalysisAction(params) {
 }
 
 export function changeLevelAction(levels) {
+console.log('changeLevelAction !!!!!!!!!!!!!!');
+
     return {
         type: CHANGE_LEVEL,
         levels: levels

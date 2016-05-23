@@ -191,10 +191,16 @@ let numberMapper = {
  * changeLevels: 修改状态树的actionCreator
  *
  */
+//思路：当销毁dialog的时候把props.levels赋值给this.levels
+/*
+TODO: 如果没有点击确定，那么再次打开dialog的时候还是显示当前props.levels的数据
+
+ */
 class Dialog extends React.Component {
     constructor(props) {
         super(props);
         this.levels = props.levels;
+        this.isValid = true; //先放在这里，回来移入到state中？
         this.levLastIndex = _.size(this.levels) - 1;
         this.state = {
             levelNum: _.size(this.levels)
@@ -204,12 +210,19 @@ class Dialog extends React.Component {
         this.refs[ref].value = event.target.value;
     }
     adjustGrades() {
-        var value = this.refs.levelInput.value;
+        var value = parseInt(this.refs.levelInput.value);
+
         if (!(value && _.isNumber(value) && value > 0)) {
             console.log('value 分档个数必须是正数');
             return;
         }
+
+        if(value == _.size(this.levels)) return;
         this.levLastIndex = value - 1;
+        this.levels = {};
+        _.each(_.range(value), (index) => {
+            this.levels[index+''] = {score: 0, count: 0, percentage: 0};
+        });
         this.setState({ levelNum: value });
     }
 
@@ -243,11 +256,16 @@ class Dialog extends React.Component {
 //         }
 
         //this.levels的个数和input的值是一样的；所有的input都不为空
-        var levTotal = this.refs.levelInput.value;
-        var isValid = _.every(_.range(levTotal), (index) => (!_.isUndefined(this.refs[('score-' + i)].value) && !_.isUndefined(this.refs[('rate-'+ i)].value)));
-        if(_.keys(this.levels).length !== levTotal) isValid = false;
+        var levTotal = parseInt(this.refs.levelInput.value);
+        if (!(levTotal && _.isNumber(levTotal) && levTotal > 0)) {
+            console.log('levTotal 分档个数必须是正数');
+            return;
+        }
 
-        if(!isValid) {
+        // var isValid = _.every(_.range(levTotal), (index) => (!_.isUndefined(this.refs[('score-' + index)].value) && !_.isUndefined(this.refs[('rate-'+ index)].value)));
+        // if(_.keys(this.levels).length !== levTotal) isValid = false;
+
+        if(!this.isValid) {
             console.log('levels 表单验证不通过');
             return;
         }
@@ -260,7 +278,7 @@ class Dialog extends React.Component {
 低档次的 score 一定要比高档次的 score 低，比档次的要高（相对的，低档次的percentage和count都会比高档次的高）
  */
     onInputBlur(id, event) {
-        var value = event.target.value;
+        var value = parseInt(event.target.value);
         if (!(value && _.isNumber(value) && value >= 0)) return;
         var arr = id.split('-');
         var type = arr[0];
@@ -270,12 +288,15 @@ class Dialog extends React.Component {
         var higherLevObj = this.levels[(this.levLastIndex-num+1)+''];
         var lowerLevObj = this.levels[(this.levLastIndex-num-1)+''];
         var temp = {score: 0, percentage: 0, count: 0};
+        var {examInfo, examStudentsInfo} = this.props;
         switch (type) {
             case 'score':
             //根据给出的分数，计算在此分数以上的人数，然后求出百分比
                 //要么没有，如果有则一定符合规则
-                if((!value) || (_.isNumber(value) && (!higherLevObj || (value<higherLevObj.score)) && (!lowerLevObj || (value>lowerLevObj.score)))) {
+                // debugger;
+                if(!((value < examInfo.fullMark) && (!higherLevObj || (value < higherLevObj.score)) && (!lowerLevObj || (value >lowerLevObj.score)))) {
                     console.log('所给的score不符合规则');
+                    this.isValid = false;
                     return;
                 }
                 var targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= value);//因为examStudentsInfo是有序的，所以可以用二分
@@ -285,52 +306,60 @@ class Dialog extends React.Component {
                 temp.score = value;
                 temp.percentage = percentage;
                 temp.count = count;
-
+// debugger;
                 this.refs['rate-' + num].value = percentage;
                 break;
             case 'rate':
             //根据给出的百分比，得到学生的位置，然后此学生的分数即为分数线
-                if((!value) || (_.isNumber(value) && (!higherLevObj || (value>higherLevObj.percentage)) && (!lowerLevObj || (value<lowerLevObj.percentage)))) {
+                // debugger;
+                if(!((value < 100) && (!higherLevObj || (value > higherLevObj.percentage)) && (!lowerLevObj || (value < lowerLevObj.percentage)))){
                     console.log('所给的percentage不符合规则');
+                    this.isValid = false;
                     return;
                 }
                 var targetCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
-                var targetStudent = _.takeRight(examStudentsInfo, count)[0];
+                var targetStudent = _.takeRight(examStudentsInfo, targetCount)[0];
 
                 temp.score = targetStudent.score;
                 temp.percentage = value;
                 temp.count = targetCount;
 
+// debugger;
+
                 this.refs['score-' + num].value = targetStudent.score;
                 break;
         }
+        // debugger;
+        this.isValid = true;
         this.levels[(this.levLastIndex-num)+''] = temp;
     }
+
     render() {
-        var {totalScoreLevel} = this.props;
         var _this = this;
+        var {examInfo, examStudentsInfo} = this.props;
+//重绘要不要 来自 props
         return (
-            <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this,{})}>
+            <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {})}>
                 <Header closeButton style={{textAlign: 'center'}}>
                     分档参数设置
                 </Header>
                 <Body className="apply-content">
                 <div style={{ minHeight: 230 }}>
-                <span style={{ float: 'right' }}>总分： {_this.props.fullScore}  最高分: {_this.props.highScore}</span>
+                <span style={{ float: 'right' }}>总分： {examInfo.fullMark}  最高分: {_.last(examStudentsInfo).score}</span>
                 <div style={{ clear: 'both' }}>
                     <div>
-                        整体分档为：<input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={{ width: 150, height: 30 }} defaultValue={_this.state.levelNum}onChange={_this.onChange.bind(_this, 'levelInput') }/>
+                        整体分档为：<input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={{ width: 150, height: 30 }} defaultValue={_this.state.levelNum} onChange={_this.onChange.bind(_this, 'levelInput') }/> {/*加个'levelInput'是几个意思？*/}
                     </div>
                     <div>
                         {
-                            _.range(this.state.levelNum).map(num => {
+                            _.map(_.range(this.state.levelNum), (index) => {
                                 return (
-                                    <div key={num}>
-                                        <div style={{ display: 'inline-block' }}>{numberMapper[(num + 1).toString()]}档：
-                                            <input id={'score-' + num} ref={'score-' + num} defaultValue={totalScoreLevel[num] && totalScoreLevel[num].score ? totalScoreLevel[num].score: ''} onBlur={_this.onInputBlur.bind(_this, 'score-' + num) } onChange={_this.onChange.bind(_this, 'score-' + num) } style={localStyle.dialogInput}/>
+                                    <div key={index}>
+                                        <div style={{ display: 'inline-block' }}>{numberMap[(index + 1)]}档：
+                                            <input id={'score-' + index} ref={'score-' + index} defaultValue={this.levels[(this.levLastIndex-index)+''].score} onBlur={_this.onInputBlur.bind(_this, 'score-' + index) } onChange={_this.onChange.bind(_this, 'score-' + index) } style={localStyle.dialogInput}/>
                                         </div>
                                         <div style={{ display: 'inline-block' }}>上线率：
-                                            <input id={'rate-' + num} ref={'rate-' + num} defaultValue={totalScoreLevel[num] && totalScoreLevel[num].rate ? totalScoreLevel[num].rate : ''} onBlur={_this.onInputBlur.bind(_this, 'rate-' + num) } onChange={_this.onChange.bind(_this, 'rate-' + num) } style={localStyle.dialogInput}/>
+                                            <input id={'rate-' + index} ref={'rate-' + index} defaultValue={this.levels[(this.levLastIndex-index)+''].percentage} onBlur={_this.onInputBlur.bind(_this, 'rate-' + index) } onChange={_this.onChange.bind(_this, 'rate-' + index) } style={localStyle.dialogInput}/>
                                             %
                                         </div>
                                     </div>
@@ -380,6 +409,9 @@ class ScoreDistribution extends React.Component {
         })
     }
     onHideDialog() {
+
+console.log('onHideDialog~~~');
+
         this.setState({
             showDialog: false
         })
@@ -392,7 +424,8 @@ class ScoreDistribution extends React.Component {
     render() {
     //Props数据结构：
         var {examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, changeLevels} = this.props;
-
+// console.log('ScoreDistribution 重绘');
+// console.log('levels = ', _.size(levels));
         //算法数据结构
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
         var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
@@ -529,6 +562,8 @@ class ScoreDistribution extends React.Component {
                         <ReactHighcharts config={config} style={{ display: 'inline-block', width: 360, height: 250, float: 'right' }}></ReactHighcharts>
                     </div>
                 </div>
+            {/*--------------------------------  总分分档上线Dialog -------------------------------------*/}
+                <Dialog changeLevels={changeLevels} levels={levels} show={_this.state.showDialog} onHide={_this.onHideDialog.bind(_this)} examInfo={examInfo} examStudentsInfo={examStudentsInfo} />
             </div>
         )
     }

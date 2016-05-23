@@ -25,7 +25,7 @@ import SubjectPerformance from '../components/schoolReport/SubjectPerformance';
 import GroupAnalysis from '../components/schoolReport/GroupAnalysis';
 import StudentPerformance from '../components/schoolReport/StudentPerformance/StudentPerformance';;
 
-import {initSchoolAnalysisAction} from '../reducers/schoolAnalysis/actions';
+import {initSchoolAnalysisAction, changeLevelAction} from '../reducers/schoolAnalysis/actions';
 import {initParams, convertJS} from '../lib/util';
 import {SUBJECTS_WEIGHT as subjectWeight} from '../lib/constants';
 
@@ -53,6 +53,10 @@ class SchoolReport extends React.Component {
         allStudentsPaperMap = (Map.isMap(allStudentsPaperMap)) ? allStudentsPaperMap.toJS() : allStudentsPaperMap;
         headers = (List.isList(headers)) ? headers.toJS() : headers;
         levels = (Map.isMap(levels)) ? levels.toJS() : levels;
+
+console.log('SchoolReport 重绘');
+// debugger;
+
 
         if((!examInfo || _.size(examInfo) == 0) || (!examStudentsInfo || examStudentsInfo.length == 0) ||
             (!examPapersInfo || _.size(examPapersInfo) == 0) || (!examClassesInfo || _.size(examClassesInfo) == 0) ||
@@ -104,7 +108,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        initSchoolAnalysis: bindActionCreators(initSchoolAnalysisAction, dispatch)
+        initSchoolAnalysis: bindActionCreators(initSchoolAnalysisAction, dispatch),
+        changeLevels: bindActionCreators(changeLevelAction, dispatch)
     }
 }
 

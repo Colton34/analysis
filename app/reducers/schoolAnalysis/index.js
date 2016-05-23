@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:27:20
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 20:15:19
+* @Last Modified time: 2016-05-23 17:38:44
 */
 
 'use strict';
@@ -30,6 +30,9 @@ export default function reducer(state, action) {
             });
             return nextState;
         case CHANGE_LEVEL:
+
+console.log('levels = ', _.size(action.levels));
+debugger;
             return state.set('levels', action.levels);
     }
     return state;
