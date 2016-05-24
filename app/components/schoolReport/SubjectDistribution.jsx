@@ -63,13 +63,11 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
 
     var resultData = _.map(levels, (levObj, levelKey) => {
         var currentLevel = levels[(levLastIndex-levelKey)+''];
-// debugger;
 
         var {subjectLevelInfo, subjectsMean} = makeSubjectLevelInfo(currentLevel.score, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examInfo.fullMark);
-// debugger;
+
 //按行横向扫描的各行RowData
         var tableData = theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers);
-// debugger;
 /*
 disData: {
     <className> : {maxSubjects: [], minSubjects: []}
@@ -77,18 +75,13 @@ disData: {
 
  */
         var disData = theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers);
-        // debugger;
-// debugger;
 /*
 chartData: {
     xAxons: [<className>],
     yAxons: [ [{count: , subject: , nice: true}, {count: , subject: , nice: false}], ... ]
 }
-
- */
+*/
         var chartData = theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, headers);
-
-// debugger;
 
         var chartConfig = _.cloneDeep(config);
         chartConfig['xAxis']['categories'] = chartData['xAxons'];
@@ -99,8 +92,6 @@ chartData: {
         });
         chartConfig['series'] = series;
 
-// debugger;
-
         return { //这里返回的数据就是从高档到低档
             tableData: tableData,
             disData: disData,
@@ -109,7 +100,6 @@ chartData: {
     });
 //自定义Module数据结构
 var levelCommonInfo = _.join(_.map(_.range(_.size(levels)), (index) => numberMap[index+1]));
-// debugger;
     return (
         <div style={{ position: 'relative' }}>
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
@@ -191,7 +181,6 @@ export default SubjectDistribution;
  */
 function theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers) {
     //此档的内容
-    // debugger;
     var table = [];
     var titleHeader = _.map(headers, (headerObj, index) => {
         return headerObj.subject + ' (' + subjectsMean[headerObj.id].mean + ')';
@@ -267,8 +256,6 @@ function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examCl
     //构造基本的原matrix
     var originalMatrix = makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, headers);
 
-// debugger;
-
     //factorsMatrix中每一行（即一重数组的长度应该和titleHeader相同，且位置意义对应）
     var factorsMatrix = makeFactor(originalMatrix);
 
@@ -293,20 +280,11 @@ function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examI
     var matrix = []; //一维是“班级”--横着来
     //把全校的数据放到第一位
     var totalSchoolObj = subjectLevelInfo.totalSchool;
-    // debugger;
     matrix.push(_.map(headers, (headerObj) => _.round(_.divide(totalSchoolObj[headerObj.id], examInfo.realStudentsCount), 2)));
 
     _.each(subjectLevelInfo, (subjectsOrTotalScoreObj, theKey) => {
-        // var baseCount = (theKey == 'totalSchool') ? examInfo.realStudentsCount : examClassesInfo[theKey].realStudentsCount;
         if(theKey == 'totalSchool') return;
-        // debugger;
         matrix.push(_.map(headers, (headerObj) => _.round(_.divide(subjectsOrTotalScoreObj[headerObj.id], examClassesInfo[theKey].realStudentsCount), 2)));
-        // _.map(subjectsOrTotalScoreObj, (count, countKey) => _.round(_.divide(count, baseCount), 2))
-        // //有可能某个班级没有考某个科目
-        // var classCounts = [];
-        // _.each(headers, (headerObj) => {
-        //     classCounts.push(subjectsOrTotalScoreObj[headerObj.id]);
-        // })
     });
     return matrix;
 }
@@ -346,7 +324,6 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
     result.totalSchool.totalScore = _.filter(examStudentsInfo, (student) => student.score >= levelScore).length;
 
     _.each(subjectsMean, (subMean, pid) => {
-        // debugger;
         if(pid == 'totalScore') return;
 
         result.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score >= subMean.mean).length;
