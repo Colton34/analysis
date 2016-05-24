@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
-* @Last Modified by:   liucong
-* @Last Modified time: 2016-05-23 14:27:47
+* @Last Modified by:   HellMagic
+* @Last Modified time: 2016-05-24 15:23:38
 */
 
 
@@ -1336,6 +1336,7 @@ export function makeFactor(originalMatrix) {
         });
         resultMatrix.push(tempRow);
     });
+
     return resultMatrix;
 }
 

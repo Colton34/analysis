@@ -54,7 +54,7 @@ class SchoolReport extends React.Component {
         headers = (List.isList(headers)) ? headers.toJS() : headers;
         levels = (Map.isMap(levels)) ? levels.toJS() : levels;
 
-console.log('SchoolReport 重绘');
+// console.log('SchoolReport 重绘');
 // debugger;
 
 
@@ -76,6 +76,15 @@ console.log('SchoolReport 重绘');
                 studentsGroupByClass = {studentsGroupByClass}
                 levels = {levels}
                 changeLevels = {this.props.changeLevels} />
+                <SubjectDistribution
+                examInfo = {examInfo}
+                examStudentsInfo = {examStudentsInfo}
+                examPapersInfo = {examPapersInfo}
+                examClassesInfo = {examClassesInfo}
+                studentsGroupByClass = {studentsGroupByClass}
+                allStudentsPaperMap = {allStudentsPaperMap}
+                levels = {levels}
+                headers = {headers}/>
             </div>
         )
     }
@@ -84,7 +93,9 @@ console.log('SchoolReport 重绘');
 /*
 
 
-                <SubjectDistribution totalScoreLevel={totalScoreLevel}/>
+
+
+
                 <ClassPerformance totalScoreLevel={totalScoreLevel}/>
                 <SubjectPerformance/>
                 <GroupAnalysis totalScoreLevel={totalScoreLevel}/>

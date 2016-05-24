@@ -431,7 +431,7 @@ console.log('onHideDialog~~~');
         var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
         var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels);
 
-        //自定义Moudle数据结构
+        //自定义Module数据结构
         var _this = this;
         var levTotal = _.size(levels);
 

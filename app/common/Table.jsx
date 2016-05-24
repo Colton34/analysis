@@ -18,25 +18,26 @@ let tableData_example = {
     ]
 }
 const Table = ({tableData}) => {
-    
+    var tableHeaderData = tableData[0];
+    var tableBodyData = _.slice(tableData, 1);
     return (
         <table  style={{border: '1px solid #d7d7d7', borderCollapse: 'collapse', width: '100%' }}>
             <tbody>
                 <tr style={{ backgroundColor: '#f4faee' }}>
                     {
-                        tableData['ths'].map((th,index) => {
+                        _.map(tableData[0], (th,index) => {
                             return (
                                 <th key={index} className={styles['table-unit']}>{th}</th>
                             )
                         })
                     }
                 </tr>
-                {   
-                    tableData['tds'].map((tdList,index) => {
+                {
+                    _.map(tableBodyData, (tdList,index) => {
                         return (
                             <tr key={'tr' + index}>
                                 {
-                                    tdList.map((td,index) => {
+                                    _.map(tdList, (td,index) => {
                                         return (
                                             <td key={'td' + index}className={styles['table-unit']}>
                                                 {td}

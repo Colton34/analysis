@@ -1,10 +1,14 @@
 import React from 'react';
-import styles from '../../common/common.css';
 import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
+
+import styles from '../../common/common.css';
+
 import Table from '../../common/Table.jsx';
 import DropdownList from '../../common/DropdownList';
-import {getNumberCharacter} from '../../lib/util';
+
+import {NUMBER_MAP as numberMap} from '../../lib/constants';
+import {makeFactor} from '../../api/mexam';
 
 //todo: 各档上线信息展示区域可以专门提出来做一个组件。
 
@@ -23,22 +27,26 @@ let tableData = {
 }
 
 
-const SubjectDistribution = ({totalScoreLevel}) => {
+const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, levels, headers}) => {
+
+//算法数据结构：
+    var levLastIndex = _.size(levels) - 1;
+
     var config = {
         chart: {
             type: 'column'
         },
         title: {
-        	text: ''
+            text: ''
         },
         legend: {
-        	enabled: false
+            enabled: false
         },
         xAxis: {
-            categories: ['初一1班', '初一2班', '初一3班', '初一4班', '初一5班']
+
         },
         yAxis: {
-        	title: ''
+            title: ''
         },
         plotOptions: {
             column: {
@@ -48,24 +56,60 @@ const SubjectDistribution = ({totalScoreLevel}) => {
         tooltip: {
             pointFormat: '<b>{point.name}:{point.y:.1f}</b>'
         },
-        series: [
-            {
-                data: [{name: '语文',y:29.9},{name:'英语',y:71.5},{name:'英语',y:106.4},{name:'化学',y:129.2},{name:'语文',y: 144}],
-                color: '#74c13b',
-                stack: 0
-            }, {
-                data:  [{name: '物理',y:-29.9},{name:'生物',y:-71.5},{name:'生物',y:-106.4},{name:'数学',y:-129.2},{name:'数学',y: -144}],
-                color: '#f2cd45',
-                stack: 0
-            }
-        ],
         credits: {
-        	enabled: false
+            enabled: false
         }
     };
-    var levelCommonInfo = _.range(totalScoreLevel.length).map(num => {
-        return getNumberCharacter(num + 1) + (num !== totalScoreLevel.length - 1 ? '、' : '');
-    })
+
+    var resultData = _.map(levels, (levObj, levelKey) => {
+        var currentLevel = levels[(levLastIndex-levelKey)+''];
+// debugger;
+
+        var {subjectLevelInfo, subjectsMean} = makeSubjectLevelInfo(currentLevel.score, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examInfo.fullMark);
+// debugger;
+//按行横向扫描的各行RowData
+        var tableData = theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers);
+// debugger;
+/*
+disData: {
+    <className> : {maxSubjects: [], minSubjects: []}
+}
+
+ */
+        var disData = theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers);
+        // debugger;
+// debugger;
+/*
+chartData: {
+    xAxons: [<className>],
+    yAxons: [ [{count: , subject: , nice: true}, {count: , subject: , nice: false}], ... ]
+}
+
+ */
+        var chartData = theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, headers);
+
+// debugger;
+
+        var chartConfig = _.cloneDeep(config);
+        chartConfig['xAxis']['categories'] = chartData['xAxons'];
+        var series = [{data: [], color: '#74c13b', stack: 0}, {data: [], color: '#f2cd45', stack: 0}];
+        _.each(chartData['yAxons'], (yInfoArr, index) => {
+            series[0].data.push({name: yInfoArr[0].subject, y: yInfoArr[0].count});
+            series[1].data.push({name: yInfoArr[1].subject, y: yInfoArr[0].count});
+        });
+        chartConfig['series'] = series;
+
+// debugger;
+
+        return { //这里返回的数据就是从高档到低档
+            tableData: tableData,
+            disData: disData,
+            chartConfig: chartConfig
+        };
+    });
+//自定义Module数据结构
+var levelCommonInfo = _.join(_.map(_.range(_.size(levels)), (index) => numberMap[index+1]));
+// debugger;
     return (
         <div style={{ position: 'relative' }}>
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
@@ -74,7 +118,7 @@ const SubjectDistribution = ({totalScoreLevel}) => {
             </div>
             <div style={{ width: 720, margin: '0 auto', marginTop: 50 }}>
                 <p style={{ marginBottom: 15 }}>
-                    根据总分分档上线学生人数的分布情况，我们用大数据分析技术能科学地将总分分数线分解到各个学科，形成各个学科的
+                    总分是由各个学科的分数构成的，我们用大数据分析技术能科学地将总分分数线分解到各个学科，形成各个学科的
                     <span className={styles['school-report-dynamic']}>{levelCommonInfo}</span>档分数线。
                     有了学科分数线，就能明确得到全校及班级各个学科<span className={styles['school-report-dynamic']}>{levelCommonInfo}</span>档上线的学生人数。
                     下面几个表分别表示<span className={styles['school-report-dynamic']}>{levelCommonInfo}</span>档各个学科的上线人数。
@@ -84,37 +128,45 @@ const SubjectDistribution = ({totalScoreLevel}) => {
                     反之，学科上线人数越少，学科对高层次学生的培养处于短板，需要引起高度重视。
                 </p>
                 {
-                    _.range(totalScoreLevel.length).map(num => {
-                        var level = getNumberCharacter(num + 1);
+                    _.map(_.range(_.size(levels)), (index) => {
+                        var levelStr = numberMap[index+1];
+                        var {tableData, disData, chartConfig} = resultData[index];
                         return (
-                            <div key={num}>
-                                <p>学校各学科{level}档上线学生人数表：</p>
+                            <div key={index}>
+                                {/*--------------------------------  学科分档上线学生人数分布表格 -------------------------------------*/}
+                                <p>学校各学科{levelStr}档上线学生人数表：</p>
                                 <div style={{width: '100%', overflow: 'scroll'}}>
                                     <Table tableData={tableData}/>
                                 </div>
-                                <a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
+
+                                {/*  _.keys(studentsGroupByClass).length > 5 ? (<a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
                                     点击查看更多班级数据 V
-                                </a>
+                                </a>) : ''     */}
+
+                                {/*--------------------------------  学科分档上线学生人数分布分析说明 -------------------------------------*/}
                                 <div style={{ backgroundColor: '#e7f9f0', padding: '5px 10px', marginTop: 15 }}>
-                                    <p>{level}档上线数据分析表明： </p>
-                                    <p>对于全校，<span style={{ color: '#c96925' }}>语文、英语学科</span>在本次考试中一档上线率贡献较大，
-                                    <span style={{ color: '#c96925' }}>数学学科</span>对高层次的学生培养处于弱势，需要引起高度重视。</p>
+                                    <p>{levelStr}档上线数据分析表明： </p>
+
+                                    <p>对于全校，<span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].maxSubjects, '、')}学科</span>在本次考试中一档上线率贡献较大，
+                                    <span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].minSubjects, '、')}学科</span>对高层次的学生培养处于弱势，需要引起高度重视。</p>
+
                                     <p style={{margin:'10px 0'}}>对于各班级而言，各个学科的表现是不一样的，经分析，可得到如下结论：</p>
-                                    <p>
-                                        对于各班，<span style={{ color: '#c96925' }}>2班、1班、6班</span>对语文学科贡献较大，
-                                        <span style={{ color: '#c96925' }}>2班、1班、6班</span>对语文学科贡献较小
-                                    </p>
-                                    <p>
-                                        对于各班，<span style={{ color: '#00955e' }}>5班、3班、4班</span>对数学学科贡献较大，
-                                        <span style={{ color: '#00955e' }}>2班、1班、6班</span>对数学学科贡献较小
-                                    </p>
+                                    {
+                                        _.map(studentsGroupByClass, (students, className) => {
+                                            return (<p key={className}>
+                                                对于<span style={{ color: '#00955e' }}>{className}班，{_.join(disData[className].maxSubjects, '、')}</span>贡献较大，
+                                                <span style={{ color: '#00955e' }}>{_.join(disData[className].minSubjects, '、')}</span>贡献较小；
+                                            </p>)
+                                        })
+                                    }
                                 </div>
+                                {/*--------------------------------  学科分档上线学生人数离差图 -------------------------------------*/}
                                 <p>
                                     各班级的具体情况不一样，综合全校各班级各学科提供的学生总分上线贡献的因素，
-                                    各班级{level}档上线贡献率最大和最小学科如下图所示：
+                                    各班级{levelStr}档上线贡献率最大和最小学科如下图所示：
                                 </p>
                                 <p>学科上线率离差：</p>
-                                <ReactHighcharts config={config}></ReactHighcharts>
+                                <ReactHighcharts config={chartConfig}></ReactHighcharts>
                                 <div style={{ backgroundColor: '#e7f9f0', padding: '15px 0', marginTop: 15,fontSize: 12}}>
                                     班级学科上线率离差： 指班级的学科上线率与全校各班级该学科的平均上线率之间的差值，反映了班级该学科对上线贡献的大小。
                                 </div>
@@ -129,3 +181,243 @@ const SubjectDistribution = ({totalScoreLevel}) => {
 }
 
 export default SubjectDistribution;
+
+/**
+ * 学科分档的表格
+ * @param  {[type]} subjectLevelInfo [description]
+ * @param  {[type]} subjectsMean    [description]
+ * @param  {[type]} headers         [description]
+ * @return {[type]}                 [description]
+ */
+function theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers) {
+    //此档的内容
+    // debugger;
+    var table = [];
+    var titleHeader = _.map(headers, (headerObj, index) => {
+        return headerObj.subject + ' (' + subjectsMean[headerObj.id].mean + ')';
+    });
+    titleHeader.unshift('班级');
+
+    var totalSchoolObj = subjectLevelInfo.totalSchool;
+    var totalSchoolRow = _.map(headers, (headerObj) => {
+        return totalSchoolObj[headerObj.id];
+    });
+    totalSchoolRow.unshift('全校');
+    table.push(totalSchoolRow);
+
+    _.each(subjectLevelInfo, (subjectLevelObj, theKey) => {
+        if(theKey == 'totalSchool') return;
+        var classRow = _.map(headers, (headerObj) => {
+            return subjectLevelObj[headerObj.id];
+        });
+        classRow.unshift(examInfo.gradeName+theKey + '班');
+        table.push(classRow);
+    });
+
+    table.unshift(titleHeader);
+
+    return table;
+}
+
+
+function theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers) {
+    var result = {};
+
+    var subjectLevelArr, maxSubjects, minSubjects;
+    _.each(subjectLevelInfo, (subjectLevelObj, theKey) => {
+        subjectLevelArr = _.sortBy(_.filter(_.map(subjectLevelObj, (count, key) => {
+            return {count: count, key: key};
+        }), (obj) => obj.key != 'totalScore'), 'count');
+
+        maxSubjects = _.map(_.takeRight(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject);
+        minSubjects = _.map(_.take(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject);
+        result[theKey] = {maxSubjects: maxSubjects, minSubjects: minSubjects};
+    });
+
+    return result;
+}
+
+//建立离差图形的数据结构
+/*
+{
+    "totalSchool": {
+        totalSchool:
+        <pid1>:
+        <pid2>:
+        ...
+    },
+    'A1': {
+        totalSchool:
+        <pid1>:
+        <pid2>:
+        ...
+    },
+    ...
+}
+
+由 pid 组成的 header
+
+ */
+function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, headers) {
+//TODO:可能需要把计算出的最大和最小作为数据结构，因为分析说明其实就是这个图表的文字版说明
+
+    //去掉总分的信息，因为最后的factors中是没有总分这一项的
+    var titleHeader = _.map(headers.slice(1), (obj) => obj.subject);
+
+    //构造基本的原matrix
+    var originalMatrix = makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, headers);
+
+// debugger;
+
+    //factorsMatrix中每一行（即一重数组的长度应该和titleHeader相同，且位置意义对应）
+    var factorsMatrix = makeFactor(originalMatrix);
+
+    //扫描每一行，得到最大和最小的坐标，然后到titHeader中获取科目名称，返回{subject: , count: } 班级的顺序就是studentsGroupByClass的顺序
+    var xAxons = _.map(_.keys(studentsGroupByClass), (className) => (examInfo.gradeName+className+'班'));
+    var yAxons = _.map(factorsMatrix, (factorsInfo) => {
+        var fmax = _.max(factorsInfo), fmin = _.min(factorsInfo);
+
+        var fmaxIndex = _.findIndex(factorsInfo, (item) => item == fmax);
+        var fminIndex = _.findIndex(factorsInfo, (item) => item == fmin);
+
+        var fmaxSubject = titleHeader[fminIndex], fminSubject = titleHeader[fminIndex];
+
+        return [{subject: fmaxSubject, count: fmax, nice: true}, {subject: fminSubject, count: fmin, nice: false}];
+    });
+
+    return {xAxons: xAxons, yAxons: yAxons }
+
+}
+
+function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, headers) {
+    var matrix = []; //一维是“班级”--横着来
+    //把全校的数据放到第一位
+    var totalSchoolObj = subjectLevelInfo.totalSchool;
+    // debugger;
+    matrix.push(_.map(headers, (headerObj) => _.round(_.divide(totalSchoolObj[headerObj.id], examInfo.realStudentsCount), 2)));
+
+    _.each(subjectLevelInfo, (subjectsOrTotalScoreObj, theKey) => {
+        // var baseCount = (theKey == 'totalSchool') ? examInfo.realStudentsCount : examClassesInfo[theKey].realStudentsCount;
+        if(theKey == 'totalSchool') return;
+        // debugger;
+        matrix.push(_.map(headers, (headerObj) => _.round(_.divide(subjectsOrTotalScoreObj[headerObj.id], examClassesInfo[theKey].realStudentsCount), 2)));
+        // _.map(subjectsOrTotalScoreObj, (count, countKey) => _.round(_.divide(count, baseCount), 2))
+        // //有可能某个班级没有考某个科目
+        // var classCounts = [];
+        // _.each(headers, (headerObj) => {
+        //     classCounts.push(subjectsOrTotalScoreObj[headerObj.id]);
+        // })
+    });
+    return matrix;
+}
+
+/**
+ * 创建学科分析需要的info数据结构
+ * @param  {[type]} levelScore           [description]
+ * @param  {[type]} examStudentsInfo     [description]
+ * @param  {[type]} studentsGroupByClass [description]
+ * @param  {[type]} allStudentsPaperMap  [description]
+ * @param  {[type]} examPapersInfo       [description]
+ * @param  {[type]} examFullMark         [description]
+ * @return {[type]}                      info格式的学科分析的数据结构
+ * {
+ *     totalSchool: {
+ *         totalScore: <count>
+ *         <pid>: <count>
+ *
+ *     },
+ *     <className>: {
+ *         totalScore: <count>
+ *         <pid>: <count>
+ *     },
+ *     ...
+ * }
+ */
+function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examFullMark) {
+    var subjectsMean = makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark);
+
+    // var schoolTotalScoreMean = _.round(_.mean(_.map(_.filter(examStudentsInfo, (student) => student.score > levelScore), (student) => student.score)), 2); //总分的平均分 = （scope下所有学生中，分数大于此档线的所有学生成绩的平均分）== 不正确，此处总分的平均分即为设置的此档的分档线的分数
+
+    subjectsMean.totalScore = {id: 'totalScore', mean: levelScore, name: '总分'};
+
+    var result = {};
+    result.totalSchool = {};
+
+    result.totalSchool.totalScore = _.filter(examStudentsInfo, (student) => student.score >= levelScore).length;
+
+    _.each(subjectsMean, (subMean, pid) => {
+        // debugger;
+        if(pid == 'totalScore') return;
+
+        result.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score >= subMean.mean).length;
+    });
+
+    _.each(studentsGroupByClass, (classStudents, className) => {
+        var temp = {};
+        // var classTotalScoreMean = _.round(_.mean(_.map(classStudents, (student) => student.score)), 2);
+        temp.totalScore = _.filter(classStudents, (student) => student.score >= levelScore).length;
+
+        _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
+            temp[pid] = _.filter(papers, (paper) => paper.score >= subjectsMean[pid].mean).length;
+        });
+
+        result[className] = temp;
+    });
+
+    return {subjectLevelInfo: result, subjectsMean: subjectsMean}
+}
+
+//计算每一档次各科的平均分
+//算法：获取所有考生基数中 总分**等于**此档分数线 的所有考生；如果这些考生的人数不足够样本数（当前是固定值25），则扩展1分（单位），再获取，注意：
+        //  1.分数都四舍五入（包括分档线）
+        //  2.一定要滑动窗口两边的数量是相同的，保证平均分不变（注意有“选择的某个分数上没有对应学生的情况”）
+        //  3.当遇到从n中取m（其中n > m）
+//  一定要保证每次取的人都是相同的（根据examStudentsInfo的顺序），这样每次计算的科目平局分才是相同的
+//  ，不断重复上述过程，直到满足样本数量
+function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark) {
+    var result = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(levelScore));
+    var count = result.length;
+
+    var currentLowScore, currentHighScore;
+    currentLowScore = currentHighScore = _.round(levelScore);
+
+    while((count < 25) && (currentLowScore >= 0) && (currentHighScore <= examFullMark)) {
+        var currentLowStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore-1));
+
+        var currentHighStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore+1));
+
+        var currentTargetCount = _.min([currentLowStudents.length, currentHighStudents.length]);
+
+
+        var currentTagretLowStudents = _.take(currentLowStudents, currentTargetCount);
+        var currentTargetHighStudents = _.take(currentHighStudents, currentTargetCount);
+
+        count += _.multiply(2, currentTargetCount);
+
+        result = _.concat(result, currentTagretLowStudents, currentTargetHighStudents);
+    }
+
+    //result即是最后获取到的满足分析条件的样本，根据此样本可以获取各个科目的平均分信息
+    return makeSubjectMean(result, examPapersInfo);
+}
+
+
+/**
+ * 返回所给学生各科成绩的平均分。注意这里没有没有包括总分(totalScore)的平均分信息
+ * @param  {[type]} students       [description]
+ * @param  {[type]} examPapersInfo [description]
+ * @return {[type]}                [description]
+ */
+function makeSubjectMean(students, examPapersInfo) {
+    var result = {};
+    _.each(_.groupBy(_.concat(..._.map(students, (student) => student.papers)), 'paperid'), (papers, pid) => {
+        var obj = {};
+
+        obj.mean = _.round(_.mean(_.map(papers, (paper) => paper.score)), 2);
+        obj.name = examPapersInfo[pid].subject; //TODO: 这里还是统一称作 'subject' 比较好
+        obj.id = pid;
+
+        result[pid] = obj;
+    });
+    return result;
+}
