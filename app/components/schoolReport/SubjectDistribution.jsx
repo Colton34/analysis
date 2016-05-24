@@ -12,20 +12,6 @@ import {makeFactor} from '../../api/mexam';
 
 //todo: 各档上线信息展示区域可以专门提出来做一个组件。
 
-let tableData = {
-    ths: [
-        '班级', '语文', '数学', '英语', '化学'
-    ],
-    tds: [
-        ['全部', 132, 112, 134, 124],
-        ['初一1班', 12, 23, 23, 34],
-        ['初一2班', 34, 34, 54, 54],
-        ['初一3班', 34, 46, 65, 23],
-        ['初一4班', 23, 23, 11, 23],
-        ['初一5班', 45, 12, 45, 53]
-    ]
-}
-
 
 const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, levels, headers}) => {
 
@@ -398,3 +384,21 @@ function makeSubjectMean(students, examPapersInfo) {
     });
     return result;
 }
+
+
+/*
+Mock Data:
+let tableData = {
+    ths: [
+        '班级', '语文', '数学', '英语', '化学'
+    ],
+    tds: [
+        ['全部', 132, 112, 134, 124],
+        ['初一1班', 12, 23, 23, 34],
+        ['初一2班', 34, 34, 54, 54],
+        ['初一3班', 34, 46, 65, 23],
+        ['初一4班', 23, 23, 11, 23],
+        ['初一5班', 45, 12, 45, 53]
+    ]
+}
+ */

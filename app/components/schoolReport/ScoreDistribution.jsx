@@ -20,86 +20,6 @@ let localStyle = {
     btn: {lineHeight: '50px', width: 150, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',margin: '0 30px'}
 }
 
-let tableData_example = {
-    tds: [
-        ['全部', 100, 120, '15%', 360, 460, '15%', 360, 120, '15%'],
-        ['一班', 100, 120, '15%', 360, 460, '15%', 360, 120, '15%'],
-        ['二班', 100, 120, '15%', 360, 460, '15%', 360, 120, '15%'],
-        ['三班', 100, 120, '15%', 360, 460, '15%', 360, 120, '15%']
-    ]
-}
-var tableData = {
-    '全校': [
-        {
-            score: 520,
-            rate: 15,
-            num: 100
-        },
-        {
-            score: 480,
-            rate: 35,
-            num: 360
-        },
-        {
-            score: 360,
-            rate: 50,
-            num: 890
-        }
-    ],
-    '1班': [
-        {
-            score: 520,
-            rate: 5,
-            num: 100
-        },
-        {
-            score: 480,
-            rate: 55,
-            num: 360
-        },
-        {
-            score: 360,
-            rate: 40,
-            num: 890
-        }
-    ],
-    '2班': [
-        {
-            score: 520,
-            rate: 11,
-            num: 100
-        },
-        {
-            score: 480,
-            rate: 22,
-            num: 360
-        },
-        {
-            score: 360,
-            rate: 67,
-            num: 890
-        }
-    ],
-    '3班': [
-         {
-            score: 520,
-            rate: 89,
-            num: 100
-        },
-        {
-            score: 480,
-            rate: 1,
-            num: 360
-        },
-        {
-            score: 360,
-            rate: 10,
-            num: 890
-        }
-    ]
-
-}
-
 const Table = ({tableData, levels}) => {
     var levTotal = _.size(levels);
     var widthProp = {};
@@ -768,3 +688,89 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
 function changeLevels(examInfo, examStudentsInfo) {
     //满分：
 }
+
+
+/*
+
+let tableData_example = {
+    tds: [
+        ['全部', 100, 120, '15%', 360, 460, '15%', 360, 120, '15%'],
+        ['一班', 100, 120, '15%', 360, 460, '15%', 360, 120, '15%'],
+        ['二班', 100, 120, '15%', 360, 460, '15%', 360, 120, '15%'],
+        ['三班', 100, 120, '15%', 360, 460, '15%', 360, 120, '15%']
+    ]
+}
+var tableData = {
+    '全校': [
+        {
+            score: 520,
+            rate: 15,
+            num: 100
+        },
+        {
+            score: 480,
+            rate: 35,
+            num: 360
+        },
+        {
+            score: 360,
+            rate: 50,
+            num: 890
+        }
+    ],
+    '1班': [
+        {
+            score: 520,
+            rate: 5,
+            num: 100
+        },
+        {
+            score: 480,
+            rate: 55,
+            num: 360
+        },
+        {
+            score: 360,
+            rate: 40,
+            num: 890
+        }
+    ],
+    '2班': [
+        {
+            score: 520,
+            rate: 11,
+            num: 100
+        },
+        {
+            score: 480,
+            rate: 22,
+            num: 360
+        },
+        {
+            score: 360,
+            rate: 67,
+            num: 890
+        }
+    ],
+    '3班': [
+         {
+            score: 520,
+            rate: 89,
+            num: 100
+        },
+        {
+            score: 480,
+            rate: 1,
+            num: 360
+        },
+        {
+            score: 360,
+            rate: 10,
+            num: 890
+        }
+    ]
+
+}
+
+
+ */
