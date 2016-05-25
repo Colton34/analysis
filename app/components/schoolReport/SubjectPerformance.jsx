@@ -226,9 +226,9 @@ console.log('updateLevelPercentages : ', newLevelPercentages);
         //TODO：很明显，levelPercentages不影响 subjectExamTable，只会影响subjectLevelExamTable，所以最后还是抽出去
         var subjectExamTableData = theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers);
         var subjectLevelExamTableData = theSubjectLevelExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, this.state.levelPcentages);
+        var disData = theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap);
 //自定义Moudle数据结构：
-
-
+        var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
         return (
             <div className={styles['school-report-layout']}>
                 <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
@@ -236,29 +236,42 @@ console.log('updateLevelPercentages : ', newLevelPercentages);
                     学科考试表现
                 </div>
                 <div className={styles['school-report-content']}>
-                    <p>（1）学科成绩整体情况如下：</p>
+                    <p>对于任何考试都需要了解，学科考试后所表现出的基本情况。一般都要有些基本指标来表达，如下面学科考试基本指标一览表所示：</p>
 
                 {/*--------------------------------  学科考试表现基本指标表格 -------------------------------------*/}
 
                     <Table tableData={subjectExamTableData} />
-                    <p>
-                        （2）从各学科的成绩表现看，每个学科的班级平均得分率最高的与最低之间的离差，从大到小的顺序是 数学、化学、英语。如果联系到学科的命题难度，其相对离差从大到小的顺序是 生物，物理，语文。
-                        离差较大的学科，反映出班级水平差距较大。利差较小的学科，反映出该学科教学效果比较整齐。（注: 语文是母语，学生水平离差较小应是常态。）
+                    <p className={styles.tips}>
+                        学科基本指标的数据虽一目了然，但其中也包含了许多考试信息，值得学校的关注，具体分析和理解各个指标：
+                        <br />
+                        最高分：反映出学科的最高分，各学科就有差异了；
+                        最低分：反映出学科的最低分，可以看出最低水平；
+                        平均分：表达各科的代表性水平，也反映了学生得分的集中趋势；
+                        标准差：反映了学生分数的分布离散程度，值越大表示个体之间的分数分布的离散程度越大，反之，值越小表示个体之间的分数分布的离散程度越小；
+                        差异系数：标准差与平均分之比，表示不同样本的相对离散程度，值越大表示相对相对离散程度越大，反之，值越小表示相对离散程度越小；
+                        难度：表达学科考试难易程度，难度系数值越大，表明考试越容易，难度系数值越小，考试越难；上表中的难度值明确表达了这次考试最难得学科和考试最容易的学科具体是哪个学科。
+                        <br />
+                        有关学科分析还有如下几点：
                     </p>
-                    <p>各个学科成绩分布的结构比例情况，如下表所示：</p>
+
+                    {/*--------------------------------  学科考试表现分析说明 -------------------------------------*/}
+                    {/* TODO: 如果联系到学科的命题难度，其相对离差从大到小的顺序是<span style={{color: 'blue'}}>生物、物理、语文</span>。 缺少*/}
+                    <p>
+                        （1）结合前面的分析内容，从各学科的成绩表现来看，每个学科的班级平均分得分率最高的与最低之间的离差，从大到小的顺序是，<span style={{color: 'blue'}}>{_.join(factorSubjects, '、')}</span>。离差较大的学科，反映出班级水平差距较大。离差较小的学科，反映出该学科教学效果比较整齐。（注：语文是母语，学生水平离差来的较小应该是常态）
+                    </p>
+
+                    <p>各个学科成绩分布的等级结构比例情况，如下表所示：</p>
                     <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>
                         设置等级参数
                     </a>
                     <Table tableData={subjectLevelExamTableData} />
 
-                    <p>（4）有关学科命题</p>
+                    {/*--------------------------------  TODO: 暂时空缺的和学科难易程度相关的数据 -------------------------------------*/}
+                    <p>（3）有关学科命题</p>
                     <p>
-                        作为学科考试，必须考虑给水平不同的全体学生都能提供展示其学业水平的机会。在这一点上，有数据分析表明，在个学科中，似乎有 语文数学 学科，表现更为突出；
-                        <br/>
-                        在学科试卷整体难度的把握上，似乎 化学生物有点过易。有的学科在试题难度分布结构方面，进一步完善。如英语物理学科，似乎存在有国难实体份量偏大问题。
+                        作为学科考试，必须考虑给水平不同的全体学生都能提供展示其学业水平的机会。有的学科在试题难度分布结构方面，可以进一步完善，防止出现过难或者过易的情况。
                     </p>
-                    <p>有的学科，试卷中有个别实体可进一步斟酌，如学科英语、语文试卷的0.2一下主观题，可商榷</p>
-                    <p>注：各个学科更精细的分析报告，另行分学科列示。</p>
+                    <p>注：各个学科更精细的分析报告，请查阅各个学科详细分析模块。</p>
                 </div>
                <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} levelPcentages={this.state.levelPcentages} updateGrades={this.updateLevelPercentages.bind(this)} />
             </div>
@@ -332,10 +345,23 @@ function theSubjectLevelExamTable(examStudentsInfo, examPapersInfo, allStudentsP
     return matrix;
 }
 
-function theSubjectExamDiscription() {
+function theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap) {
 //TODO: PM--给出具体的规则。第三个文案可以写写其他简单的
 //第二个算法：各个学科各个班级的平均得分率，然后max-min，然后从中选出哪几个学科的差值较大或较小
     //班级考试基本表现中有关于 各个班级各个学科平均得分率的数据结构，可以拿来用！！！
+
+    //各个学科
+        //各个班级的平均得分率
+    var result = _.map(allStudentsPaperMap, (papers, pid) => {
+        var classFactors = _.map(_.groupBy(papers, 'class_name'), (classPapers, className) => {
+            var theMean = _.mean(_.map(classPapers, (paperObj) => paperObj.score));
+            var theFactor = _.round(_.divide(theMean, examPapersInfo[pid].fullMark), 2);
+            return theFactor;
+        });
+        return {subject: examPapersInfo[pid].subject, factor: (_.max(classFactors) - _.min(classFactors))};
+    });
+    var sortedResult = _.sortBy(result, 'factor');
+    return sortedResult;
 }
 
 // 各个学科的总分；然后四个档次的百分比，得出分段区间  fullMark: 100%  A: 85%  b: 70%  c: 60%  D: 0%
