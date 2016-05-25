@@ -103,20 +103,15 @@ class SchoolReport extends React.Component {
                 examStudentsInfo={examStudentsInfo}
                 studentsGroupByClass={studentsGroupByClass}
                 levels={levels} />
+                <StudentPerformance
+                examInfo={examInfo}
+                examStudentsInfo={examStudentsInfo}
+                allStudentsPaperMap={allStudentsPaperMap}
+                headers={headers} />
             </div>
         )
     }
 }
-
-/*
-
-
-
-
-
-                <StudentPerformance/>
-
- */
 
 function mapStateToProps(state) {
     return {

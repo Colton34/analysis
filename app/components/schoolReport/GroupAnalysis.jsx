@@ -16,18 +16,6 @@ let localStyle = {
     btn: {lineHeight: '50px', width: 150, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',margin: '0 30px'}
 }
 
-let tableData = {
-    ths: [
-        '分档临界生', '一档临界生人数', '二档临界生人数', '三档临界生人数'
-    ],
-    tds: [
-        ['全部', 30, 43, 64],
-        ['1班', 30, 43, 64],
-        ['2班', 30, 43, 64],
-        ['3班', 30, 43, 64]
-    ]
-}
-
 class Dialog extends React.Component {
     constructor(props) {
         super(props);
@@ -44,7 +32,7 @@ class Dialog extends React.Component {
         var value = parseInt(this.refs['buffer-'+ index].value); //TODO: 为什么不能直接取value？
         //TODO:因为这里直接对没有值的情况return了，所以必须都有有效的初始值！！！这里初始值都是10
         if (!(value && _.isNumber(value) && value >= 0)) {
-            console.log('所给buffer不是有效的数字');
+            console.log('输入不是有效的数字');
             this.isValid[index] = false;
             return;
         };
@@ -318,3 +306,18 @@ function criticalStudentsDiscription(criticalLevelInfo) {  //Done
     });
     return result;//小值代表高档
 }
+
+/*
+let tableData = {
+    ths: [
+        '分档临界生', '一档临界生人数', '二档临界生人数', '三档临界生人数'
+    ],
+    tds: [
+        ['全部', 30, 43, 64],
+        ['1班', 30, 43, 64],
+        ['2班', 30, 43, 64],
+        ['3班', 30, 43, 64]
+    ]
+}
+
+ */
