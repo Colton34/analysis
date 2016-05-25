@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 20:39:35
+* @Last Modified time: 2016-05-25 20:05:08
 */
 
 'use strict';
@@ -104,24 +104,29 @@ exports.initExam = function(req, res, next) {
  */
 exports.dashboard = function(req, res, next) {
     var exam = req.exam, examScoreMap = req.classScoreMap, examScoreArr = req.orderedScoresArr;
+
     try {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
-        var classScoreReportResult = classScoreReport(examScoreArr, examScoreMap);
         var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
-        var studentSelfReportResult = studentSelfReport();
+        var classScoreReportResult = classScoreReport(examScoreArr, examScoreMap);
 
         res.status(200).json({
             examInfoGuide: examInfoGuideResult,
             scoreRank: scoreRankResult,
-            classScoreReport: classScoreReportResult,
             levelScoreReport: levelScoreReportResult,
-            studentSelfReport: studentSelfReportResult
+            classScoreReport: classScoreReportResult
         });
-
     } catch(e) {
         next(new errors.Error('format dashboard error : ', e));
     }
+
+    // getStudentSelfReport(examScoreArr, examScoreMap).then(function(studentSelfReportResult) {
+
+    // }).catch(function(err) {
+    //     next(err);
+    // });
+    // var studentSelfReportResult = studentSelfReport(examScoreArr);
 }
 
 function examInfoGuide(exam) {
@@ -139,22 +144,6 @@ function scoreRank(examScoreArr) {
         top: _.reverse(_.takeRight(examScoreArr, 6)),
         low: _.reverse(_.take(examScoreArr, 6))
     }
-}
-
-function classScoreReport(examScoreArr, examScoreMap) {
-    //年级平均分
-    var scoreMean = _.round(_.mean(_.map(examScoreArr, (scoreObj) => scoreObj.score)), 2);
-    var classesMean = _.map(examScoreMap, (classesScore, className) => {
-        return {
-            name: className,
-            mean: _.round(_.mean(_.map(classesScore, (scoreObj) => scoreObj.score)), 2)
-        }
-    });
-    var orderedClassesMean = _.sortBy(classesMean, 'mean');
-    return {
-        gradeMean: scoreMean,
-        top5ClassesMean: _.takeRight(orderedClassesMean)
-    };
 }
 
 //这个也是走默认level的设定：即，三挡，每一档有默认的上线率，然后反求对应的此档线的分数，统计人数
@@ -185,16 +174,48 @@ function levelScoreReport(exam, examScoreArr) {
     return levels;
 }
 
+function classScoreReport(examScoreArr, examScoreMap) {
+    //年级平均分
+    var scoreMean = _.round(_.mean(_.map(examScoreArr, (scoreObj) => scoreObj.score)), 2);
+    var classesMean = _.map(examScoreMap, (classesScore, className) => {
+        return {
+            name: className,
+            mean: _.round(_.mean(_.map(classesScore, (scoreObj) => scoreObj.score)), 2)
+        }
+    });
+    var orderedClassesMean = _.sortBy(classesMean, 'mean');
+    return {
+        gradeMean: scoreMean,
+        top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
+    };
+}
+
 /**
  * 怎么定义的？？？本来想是req.user--但是不对，应为当前登录应该为教师等级的。。。
  * @return {[type]} [description]
  */
-function studentSelfReport() {
-    return { todo: '待定'};
-}
+// TODO: 暂时注释
+// function getStudentSelfReport(examScoreArr, examScoreMap) {
+//     // return { todo: '待定'};
+//     // 所有学生：
+//         //[{name: , score: scoolRanking: , classRanking: , subject: }, <name>]
+//     var top20Students = _.reverse(_.takeRight(examScoreArr, 20));
+//     var topStudent = top20Students[0];
+//     var restStudents = _.slice(top20Students, 1);
+//     return getStudentInfo(topStudent.id).then(function(student) {
+//         //TODO: 在这里拼接第一个学生的相关数据
+//     })
+// }
 
 
-
+// function getStudentInfo(studentId) {
+//     return when.promise(function(resolve, reject) {
+//         peterMgr.get('@Student' + studentId, function(err, student) {
+//             if(err) return reject(new errors.MongoDBError('find single student error : ', err));
+//             resolve(student);
+//         });
+//     });
+// }
 
 
 

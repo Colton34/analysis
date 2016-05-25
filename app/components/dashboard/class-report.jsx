@@ -8,13 +8,32 @@ import _ from 'lodash';
 import dashboardStyle from './dashboard.css';
 
 const ClassReport = ({data}) => {
-    console.log('data.data = ', data.data);
-    if (!data || !data.data || (_.size(_.keys(data.data)) == 0) || data.data.size == 0) return (<div></div>);//所以这也是应该使用Immutable.Record的理由--有默认值就不会有下面的undefined bug
+    // console.log('data.data = ', data.data);
+    // if (!data || !data.data || (_.size(_.keys(data.data)) == 0) || data.data.size == 0) return (<div></div>);//所以这也是应该使用Immutable.Record的理由--有默认值就不会有下面的undefined bug
 
 
+/*
 
-    var title = data.data.title.concat('初一年级班级平均分对比top5');
-    var subtitle = data.data.title.concat('');
+        // var classReport = {
+        //     data: {
+        //         title: '',
+        //         sortedClass: ['1班', '2班', '3班', '4班', '5班'],
+        //         averageScore: 90,
+        //         sortedScore: [49.9, 71.5, 106.4, 129.2, 144.0]
+        //     }
+        // }
+
+    return {
+        gradeMean: scoreMean,
+        top5ClassesMean: _.takeRight(orderedClassesMean)
+    };
+
+ */
+
+    var title = '初一年级班级平均分对比top5';
+    var classNames = _.map(data['top5ClassesMean'], (obj) => obj.name+'班');
+    var classMeans = _.map(data['top5ClassesMean'], (obj) => obj.mean);
+    // var subtitle = data.data.title.concat('');
     var config = {
         chart: {
             type: 'column'
@@ -29,11 +48,11 @@ const ClassReport = ({data}) => {
             }
         },
         subtitle: {
-            text: subtitle
+            text: ''
         },
         colors: ['#FDBF2A'],
         xAxis: {
-            categories: data.data.sortedClass,
+            categories: classNames,
             crosshair: true
         },
         yAxis: {
@@ -45,7 +64,7 @@ const ClassReport = ({data}) => {
             plotLines: [{
                 color: 'red',                                //线的颜色，定义为红色
                 dashStyle: 'solid',                          //默认是值，这里定义为长虚线
-                value: data.data.averageScore,              //定义在那个值上显示标示线
+                value: data.gradeMean,              //定义在那个值上显示标示线
                 width: 2,                                    //标示线的宽度，2px
                 label: {
                     text: '年级平均分',                       //标签的内容
@@ -66,7 +85,7 @@ const ClassReport = ({data}) => {
         },
         series: [{
             name: '班级',
-            data: data.data.sortedScore
+            data: classMeans
         }],
         credits: {
             enabled: false

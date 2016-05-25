@@ -8,6 +8,16 @@ import dashboardStyle from './dashboard.css';
 
 import {initExamGuide} from '../../reducers/dashboard/actions';
 
+/*
+
+    return {
+        subjectCount: exam['[papers]'].length,
+        realClassesCount: exam.realClasses.length,
+        realStudentsCount: exam.realStudentsCount,
+        lostStudentsCount: exam.lostStudentsCount
+    };
+
+ */
 
 const GlobalGuideCom = ({data}) => {
 //     if(!data || !data.data || (_.size(_.keys(data))==0)) return (<div></div>);
@@ -22,19 +32,19 @@ const GlobalGuideCom = ({data}) => {
                     <div>考试学科数</div>
                 </div>
                 <div style={{float: 'right', marginRight: 40}}>
-                    <div style={styles.dataNum}>{data.totalProblemCount}</div>
-                    <div>考试总题数</div>
+                    <div style={styles.dataNum}>{data.realClassesCount}</div>
+                    <div>考试班级数</div>
                 </div>
             </div>
             <div style={{clear: 'both'}}></div>
-            <div  style={{marginTop:30, marginBottom: 30}}>
+            <div style={{marginTop:30, marginBottom: 30}}>
                 <div style={{float: 'left', marginLeft: 40}}>
-                    <div style={styles.dataNum}>{data.classCount}</div>
-                    <div>考试班级数</div>
+                    <div style={styles.dataNum}>{data.realStudentsCount}</div>
+                    <div>考试学生数</div>
                 </div>
                 <div style={{float: 'right', marginRight: 40}}>
-                    <div style={styles.dataNum}>{data.totalStudentCount}</div>
-                    <div>考试学生数</div>
+                    <div style={styles.dataNum}>{data.lostStudentsCount}</div>
+                    <div>缺考学生数</div>
                 </div>
             </div>
         </div>
@@ -49,8 +59,8 @@ export default Radium(GlobalGuideCom);
 
 const styles = {
     dataNum: {
-        textAlign: 'center', 
-        color: '#0f6afc', 
+        textAlign: 'center',
+        color: '#0f6afc',
         fontSize: 24,
         marginBottom: 20
     }

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:09:30
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-07 17:42:08
+* @Last Modified time: 2016-05-25 20:11:10
 */
 
 'use strict';
@@ -14,11 +14,11 @@ import Immutable, {Record, Map, List} from 'immutable';
 //1. 在state中创建对应的tree node
 var InitialState = Record({
     haveInit: false,
-    examGuide: {},
+
+    examInfoGuide: {},
     scoreRank: {},
-    classReport: {},
-    levelReport: {},
-    subjectReport: {}
+    levelScoreReport: {},
+    classScoreReport: {}
 });
 
 export default InitialState;

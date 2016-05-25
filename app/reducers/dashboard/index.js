@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:16:06
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-07 17:50:37
+* @Last Modified time: 2016-05-25 20:17:36
 */
 
 'use strict';
@@ -28,11 +28,6 @@ export default function reducer(state, action) {
             _.each(action.res, function(value, key) {
                 nextState = (nextState) ? nextState.set(key, value) : state.set(key, value);
             });
-
-console.log('INIT_DASHBOARD_SUCCESS ...');
-
-// console.log('examGuide = ', nextState.examGuide);
-
             return nextState;
     }
     return state;

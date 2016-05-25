@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-09 22:26:48
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 21:08:54
+* @Last Modified time: 2016-05-25 20:08:16
 */
 
 'use strict';
@@ -10,7 +10,7 @@
 
 import Immutable from 'immutable';
 
-import {fetchDashboardData} from '../../api/exam';
+import {fetchDashboardData} from '../../api/mexam';
 import {
     INIT_DASHBOARD
 } from '../../lib/constants';

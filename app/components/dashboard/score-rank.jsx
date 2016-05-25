@@ -6,6 +6,14 @@ import Radium from 'radium';
 import _ from 'lodash';
 import dashboardStyle from './dashboard.css';
 
+/*
+
+    return {
+        top: _.reverse(_.takeRight(examScoreArr, 6)),
+        low: _.reverse(_.take(examScoreArr, 6))
+    }
+
+ */
 
 const ScoreRank = ({data}) => {
     var flagFirstColor = {backgroundColor: '#FF0033'};
@@ -54,7 +62,7 @@ const ScoreRank = ({data}) => {
             </div>
         </div>
     )
-    
+
 }
 
 export default Radium(ScoreRank);

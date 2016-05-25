@@ -7,30 +7,42 @@ import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
 import dashboardStyle from './dashboard.css';
 
+import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
 /*
 
 有个问题：当所考科目不多的时候--即总分不高的时候，比如总共才3科总分才360--这个时候去划分三挡线是480肯定是不合适的，所以分档线应该跟着总分走
-
+    var levels = {
+        0: {
+            score: 0,
+            count: 0,
+            percentage: 15
+        },
+        1: {
+            score: 0,
+            count: 0,
+            percentage: 25
+        },
+        2: {
+            score: 0,
+            count: 0,
+            percentage: 60
+        }
+    };
  */
 
 const LevelReport = ({data}) => {
-    // if(!data || !data.data || (_.size(_.keys(data))==0) || data.data.size == 0) return (<div></div>);
-    // const leveFlag = ['一档', '二挡', '三挡'];
-    const leveFlag = {
-        'first': '一档',
-        'second': '二档',
-        'third': '三档'
-    };
+//这里data既是levels，注意是从大到小排序好的
 
+    var counts = [], levelLastIndex = _.size(data) - 1;
+    var categories = _.map(data, function (levObj, levelKey) {
+        counts.push(levObj.count);
 
-    var counts = [];
-    var categories = _.map(data, function (value, key) {
-        counts.push(value.count);
-
-        return ''.concat(leveFlag[key]).concat(' ').concat(value.percentage).concat('<br />').concat(' 大于').concat(value.flag).concat('分');
+        return ''.concat(numberMap[levelKey-0+1]).concat('档 ').concat(levObj.percentage).concat('%<br />').concat(' 大于').concat(levObj.score).concat('分');
     });
-    counts = [40, 260, 480];//todo: 假数据删除
+    // counts = [40, 260, 480];//todo: 假数据删除
+console.log('counts = ', counts);
+// debugger;
 
     const config = {
         chart: {
@@ -73,9 +85,9 @@ const LevelReport = ({data}) => {
 
     return (
         <div className={dashboardStyle.card} style={{ display: 'flex', padding: 10 }}>
-            
+
                 <ReactHighcharts config={config} style={{ maxWidth: 300, maxHeight: 220, margin: '0 auto' }}></ReactHighcharts>
-            
+
             <div className={dashboardStyle['detail-btn']}>
                 查看详情
             </div>

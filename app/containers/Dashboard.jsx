@@ -70,22 +70,18 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        var examGuide = (Map.isMap(this.props.dashboard.examGuide)) ? this.props.dashboard.examGuide.toJS() : this.props.dashboard.examGuide;
+        var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
-        var levelReport = (Map.isMap(this.props.dashboard.levelReport)) ? this.props.dashboard.levelReport.toJS() : this.props.dashboard.levelReport;
-        // var classReport = (Map.isMap(this.props.dashboard.classReport)) ? this.props.dashboard.classReport.toJS() : this.props.dashboard.classReport;
-        // var subjectReport = (Map.isMap(this.props.dashboard.subjectReport)) ? this.props.dashboard.subjectReport.toJS() : this.props.dashboard.subjectReport;
+        var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
+        var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
 
-        var classReport = {
-            data: {
-                title: '',
-                sortedClass: ['1班', '2班', '3班', '4班', '5班'],
-                averageScore: 90,
-                sortedScore: [49.9, 71.5, 106.4, 129.2, 144.0]
-            }
-        }
-        if ((!examGuide || _.size(examGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
-            (!levelReport || _.size(levelReport) == 0)) return (<div></div>);
+// debugger;
+
+
+        if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
+            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0)) return (<div></div>);
+
+
 
         return (
             <div>
@@ -94,7 +90,7 @@ class Dashboard extends React.Component {
                 </div>
                 <div style={[styles.box, styles.common.radius]}>
                     <div style={[styles.container, styles.common.radius]}>
-                        <ExamGuideComponent data={examGuide} />
+                        <ExamGuideComponent data={examInfoGuide} />
                         <ScoreRank data={scoreRank} />
                         <div key="test"   style={{cursor: 'pointer'}}className={dashboardStyle['card']} onClick={this.toViewSchoolAnalysis.bind(this) }>
                             <div className={dashboardStyle['card-title']}>学校成绩总报告</div>
@@ -102,10 +98,10 @@ class Dashboard extends React.Component {
                         </div>
                     </div>
                     <div style={[styles.container, styles.common.radius]}>
-                        <LevelReport data={levelReport} />
+                        <LevelReport data={levelScoreReport} />
                         <div className={dashboardStyle['card']}>
                             <div className={dashboardStyle['card-title']}>班级分析报告</div>
-                            <ClassReport data={classReport}/>
+                            <ClassReport data={classScoreReport}/>
                         </div>
                         <div className={dashboardStyle.card}>
                             <div className={dashboardStyle['card-title']}>学科数据报告</div>
