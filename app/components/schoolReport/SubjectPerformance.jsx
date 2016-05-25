@@ -84,7 +84,7 @@ class Dialog extends React.Component {
         //的机会了。。。不可以~
 
         var higherLevPer = this.state.grades[gradeLastIndex-index];
-        var lowerLevPer = this.levels[gradeLastIndex-index-2];
+        var lowerLevPer = this.state.grades[gradeLastIndex-index-2];
 
         if(!((value < 100) && (!higherLevPer || (value < higherLevPer)) && (!lowerLevPer || (value > lowerLevPer)))) {
             console.log('所给的百分比不符合规则');

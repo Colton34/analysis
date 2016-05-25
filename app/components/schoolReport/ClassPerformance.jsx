@@ -97,10 +97,6 @@ class ClassPerformance extends React.Component {
     render() {
 //Props数据结构：
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, levels, headers} = this.props;
-
-console.log('=======================  ClassPerformance.jsx');
-debugger;
-
 //算法数据结构：
 
 // var lineChartRenderData = [{
@@ -112,9 +108,6 @@ debugger;
 //             }];
 
         var {xAxons, yAxonses} = theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers, this.state.currentClasses);
-
-debugger;
-
         var subjectMeanInfo = makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass, headers);
         var meanTableBodyData = theClassExamMeanTable(examInfo, subjectMeanInfo, headers);
         var factorsTableData = theClassExamMeanFactorsTable(examInfo, subjectMeanInfo, studentsGroupByClass, headers);
