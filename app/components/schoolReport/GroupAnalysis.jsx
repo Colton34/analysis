@@ -5,11 +5,10 @@ import _ from 'lodash';
 
 import Table from '../../common/Table';
 
+import {makeSegmentsStudentsCount} from '../../api/mexam';
 import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
 import styles from '../../common/common.css';
-
-import {getNumberCharacter} from '../../lib/util';
 
 var {Header, Title, Body, Footer} = Modal;
 
@@ -42,7 +41,7 @@ class Dialog extends React.Component {
     }
 
     onInputBlur(index) {
-        var value = parseInt(this.refs['float-'+ index].value); //TODO: 为什么不能直接取value？
+        var value = parseInt(this.refs['buffer-'+ index].value); //TODO: 为什么不能直接取value？
         //TODO:因为这里直接对没有值的情况return了，所以必须都有有效的初始值！！！这里初始值都是10
         if (!(value && _.isNumber(value) && value >= 0)) {
             console.log('所给buffer不是有效的数字');
@@ -50,8 +49,22 @@ class Dialog extends React.Component {
             return;
         };
 
-        //如果value不变。。。那么也不更新
-        if(this.levelBuffers[index] != value) this.isUpdate = true;
+
+        if(this.levelBuffers[index] == value) {
+            console.log('没有更新');
+            return;
+        }
+        this.levelBuffers[index] = value;
+
+        //检测如果添加了此buffer，那么保证顺序是对的，由小到大。拿到当前生成的两个值，左边的要比它左边的大，右边的要比它右边的小（前提是如果左右边有值的话）：
+        var newSegments = makeCriticalSegments(this.levelBuffers, this.props.levels);
+
+        var segmentsIsValid = _.every(_.range(newSegments.length-1), (index) => (newSegments[index+1] > newSegments[index]));
+        if(!segmentsIsValid) {
+            console.log('newSegments is invalid');
+            return;
+        }
+        this.isUpdate = true;
     }
 
     okClickHandler() {
@@ -62,6 +75,11 @@ class Dialog extends React.Component {
             return;
         }
 
+        if(!this.isUpdate) {
+            console.log('表单没有更新');
+            return;
+        }
+        this.isUpdate = false;
 
         //调用父类传递来的函数  this.props.updateLevelBuffers(this.levelBuffers)，从而更新父类
         this.props.updateLevelBuffers(this.levelBuffers);
@@ -87,11 +105,11 @@ class Dialog extends React.Component {
                     <div style={{ minHeight: 150, display: 'table', margin:'0 auto'}}>
                         <div style={{display: 'table-cell', verticalAlign: 'middle'}}>
                         {
-                            _.map(this.state.levelBuffers, (buffer, index) => {
+                            _.map(this.levelBuffers, (buffer, index) => {
                                 return (
                                     <div key={index} style={{textAlign: 'center', marginBottom:20}}>
                                         {numberMap[index+1]}档线上下浮分数：
-                                        <input ref={'float-' + index} onBlur={_this.onInputBlur.bind(_this, 'float-' + index) } defaultValue={buffer} style={{ width: 140, heigth: 28, display: 'inline-block', textAlign: 'center' }}/>分
+                                        <input ref={'buffer-' + index} onBlur={_this.onInputBlur.bind(_this, index) } defaultValue={buffer} style={{ width: 140, heigth: 28, display: 'inline-block', textAlign: 'center' }}/>分
                                     </div>
                                 )
                             })
@@ -107,8 +125,6 @@ class Dialog extends React.Component {
                         取消
                     </a>
                 </Footer>
-
-
             </Modal>
         )
     }
@@ -184,7 +200,7 @@ console.log('updateLevelBuffers = ', newLevelBuffers);
                         <p>此处文字待添加。</p>
                     </div>
                 </div>
-                <Dialog totalScoreLevel={totalScoreLevel} updateLevelBuffers={this.updateLevelBuffers.bind(this)} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)}/>
+                <Dialog levels={levels} levelBuffers={this.state.levelBuffers} updateLevelBuffers={this.updateLevelBuffers.bind(this)} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)}/>
             </div>
         )
     }
@@ -215,7 +231,9 @@ function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass,
     var segments = makeCriticalSegments(levelBuffers, levels);
 
     var totalSchoolCounts = makeSegmentsStudentsCount(examStudentsInfo, segments);
+
     var totalSchool = _.filter(totalSchoolCounts, (count, index) => (index % 2 == 0));
+
     totalSchool = _.reverse(totalSchool);
     totalSchool.unshift('全校');
     table.push(totalSchool);

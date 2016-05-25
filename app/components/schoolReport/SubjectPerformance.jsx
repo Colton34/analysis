@@ -64,7 +64,15 @@ class Dialog extends React.Component {
         //this.props.updateLevelPercentages(newLevelPercentages);
 
         var formValid = _.every(this.isValid, (flag) => flag);
-        if(!(formValid && this.isUpdate)) return;
+        if(!formValid) {
+            console.log('表单验证不通过');
+            return;
+        }
+
+        if(!this.isUpdate) {
+            console.log('表单没有更新');
+            return;
+        }
 
         console.log('============update grades list:' + JSON.stringify(this.state.grades));
         this.isUpdate = false;
