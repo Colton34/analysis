@@ -168,6 +168,7 @@ console.log('updateLevelBuffers = ', newLevelBuffers);
 //算法数据结构：
         var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, this.state.levelBuffers);
         var disData = criticalStudentsDiscription(criticalLevelInfo); //缺少UI
+        // debugger;
 //自定义Module数据结构：
 
         return (
@@ -195,17 +196,44 @@ console.log('updateLevelBuffers = ', newLevelBuffers);
                     </a>) : ''   */}
 
                 {/*--------------------------------  TODO: 临界生群体分析说明 -------------------------------------*/}
+
+{/*
+
+                                            {_.map(_.range(_.size(levels)), (lindex) => {
+                                                return (
+                                                    <span key={lindex} style={{ color: '#00955e' }}>{_.join(disData[index].top, '、')}</span>{numberMap[index]}档临界生人数较{pindex == 0 ? '多' : '少'}{(pindex == 0 && lindex == (_.size(levels)-1)) ? '可以更多的关注这几个班级的同学。' : (lindex == (_.size(levels)-1) ? '。' : '，')}
+                                                )
+                                            })}
+
+*/}
+
                     <div className={styles.tips}>
-                        <p>说明：</p>
-                        <p>此处文字待添加。</p>
+                        <p>数据分析表明：</p>
+                        {
+                            _.map(_.range(2), (pindex) => {
+                                    return (
+                                        <p key={pindex}>
+                                            {
+                                                _.map(_.range(_.size(levels)), (lindex) => {
+                                                    return (
+                                                        <span key={lindex} >
+                                                            <span style={(pindex == 0) ? {color: '#c96925'} : { color: '#00955e' } }>{_.join(disData[(pindex ==0) ? 'top' : 'low'][lindex], '、')}</span>{numberMap[lindex]}档临界生人数较{(pindex == 0) ? '多' : '少'}
+                                                            {(pindex == 0 && lindex == (_.size(levels)-1)) ? '可以更多的关注这几个班的同学' : (lindex == (_.size(levels)-1) ? '。' : '，')}
+                                                        </span>
+                                                    )
+                                                })
+                                            }
+                                        </p>
+                                    )
+                                }
+                            )
+                        }
                     </div>
                 </div>
                 <Dialog levels={levels} levelBuffers={this.state.levelBuffers} updateLevelBuffers={this.updateLevelBuffers.bind(this)} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)}/>
             </div>
         )
     }
-
-
 }
 
 export default GroupAnalysis;
@@ -277,7 +305,7 @@ function makeCriticalSegments(levelBuffers, levels) {
 }
 
 function criticalStudentsDiscription(criticalLevelInfo) {  //Done
-    //上面的 criticalLevelInfo
+    //上面的 criticalLevelInfo，已经是反转后的数据了
     // 每一档
     var result = {top: {}, low: {}};
     _.each(criticalLevelInfo, (counts, levelKey) => {
