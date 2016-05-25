@@ -97,8 +97,23 @@ class ClassPerformance extends React.Component {
     render() {
 //Props数据结构：
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, levels, headers} = this.props;
+
+console.log('=======================  ClassPerformance.jsx');
+debugger;
+
 //算法数据结构：
-        var {xAxons, yAxonses} = theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers, this.currentClasses);
+
+// var lineChartRenderData = [{
+//                 name: '全校',
+//                 data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+//             },{
+//                 name: '初一1班',
+//                 data: [11.2, 9.6, 19.5, 85.5, 21.8, 12.5, 87.5, 78.5, 33.3, 8.3, 23.9, 5.6]
+//             }];
+
+        var {xAxons, yAxonses} = theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers, this.state.currentClasses);
+
+debugger;
 
         var subjectMeanInfo = makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass, headers);
         var meanTableBodyData = theClassExamMeanTable(examInfo, subjectMeanInfo, headers);
@@ -246,7 +261,7 @@ function theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers,
         var students = examStudentsGroupByClass[classItem.key];
         var yAxons = makeSegmentsStudentsCount(students, segments);
         return {
-            name: examInfo.gradeName+classItem.key+'班',
+            name: classItem.value,
             data: yAxons
         }
     });

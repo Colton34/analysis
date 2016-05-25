@@ -214,7 +214,7 @@ class Dialog extends React.Component {
             //根据给出的分数，计算在此分数以上的人数，然后求出百分比
                 //要么没有，如果有则一定符合规则
                 // debugger;
-                if(!((value < examInfo.fullMark) && (!higherLevObj || (value < higherLevObj.score)) && (!lowerLevObj || (value >lowerLevObj.score)))) {
+                if(!((value < examInfo.fullMark) && (!higherLevObj || (value < higherLevObj.score)) && (!lowerLevObj || (value > lowerLevObj.score)))) {
                     console.log('所给的score不符合规则');
                     this.isValid = false;
                     return;
@@ -250,7 +250,7 @@ class Dialog extends React.Component {
                 break;
         }
         // debugger;
-        this.isValid = true;
+        this.isValid = true; //TODO: 这里有bug，还是要确保所有的input都是true才对。不然，先来个错的，然后跳过这个错的，再来个对的，那么isValid就是true了。。。
         this.levels[(this.levLastIndex-num)+''] = temp;
     }
 

@@ -93,6 +93,11 @@ class SchoolReport extends React.Component {
                 studentsGroupByClass = {studentsGroupByClass}
                 levels = {levels}
                 headers = {headers} />
+                <SubjectPerformance
+                examStudentsInfo={examStudentsInfo}
+                examPapersInfo={examPapersInfo}
+                allStudentsPaperMap={allStudentsPaperMap}
+                headers={headers} />
             </div>
         )
     }
@@ -104,7 +109,6 @@ class SchoolReport extends React.Component {
 
 
 
-                <SubjectPerformance/>
                 <GroupAnalysis totalScoreLevel={totalScoreLevel}/>
                 <StudentPerformance/>
 

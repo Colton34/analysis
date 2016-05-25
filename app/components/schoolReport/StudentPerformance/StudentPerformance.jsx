@@ -1,8 +1,9 @@
 import React from 'react';
-import styles from '../../../common/common.css';
-import localStyle from './studentPerformance.css';
 import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
+
+import styles from '../../../common/common.css';
+import localStyle from './studentPerformance.css';
 
 let studentList = {
     firstTen: [
@@ -75,10 +76,10 @@ let studentList = {
  * 传入 “前 或 后”  studentPosition
  * 学科列表 subjectList
  * 班级&成绩列表 classData
- * 
+ *
  */
 class StudentPerformanceTable extends React.Component {
-
+//变动的交互模块和当前显示的模块是同一个模块--这种方式应该是比较好处理的。就像之前select所控制的图表，那么select和图表就应该在一起
     constructor(props) {
         super(props);
         this.state = {
@@ -110,7 +111,7 @@ class StudentPerformanceTable extends React.Component {
                 <div style={{ position: 'absolute', right: 180 }}>
                     <a className={localStyle.btn} href="javascript:void(0)" onClick={this.toggleList.bind(this) }>
                         {this.state.current}
-                    </a >
+                    </a>
                     {this.props.dropList ? (
                         <ul className={this.state.active ? localStyle.list : localStyle.hide}>
                             {
@@ -185,13 +186,22 @@ var classData = {
     '初一三班': [78, 98, 32, 42, 28, 89, 21],
     '初一四班': [78, 98, 32, 42, 28, 89, 21]
 }
-const StudentPerformance = () => {
+const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, headers}) => {
+//算法数据结构：
+    var {topTableData, lowTableData} = theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, headers);
+//自定义Module数据结构：
+    var topStudents = _.takeRight(examStudentsInfo, 10);
+    var lowStudents = _.take(examStudentsInfo, 10);
+    var tableHeaderData = _.map(headers, (headerObj) => headerObj.subject);
+
     return (
         <div className={styles['school-report-layout']} style={{paddingBottom: 100}}>
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
             <div style={{ padding: '0 10px', position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 300 }}>
                 学校有必要知道的学生重点信息
             </div>
+
+        {/*--------------------------------  有关学生重要信息的图表 -------------------------------------*/}
             <div className={styles['school-report-content']}>
                 <p>（1）这次考试，全校总分前后十名的学生是：</p>
                 <div>
@@ -200,11 +210,11 @@ const StudentPerformance = () => {
                             <div className={localStyle['first-ten']}></div>
                             <div style={{ width: 155, height: 260, border: '1px solid #6dd0a8', margin: '0 auto' }}>
                                 {
-                                    studentList.firstTen.map((s, index) => {
+                                    _.map(topStudents, (student, index) => {
                                         return (
                                             <div key={index} className={localStyle['student-box']}>
-                                                <div style={{ fontSize: 14, color: '#3bba80' }}>{s.name}</div>
-                                                <div style={{ fontSize: 12 }}>({s.class}) </div>
+                                                <div style={{ fontSize: 14, color: '#3bba80' }}>{student.name}</div>
+                                                <div style={{ fontSize: 12 }}>({student.class+'班'}) </div>
                                             </div>
                                         )
                                     })
@@ -215,11 +225,11 @@ const StudentPerformance = () => {
                             <div className={localStyle['last-ten']}></div>
                             <div style={{ width: 155, height: 260, border: '1px solid #f9b4a2', margin: '0 auto' }}>
                                 {
-                                    studentList.lastTen.map((s, index) => {
+                                    _.map(lowStudents, (student, index) => {
                                         return (
                                             <div key={index} className={localStyle['student-box']}>
-                                                <div style={{ fontSize: 14, color: '#f68a72' }}>{s.name}</div>
-                                                <div style={{ fontSize: 12 }}>({s.class}) </div>
+                                                <div style={{ fontSize: 14, color: '#f68a72' }}>{student.name}</div>
+                                                <div style={{ fontSize: 12 }}>({student.class+'班'}) </div>
                                             </div>
                                         )
                                     })
@@ -228,13 +238,15 @@ const StudentPerformance = () => {
                         </div>
                     </div>
                 </div>
+
+            {/*--------------------------------  有关学生重要信息的表格 -------------------------------------*/}
                 <div style={{ marginTop: 60 }}>
                     <p>（2）全校各个班级在各个学科优秀的学生人数，见下表：</p>
-                    <StudentPerformanceTable studentPosition={'前'} subjectList={['总分', '语文', '数学', '英语', '化学', '物理', '生物']}  classData={classData} dropList={['名次统计', '比例统计']}/>
+                    <StudentPerformanceTable studentPosition={'前'} tableHeaderData={tableHeaderData} tableBodyData={topTableData} dropList={['名次统计', '比例统计']}/>
                 </div>
                 <div style={{ marginTop: 40 }}>
                     <p>（3）全校各班级在各学科欠佳的学生数，如下表所示。希望相应班级任课教师多多帮助他们进步。</p>
-                    <StudentPerformanceTable studentPosition={'后'} subjectList={['总分', '语文', '数学', '英语', '化学', '物理', '生物']}  classData={classData}  dropList={['名次统计', '比例统计']}/>
+                    <StudentPerformanceTable studentPosition={'后'} tableHeaderData={tableHeaderData} tableBodyData={lowTableData} dropList={['名次统计', '比例统计']}/>
                 </div>
                 <div style={{ marginTop: 30 }}>
                     注：每个学生都有精准的个人学业诊断分析报告，学生或家长可免费通过“好分数网”查阅个人考试的基本情况。网址：
@@ -248,3 +260,81 @@ const StudentPerformance = () => {
 
 
 export default StudentPerformance;
+
+/*
+{
+    <className>: {
+        totalScore: {
+            top:
+            low:
+        },
+        <pid>: {
+            top:
+            low:
+        }
+    }
+}
+*/
+function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, headers) {
+    var result = {};
+    _.each(examInfo.realClasses, (className) => {
+        result[className] = {};
+    });
+
+//总分的相关信息
+    var totalScoreTopStudentsGroupByClass = _.groupBy(_.takeRight(examStudentsInfo, 30), 'class');
+    var totalScoreLowStudentsGroupByClass = _.groupBy(_.take(examStudentsInfo, 30), 'class');
+
+    _.each(totalScoreTopStudentsGroupByClass, (students, className) => {
+        result[className].totalScore = { top: students.length };
+    });
+
+    _.each(totalScoreLowStudentsGroupByClass, (students, className) => {
+        if(!result[className].totalScore) {
+            result[className].totalScore = { low: students.length };
+        } else {
+            result[className].totalScore.low = students.length;
+        }
+    });
+
+    _.each(allStudentsPaperMap, (papers, pid) => {
+        var orderPapers = _.sortBy(papers, 'score');
+
+        var topPapers = _.takeRight(orderPapers, 30); //这个30，不是固定的，而且如果是比例的话，要把比例换算成数值
+        var lowPapers = _.take(orderPapers, 30);
+
+        var topPapersGroupByClassName = _.groupBy(topPapers, 'class_name');
+        var lowPapersGroupByClassName = _.groupBy(lowPapers, 'class_name');
+
+        _.each(topPapersGroupByClassName, (cpapers, className) => {
+            result[className][pid] = { top: cpapers.length };
+        });
+        _.each(lowPapersGroupByClassName, (cpapers, className) => {
+            if(!result[className][pid]) {
+                result[className][pid] = { low: cpapers.length };
+            } else {
+                result[className][pid].low = cpapers.length;
+            }
+        });
+    });
+//TODO: select可以变化多种计算方式，会改变matrix table的数据
+    var topMatrix = [], lowMatrix = [];
+    _.each(result, (value, className) => {
+        var tempTop = [], tempLow = [];
+         _.each(headers, (headerObj, index) => {
+            var tempTopCount = value[headerObj.id] ? (value[headerObj.id].top ? value[headerObj.id].top : 0) : 0;
+            var tempLowCount = value[headerObj.id] ? (value[headerObj.id].low ? value[headerObj.id].low : 0) : 0;
+
+            tempTop.push(tempTopCount);
+            tempLow.push(tempLowCount);
+        });
+
+        tempTop.unshift(examInfo.gradeName+className+'班');
+        tempLow.unshift(examInfo.gradeName+className+'班');
+
+        topMatrix.push(tempTop);
+        lowMatrix.push(tempLow);
+    });
+
+    return {topTableData: topMatrix, lowTableData: lowMatrix}
+}

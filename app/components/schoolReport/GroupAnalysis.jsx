@@ -1,10 +1,16 @@
 import React from 'react';
-import styles from '../../common/common.css';
 import ReactHighcharts from 'react-highcharts';
-import Table from '../../common/Table';
-import {getNumberCharacter} from '../../lib/util';
-import _ from 'lodash';
 import { Modal } from 'react-bootstrap';
+import _ from 'lodash';
+
+import Table from '../../common/Table';
+
+import {NUMBER_MAP as numberMap} from '../../lib/constants';
+
+import styles from '../../common/common.css';
+
+import {getNumberCharacter} from '../../lib/util';
+
 var {Header, Title, Body, Footer} = Modal;
 
 let localStyle = {
@@ -26,21 +32,51 @@ let tableData = {
 class Dialog extends React.Component {
     constructor(props) {
         super(props);
+        this.isValid = _.map(_.range(this.props.levelBuffers.length), (index) => true);
+        this.isUpdate = false;
+        this.levelBuffers = this.props.levelBuffers;
     }
+
     onChange(ref, event) {
         this.refs[ref].value = event.target.value;
     }
-    okClickHandler() {
-        var levels = this.props.totalScoreLevel.length;
-        var floatScores = [];
-        for(var i=0; i < levels; i++) {
-            floatScores.push(parseFloat(this.refs['float-' + i].value)); 
-        }
-        console.log('================== set float scores: ' + JSON.stringify(floatScores));
-        this.props.onHide();
+
+    onInputBlur(index) {
+        var value = parseInt(this.refs['float-'+ index].value); //TODO: 为什么不能直接取value？
+        //TODO:因为这里直接对没有值的情况return了，所以必须都有有效的初始值！！！这里初始值都是10
+        if (!(value && _.isNumber(value) && value >= 0)) {
+            console.log('所给buffer不是有效的数字');
+            this.isValid[index] = false;
+            return;
+        };
+
+        //如果value不变。。。那么也不更新
+        if(this.levelBuffers[index] != value) this.isUpdate = true;
     }
+
+    okClickHandler() {
+        var formValid = _.every(this.isValid, (flag) => flag);
+
+        if(!formValid) {
+            console.log('表单没通过');
+            return;
+        }
+
+
+        //调用父类传递来的函数  this.props.updateLevelBuffers(this.levelBuffers)，从而更新父类
+        this.props.updateLevelBuffers(this.levelBuffers);
+        this.props.onHide();
+
+        // var levels = this.props.totalScoreLevel.length;
+        // var floatScores = [];
+        // for(var i=0; i < levels; i++) {
+        //     floatScores.push(parseFloat(this.refs['float-' + i].value));
+        // }
+        // console.log('================== set float scores: ' + JSON.stringify(floatScores));
+    }
+
     render() {
-        var {totalScoreLevel} = this.props;
+        // var {totalScoreLevel} = this.props;
         var _this = this;
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this) }>
@@ -51,11 +87,11 @@ class Dialog extends React.Component {
                     <div style={{ minHeight: 150, display: 'table', margin:'0 auto'}}>
                         <div style={{display: 'table-cell', verticalAlign: 'middle'}}>
                         {
-                            _.range(totalScoreLevel.length).map(num => {
+                            _.map(this.state.levelBuffers, (buffer, index) => {
                                 return (
-                                    <div key={num} style={{textAlign: 'center', marginBottom:20}}>
-                                        {getNumberCharacter(num + 1) }档线上下浮分数：
-                                        <input ref={'float-' + num} defaultValue={10} style={{ width: 140, heigth: 28, display: 'inline-block', textAlign: 'center' }}/>分
+                                    <div key={index} style={{textAlign: 'center', marginBottom:20}}>
+                                        {numberMap[index+1]}档线上下浮分数：
+                                        <input ref={'float-' + index} onBlur={_this.onInputBlur.bind(_this, 'float-' + index) } defaultValue={buffer} style={{ width: 140, heigth: 28, display: 'inline-block', textAlign: 'center' }}/>分
                                     </div>
                                 )
                             })
@@ -80,14 +116,15 @@ class Dialog extends React.Component {
 /**
  * props:
  * totalScoreLevel: 分档数据;
- * 
+ *
  *
  */
 class GroupAnalysis extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            showDialog: false
+            showDialog: false,
+            levelBuffers: _.map(_.range(_.size(props.levels)), (index) => 10)
         }
     }
     onShowDialog() {
@@ -100,14 +137,31 @@ class GroupAnalysis extends React.Component {
             showDialog: false
         })
     }
+
+    updateLevelBuffers(newLevelBuffers) {
+console.log('updateLevelBuffers = ', newLevelBuffers);
+
+        this.setState({
+            levelBuffers: newLevelBuffers
+        });
+    }
+
     render() {
-        var {totalScoreLevel} = this.props;
+//Props数据结构：
+        var {examInfo, examStudentsInfo, studentsGroupByClass, levels} = this.props;
+//算法数据结构：
+        var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, this.state.levelBuffers);
+        var disData = criticalStudentsDiscription(criticalLevelInfo); //缺少UI
+//自定义Module数据结构：
+
         return (
             <div className={styles['school-report-layout']}>
                 <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
                 <div style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 280 }}>
                     临界生群体分析
                 </div>
+
+            {/*--------------------------------  临界生群体分析Header -------------------------------------*/}
                 <div className={styles['school-report-content']}>
                     <p>
                         将临近总分各分数线上下的群体视为“临界生”，学校可以给他们多一点关注，找到他们的薄弱点、有针对性促进一下，他们就坑稳定、甚至提升总分档次。
@@ -117,16 +171,20 @@ class GroupAnalysis extends React.Component {
                         设置临界分数
                     </a>
 
+                    {/*--------------------------------  临界生群体分析表格 -------------------------------------*/}
                     <Table tableData={tableData}/>
-                    <a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
+
+                    {/*     _.keys(studentsGroupByClass).length > 5 ? (<a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
                         点击查看更多班级数据 V
-                    </a>
+                    </a>) : ''   */}
+
+                {/*--------------------------------  TODO: 临界生群体分析说明 -------------------------------------*/}
                     <div className={styles.tips}>
                         <p>说明：</p>
                         <p>此处文字待添加。</p>
                     </div>
                 </div>
-                <Dialog totalScoreLevel={totalScoreLevel} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)}/>
+                <Dialog totalScoreLevel={totalScoreLevel} updateLevelBuffers={this.updateLevelBuffers.bind(this)} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)}/>
             </div>
         )
     }
@@ -135,3 +193,82 @@ class GroupAnalysis extends React.Component {
 }
 
 export default GroupAnalysis;
+
+
+function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers) {
+    // levels = levels || makeDefaultLevles(examInfo, examStudentsInfo);
+    // levelBuffers = levelBuffers || _.map(_.range(_.size(levels)), (index) => 10);
+
+    var table = [], criticalLevelInfo = {};
+
+    _.each(_.range(_.size(levels)), (index) => {
+        criticalLevelInfo[index] = [];
+    });
+
+    var titleHeader = _.map(_.range(_.size(levels)), (index) => {
+        return numberMap[index+1] + '档临界生人数';
+    });
+    titleHeader.unshift('分档临界生');
+
+    table.push(titleHeader);
+
+    var segments = makeCriticalSegments(levelBuffers, levels);
+
+    var totalSchoolCounts = makeSegmentsStudentsCount(examStudentsInfo, segments);
+    var totalSchool = _.filter(totalSchoolCounts, (count, index) => (index % 2 == 0));
+    totalSchool = _.reverse(totalSchool);
+    totalSchool.unshift('全校');
+    table.push(totalSchool);
+
+    _.each(studentsGroupByClass, (students, className) => {
+        var classCounts = makeSegmentsStudentsCount(students, segments);
+        var classRow = _.filter(classCounts, (count, index) => (index % 2 == 0));//从低到高
+        classRow = _.reverse(classRow); //从高到底
+
+        _.each(classRow, (count, index) => {
+            criticalLevelInfo[index].push({'class': className, count: count});//因为这里使用的是反转后得到classRow，所以这里criticalLevelInfo中的
+                                                                                    //levelKey是颠倒后的，即小值代表高档
+        });
+
+        classRow.unshift(examInfo.gradeName+className+'班');
+        table.push(classRow);
+    });
+// debugger;
+
+// console.log('=============== criticalStudentsTable');
+// console.log(table);
+// console.log('=====================================');
+
+//     var criticalDis = criticalStudentsDiscription(criticalLevelInfo);  Done
+
+// console.log('=============== criticalStudentsDiscription');
+// console.log(criticalDis);
+// console.log('=====================================');
+
+    return {tableData: table, criticalLevelInfo: criticalLevelInfo};
+}
+
+function makeCriticalSegments(levelBuffers, levels) {
+    //[<thirdScore-thirdBuffer>, <thirdScore+thirdBuffer>, ...]
+    var result = [];
+    _.each(levels, (levObj, levelKey) => {
+        result.push(levObj.score-levelBuffers[levelKey-0]);
+        result.push(levObj.score+levelBuffers[levelKey-0]);
+    });
+    return result;
+}
+
+function criticalStudentsDiscription(criticalLevelInfo) {  //Done
+    //上面的 criticalLevelInfo
+    // 每一档
+    var result = {top: {}, low: {}};
+    _.each(criticalLevelInfo, (counts, levelKey) => {
+        //多的前3 和 少的前三
+        var orderedCounts = _.sortBy(counts, 'count');// 升序
+        var top = _.map(_.takeRight(orderedCounts, 3), (cobj) => cobj.class+'班');
+        result.top[levelKey] = top;
+        var low = _.map(_.take(orderedCounts, 3), (cobj) => cobj.class+'班');
+        result.low[levelKey] = low;
+    });
+    return result;//小值代表高档
+}
