@@ -9,7 +9,7 @@ import _ from 'lodash';
 import {showDialog, hideDialog} from '../../reducers/global-app/actions';//TODO: 设计思路？？？
 import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
-import {makeSegmentsStudentsCount} from '../../api/mexam';
+import {makeSegmentsStudentsCount} from '../../api/exam';
 
 import DropdownList from '../../common/DropdownList';
 

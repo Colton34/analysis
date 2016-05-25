@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Table from '../../common/Table';
 import DropdownList from '../../common/DropdownList';
 
-import {makeSegments, makeFactor, makeSegmentsStudentsCount} from '../../api/mexam';
+import {makeSegments, makeFactor, makeSegmentsStudentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
 import styles from '../../common/common.css';

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from '../../common/common.css';
 import ReactHighcharts from 'react-highcharts';
 
-import {makeSegments, makeSegmentsStudentsCount} from '../../api/mexam';
+import {makeSegments, makeSegmentsStudentsCount} from '../../api/exam';
 
 const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
 //算法数据结构：

@@ -8,7 +8,7 @@ import Table from '../../common/Table.jsx';
 import DropdownList from '../../common/DropdownList';
 
 import {NUMBER_MAP as numberMap} from '../../lib/constants';
-import {makeFactor} from '../../api/mexam';
+import {makeFactor} from '../../api/exam';
 
 //todo: 各档上线信息展示区域可以专门提出来做一个组件。
 
