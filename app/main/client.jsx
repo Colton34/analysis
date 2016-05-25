@@ -19,7 +19,6 @@ window.request = axios.create({
   // timeout: 1000,
   headers: {'x-access-token': Cookies.get('authorization')}
 });
-console.log('initialState : ', initialState);
 
 const store = configureStore(initialState, browserHistory);
 const history = syncHistoryWithStore(browserHistory, store);

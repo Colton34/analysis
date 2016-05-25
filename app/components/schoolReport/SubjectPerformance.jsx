@@ -74,7 +74,6 @@ class Dialog extends React.Component {
             return;
         }
 
-        console.log('============update grades list:' + JSON.stringify(this.state.grades));
         this.isUpdate = false;
 
         this.props.updateGrades(this.state.grades);
@@ -120,10 +119,6 @@ class Dialog extends React.Component {
 
     render() {
         var _this = this, gradeLastIndex = this.state.grades.length - 1;
-
-        var charCode_A = 65;
-
-        console.log('===== state:' + JSON.stringify(this.state));
 
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {}) }>

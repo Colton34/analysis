@@ -40,9 +40,6 @@ const LevelReport = ({data}) => {
 
         return ''.concat(numberMap[levelKey-0+1]).concat('档 ').concat(levObj.percentage).concat('%<br />').concat(' 大于').concat(levObj.score).concat('分');
     });
-    // counts = [40, 260, 480];//todo: 假数据删除
-console.log('counts = ', counts);
-// debugger;
 
     const config = {
         chart: {

@@ -37,7 +37,6 @@ class SchoolReport extends React.Component {
     componentDidMount() {
         if (this.props.haveInit) return;
 
-        console.log('***********************   SchoolAnalysis componentDidMount');
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initSchoolAnalysis(params);
     }
