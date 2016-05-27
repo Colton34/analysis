@@ -1,0 +1,87 @@
+.container {
+    width: 100%;
+    min-height: 670px;
+    background-color: #ffffff;
+    padding: 20px 30px;
+}
+
+.tip {
+    color: #8c8c8c;
+    font-size: 12px;
+}
+
+.content-header {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    line-height: 32px;
+    vertical-align: middle;
+}
+
+.stats {
+    color: #54bde7;
+    font-size: 18px;
+    font-weight: 500;
+}
+.table-row {
+    border: 1px #fff solid;
+}
+
+.table-item {
+    border: 1px solid #ddd;
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+    text-align: left;
+}
+
+.upload-btn {
+    float: right;
+    height: 34px;
+    width: 120px;
+    margin-left: 10px;
+    background-color: #54bde7;
+    border-color: #54bde7;
+    color: #FFFFFF;
+    min-width: 86px;
+    border-radius: 2px;
+    border: 1px solid;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    padding: 1px 10px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+}
+
+.upload-input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.export-btn{
+        float: right;
+    height: 34px;
+    width: 120px;
+    margin-left: 10px;
+    border-color: #54bde7;
+    color: #54bde7;
+    min-width: 86px;
+    background-color: #FFFFFF;
+    border-radius: 2px;
+    border: 1px solid;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    padding: 1px 10px;
+    cursor: pointer;
+    
+}

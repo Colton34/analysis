@@ -1,0 +1,95 @@
+.header {
+    width: 100%;
+    height: 58px;
+    background-color: #647081;
+    position: relative;
+    text-align: center; 
+    line-height: 58px; 
+}
+
+.header-back {
+    position: absolute;
+    left: 21px;
+    line-height: 58px;
+    vertical-align: middle;
+    color: #b1bdc1;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.header-title {
+    color: #fff;
+    font-size: 18px;
+}
+
+.content-tips {
+    color: #8c8c8c;
+    font-size: 12px;
+}
+
+.label {
+    color: #6a6a6a;
+    font-size: 14px;
+    font-weight: 100;
+    margin-right: 15px;
+}
+
+.fx-input {
+    display: inline-block;
+    border: solid 1px #ecebf0;
+    border-radius: 3px;
+    color: #333333;
+    padding: 0 10px;
+    font-size: 14px;
+}
+
+.ca-tips {
+    background-image: url(../../../images/ca_tips.jpg);
+    width: 865px;
+    height: 285px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    margin-left: 70px;
+}
+
+.fx-btn {
+    min-width: 86px;
+    height: 32px;
+    border-radius: 2px;
+    border: 1px solid;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    padding: 1px 10px;
+    cursor: pointer;
+}
+
+.fx-btn2 {
+    min-width: 86px;
+    background-color: #FFFFFF;
+    border-radius: 2px;
+    border: 1px solid;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    padding: 1px 10px;
+    cursor: pointer;
+}
+
+.fx-btn-primary {
+    background-color: #54bde7;
+    border-color: #54bde7;
+    color: #FFFFFF;
+}
+
+.fx-btn2-primary {
+    border-color: #54bde7;
+    color: #54bde7;
+    line-height: 30px;
+}
+
+.edit-btn {
+    color: #6C737A;
+    margin-right: 10px;
+    text-decoration: none;
+}

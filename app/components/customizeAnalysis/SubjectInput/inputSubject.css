@@ -1,0 +1,43 @@
+.content {
+    width: 100%;
+    min-height: 670px;
+    background-color: #fff;
+    padding: 20px 30px;
+}
+.label {
+    display: inline-block;
+    color: #6a6a6a;
+    font-size: 14px;
+    font-weight: 100;
+    margin-right: 15px;
+}
+
+.fx-input {
+    display: inline-block;
+    border: solid 1px #ecebf0;
+    border-radius: 3px;
+    color: #333333;
+    padding: 0 10px;
+    font-size: 14px;
+    width: 360px;
+    height: 40px;
+}
+
+.fx-select-tag {
+    float: left;
+    width: 86px;
+    height: 30px;
+    margin: 0 10px 10px 0;
+    border: #e7e7e7 1px solid;
+    border-radius: 1px;
+    color: #6a6a6a;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 28px;
+    cursor: pointer;
+}
+
+.tag-checked {
+    color: #54bde7;
+    border-color: #54bde7;
+}
