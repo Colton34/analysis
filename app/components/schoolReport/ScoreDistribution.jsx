@@ -102,10 +102,9 @@ class Dialog extends React.Component {
     constructor(props) {
         super(props);
         this.levels = props.levels;
-        this.isValid = true; //TODO: 修改成数组标记的形式？当修改分档个数的时候 isValid 的个数也要对应修改
-        this.levLastIndex = _.size(this.levels) - 1;
+        // this.isValid = true; //TODO: 修改成数组标记的形式？当修改分档个数的时候 isValid 的个数也要对应修改
         this.state = {
-            levelNum: _.size(this.levels)
+            levelNum: _.size(props.levels)
         };
     }
     onChange(ref, event) {
@@ -124,7 +123,7 @@ class Dialog extends React.Component {
         if(theDiff === 0) return;
 
 //更新levLastIndex
-        this.levLastIndex = value - 1;
+        // this.levLastIndex = value - 1;
 //更新levels
         var tempLevels = {};
         if(value < preLength) {
@@ -183,8 +182,19 @@ class Dialog extends React.Component {
         // var isValid = _.every(_.range(levTotal), (index) => (!_.isUndefined(this.refs[('score-' + index)].value) && !_.isUndefined(this.refs[('rate-'+ index)].value)));
         // if(_.keys(this.levels).length !== levTotal) isValid = false;
 
-        if(!this.isValid) {
-            console.log('levels 表单验证不通过');
+        // if(!this.isValid) {
+        //     console.log('levels 表单验证不通过');
+        //     return;
+        // }
+
+        //保证层级是正确的
+        var isValid = _.every(_.range(_.size(this.levels) - 1), (index) => {
+            return this.levels[index+''].score < this.levels[(index+1)+''].score
+        });
+
+        debugger;
+        if(!isValid) {
+            console.log('表单验证不通过');
             return;
         }
 
@@ -203,8 +213,8 @@ class Dialog extends React.Component {
         var num = arr[1]; //是第一个（高档次） 还是 最后一个（低档次），但是赋值给levels的时候就应该颠倒过来了
 
 //num = 0, 1, 2(levlTotal)
-        var higherLevObj = this.levels[(this.levLastIndex-num+1)+''];
-        var lowerLevObj = this.levels[(this.levLastIndex-num-1)+''];
+        // var higherLevObj = this.levels[(this.levLastIndex-num+1)+''];
+        // var lowerLevObj = this.levels[(this.levLastIndex-num-1)+''];
         var temp = {score: 0, percentage: 0, count: 0};
         var {examInfo, examStudentsInfo} = this.props;
         switch (type) {
@@ -216,11 +226,11 @@ class Dialog extends React.Component {
                 // 30分（这个有点极端了。。。暂时可以不考虑）
                 // if(!((value < examInfo.fullMark) && (!higherLevObj || (10 < higherLevObj.score - value)) && (!lowerLevObj || (value - lowerLevObj.score > 10))))
 
-                if(!((value < examInfo.fullMark) && (!higherLevObj || (higherLevObj.score > value)) && (!lowerLevObj || (value > lowerLevObj.score)))) {
-                    console.log('所给的score不符合规则');
-                    this.isValid = false;
-                    return;
-                }
+                // if(!((value < examInfo.fullMark) && (!higherLevObj || (higherLevObj.score > value)) && (!lowerLevObj || (value > lowerLevObj.score)))) {
+                //     console.log('所给的score不符合规则');
+                //     this.isValid = false;
+                //     return;
+                // }
                 var targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= value);//因为examStudentsInfo是有序的，所以可以用二分
                 var count = examStudentsInfo.length - targetIndex;
                 var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);
@@ -234,11 +244,11 @@ class Dialog extends React.Component {
             case 'rate':
             //根据给出的百分比，得到学生的位置，然后此学生的分数即为分数线
                 // debugger;
-                if(!((value < 100) && (!higherLevObj || (value > higherLevObj.percentage)) && (!lowerLevObj || (value < lowerLevObj.percentage)))){
-                    console.log('所给的percentage不符合规则');
-                    this.isValid = false;
-                    return;
-                }
+                // if(!((value < 100) && (!higherLevObj || (value > higherLevObj.percentage)) && (!lowerLevObj || (value < lowerLevObj.percentage)))){
+                //     console.log('所给的percentage不符合规则');
+                //     this.isValid = false;
+                //     return;
+                // }
                 var targetCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
                 var targetStudent = _.takeRight(examStudentsInfo, targetCount)[0];
 
@@ -258,14 +268,18 @@ class Dialog extends React.Component {
                 break;
         }
         // debugger;
-        this.isValid = true; //TODO: 这里有bug，还是要确保所有的input都是true才对。不然，先来个错的，然后跳过这个错的，再来个对的，那么isValid就是true了。。。
-        this.levels[(this.levLastIndex-num)+''] = temp;
+        // this.isValid = true; //TODO: 这里有bug，还是要确保所有的input都是true才对。不然，先来个错的，然后跳过这个错的，再来个对的，那么isValid就是true了。。。
+        this.levels[(_.size(this.levels) - 1 - num)+''] = temp;
     }
 
     render() {
         var _this = this;
         var {examInfo, examStudentsInfo} = this.props;
 
+
+        // this.levels = this.props.levels;
+        this.levLastIndex = _.size(this.levels) - 1;
+// debugger;
 //重绘要不要 来自 props
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {})}>
