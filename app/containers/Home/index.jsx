@@ -127,9 +127,9 @@ const ExamList = ({examList}) => {
     return (
         <div style={{ display: 'inline-block', width: 800, position: 'absolute', right: 380 }}>
             <div style={{ borderBottom: '1px solid #bfbfbf', width: '100%', height: 70, position: 'relative', right: 0, padding: '10px 0 0 0', lineHeight: '70px' }}>
-                <a style={{ display: 'inline-block', width: 130, height: 40, backgroundColor: '#009966', color: '#fff', borderRadius: 5, lineHeight: '40px', textAlign: 'center' }}>
+                <Link to={{pathname: '/add/analysis'}}style={{ display: 'inline-block', width: 130, height: 40, backgroundColor: '#009966', color: '#fff', borderRadius: 5, lineHeight: '40px', textAlign: 'center' }}>
                     创建分析
-                </a>
+                </Link>
                 <span style={{ color: '#aeaeae', position: 'absolute', bottom: -7, marginLeft: 10, fontSize: 14 }}>根据学校实际情况，自定义数据进行分析。比如：文理拆分、文理合并等</span>
             </div>
 

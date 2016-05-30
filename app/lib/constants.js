@@ -76,3 +76,10 @@ export const LETTER_MAP = {
     5: 'F',
     6: 'G'
 };
+
+//考试来源：
+export const ExamOrigin = {
+    YUEJUAN: 0,
+    ZIDINGYI: 1
+}
+

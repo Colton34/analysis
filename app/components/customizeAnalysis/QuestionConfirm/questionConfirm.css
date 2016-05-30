@@ -1,0 +1,33 @@
+.container {
+    width: 100%;
+    min-height: 670px;
+    background-color: #ffffff;
+    padding: 20px 30px;
+}
+
+.table-row {
+    border: 1px #fff solid;
+}
+
+.table-item {
+    border: 1px solid #ddd;
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+    text-align: left;
+}
+
+.table-input {
+    height: 30px;
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+    display: block;
+    width: 100%;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+}

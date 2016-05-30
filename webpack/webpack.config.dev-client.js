@@ -66,8 +66,13 @@ module.exports = {
     module: {
         loaders: commonLoaders.concat([
             {
-                test: /\.css$/,
+                //test: /\.css$/,
+                test: /^((?!datepicker).)*\.css$/,
                 loader: 'style!css?module&localIdentName=[name]__[local]___[hash:base64:5]!postcss-loader'
+            },
+            {
+                test: /datepicker\.css$/,
+                loader: 'style!css?module&localIdentName=[local]!postcss-loader'
             },
             {test: /\.less$/, loaders: ['style', 'css', 'autoprefixer', 'less']}
         ])
