@@ -84,24 +84,6 @@ const Table = ({tableData, levels}) => {
     )
 }
 
-let basicInfos = {
-    fullScore: 750,
-    maxScore: 680
-}
-
-let numberMapper = {
-    1: '一',
-    2: '二',
-    3: '三',
-    4: '四',
-    5: '五',
-    6: '六',
-    7: '七',
-    8: '八',
-    9: '九',
-    10: '十'
-
-}
 /**
  * props:
  * show: 是否打开的状态
@@ -120,7 +102,7 @@ class Dialog extends React.Component {
     constructor(props) {
         super(props);
         this.levels = props.levels;
-        this.isValid = true; //先放在这里，回来移入到state中？
+        this.isValid = true; //TODO: 修改成数组标记的形式？当修改分档个数的时候 isValid 的个数也要对应修改
         this.levLastIndex = _.size(this.levels) - 1;
         this.state = {
             levelNum: _.size(this.levels)
@@ -137,12 +119,28 @@ class Dialog extends React.Component {
             return;
         }
 
-        if(value == _.size(this.levels)) return;
+        var preLength = _.size(this.levels);
+        var theDiff = Math.abs(preLength - value);
+        if(theDiff === 0) return;
+
+//更新levLastIndex
         this.levLastIndex = value - 1;
-        this.levels = {};
-        _.each(_.range(value), (index) => {
-            this.levels[index+''] = {score: 0, count: 0, percentage: 0};
-        });
+//更新levels
+        var tempLevels = {};
+        if(value < preLength) {
+            _.each(_.range(_.size(value)), (index) => {
+                tempLevels[index+''] = this.levels[(index+theDiff)]
+            });
+        } else {
+            _.each(_.range(theDiff), (index) => {
+                tempLevels[index+''] = {score: 0, count: 0, percentage: 0}
+            });
+            _.each(_.range(preLength), (index) => {
+                tempLevels[(index+theDiff)+''] = this.levels[index+'']
+            });
+        }
+        this.levels = tempLevels;
+
         this.setState({ levelNum: value });
     }
 
@@ -213,8 +211,12 @@ class Dialog extends React.Component {
             case 'score':
             //根据给出的分数，计算在此分数以上的人数，然后求出百分比
                 //要么没有，如果有则一定符合规则
-                // debugger;
-                if(!((value < examInfo.fullMark) && (!higherLevObj || (value < higherLevObj.score)) && (!lowerLevObj || (value > lowerLevObj.score)))) {
+
+                //TODO:这里修改条件判断；前后挡最少相差10分；但是百分比也会相关联。。。修改百分比的时候要注意score的分差；但是10分又不科学，如果满分是
+                // 30分（这个有点极端了。。。暂时可以不考虑）
+                // if(!((value < examInfo.fullMark) && (!higherLevObj || (10 < higherLevObj.score - value)) && (!lowerLevObj || (value - lowerLevObj.score > 10))))
+
+                if(!((value < examInfo.fullMark) && (!higherLevObj || (higherLevObj.score > value)) && (!lowerLevObj || (value > lowerLevObj.score)))) {
                     console.log('所给的score不符合规则');
                     this.isValid = false;
                     return;
@@ -226,7 +228,7 @@ class Dialog extends React.Component {
                 temp.score = value;
                 temp.percentage = percentage;
                 temp.count = count;
-// debugger;
+
                 this.refs['rate-' + num].value = percentage;
                 break;
             case 'rate':
@@ -240,11 +242,17 @@ class Dialog extends React.Component {
                 var targetCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
                 var targetStudent = _.takeRight(examStudentsInfo, targetCount)[0];
 
+                //当修改百分比后也要换算成分数看一下是否满足相应的规则：前后要相差不少于10分（一旦修改levels，那么就自动重置levelBuffers为10）
+                //TODO:但是这里还是可能会有问题：因为一上来是按照默认百分比设置的，但是怎么保证默认的百分比设置对应的score就一定满足相差10分呢？
+                // if(!((!higherLevObj || (10 < higherLevObj.score - targetStudent.score)) && (!lowerLevObj || (targetStudent.score - lowerLevObj.score > 10)))) {
+                //     console.log('所给的score不符合规则');
+                //     this.isValid = false;
+                //     return;
+                // }
+
                 temp.score = targetStudent.score;
                 temp.percentage = value;
                 temp.count = targetCount;
-
-// debugger;
 
                 this.refs['score-' + num].value = targetStudent.score;
                 break;
@@ -257,6 +265,7 @@ class Dialog extends React.Component {
     render() {
         var _this = this;
         var {examInfo, examStudentsInfo} = this.props;
+
 //重绘要不要 来自 props
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {})}>
@@ -329,9 +338,6 @@ class ScoreDistribution extends React.Component {
         })
     }
     onHideDialog() {
-
-console.log('onHideDialog~~~');
-
         this.setState({
             showDialog: false
         })
@@ -344,8 +350,7 @@ console.log('onHideDialog~~~');
     render() {
     //Props数据结构：
         var {examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, changeLevels} = this.props;
-// console.log('ScoreDistribution 重绘');
-// console.log('levels = ', _.size(levels));
+
         //算法数据结构
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
         var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
@@ -679,18 +684,28 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
     return levItem;
 }
 
-/**
- * 通过dialog修改levels
- * @param  {[type]} examInfo         [description]
- * @param  {[type]} examStudentsInfo [description]
- * @return {[type]}                  [description]
- */
-function changeLevels(examInfo, examStudentsInfo) {
-    //满分：
+/*
+
+
+let basicInfos = {
+    fullScore: 750,
+    maxScore: 680
 }
 
+let numberMapper = {
+    1: '一',
+    2: '二',
+    3: '三',
+    4: '四',
+    5: '五',
+    6: '六',
+    7: '七',
+    8: '八',
+    9: '九',
+    10: '十'
 
-/*
+}
+
 
 let tableData_example = {
     tds: [

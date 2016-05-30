@@ -51,6 +51,7 @@ export const FETCH_SCHOOL_ANALYSIS_DATA_SUCCESS = 'FETCH_SCHOOL_ANALYSIS_DATA_SU
 export const FETCH_SCHOOL_ANALYSIS_DATA_FAILURE = 'FETCH_SCHOOL_ANALYSIS_DATA_FAILURE';
 
 export const CHANGE_LEVEL = 'CHANGE_LEVEL';
+export const CHANGE_LEVEL_BUFFERS = 'CHANGE_LEVEL_BUFFERS';
 
 export const SUBJECTS_WEIGHT = ['语文', '数学', '英语', '物理', '化学', '生物', '政治', '历史', '地理' ];
 export const NUMBER_MAP = {

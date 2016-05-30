@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-24 15:23:38
+* @Last Modified time: 2016-05-30 11:49:24
 */
 
 
@@ -234,6 +234,7 @@ export function fetchSchoolAnalysisData(params) {
         headers = _.sortBy(headers, 'index');
         headers.unshift({subject: '总分', id: 'totalScore' });
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
+        var levelBuffers = _.map(levels, (value, key) => 1);
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
@@ -243,7 +244,8 @@ export function fetchSchoolAnalysisData(params) {
             studentsGroupByClass: studentsGroupByClass,
             allStudentsPaperMap: allStudentsPaperMap,
             headers: headers,
-            levels: levels
+            levels: levels,
+            levelBuffers: levelBuffers
         });
     });
 }

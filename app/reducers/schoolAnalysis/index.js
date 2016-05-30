@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:27:20
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-23 17:38:44
+* @Last Modified time: 2016-05-30 11:25:44
 */
 
 'use strict';
@@ -15,7 +15,8 @@ var initialState = new InitialState;
 import {
     FETCH_SCHOOL_ANALYSIS_DATA_SUCCESS,
     INIT_SCHOOL_ANALYSIS_SUCCESS,
-    CHANGE_LEVEL
+    CHANGE_LEVEL,
+    CHANGE_LEVEL_BUFFERS
 } from '../../lib/constants';
 
 export default function reducer(state, action) {
@@ -30,10 +31,10 @@ export default function reducer(state, action) {
             });
             return nextState;
         case CHANGE_LEVEL:
-
-console.log('levels = ', _.size(action.levels));
-debugger;
-            return state.set('levels', action.levels);
+            var newLevelBuffers = _.map(action.levels, (value, key) => 1);
+            return state.set('levels', action.levels).set('levelBuffers', newLevelBuffers);
+        case CHANGE_LEVEL_BUFFERS:
+            return state.set('levelBuffers', action.levelBuffers);
     }
     return state;
 }
