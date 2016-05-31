@@ -1,5 +1,8 @@
 import React from 'react';
 import _ from 'lodash';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {List} from 'immutable';
 
 import MainPage from '../../components/customizeAnalysis/MainPage';
 import SubjectInput from '../../components/customizeAnalysis/SubjectInput';
@@ -168,6 +171,12 @@ class CustomizeAnalysis extends React.Component {
     }
     render() {
         var {status, pageIndex} = this.state;
+        var examList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList;
+        var customExamList = [];
+        _.each(examList, (obj, index) => {
+            customExamList = _.concat(customExamList, obj.values);
+        });
+
         return (
             <div style={{ width: 1000, minHeight: 600, margin: '20px auto', background: '#fff', paddingBottom: 30 }}>
                 <Header pageIndex={this.state.pageIndex} status={this.state.status} onDiscardCurrent={this.onDiscardCurrent.bind(this) } onBackHomePage={this.onBackHomePage}/>
@@ -186,7 +195,7 @@ class CustomizeAnalysis extends React.Component {
                 {
 
                     status === 'create' && pageIndex === 1 &&
-                    <ExamSelect pageIndex={this.state.pageIndex} onPrevPage={this.onPrevPage.bind(this) }
+                    <ExamSelect examList={customExamList} pageIndex={this.state.pageIndex} onPrevPage={this.onPrevPage.bind(this) }
                         onNextPage={this.onNextPage.bind(this) } saveExamInfos={this.saveExamInfos.bind(this) } currentSubject= {this.state.currentSubject}/>
 
                 }
@@ -213,4 +222,10 @@ class CustomizeAnalysis extends React.Component {
 
 
 
-export default CustomizeAnalysis;
+export default connect(mapStateToProps)(CustomizeAnalysis);
+
+function mapStateToProps(state) {
+    return {
+        examList: state.home.examList
+    }
+}

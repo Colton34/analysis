@@ -1,10 +1,14 @@
 import React from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import ReactHighcharts from 'react-highcharts';
 import { Modal } from 'react-bootstrap';
 import _ from 'lodash';
+import {List} from 'immutable';
 
 import Table from '../../common/Table';
 
+import {updateLevelBuffersAction} from '../../reducers/schoolAnalysis/actions';
 import {makeSegmentsStudentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
@@ -31,23 +35,27 @@ class Dialog extends React.Component {
     onInputBlur(index) {
         var value = parseInt(this.refs['buffer-'+ index].value); //TODO: 为什么不能直接取value？
         //TODO:因为这里直接对没有值的情况return了，所以必须都有有效的初始值！！！这里初始值都是10
+
+        var levBufLastIndex = this.levelBuffers.length - 1;
         if (!(value && _.isNumber(value) && value >= 0)) {
             console.log('输入不是有效的数字');
-            this.isValid[index] = false;
+            this.isValid[levBufLastIndex-index] = false;
             return;
         };
 
 
-        if(this.levelBuffers[index] == value) {
+        if(this.levelBuffers[levBufLastIndex-index] == value) {
             console.log('没有更新');
             return;
         }
-        this.levelBuffers[index] = value;
+
+        //levelBuffers的顺序是和levels对应的--显示的时候是倒序
+        this.levelBuffers[levBufLastIndex-index] = value;
 
         //检测如果添加了此buffer，那么保证顺序是对的，由小到大。拿到当前生成的两个值，左边的要比它左边的大，右边的要比它右边的小（前提是如果左右边有值的话）：
         var newSegments = makeCriticalSegments(this.levelBuffers, this.props.levels);
-
         var segmentsIsValid = _.every(_.range(newSegments.length-1), (index) => (newSegments[index+1] > newSegments[index]));
+
         if(!segmentsIsValid) {
             console.log('newSegments is invalid');
             return;
@@ -84,6 +92,11 @@ class Dialog extends React.Component {
     render() {
         // var {totalScoreLevel} = this.props;
         var _this = this;
+
+        this.levelBuffers = this.props.levelBuffers;
+        this.isValid = _.map(_.range(this.levelBuffers.length), (index) => true);
+        this.isUpdate = false;
+
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this) }>
                 <Header closeButton style={{ textAlign: 'center' }}>
@@ -97,7 +110,7 @@ class Dialog extends React.Component {
                                 return (
                                     <div key={index} style={{textAlign: 'center', marginBottom:20}}>
                                         {numberMap[index+1]}档线上下浮分数：
-                                        <input ref={'buffer-' + index} onBlur={_this.onInputBlur.bind(_this, index) } defaultValue={buffer} style={{ width: 140, heigth: 28, display: 'inline-block', textAlign: 'center' }}/>分
+                                        <input ref={'buffer-' + index} onBlur={_this.onInputBlur.bind(_this, index) } defaultValue={this.levelBuffers[this.levelBuffers.length-1-index]} style={{ width: 140, heigth: 28, display: 'inline-block', textAlign: 'center' }}/>分
                                     </div>
                                 )
                             })
@@ -127,8 +140,7 @@ class GroupAnalysis extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            showDialog: false,
-            levelBuffers: _.map(_.range(_.size(props.levels)), (index) => 10)
+            showDialog: false
         }
     }
     onShowDialog() {
@@ -142,19 +154,23 @@ class GroupAnalysis extends React.Component {
         })
     }
 
-    updateLevelBuffers(newLevelBuffers) {
-console.log('updateLevelBuffers = ', newLevelBuffers);
+//     updateLevelBuffers(newLevelBuffers) {
+// console.log('updateLevelBuffers = ', newLevelBuffers);
 
-        this.setState({
-            levelBuffers: newLevelBuffers
-        });
-    }
+//         this.setState({
+//             levelBuffers: newLevelBuffers
+//         });
+//     }
 
     render() {
 //Props数据结构：
-        var {examInfo, examStudentsInfo, studentsGroupByClass, levels} = this.props;
+        var {examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers} = this.props;
+
+        levelBuffers = (List.isList(levelBuffers)) ? levelBuffers.toJS() : levelBuffers;
+        if((!levelBuffers || _.size(levelBuffers) == 0)) return (<div></div>)
+
 //算法数据结构：
-        var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, this.state.levelBuffers);
+        var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers);
         var disData = criticalStudentsDiscription(criticalLevelInfo); //缺少UI
         // debugger;
 //自定义Module数据结构：
@@ -218,14 +234,26 @@ console.log('updateLevelBuffers = ', newLevelBuffers);
                         }
                     </div>
                 </div>
-                <Dialog levels={levels} levelBuffers={this.state.levelBuffers} updateLevelBuffers={this.updateLevelBuffers.bind(this)} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)}/>
+                <Dialog levels={levels} levelBuffers={levelBuffers} updateLevelBuffers={this.props.updateLevelBuffers} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)}/>
             </div>
         )
     }
 }
 
-export default GroupAnalysis;
+//设计：这里将GroupAnalysis作为container，而不是pure render function--就是为了降级，将整个校级分析只是作为一个集装箱，而不是container component
+export default connect(mapStateToProps, mapDispatchToProps)(GroupAnalysis);
 
+function mapStateToProps(state) {
+    return {
+        levelBuffers: state.schoolAnalysis.levelBuffers
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        updateLevelBuffers: bindActionCreators(updateLevelBuffersAction, dispatch)
+    }
+}
 
 function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers) {
     // levels = levels || makeDefaultLevles(examInfo, examStudentsInfo);

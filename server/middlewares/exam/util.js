@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 20:40:35
+* @Last Modified time: 2016-05-27 16:37:56
 */
 
 'use strict';
@@ -116,7 +116,7 @@ exports.generateExamInfo = function(schoolid, examid, gradeName) {
         return getSchoolById(schoolid);
     }).then(function(school) {
         var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
-        if(!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.NotFoundError('没有找到对应的年级或者从属此年级的班级'));
+        if(!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.Error('没有找到对应的年级或者从属此年级的班级'));
 
         data.exam.grade = targetGrade;
         //fetchId是不带有一大串儿'0'的examid

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:02:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-05 10:50:12
+* @Last Modified time: 2016-05-30 19:04:06
 */
 
 'use strict';
@@ -17,12 +17,14 @@ import app from './global-app';
 import home from './home';
 import dashboard from './dashboard';
 import schoolAnalysis from './schoolAnalysis';
+import customAnalysis from './customAnalysis';
 
 var rootReducer = combineReducers({
     app,
     home,
     dashboard,
     schoolAnalysis,
+    customAnalysis,
     routing
 });
 
