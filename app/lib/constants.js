@@ -83,3 +83,11 @@ export const ExamOrigin = {
     ZIDINGYI: 1
 }
 
+//=============== CustomAnalysis =============================
+export const ADD_PAPER_INFO = 'ADD_PAPER_INFO';
+export const ADD_PAPER_INFO_SUCCESS = 'ADD_PAPER_INFO_SUCCESS';
+
+export const SUBTRACT_PAPER_INFO = 'SUBTRACT_PAPER_INFO';
+
+// export const FETCH_EXAMLIST = 'FETCH_EXAMLIST';
+// export const FETCH_EXAMLIST_SUCCESS = 'FETCH_EXAMLIST_SUCCESS';

@@ -1,24 +1,29 @@
 /**
- * todos: 
- * daterangepicker; 
+ * todos:
+ * daterangepicker;
  * label style for input checkbox;
  * upload download buttons' style;
  * alert -> dialog;
  */
 
 import React from 'react';
-import ownClassNames from './examSelect.css';
-import _ from 'lodash';
-import PageFooter from '../Footer';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { Modal } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
+import Radium from 'radium';
+import _ from 'lodash';
 import moment from 'moment';
+
+import {addPaperInfoAction, subtractPaperInfoAction} from '../../../reducers/schoolAnalysis/actions';
+import PageFooter from '../Footer';
 import {ExamOrigin} from '../../../lib/constants.js';
 import matrixBase from '../../../lib/matrixBase.js';
-import { Modal } from 'react-bootstrap';
-var {Header, Title, Body, Footer} = Modal;
-import Radium from 'radium';
 
-require('react-datepicker/dist/react-datepicker.css');
+import ownClassNames from './examSelect.css';
+
+var {Header, Title, Body, Footer} = Modal;
+
 var examList = [
     {
         name: '2016年永丰中学第六次月考',
@@ -26,7 +31,7 @@ var examList = [
         from: ExamOrigin.YUEJUAN,
         id: 16789,
         grade: '初三',
-        '[papers]': [
+        '[papers]': [ //注意：这里修改属性名'[papers]'为'papers'
             {
                 subject: '数学',
                 id: '5732ae730000051411235472'
@@ -51,24 +56,12 @@ var paperInfos = {
         m: [[2, 2, 4, 1, 2], [3, 0, 7, 2, 2], [1, 2, 2, 2, 2], [2, 1, 7, 0, 2], [3, 2, 2, 2, 2]]
     }
 }
-// var examInfos = {
-//     '5732ae730000051411235472': {
-//         subject: '数学',
-//         questionInfos: [{ "name": "第1题", "score": 3, "selected": true}, { "name": "第2题", "score": 3, "selected": true}, { "name": "第3题", "score": 3, "selected": true}, { "name": "第4题", "score": 3, "selected": true}, { "name": "第5题", "score": 3, "selected": true}],
-//         studentInfos: [{ "name": "潘琳洁", "kaohao": "130615", "class": "6", "id": 3155561, "score": 118 }, { "name": "陈子彦", "kaohao": "132210", "class": "22", "id": 3156491, "score": 114 }, { "name": "徐伶依", "kaohao": "132252", "class": "22", "id": 3156520, "score": 113 }, { "name": "肖雨儿", "kaohao": "130813", "class": "8", "id": 3155678, "score": 113 }, { "name": "陈远", "kaohao": "132238", "class": "22", "id": 3156513, "score": 113 }, { "name": "祝睿", "kaohao": "130642", "class": "6", "id": 3155577, "score": 112 }, { "name": "徐凯鸿", "kaohao": "130643", "class": "6", "id": 3155578, "score": 112 }, { "name": "黄梦琦", "kaohao": "130644", "class": "6", "id": 3155579, "score": 112 }, { "name": "严博瀚", "kaohao": "132268", "class": "22", "id": 3156532, "score": 112 }]
-//     },
-//     '5733042b0000051411238c7f': {
-//         subject: '语文',
-//         questionInfos: [{ "name": "第1题", "score": 1, "selected": true}, { "name": "第2题", "score": 1, "selected": true}, { "name": "第3题", "score": 1, "selected": true}, { "name": "第4题", "score": 1, "selected": true}, { "name": "第5题", "score": 1, "selected": true}, { "name": "第6题", "score": 1, "selected": true}, { "name": "第7题", "score": 1, "selected": true}],
-//         studentInfos: [{ "name": "许志鹏", "kaohao": "10336", "class": "3", "id": 3593969, "score": 99 }, { "name": "贺新奕", "kaohao": "10116", "class": "1", "id": 3593867, "score": 97 }, { "name": "彭国阳", "kaohao": "10514", "class": "5", "id": 3594028, "score": 97 }, { "name": "许晓红", "kaohao": "10428", "class": "4", "id": 3594001, "score": 97 }, { "name": "马世景", "kaohao": "10505", "class": "5", "id": 3594019, "score": 97 }, { "name": "吴冠宇", "kaohao": "10435", "class": "4", "id": 3594008, "score": 97 }]
-//     }
-
-// }
 
 var PAPER_FROM = {
     system: 'sys',
     upload: 'upload'
 }
+
 var MERGE_TYPE = {
     same: 0,
     merge: 1,
@@ -81,7 +74,7 @@ var MERGE_TYPE = {
  * props:
  * isLiankao: 是否联考
  * pageIndex: 当前的页码；
- * onPrevPage: '上一步'回调函数 
+ * onPrevPage: '上一步'回调函数
  * onNextPage: '下一步'回调函数
  * currentSubject: 当前分析数据
  */
@@ -102,7 +95,8 @@ class ExamSelect extends React.Component {
 
         //在doMerge方法中调用this.props.onNextPage()
     }
-    // 选中某个考试科目时载入该科目的数据； 
+
+    // 选中某个考试科目时载入该科目的数据；
     onSelectExam(event) {
         var checked = event.target.checked;
         var paperId = event.target.value;
@@ -135,6 +129,19 @@ class ExamSelect extends React.Component {
         }
     }
 
+//TODO: 。。。
+    onSelectPaper(event) {
+        //对一个paper的checkbox交互，判断是增加还是减少，执行相应的action，从而执行相应的更新操作
+        var checked = event.target.checked;
+        var paperId = event.target.value;
+
+        if(checked) {
+            this.props.addPaperInfo(this.props.papersCache, paperId);
+        } else {
+            this.props.subtractPaperInfo(paperId);
+        }
+    }
+
     onCheckAllQuestions(ref, event) {
         var checked = event.target.checked;
         this.refs[ref].checked = checked;
@@ -161,6 +168,7 @@ class ExamSelect extends React.Component {
         // elements.prop('checked', checked);
 
     }
+
     onCheckQuestion(ref, event) {
         // 获得当前题目的基本信息： 属于哪个paper， 它的题号是多少；
         // 根据paperId， 找到currenPapers中的paper，然后根据题号找到当前题号;
@@ -389,6 +397,12 @@ class ExamSelect extends React.Component {
     }
     render() {
         //var selectedExams = Object.keys(this.state.selectedExamInfos);
+
+//TODO: examList从外部props传入
+        var {examList} = this.props;
+
+
+
         var {currentPapers, examList} = this.state;
         var paperIds = Object.keys(currentPapers);
 
@@ -596,4 +610,24 @@ let localStyle = {
         }
     }
 }
+
+
+/**
+ * examList从外层给。因为在内层不曾改变examList。而且这样只要不出这个custrom view的路由，那么这个数据结构就能一直用
+ */
 export default ExamSelect;
+
+//从外部的props中获取 examList和papersCache
+function mapStateToProps(state) {
+    return {
+        papersCache: state.customAnalysis.papersCache,
+        papersInfo: state.customAnalysis.papersInfo
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        addPaperInfo: bindActionCreators(addPaperInfoAction, dispatch),
+        subtractPaperInfo: bindActionCreators(subtractPaperInfoAction, dispatch)
+    }
+}
