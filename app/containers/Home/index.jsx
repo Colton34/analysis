@@ -55,7 +55,7 @@ const CommonQuestions = () => {
                     questionList.map((q, index) => {
                         return (
                             <li key={index} style={{ fontSize: 12 }}>
-                                <a href='javascript: void(0)' style={{ textDecoration: 'none', color: '#333' }}>{q}</a>
+                                <Link to={{pathname: '/faq'}} style={{ textDecoration: 'none', color: '#333' }}>{q}</Link>
                             </li>
                         )
                     })
