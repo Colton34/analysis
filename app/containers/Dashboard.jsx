@@ -85,8 +85,10 @@ class Dashboard extends React.Component {
 
         return (
             <div>
-                <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: '35px auto 20px auto', paddingLeft: 20,fontSize: 16}}>
-                    遵义清华中学2016年1月月考
+                <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: '35px auto 20px auto', paddingLeft: 20,fontSize: 16 , color: '#333'}}>
+                    <a href='/' style={styles.dashboardTitleName}>
+                        {String.fromCharCode(60)} 遵义清华中学2016年1月月考
+                    </a>
                 </div>
                 <div style={[styles.box, styles.common.radius]}>
                     <div style={[styles.container, styles.common.radius]}>
@@ -95,6 +97,7 @@ class Dashboard extends React.Component {
                         <div key="test"   style={{cursor: 'pointer'}}className={dashboardStyle['card']} onClick={this.toViewSchoolAnalysis.bind(this) }>
                             <div className={dashboardStyle['card-title']}>学校成绩总报告</div>
                             <div className={dashboardStyle['analysis-report'] + ' ' + dashboardStyle['card-image']}></div>
+                            <div className={dashboardStyle['detail-btn']}>查看详情</div>
                         </div>
                     </div>
                     <div style={[styles.container, styles.common.radius]}>
@@ -170,9 +173,11 @@ var styles = {
         ':hover': {
             backgroundColor: 'black'
         }
-        // transitionProperty: '',
-        // transitionDuration: '',
-        // transitionTimingFunction: ''
+    },
+    dashboardTitleName: {
+        textDecoration: 'none',
+        color: '#333',
+        ':hover': {textDecoration: 'none', color: '#333'}
     }
 }
 
