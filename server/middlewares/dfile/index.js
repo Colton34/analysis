@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-02 15:01:22
+* @Last Modified time: 2016-06-02 15:15:16
 */
 
 'use strict';
@@ -20,6 +20,11 @@ exports.downloadFile = function(req, res, next) {
     req.checkBody('url', '无效的url').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
 
+    //先检测tempFileDir是否存在如果不存在则自动创建--节省时间，默认手动创建此文件夹
+    // fs.access(tempFileDir, fs.F_OK, function(err) {
+    //     if(err) fs.mkdirSync(tempFileDir);
+
+    // });
     var tmpobj = tmp.fileSync({ postfix: '.pdf', dir: tempFileDir });
 
     var childArgs = [
