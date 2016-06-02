@@ -11,7 +11,7 @@ var peterMgr = require('../../lib/peter').Manager;
 var errors = require('common-errors');
 
 exports.fetchPaper = function (req, res, next) {
-    req.checkQuery('paperId', '无效的paperId').notEmpty();
+    req.checkParams('paperId', '无效的paperId').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
     //从数据库中找到此paper，然后返回
     peterMgr.get(req.params.paperId, function(err, paper) {

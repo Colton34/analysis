@@ -118,7 +118,7 @@ var paperPath = '/papers';
 
 
 export function fetchPaper(params) {
-    var url = paperPath + params.pid;
+    var url = paperPath + '/' + params.pid;
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     });
