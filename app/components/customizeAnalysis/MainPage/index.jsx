@@ -23,7 +23,7 @@ class MainPage extends React.Component {
     onFenxiNameInputBlur(event) {
         var value = event.target.value;
         if (value === this.props.analysisName) return ;
-        this.props.getAnalysisName(event.target.value);
+        this.props.setAnalysisName(event.target.value);
     }
     onEditSubject(subjectName) {
         
@@ -37,10 +37,9 @@ class MainPage extends React.Component {
         alert('敬请期待!');
     }
     render() {
-        var { resultSet,getAnalysisName, analysisName} = this.props;
+        var { resultSet, analysisName} = this.props;
         
         var subjectList = Object.keys(resultSet);
-        //var _this = this;
         return (
             <div>
                 <div style={{ padding: '20px 30px' }}>

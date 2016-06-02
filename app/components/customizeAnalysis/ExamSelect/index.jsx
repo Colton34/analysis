@@ -14,8 +14,16 @@ import DatePicker from 'react-datepicker';
 import Radium from 'radium';
 import _ from 'lodash';
 import moment from 'moment';
+import {Map} from 'immutable';
 
-import {addPaperInfoAction, subtractPaperInfoAction} from '../../../reducers/schoolAnalysis/actions';
+import {
+    addPaperInfoAction,
+    subtractPaperInfoAction,
+    checkAllQuestionAction,
+    checkOneQuestionAction,
+    setPaperSqmAction,
+    setMergedSqmAction
+} from '../../../reducers/customAnalysis/actions';
 import PageFooter from '../Footer';
 import {ExamOrigin} from '../../../lib/constants.js';
 import matrixBase from '../../../lib/matrixBase.js';
@@ -70,6 +78,7 @@ var MERGE_TYPE = {
 
 }
 
+
 /**
  * props:
  * isLiankao: 是否联考
@@ -81,176 +90,51 @@ var MERGE_TYPE = {
 class ExamSelect extends React.Component {
     constructor(props) {
         super(props);
+        //var {currentSubject} = this.props;
+
         this.state = {
-            currentPapers: this.props.currentSubject.src ? this.props.currentSubject.src : {},// {paperId: {}}的结构
+            //currentPapers: currentSubject.src ? currentSubject.src : {},  
             showDialog: false,
-            startDate: moment().month(-1),
+            startDate: moment().month(moment().month() - 12),  //默认显示一年内的考试
             endDate: moment(),
-            examList: examList
+            examList: this.props.examList
         }
     }
-    onNextPage() {
-        this.cacheCurrentSQM();
-        this.chooseMergeMethod();
-
-        //在doMerge方法中调用this.props.onNextPage()
+    componentDidMount() {
+        this.getExamList();
     }
-
-    // 选中某个考试科目时载入该科目的数据；
-    onSelectExam(event) {
-        var checked = event.target.checked;
-        var paperId = event.target.value;
-        var {currentPapers} = this.state;
-
-        if (checked) {
-            //获取考试数据填入currentPapers
-            var $target = $(event.target);
-            var $parent = $target.parents('.exam-item');
-            var examName = $parent.find('.exam-name').text();
-            var paperFrom = $parent.find('.paper-from').text() === '自定义' ? PAPER_FROM.upload : PAPER_FROM.system;
-            var paperName = $target.data('subject');
-            currentPapers[paperId] = {
-                from: paperFrom,
-                paperId: paperId,
-                oriSQM: paperInfos[paperId],
-                examName: examName,
-                paperName: paperName
-            }
-            this.setState({
-                currentPapers: currentPapers
-            }, () => {
-                console.log("================ state:" + JSON.stringify(this.state))
-            })
-        } else {
-            delete currentPapers[paperId];
-            this.setState({
-                currentPapers: currentPapers
-            })
-        }
-    }
-
-//TODO: 。。。
-    onSelectPaper(event) {
-        //对一个paper的checkbox交互，判断是增加还是减少，执行相应的action，从而执行相应的更新操作
-        var checked = event.target.checked;
-        var paperId = event.target.value;
-
-        if(checked) {
-            this.props.addPaperInfo(this.props.papersCache, paperId);
-        } else {
-            this.props.subtractPaperInfo(paperId);
-        }
-    }
-
-    onCheckAllQuestions(ref, event) {
-        var checked = event.target.checked;
-        this.refs[ref].checked = checked;
-        var paperId = event.target.value;
-        if (checked) {
-            var {currentPapers} = this.state;
-            _.forEach(currentPapers[paperId].oriSQM.x, (questionInfo) => {
-                questionInfo.selected = true;
-            })
-            this.setState({
-                currentPapers: currentPapers
-            })
-        } else {
-            var {currentPapers} = this.state;
-            _.forEach(currentPapers[paperId].oriSQM.x, (questionInfo) => {
-                questionInfo.selected = false;
-            })
-            this.setState({
-                currentPapers: currentPapers
-            })
-        }
-
-        // var elements = $('#qlist-' + event.target.value).find('input[type="checkbox"]');
-        // elements.prop('checked', checked);
-
-    }
-
-    onCheckQuestion(ref, event) {
-        // 获得当前题目的基本信息： 属于哪个paper， 它的题号是多少；
-        // 根据paperId， 找到currenPapers中的paper，然后根据题号找到当前题号;
-        // 修改题号的选中信息， 然后修改整体的state；
-
-        var questionInfo = event.target.value;
-        var paperId = questionInfo.split('-')[0];
-        var questionName = questionInfo.split('-')[1];
-        var {currentPapers} = this.state;
-        var checked = event.target.checked;
-        //this.refs[ref].checked = checked;
-        var len = currentPapers[paperId].oriSQM.x.length;
-        for (var i = 0; i < len; i++) {
-            var target = currentPapers[paperId].oriSQM.x[i];
-            if (target.name === questionName) {
-                target.selected = checked;
-                break;
-            }
-        }
-
-        this.setState({
-            currentPapers: currentPapers
-        })
-
-        // var $elems = $('#qlist-' + examId).find('input[type="checkbox"]');
-        // var isAll = true;
-        // _.forEach($elems, ($ele) => {
-        //     isAll &= $ele.checked;
-        // })
-        // $('#checker-question-all-' + examId).prop('checked', isAll);
-    }
-    /**
-     * 把当前paper选中的题目保存到src对应的paper的SQM中去, 如果没有选中, 则把src对应的paper清空掉
+     /**
+     * 计算每个paper的SQM，准备合并
     */
-    cacheCurrentSQM() {
-
-        var grades = [];
-        var {currentPapers} = this.state;
+    onNextPage() {
+       var currentPapers = this.props.currentSubject.src;
+        var sqmMap = {};
         for (var paperId in currentPapers) {
             var currentPaper = currentPapers[paperId];
             var {examName, paperName} = currentPaper;
-
             var questions = [];
             _.forEach(currentPaper.oriSQM.x, questionInfo => {
                 if (questionInfo.selected)
                     questions.push(questionInfo.name);
             })
-            currentPaper.SQM = matrixBase.getByNames(currentPaper.oriSQM, 'col', 'name', questions);
-            if (currentPaper.SQM) {
-                _.forEach(currentPaper.SQM.x, questionInfo => {
+            //currentPaper.SQM = matrixBase.getByNames(currentPaper.oriSQM, 'col', 'name', questions);
+            var SQM = matrixBase.getByNames(currentPaper.oriSQM, 'col', 'name', questions);
+            if (SQM) {
+                _.forEach(SQM.x, questionInfo => {
                     questionInfo.exam = examName;
                     questionInfo.paper = paperName;
                 })
-            } else {
-                delete currentPapers[paperId];
+                //sqmList.push({ sqm: SQM, pid: paperId });
+                sqmMap[paperId] = SQM;
             }
         }
-        this.setState({
-            currentPapers: currentPapers
-        })
-
-    }
-    /**
-     * 根据题目勾选情况, 选择题目合并方式
-     * @param grades
-     */
-    chooseMergeMethod() {
-
-        var
-            html, buttons, manfen, SQM,
-            _this = this,
+        //this.props.setPaperSqm(sqmList)
+        var manfen,
             hasZipAsOne = true,
             tmpManfen = -999999,
             legalSQMs = [];
-
-        //判断是否可以合并成一题, 条件是所有勾选的试卷满分相同, 否则不能合并为一题
-        var {currentPapers} = this.state;
-
-        for (var paperId in currentPapers) {
-
-            SQM = currentPapers[paperId].SQM;
-
+        _.each(sqmMap, (sqm, paperId) => {
+            var SQM = sqm;
             if (SQM && SQM.x) {
 
                 legalSQMs.push(SQM);
@@ -266,58 +150,74 @@ class ExamSelect extends React.Component {
                     hasZipAsOne &= false;
                 }
             }
-        }
-        // var bootboxHtml = "<div>" +
-        //                     "<span class=\"am-content-tips\">说明：题目合并是因为，您选择了多个学科，学科下的题目可能不一样，现在提供以下3种方式供您选择</span> </div>"
+        })
         if (legalSQMs.length === 0) {
             alert('请先选择考试题目');
         } else if (legalSQMs.length === 1) {
-            //this.ensureSelectQuestionHandler(MERGE_TYPE.same, legalSQMs);
-            this.doMerge(MERGE_TYPE.same, legalSQMs);
+            this.setState({
+                sqmMap: sqmMap
+            }, ()=>{
+                this.doMerge(MERGE_TYPE.same, legalSQMs);
+            })
         } else {
-
-            // buttons = {
-            //     method1: {
-            //         label: "题目合并",
-            //         className: "fx-btn fx-btn-primary",
-            //         callback: function () {
-            //             this.ensureSelectQuestionHandler(MERGE_TYPE.merge, legalSQMs);
-            //         }
-            //     },
-            //     method2: {
-            //         label: "题目累加",
-            //         className: "fx-btn fx-btn-primary",
-            //         callback: function () {
-            //             this.ensureSelectQuestionHandler(MERGE_TYPE.accumulate, legalSQMs);
-            //         }
-            //     }
-            // };
-
-            // if (hasButton3) {
-            //     buttons.method3 = {
-            //         label: "将题目合并成一道题",
-            //         className: "fx-btn fx-btn-primary",
-            //         callback: function () {
-            //             this.ensureSelectQuestionHandler(MERGE_TYPE.zipAsOne, legalSQMs);
-            //         }
-            //     }
-            // }
-
             this.setState({
                 showDialog: true,
                 hasZipAsOne: hasZipAsOne,
-                legalSQMs: legalSQMs
+                legalSQMs: legalSQMs,
+                sqmMap: sqmMap
             }, () => {
                 console.log('============== after set showDialog:' + this.state.showDialog);
             })
-            // bootbox.dialog({
-            //     title: "选择合并题目的方式",
-            //     message: bootboxHtml,
-            //     size: 'large',
-            //     buttons: buttons
-            // });
+        }
+        //在doMerge方法中调用this.props.onNextPage()
+    }
+
+    // 选中某个考试科目时载入该科目的数据；
+    onSelectPaper(event) {
+        //对一个paper的checkbox交互，判断是增加还是减少，执行相应的action，从而执行相应的更新操作
+        var checked = event.target.checked;
+        var paperId = event.target.value;
+
+        if (checked) {
+            var $target = $(event.target);
+            var $parent = $target.parents('.exam-item');
+            var examName = $parent.find('.exam-name').text();
+            var paperFrom = $parent.find('.paper-from').text() === '自定义' ? PAPER_FROM.upload : PAPER_FROM.system;
+            var paperName = $target.data('subject');
+
+            var paperInfo = {
+                from: paperFrom,
+                paperId: paperId,
+                examName: examName,
+                paperName: paperName
+            }
+            var {papersCache} = this.props;
+            papersCache = Map.isMap(papersCache) ? papersCache.toJS() : papersCache;
+            this.props.addPaperInfo(papersCache, paperInfo);
+        } else {
+            this.props.subtractPaperInfo(paperId);
         }
     }
+
+    onCheckAllQuestions(ref, event) {
+        var checked = event.target.checked;
+        this.refs[ref].checked = checked;
+        var paperId = event.target.value;
+        this.props.checkAllQuestion(paperId, checked);
+    }
+
+    onCheckQuestion(ref, event) {
+        // 获得当前题目的基本信息： 属于哪个paper， 它的题号是多少；
+        // 根据paperId， 找到currenPapers中的paper，然后根据题号找到当前题号;
+        // 修改题号的选中信息， 然后修改整体的state；
+
+        var questionInfo = event.target.value;
+        var paperId = questionInfo.split('-')[0];
+        var questionName = questionInfo.split('-')[1];
+        var checked = event.target.checked;
+        this.props.checkOneQuestion(paperId, questionName, checked);
+    }
+   
     doMerge(mergeType, SQMs) {
         console.log('merge matrix');
         // todo: 合并题目
@@ -361,9 +261,9 @@ class ExamSelect extends React.Component {
         _.each(finSQM.x, function (item) {
             item.default = "第" + (count++) + "题";
         });
-        console.log('========== merge result: ' + JSON.stringify(finSQM));
-        // 保存currentPapers、合并结果到上层的状态中
-        this.props.saveExamInfos(this.state.currentPapers, finSQM);
+        //console.log('========== merge result: ' + JSON.stringify(finSQM));
+        // 保存finSQM & 每个paper的SQM
+        this.props.setMergedSqm(finSQM, this.state.sqmMap);
         // 跳转到下一页
         this.props.onNextPage();
     }
@@ -374,7 +274,7 @@ class ExamSelect extends React.Component {
         var self = this;
         this.setState({
             startDate: date
-        },()=>{
+        }, () => {
             self.getExamList();
         })
     }
@@ -382,14 +282,14 @@ class ExamSelect extends React.Component {
         var self = this;
         this.setState({
             endDate: date
-        },() => {
+        }, () => {
             self.getExamList();
         })
     }
     getExamList() {
         var {startDate, endDate} = this.state;
-        var newList = _.filter(examList, exam => {
-            return moment(exam.event_time) >= startDate && moment(exam.event_time)  <= endDate
+        var newList = _.filter(this.props.examList, exam => {
+            return moment(exam.time) >= startDate && moment(exam.time) <= endDate
         })
         this.setState({
             examList: newList
@@ -397,53 +297,50 @@ class ExamSelect extends React.Component {
     }
     render() {
         //var selectedExams = Object.keys(this.state.selectedExamInfos);
+        var {currentSubject} = this.props;
+        var currentPapers = Map.isMap(currentSubject) ? currentSubject.toJS().src : currentSubject.src;
+        var {examList} = this.state;
 
-//TODO: examList从外部props传入
-        var {examList} = this.props;
-
-
-
-        var {currentPapers, examList} = this.state;
         var paperIds = Object.keys(currentPapers);
-
         return (
             <div>
                 <div className={ownClassNames['container']}>
                     <div className={'col-md-5'}>
-                        <div style={{marginBottom: 30}}>
+                        <div style={{ marginBottom: 30 }}>
                             <DatePicker
                                 selected={this.state.startDate}
                                 startDate={this.state.startDate}
                                 endDate={this.state.endDate}
-                                onChange={this.handleChangeStart.bind(this)} />
+                                onChange={this.handleChangeStart.bind(this) } />
                             <DatePicker
                                 selected={this.state.endDate}
                                 startDate={this.state.startDate}
                                 endDate={this.state.endDate}
-                                onChange={this.handleChangeEnd.bind(this)} />
+                                onChange={this.handleChangeEnd.bind(this) } />
                         </div>
 
                         <div id='examList'>
                             {
                                 examList.map((exam, index) => {
-                                    var date = new Date(exam.event_time);
+                                    var date = new Date(exam.time);
+
                                     var fromYuejuan = (exam['from'] === ExamOrigin.YUEJUAN ? true : false);
                                     return (
                                         <div className='exam-item' key={'exam-' + index}>
-                                            <p id={exam.id} className='exam-name' style={{ marginBottom: 4 }}>{exam.name}</p>
+                                            <p id={exam.id} className='exam-name' style={{ marginBottom: 4 }}>{exam.examName}</p>
                                             <ul className={ownClassNames['exam-summary']}>
-                                                <li className={ownClassNames['exam-info-li']}>{date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + (date.getDate()) }</li>
+                                                <li className={ownClassNames['exam-info-li']}>{date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + (date.getDate() + 1) }</li>
                                                 <li className={ownClassNames['exam-info-li']}>{exam.grade}</li>
                                                 <li className={ownClassNames['exam-info-li'] + ' ' + 'paper-from'}>来自<span style={fromYuejuan ? {} : { color: '#f9d061' }}>{fromYuejuan ? '阅卷' : '自定义'}</span></li>
                                             </ul>
                                             <ul className={ownClassNames['subjects']}>
                                                 {
-                                                    exam['[papers]'].map((paper, index) => {
+                                                    exam['papers'].map((paper, index) => {
                                                         return (
                                                             <li key={'subject-' + index} className={ownClassNames['subject-li']}>
                                                                 <div className={ownClassNames['checkbox']}>
                                                                     <input id={'checkbox-subject-' + index} type='checkbox' value={paper.id} data-subject={paper.subject}
-                                                                        onChange={this.onSelectExam.bind(this) }checked={paperIds.indexOf(paper.id) !== -1 ? true : false}/>
+                                                                        onChange={this.onSelectPaper.bind(this) }checked={paperIds.indexOf(paper.id) !== -1 ? true : false}/>
                                                                     <label for={'checkbox-subject-' + index}/>
                                                                     <span>{paper.subject}</span>
                                                                 </div>
@@ -615,7 +512,7 @@ let localStyle = {
 /**
  * examList从外层给。因为在内层不曾改变examList。而且这样只要不出这个custrom view的路由，那么这个数据结构就能一直用
  */
-export default ExamSelect;
+export default connect(mapStateToProps, mapDispatchToProps)(ExamSelect);
 
 //从外部的props中获取 examList和papersCache
 function mapStateToProps(state) {
@@ -628,6 +525,10 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         addPaperInfo: bindActionCreators(addPaperInfoAction, dispatch),
-        subtractPaperInfo: bindActionCreators(subtractPaperInfoAction, dispatch)
+        subtractPaperInfo: bindActionCreators(subtractPaperInfoAction, dispatch),
+        checkAllQuestion: bindActionCreators(checkAllQuestionAction, dispatch),
+        checkOneQuestion: bindActionCreators(checkOneQuestionAction, dispatch),
+        setPaperSqm: bindActionCreators(setPaperSqmAction, dispatch),
+        setMergedSqm: bindActionCreators(setMergedSqmAction, dispatch)
     }
 }
