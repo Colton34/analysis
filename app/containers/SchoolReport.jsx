@@ -15,7 +15,6 @@ import {Map, List} from 'immutable';
 //设计：这里是所有view container的page view。
 //尽量是木偶组件
 
-
 import Header from '../components/schoolReport/Header';
 import FullScoreTrend from '../components/schoolReport/FullScoreTrend';
 import ScoreDistribution from '../components/schoolReport/ScoreDistribution';
@@ -29,9 +28,6 @@ import {initSchoolAnalysisAction, changeLevelAction} from '../reducers/schoolAna
 import {initParams, convertJS} from '../lib/util';
 import {SUBJECTS_WEIGHT as subjectWeight} from '../lib/constants';
 
-
-// import { Button } from 'react-bootstrap';
-
 class SchoolReport extends React.Component {
     static need = [
         initSchoolAnalysisAction
@@ -43,8 +39,6 @@ class SchoolReport extends React.Component {
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initSchoolAnalysis(params);
     }
-
-
 
     render() {
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, headers, levels} = this.props;
@@ -58,27 +52,14 @@ class SchoolReport extends React.Component {
         headers = (List.isList(headers)) ? headers.toJS() : headers;
         levels = (Map.isMap(levels)) ? levels.toJS() : levels;
 
-// console.log('SchoolReport 重绘');
-// debugger;
-
-
         if((!examInfo || _.size(examInfo) == 0) || (!examStudentsInfo || examStudentsInfo.length == 0) ||
             (!examPapersInfo || _.size(examPapersInfo) == 0) || (!examClassesInfo || _.size(examClassesInfo) == 0) ||
             (!studentsGroupByClass || _.size(studentsGroupByClass) == 0) || (!allStudentsPaperMap || _.size(allStudentsPaperMap) == 0) ||
              (!headers || _.size(headers) == 0) || (!levels || _.size(levels) == 0)) return (<div></div>) //显示 loading
 
-// debugger;
-
-/*
-<Button onClick={this.downloadFile.bind(this)} bsStyle="primary">Primary</Button>
- */
-
         return (
             <div style={{ width: 1000, margin: '0 auto', marginTop: 20, backgroundColor: '#fff' }}>
                 <Header examInfo = {examInfo} params={this.props.params} location={this.props.location} />
-
-
-
                 <FullScoreTrend examInfo = {examInfo} examStudentsInfo = {examStudentsInfo} />
                 <ScoreDistribution
                 examInfo = {examInfo}
