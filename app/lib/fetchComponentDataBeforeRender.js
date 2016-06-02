@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 21:08:44
+* @Last Modified time: 2016-06-01 20:48:30
 */
 import _ from 'lodash';
 
@@ -14,8 +14,6 @@ var http_port = process.env.HTTP_PORT || config.port;
 
 var request = axios.create({
   baseURL: 'http://localhost:' + http_port + '/api/v1'
-  // timeout: 1000,
-  // headers: {'x-access-token': Cookies.get('authorization')}
 });
 
 export function fetchComponentDataBeforeRender(dispatch, components, params, location, req) {

@@ -2,9 +2,32 @@ import React from 'react';
 import styles from '../../common/common.css';
 import moment from 'moment';
 
-const Header = ({examInfo}) => {
-//自定义Module数据结构
-    var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
+import {initParams} from '../../lib/util';
+
+class Header extends React.Component {
+    constructor(props) {
+      super(props);
+
+    }
+
+        downloadFile() {
+        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        var url = this.props.location.pathname+this.props.location.search;
+debugger;
+
+        params.request.post('/file/download', {url: url}).then(function(res) {
+            console.log('===================  res.data = ', res.data);
+            saveAs("http://localhost:3000/api/v1/file/get?filename="+res.data, '我是MT.png');
+            //延时10秒后删除文件
+        }).catch(function(err) {
+            console.log('err = ', err);
+        })
+    }
+
+
+    render() {
+        var {examInfo} = this.props;
+        var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
 
     return (
         <div>
@@ -15,6 +38,7 @@ const Header = ({examInfo}) => {
                     <div style={{ textAlign: 'center' }}>学校总体分析诊断报告</div>
                 </div>
                 <a href='javascript: void(0)' className={styles.button}
+                    onClick={this.downloadFile.bind(this)}
                     style={{
                         width: 120, height: 30, borderRadius: '20px', backgroundColor: '#698fba', color: '#fff', lineHeight: '30px',
                         position: 'absolute', right: '30px', top: '50%', marginTop: '-15px'
@@ -43,5 +67,23 @@ const Header = ({examInfo}) => {
             </div>
         </div>
     )
+    }
 }
+
+
 export default Header;
+
+
+
+function saveAs(uri, filename) {
+  var link = document.createElement('a');
+  if (typeof link.download === 'string') {
+    document.body.appendChild(link); //Firefox requires the link to be in the body
+    link.download = filename;
+    link.href = uri;
+    link.click();
+    document.body.removeChild(link); //remove the link when done
+  } else {
+    location.replace(uri);
+  }
+}

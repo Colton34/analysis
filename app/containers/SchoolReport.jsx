@@ -29,6 +29,9 @@ import {initSchoolAnalysisAction, changeLevelAction} from '../reducers/schoolAna
 import {initParams, convertJS} from '../lib/util';
 import {SUBJECTS_WEIGHT as subjectWeight} from '../lib/constants';
 
+
+// import { Button } from 'react-bootstrap';
+
 class SchoolReport extends React.Component {
     static need = [
         initSchoolAnalysisAction
@@ -40,6 +43,8 @@ class SchoolReport extends React.Component {
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initSchoolAnalysis(params);
     }
+
+
 
     render() {
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, headers, levels} = this.props;
@@ -64,9 +69,16 @@ class SchoolReport extends React.Component {
 
 // debugger;
 
+/*
+<Button onClick={this.downloadFile.bind(this)} bsStyle="primary">Primary</Button>
+ */
+
         return (
             <div style={{ width: 1000, margin: '0 auto', marginTop: 20, backgroundColor: '#fff' }}>
-                <Header examInfo = {examInfo}/>
+                <Header examInfo = {examInfo} params={this.props.params} location={this.props.location} />
+
+
+
                 <FullScoreTrend examInfo = {examInfo} examStudentsInfo = {examStudentsInfo} />
                 <ScoreDistribution
                 examInfo = {examInfo}
@@ -134,7 +146,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SchoolReport);
-
 
 /*
 Mock Data:
