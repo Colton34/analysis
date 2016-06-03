@@ -83,3 +83,28 @@ export const ExamOrigin = {
     ZIDINGYI: 1
 }
 
+//=============== CustomAnalysis =============================
+export const ADD_PAPER_INFO = 'ADD_PAPER_INFO';
+export const ADD_PAPER_INFO_SUCCESS = 'ADD_PAPER_INFO_SUCCESS';
+
+export const SUBTRACT_PAPER_INFO = 'SUBTRACT_PAPER_INFO';
+
+export const CHECK_ALL_QUESTION = 'CHECK_ALL_QUESTION';
+export const CHECK_ONE_QUESTION = 'CHECK_ONE_QUESTION'; 
+
+export const SET_PAPER_SQM = 'SET_PAPER_SQM';
+export const SET_MERGED_SQM = 'SET_MERGED_SQM';
+export const CHANGE_QUESTION_NAME = 'CHANGE_QUESTION_NAME';
+export const SET_GROUP_MAP = 'SET_GROUP_MAP';
+
+export const SET_PAGE_INDEX = 'SET_PAGE_INDEX';
+export const NEXT_PAGE = 'NEXT_PAGE';
+export const PREV_PAGE = 'PREV_PAGE';
+
+export const SAVE_CURRENT_SUBJECT = 'SAVE_CURRENT_SUBJECT';
+export const SET_ANALYSIS_NAME = 'SET_ANALYSIS_NAME';
+export const SET_CREATE_STATUS = 'SET_CREATE_STATUS';
+export const EDIT_SUBJECT = 'EDIT_SUBJECT'; 
+export const DELE_SUBJECT = 'DELE_SUBJECT'; 
+export const CHANGE_CURRENT_SUBJECT_NAME = 'CHANGE_CURRENT_SUBJECT_NAME';
+export const DISCARD_CURRENT_SUBJECT = 'DISCARD_CURRENT_SUBJECT';

@@ -25,7 +25,7 @@ import GroupAnalysis from '../components/schoolReport/GroupAnalysis';
 import StudentPerformance from '../components/schoolReport/StudentPerformance/StudentPerformance';;
 
 import {initSchoolAnalysisAction, changeLevelAction} from '../reducers/schoolAnalysis/actions';
-import {initParams, convertJS} from '../lib/util';
+import {initParams} from '../lib/util';
 import {SUBJECTS_WEIGHT as subjectWeight} from '../lib/constants';
 
 class SchoolReport extends React.Component {
@@ -36,6 +36,7 @@ class SchoolReport extends React.Component {
     componentDidMount() {
         if (this.props.haveInit) return;
 
+//TODO: 将initParams的参数调换一下位置--request是肯定要有的，所以应该放在前面，不叫做other而是request
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initSchoolAnalysis(params);
     }

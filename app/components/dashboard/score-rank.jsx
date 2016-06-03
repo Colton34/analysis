@@ -16,10 +16,9 @@ import dashboardStyle from './dashboard.css';
  */
 
 const ScoreRank = ({data}) => {
-    var flagFirstColor = {backgroundColor: '#FF0033'};
-    var flagSecondColor = {backgroundColor: '#FF9900'};
-    var flagThirdColor = {backgroundColor: '#99CC00'};
-
+    var flagFirstColor =  {color: '#FF0033'};
+    var flagSecondColor = {color: '#54ba54'};
+    var flagThirdColor =  {color: '#ce9dff'};
     var tops = _.map(data.top, function(obj, index) {
         var flagColor = {};
         if(index === 0) {flagColor.first = true};
@@ -29,8 +28,9 @@ const ScoreRank = ({data}) => {
         var result = ((flagColor.first && flagFirstColor) || (flagColor.second && flagSecondColor) || (flagColor.third && flagThirdColor));
 
         return (
-            <div key={index} style={[styles.container, result, styles.common.radius, {marginBottom: 2}]}>
+            <div key={index} style={[styles.container, result, styles.common.radius, {marginBottom: 8}]}>
                 <div>{obj.name}</div>
+                <div>{obj.class}班</div>
                 <div>{obj.score}分</div>
             </div>
         )
@@ -47,14 +47,10 @@ const ScoreRank = ({data}) => {
     return (
         <div className={dashboardStyle.card}>
             <div className={dashboardStyle['card-title']}>分数排行榜</div>
-            <div style={{flexGrow: 1, display: 'flex', marginTop: 30}}>
-                <div style={[styles.box,{borderRight: 'solid 2px #cac9ca', marginLeft: 5}]}>
+            <div style={{flexGrow: 1, display: 'flex', marginTop: 20}}>
+                <div style={[styles.box,{marginLeft: 5}]}>
                     <p style={{textAlign: 'center', marginBottom: 20}}>最高分排行榜top6</p>
                     {tops}
-                </div>
-                <div style={[styles.box, styles.common.radius, {marginRight: 5}]}>
-                    <p style={{textAlign: 'center', marginBottom: 20}}>最低分排行榜top6</p>
-                    {lows}
                 </div>
             </div>
             <div className={dashboardStyle['detail-btn']}>

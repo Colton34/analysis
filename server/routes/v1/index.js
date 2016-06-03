@@ -13,6 +13,7 @@ var rootRouter = express.Router();
 rootRouter.use('/auth', require('./auth'));
 rootRouter.use('/user', require('./user'));
 rootRouter.use('/exam', require('./exam'));
+rootRouter.use('/papers', require('./paper'));
 rootRouter.use('/file', require('./file'));
 
 module.exports = function(app) {

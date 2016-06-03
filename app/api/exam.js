@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-30 11:49:24
+* @Last Modified time: 2016-05-31 14:15:10
 */
 
 
@@ -114,6 +114,16 @@ import {
 
 var examPath = "/exam";
 
+var paperPath = '/papers';
+
+
+export function fetchPaper(params) {
+    var url = paperPath + '/' + params.pid;
+    return params.request.get(url).then(function(res) {
+        return Promise.resolve(res.data);
+    });
+}
+
 //********************************************************* Home *********************************************************
 /**
  * 从服务端获取格式化好的视图数据
@@ -177,6 +187,9 @@ function formatExams(exams) {
                 obj.time = moment(value.exam['event_time']).valueOf();
                 obj.eventTime = moment(value.exam['event_time']).format('ll');
                 obj.subjectCount = papers.length;
+                obj.papers = _.map(papers, (obj) => {
+                    return {id: obj.paper, subject: obj.subject}
+                });
                 obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
                 obj.from = value.exam.from; //TODO: 这里数据库里只是存储的是数字，但是显示需要的是文字，所以需要有一个map转换
 
@@ -1401,3 +1414,7 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
 // }
 
  */
+
+
+ //********************************************************* CustomAnalysis *********************************************************
+

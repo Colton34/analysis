@@ -1,9 +1,11 @@
 import React from 'react';
 import styles from '../../common/common.css';
 import moment from 'moment';
-
+import {Link} from 'react-router'
 import {initParams} from '../../lib/util';
+import Radium from 'radium';
 
+@Radium
 class Header extends React.Component {
     constructor(props) {
       super(props);
@@ -30,11 +32,12 @@ class Header extends React.Component {
     render() {
         var {examInfo} = this.props;
         var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
-
+        var {examid, grade} = this.props.location.query;
+        
         return (
             <div>
-                <div style={{ height: 110, padding: '40px 0 20px 0', backgroundColor: '#fcfcfc', position: 'relative' }}>
-                    <span style={{ float: 'left' }}>{String.fromCharCode(60) } 返回</span>
+                <div style={{ height: 110, padding: '40px 0 20px 20px', backgroundColor: '#fcfcfc', position: 'relative' }}>
+                    <a href={'/dashboard?' + 'examid=' + examid + '&grade=' + encodeURI(grade)} style={[localStyle.goBackLink,{ float: 'left'}]}>{String.fromCharCode(60) } 返回</a>
                     <div style={{ margin: "0 auto", fontSize: 20, width: 600 }}>
                         <div style={{ textAlign: 'center' }}>{examInfo.name}</div>
                         <div style={{ textAlign: 'center' }}>学校总体分析诊断报告</div>
@@ -45,7 +48,7 @@ class Header extends React.Component {
                             width: 120, height: 30, borderRadius: '20px', backgroundColor: '#698fba', color: '#fff', lineHeight: '30px',
                             position: 'absolute', right: '30px', top: '50%', marginTop: '-15px'
                         }}>
-                        下载模板
+                        下载报告
                     </a>
                 </div>
                 <div className={styles['school-report-content']}>
@@ -72,7 +75,12 @@ class Header extends React.Component {
     }
 }
 
-
+var localStyle={
+    goBackLink: {
+        color: '#333',
+        ':hover': {textDecoration: 'none', color: '#333'}
+    }
+}
 export default Header;
 
 function saveAs(uri, filename) {

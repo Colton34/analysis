@@ -1,5 +1,8 @@
 import React from 'react';
 import _ from 'lodash';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import {Map,List} from 'immutable';
 
 import MainPage from '../../components/customizeAnalysis/MainPage';
 import SubjectInput from '../../components/customizeAnalysis/SubjectInput';
@@ -9,6 +12,13 @@ import StudentConfirm from '../../components/customizeAnalysis/StudentConfirm';
 import Header from '../../components/customizeAnalysis/Header';
 import Footer from '../../components/customizeAnalysis/Footer';
 
+import {initHomeAction} from '../../reducers/home/actions';
+import {changeQuesitonNameAction, setGroupMapAction, setPageIndexAction,
+        saveCurrentSubjectAction, setAnalysisNameAction, setCreateStatusAction,
+        editSubjectAction, delSubjectAction, changeCurrentSubjectNameAction,
+        discardCurrentSubjectAction} from '../../reducers/customAnalysis/actions';
+import {initParams} from '../../lib/util';
+import {NEXT_PAGE,PREV_PAGE} from '../../lib/constants'
 /**
  * {
  *  timeRange : {startDate : '', endDate : ''},
@@ -30,179 +40,110 @@ import Footer from '../../components/customizeAnalysis/Footer';
 class CustomizeAnalysis extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            pageIndex: 0,        //当前页面索引0,1,2,3,4
-            status: '',          //页面状态'create' or ''
-            currentSubject: { src: {}, groupMap: {}, name: '' },       //当前正在操作的科目所有信息,包括名称,来源,合并方式,以及最终结果, 称为subjectTrace
-            resultSet: {
-            },       //已经编辑完成的科目,内部是 subjectName : subjectTrace
-            analysisName: ''
-
+    }
+    componentDidMount(){
+        if(this.props.examList.length === 0) {
+            console.log('============ should init home');
+            var params = initParams(this.props.params, this.props.location, {'request': window.request});
+            this.props.initHome(params);
         }
     }
-    getAnalysisName(name) {
-        console.log('================== analysis name:' + name);
-        this.setState({
-            analysisName: name
-        }, () => {
-            console.log('================== state:' + JSON.stringify(this.state));
-        })
-
-
-    }
-    changeToCreateStatus() {
-        this.setState({
-            status: 'create'
-        }, () => {
-            console.log('================== state:' + JSON.stringify(this.state));
-        })
-    }
+    
+   
     changeCurrentSubjectName(name) {
         console.log('======== subject name: ' + name);
-        var newCurrentSubject = this.state.currentSubject;
-        newCurrentSubject.name = name;
-        this.setState({
-            currentSubject: newCurrentSubject
-        }, () => {
-            console.log('================== currentSubject:' + JSON.stringify(this.state.currentSubject));
-        })
+        this.props.changeCurrentSubjectName(name);   
+       
     }
-    onDiscardCurrent() {
-        console.log('in discard current function');
-        this.setState({
-            status: '',
-            currentSubject: {},
-            pageIndex: 0
-        }, () => {
-            console.log('================== state:' + JSON.stringify(this.state));
-        })
-    }
+   
     onBackHomePage() {
         location.href = '/';
     }
     onPrevPage() {
         console.log('in onPrevPage function');
-        var {pageIndex} = this.state;
+        var {pageIndex} = this.props;
         if (pageIndex === 0) return;
-        this.setState({
-            pageIndex: (pageIndex - 1)
-        }, () => {
-            console.log('================== state:' + JSON.stringify(this.state));
-        })
+        this.props.setPageIndex(PREV_PAGE);
     }
     onNextPage() {
         console.log('in onNextPage funciton');
-        var {pageIndex} = this.state;
+        var {pageIndex} = this.props;
         if (pageIndex === 3) {
-            var {resultSet, currentSubject} = this.state;
-            resultSet[currentSubject.name] = currentSubject;
-            this.setState({
-                pageIndex: 0,
-                status: '',
-                currentSubject: {},
-                resultSet: resultSet
-            }, () => {
-                console.log('================== state:' + JSON.stringify(this.state));
-            })
+            this.props.saveCurrentSubject();
         } else {
-            this.setState({
-                pageIndex: pageIndex + 1
-            }, () => {
-                console.log('================== state:' + JSON.stringify(this.state));
-            })
+            this.props.setPageIndex(NEXT_PAGE);
         }
     }
-    onEditSubject(subjectName) {
-        console.log('subjectName:' + subjectName);
-        var subjectObj = this.state.resultSet[subjectName];
-        this.setState({
-            currentSubject: subjectObj,
-            status: 'create',
-            pageIndex: 0
-        }, () => {
-            console.log('================== state:' + JSON.stringify(this.state));
-        })
-    }
-    onDelSubject(subjectName) {
-        console.log('on delete subject:' + subjectName);
-        if (!this.state.resultSet[subjectName]) return;
-        var {resultSet} = this.state;
-        delete resultSet[subjectName];
-        this.setState({
-            resultSet: resultSet
-        }, () => {
-            console.log('================== state:' + JSON.stringify(this.state));
-        })
-    }
-    saveExamInfos(currenPapers, mergedSQM) {
-        var {currentSubject} = this.state;
-        currentSubject.src = currenPapers;
-        currentSubject.SQM = mergedSQM;
-        this.setState({
-            currentSubject: currentSubject
-        }, () => {
-            console.log('================== state:' + JSON.stringify(this.state));
-        })
-    }
-    onChangeGroupMap(groupMap) {
-        var {currentSubject} = this.state;
-        currentSubject.groupMap = groupMap;
-        this.setState({
-            currentSubject: currentSubject
-        }, () => {
-            console.log('================== state:' + JSON.stringify(this.state));
-        })
-    }
-    onChangeQuestionName(oldName, newName) {
-        var {currentSubject} = this.state;
-        for (var i = 0; i < currentSubject.SQM.x.length; i++) {
-            if (currentSubject.SQM.x[i].name === oldName) {
-                currentSubject.SQM.x[i].name = newName;
-                break;
-            }
-        }
-        this.setState({
-            currentSubject: currentSubject
-        })
-
-    }
+    
     render() {
-        var {status, pageIndex} = this.state;
+        var {status, pageIndex} = this.props;
+        var examList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList;
+        var currentSubject = Map.isMap(this.props.currentSubject) ? this.props.currentSubject.toJS() : this.props.currentSubject;
+        var resultSet = Map.isMap(this.props.resultSet) ? this.props.resultSet.toJS() : this.props.resultSet;
+        var customExamList = [];
+        _.each(examList, (obj, index) => {
+            customExamList = _.concat(customExamList, obj.values);
+        });
         return (
             <div style={{ width: 1000, minHeight: 600, margin: '20px auto', background: '#fff', paddingBottom: 30 }}>
-                <Header pageIndex={this.state.pageIndex} status={this.state.status} onDiscardCurrent={this.onDiscardCurrent.bind(this) } onBackHomePage={this.onBackHomePage}/>
+                <Header 
+                    pageIndex={pageIndex}
+                    status={status}
+                    onDiscardCurrent={this.props.discardCurrentSubject}
+                    onBackHomePage={this.onBackHomePage} />
                 {
                     status !== 'create' &&
-                    <MainPage resultSet={this.state.resultSet} analysisName={this.state.analysisName} getAnalysisName={this.getAnalysisName.bind(this) }
-                        changeToCreateStatus={this.changeToCreateStatus.bind(this) } onEditSubject={this.onEditSubject.bind(this) } onDelSubject={this.onDelSubject.bind(this) }/>
+                    <MainPage 
+                        resultSet={resultSet} 
+                        analysisName={this.props.analysisName} 
+                        setAnalysisName={this.props.setAnalysisName}
+                        changeToCreateStatus={this.props.setCreateStatus} 
+                        onEditSubject={this.props.onEditSubject} 
+                        onDelSubject={this.props.onDelSubject} />
 
                 }
                 {
                     status === 'create' && pageIndex === 0 &&
-                    <SubjectInput onNextPage={this.onNextPage.bind(this) } subjectList={Object.keys(this.state.resultSet) }
-                        currentSubject={this.state.currentSubject} changeCurrentSubjectName={this.changeCurrentSubjectName.bind(this) } pageIndex={this.state.pageIndex}/>
+                    <SubjectInput 
+                        onNextPage={this.onNextPage.bind(this) }
+                        subjectList={Object.keys(resultSet)}
+                        currentSubject={currentSubject}
+                        changeCurrentSubjectName={this.changeCurrentSubjectName.bind(this)}
+                        pageIndex={pageIndex} />
 
                 }
                 {
 
                     status === 'create' && pageIndex === 1 &&
-                    <ExamSelect pageIndex={this.state.pageIndex} onPrevPage={this.onPrevPage.bind(this) }
-                        onNextPage={this.onNextPage.bind(this) } saveExamInfos={this.saveExamInfos.bind(this) } currentSubject= {this.state.currentSubject}/>
+                    <ExamSelect 
+                        examList={customExamList} 
+                        pageIndex={pageIndex}
+                        onPrevPage={this.onPrevPage.bind(this) }
+                        onNextPage={this.onNextPage.bind(this) }
+                        currentSubject={currentSubject}
+                        />
 
                 }
                 {
 
                     status === 'create' && pageIndex === 2 &&
-                    <QuestionConfirm pageIndex={this.state.pageIndex} onPrevPage={this.onPrevPage.bind(this) } onNextPage={this.onNextPage.bind(this) }
-                        mergedSQM={this.state.currentSubject.SQM} onChangeQuestionName={this.onChangeQuestionName.bind(this) }/>
+                    <QuestionConfirm 
+                        pageIndex={pageIndex} 
+                        onPrevPage={this.onPrevPage.bind(this) } 
+                        onNextPage={this.onNextPage.bind(this) }
+                        mergedSQM={currentSubject.SQM} 
+                        changeQuestionName={this.props.changeQuesitonName}/>
 
 
                 }
                 {
                     status === 'create' && pageIndex === 3 &&
-                    <StudentConfirm  pageIndex={this.state.pageIndex} onPrevPage={this.onPrevPage.bind(this) } onNextPage={this.onNextPage.bind(this) }
-                        onChangeGroupMap={this.onChangeGroupMap.bind(this) } currentSubject={this.state.currentSubject}/>
-
+                    <StudentConfirm  
+                        pageIndex={pageIndex}
+                        onPrevPage={this.onPrevPage.bind(this) }
+                        onNextPage={this.onNextPage.bind(this) }
+                        onChangeGroupMap={this.props.setGroupMap}
+                        currentSubject={currentSubject} />
                 }
 
 
@@ -213,4 +154,31 @@ class CustomizeAnalysis extends React.Component {
 
 
 
-export default CustomizeAnalysis;
+export default connect(mapStateToProps, mapDispatchToProps)(CustomizeAnalysis);
+
+function mapStateToProps(state) {
+    return {
+        examList: state.home.examList,
+        currentSubject: state.customAnalysis.currentSubject,
+        pageIndex: state.customAnalysis.pageIndex,
+        resultSet: state.customAnalysis.resultSet,
+        analysisName: state.customAnalysis.analysisName,
+        status: state.customAnalysis.status
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        initHome: bindActionCreators(initHomeAction, dispatch),
+        changeQuesitonName: bindActionCreators(changeQuesitonNameAction, dispatch),
+        setGroupMap: bindActionCreators(setGroupMapAction, dispatch),
+        setPageIndex: bindActionCreators(setPageIndexAction, dispatch),
+        saveCurrentSubject: bindActionCreators(saveCurrentSubjectAction, dispatch),
+        setAnalysisName: bindActionCreators(setAnalysisNameAction, dispatch),
+        setCreateStatus: bindActionCreators(setCreateStatusAction, dispatch),
+        onEditSubject: bindActionCreators(editSubjectAction, dispatch),
+        onDelSubject: bindActionCreators(delSubjectAction, dispatch),
+        changeCurrentSubjectName: bindActionCreators(changeCurrentSubjectNameAction, dispatch),
+        discardCurrentSubject: bindActionCreators(discardCurrentSubjectAction, dispatch) 
+    }
+}

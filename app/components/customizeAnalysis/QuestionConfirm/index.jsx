@@ -44,7 +44,7 @@ class QuestionConfirm extends React.Component {
         var $target = $(event.target); 
         var oldName = $target.data('name');
         if(newName === oldName) return;
-        this.props.onChangeQuestionName(oldName, newName);
+        this.props.changeQuestionName(oldName, newName);
     }
     render() {
         return (
@@ -62,7 +62,7 @@ class QuestionConfirm extends React.Component {
                         </thead>
                         <tbody>
                             {
-                                this.props.mergedSQM.x.map((question, index) => {
+                                !_.isEmpty(this.props.mergedSQM) && this.props.mergedSQM.x.map((question, index) => {
                                     return (
                                         <tr key={'question-' + index} className={ownClassNames['table-row']}>
                                             <td className={ownClassNames['table-item']}>{question.exam}</td>
