@@ -355,7 +355,6 @@ class ExamSelect extends React.Component {
                             }
                         </div>
                     </div>
-
                     <div className={'col-md-7'}>
                         <div style={{ marginBottom: 20 }}>
                             {
@@ -410,6 +409,7 @@ class ExamSelect extends React.Component {
                             }
                         </div>
                     </div>
+                    <div style={{clear:'both'}}></div>
                 </div>
                 <PageFooter pageIndex={this.props.pageIndex} onPrevPage={this.props.onPrevPage} onNextPage={this.onNextPage.bind(this) }/>
                 <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }
