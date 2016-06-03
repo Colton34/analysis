@@ -13,3 +13,5 @@ code*
 note*
 .vscode
 tempFiles/
+start-dev.sh
+start.sh
