@@ -12,11 +12,12 @@ class Header extends React.Component {
 
     downloadFile() {
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
-        var url = this.props.location.pathname+this.props.location.search;
+        // var baseURL = (window.client.hostname == 'localhost') ? 'http://' + window.client.hostname + ':' + window.http_port : 'http://' + window.client.hostname
+        var path = this.props.location.pathname+this.props.location.search;
 
-        params.request.post('/file/render', {url: url}).then(function(res) {
+        params.request.post('/file/render', {url: path}).then(function(res) {
             var targetFileName = res.data;
-            saveAs("http://localhost:3000/api/v1/file/download?filename="+targetFileName);
+            saveAs(window.request.defaults.baseURL+"/file/download?filename="+targetFileName);
             //TODO: 删除文件
             setTimeout(function() {
                 params.request.delete('/file/rm?filename='+targetFileName);
