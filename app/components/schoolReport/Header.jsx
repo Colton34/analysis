@@ -9,10 +9,17 @@ import Radium from 'radium';
 class Header extends React.Component {
     constructor(props) {
       super(props);
-
+      this.isDownloading = false;
     }
 
     downloadFile() {
+        var _this = this;
+        if(_this.isDownloading) {
+            console.log('文件正在下载中，请稍后再试，或者刷新当前页面重试');
+            return;
+        }
+        _this.isDownloading = true;
+
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         // var baseURL = (window.client.hostname == 'localhost') ? 'http://' + window.client.hostname + ':' + window.http_port : 'http://' + window.client.hostname
         var path = this.props.location.pathname+this.props.location.search;
@@ -23,8 +30,10 @@ class Header extends React.Component {
             //TODO: 删除文件
             setTimeout(function() {
                 params.request.delete('/file/rm?filename='+targetFileName);
+                _this.isDownloading = false;
             }, 4000);
         }).catch(function(err) {
+            _this.isDownloading = false;
             console.log('err = ', err);
         })
     }
@@ -33,7 +42,7 @@ class Header extends React.Component {
         var {examInfo} = this.props;
         var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
         var {examid, grade} = this.props.location.query;
-        
+
         return (
             <div>
                 <div style={{ height: 110, padding: '40px 0 20px 20px', backgroundColor: '#fcfcfc', position: 'relative' }}>
