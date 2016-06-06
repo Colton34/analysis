@@ -30,10 +30,10 @@ let style = {
 class DropdownList extends React.Component {
     constructor(props) {
         super(props);
-        this.multiChoiceNum = this.props.multiChoiceNum ? this.props.multiChoiceNum : 2;
+        this.multiChoiceNum = this.props.multiChoiceNum ? this.props.multiChoiceNum : this.props.classList.length;
         if (this.props.isMultiChoice) {
-            _.each(_.range(this.multiChoiceNum), val => {
-                this.props.classList[val].selected = true;
+            _.each(_.range(2), index => { //默认选择前两个
+                this.props.classList[index].selected = true;
             })    
         }
         this.state = {
@@ -71,9 +71,6 @@ class DropdownList extends React.Component {
             } else {
                 item.selected = true;
                 var {selectedItems} = this.state;
-                if (selectedItems.length > 1) {
-                    selectedItems[0].selected = false;
-                }
                 selectedItems.push(item);
                 this.setState({
                     selectedItems: _.takeRight(selectedItems, this.multiChoiceNum)

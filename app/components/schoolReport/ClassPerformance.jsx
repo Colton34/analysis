@@ -88,7 +88,7 @@ class ClassPerformance extends React.Component {
         else if (classItem.selected){
             currentClasses.push(classItem);
             this.setState({
-                currentClasses: _.takeRight(currentClasses, 2)
+                currentClasses: currentClasses
             });
         } else {
             this.setState({
