@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-22 20:42:50
+* @Last Modified time: 2016-06-03 16:41:25
 */
 
 'use strict';
@@ -64,8 +64,6 @@ exports.authenticate = function(req, res, next) {
 
 
 exports.verify = function (req, res, next) {
-    if(!(_.isUndefined(req.query.pass)) && _.toNumber(req.query.pass) > 0) return next();
-
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.authorization;
     if(!token) return next(new BadRequestError('400', { message: 'no token be passed'}));
 

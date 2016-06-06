@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-03 15:03:13
+* @Last Modified time: 2016-06-03 16:42:53
 */
 
 'use strict';
@@ -29,12 +29,9 @@ exports.downloadFile = function(req, res, next) {
     var tmpobj = tmp.fileSync({ postfix: '.pdf', dir: tempFileDir });
     var renderBaseUrl = process.env.RENDERHOSTNAME || 'http://localhost:3000';
 
-console.log('render url = ', renderBaseUrl+req.body.url);
-
-
     var childArgs = [
         path.join(__dirname, '../..', 'lib', 'phantom-script.js'),
-        renderBaseUrl+req.body.url,
+        'http://'+renderBaseUrl+req.body.url,
         req.user.token,
         path.join(tmpobj.name)
     ];
