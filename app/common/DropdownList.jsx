@@ -31,9 +31,11 @@ class DropdownList extends React.Component {
     constructor(props) {
         super(props);
         this.multiChoiceNum = this.props.multiChoiceNum ? this.props.multiChoiceNum : 2;
-        _.each(_.range(this.multiChoiceNum), val => {
-            this.props.classList[val].selected = true;
-        })
+        if (this.props.isMultiChoice) {
+            _.each(_.range(this.multiChoiceNum), val => {
+                this.props.classList[val].selected = true;
+            })    
+        }
         this.state = {
             active: false,
             current: this.props.isMultiChoice ? {value:'选择班级'} : this.props.classList? this.props.classList[0] : {value:'无数据'},
@@ -88,7 +90,7 @@ class DropdownList extends React.Component {
                     <ul style={this.state.active? style.list : style.hide}>
                         {
                             _.map(_this.state.coveredItems, (item,index) => {
-                                var selectedStyle = item.selected ? {backgroundColor: '#00c076', ':hover': {backgroundColor: '#b66c'}}: {};
+                                var selectedStyle = item.selected ? {backgroundColor: '#00c076', color: "#fff",':hover': {backgroundColor: '#b66c'}}: {};
                                 return (
                                     <li key={index} style={{width: 130, height: 30, padding: 5, backgroundColor: '#fff'}}>
                                         <a  key={'ddAtag-' + index} 
