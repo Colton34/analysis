@@ -8,14 +8,18 @@ TODO: 清理这里没用的代码；补充完善所有的交互点--javascript(0
 */
 
 // 需要补充其他产品的跳转链接
-const HeaderMenu = () => {
-    return (
-        <ul className={style.menu}>
-            <li className={style['menu-li']}>
-                <Link to="/" className={style['menu-nav']}>首页</Link>
-            </li>
-        </ul>
-    )
+@Radium
+class HeaderMenu extends React.Component {
+    render(){
+        return (
+            <ul className={style.menu}>
+                <li className={style['menu-li']}>
+                    <a href="/" className={style['menu-nav']} style={localStyle.headerLink} key={'headerLink-0'}>首页</a>
+                </li>
+            </ul>
+        )    
+    }
+    
 }
 
 //TODO:这里有交互？需要展示学生的其他信息？
@@ -111,6 +115,9 @@ var localStyle = {
     },
     listLink: {
         ':hover': { textDecoration: 'none',backgroundColor: '#f5f5f5',color: '#999'}
+    },
+    headerLink: {
+        ':hover': { textDecoration: 'none'}
     }
 }
 HeaderComponent.propTypes = {
