@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-02 15:15:16
+* @Last Modified time: 2016-06-03 16:42:53
 */
 
 'use strict';
@@ -13,6 +13,7 @@ var phantom = require('phantomjs-prebuilt');
 var path = require('path');
 var fs = require('fs');
 var tmp = require('tmp');
+// var config = require('../../config/env');
 
 var tempFileDir = path.join(__dirname, '../../..', 'tempFiles');
 
@@ -26,10 +27,11 @@ exports.downloadFile = function(req, res, next) {
 
     // });
     var tmpobj = tmp.fileSync({ postfix: '.pdf', dir: tempFileDir });
+    var renderBaseUrl = process.env.RENDERHOSTNAME || 'http://localhost:3000';
 
     var childArgs = [
         path.join(__dirname, '../..', 'lib', 'phantom-script.js'),
-        req.body.url,
+        'http://'+renderBaseUrl+req.body.url,
         req.user.token,
         path.join(tmpobj.name)
     ];
