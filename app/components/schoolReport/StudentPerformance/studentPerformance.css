@@ -28,17 +28,6 @@
     display: none;
 }
 
-.btn {
-     display: inline-block;
-     width: 115px;
-     height: 20px;
-     color: #333;
-     line-height: 20px;
-     text-decoration: none;
-     text-align: center;
-     border: 1px solid #e9e8e6;
-}
-
 .list {
     list-style-type: none;
     padding: 0;
