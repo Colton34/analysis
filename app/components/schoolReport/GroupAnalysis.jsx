@@ -13,6 +13,7 @@ import {makeSegmentsStudentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
 import styles from '../../common/common.css';
+import TableView from './TableView';
 
 var {Header, Title, Body, Footer} = Modal;
 
@@ -193,7 +194,7 @@ class GroupAnalysis extends React.Component {
                     </a>
 
                     {/*--------------------------------  临界生群体分析表格 -------------------------------------*/}
-                    <Table tableData={tableData}/>
+                    <TableView tableData={tableData} reserveRows={6}/>
 
                     {/*     _.keys(studentsGroupByClass).length > 5 ? (<a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
                         点击查看更多班级数据 V
