@@ -43,14 +43,20 @@ class DropdownList extends React.Component {
             selectedItems: this.props.classList.slice(0, this.multiChoiceNum)
         }
     }
+    handleBodyClick(event) {
+        if($(event.target).parents('#dropdownList').length === 0) {
+            this.setState({
+                active: false
+            })
+         }
+    }
     componentDidMount() {
-        $('body').click(event => {
-            if($(event.target).parents('#dropdownList').length === 0) {
-                this.setState({
-                    active: false
-                })
-            }
-        })
+        this.clickHandlerRef = this.handleBodyClick.bind(this);
+        $('body').bind('click', this.clickHandlerRef);
+        
+    }
+    componentWillUnmount() {
+        $('body').unbind('click', this.clickHandlerRef);
     }
     toggleList () {
         this.setState({active: !this.state.active})
