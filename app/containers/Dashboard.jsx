@@ -23,6 +23,7 @@ import {convertJS, initParams} from '../lib/util';
 import {Map, List} from 'immutable';
 
 import dashboardStyle from '../components/dashboard/dashboard.css';
+import Spinkit from '../common/Spinkit';
 
 // 　Bgcolor:″＃F1FAFA″——做正文的背景色好，淡雅
 // 　　Bgcolor:″＃E8FFE8″——做标题的背景色较好，与上面的颜色搭配很协调
@@ -79,7 +80,12 @@ class Dashboard extends React.Component {
 
 
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
-            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0)) return (<div></div>);
+            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0)) 
+            return (  
+                <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
+                    <Spinkit/>
+                 </div>
+            );
 
 
 

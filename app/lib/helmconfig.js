@@ -25,7 +25,8 @@ const config = {
     { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto+Condensed', type: 'text/css' },
     { rel: 'stylesheet', href: "https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css" },
     { rel: 'stylesheet', href: '/assets/styles/main.css' },
-    { rel: 'stylesheet', href: '/styles/datepicker.css' }
+    { rel: 'stylesheet', href: '/styles/datepicker.css' },
+    { rel: 'stylesheet', href: '/styles/spinkit.css' }
     // SEO: If your mobile URL is different from the desktop URL,
     // add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones
     // { 'rel': 'canonical', 'href': 'http://www.example.com/' }

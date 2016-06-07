@@ -27,6 +27,7 @@ import StudentPerformance from '../components/schoolReport/StudentPerformance/St
 import {initSchoolAnalysisAction, changeLevelAction} from '../reducers/schoolAnalysis/actions';
 import {initParams} from '../lib/util';
 import {SUBJECTS_WEIGHT as subjectWeight} from '../lib/constants';
+import Spinkit from '../common/Spinkit';
 
 class SchoolReport extends React.Component {
     static need = [
@@ -36,13 +37,13 @@ class SchoolReport extends React.Component {
     componentDidMount() {
         if (this.props.haveInit) return;
 
-//TODO: 将initParams的参数调换一下位置--request是肯定要有的，所以应该放在前面，不叫做other而是request
+        //TODO: 将initParams的参数调换一下位置--request是肯定要有的，所以应该放在前面，不叫做other而是request
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initSchoolAnalysis(params);
     }
 
     render() {
-        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, headers, levels} = this.props;
+        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, headers, levels, isLoading} = this.props;
 
         examInfo = (Map.isMap(examInfo)) ? examInfo.toJS() : examInfo;
         examStudentsInfo = (List.isList(examStudentsInfo)) ? examStudentsInfo.toJS() : examStudentsInfo;
@@ -56,51 +57,55 @@ class SchoolReport extends React.Component {
         if((!examInfo || _.size(examInfo) == 0) || (!examStudentsInfo || examStudentsInfo.length == 0) ||
             (!examPapersInfo || _.size(examPapersInfo) == 0) || (!examClassesInfo || _.size(examClassesInfo) == 0) ||
             (!studentsGroupByClass || _.size(studentsGroupByClass) == 0) || (!allStudentsPaperMap || _.size(allStudentsPaperMap) == 0) ||
-             (!headers || _.size(headers) == 0) || (!levels || _.size(levels) == 0)) return (<div></div>) //显示 loading
-
+             (!headers || _.size(headers) == 0) || (!levels || _.size(levels) == 0))
+             return (   
+                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
+                    <Spinkit/>
+                 </div>
+             )
         return (
             <div style={{ width: 1000, margin: '0 auto', marginTop: 20, backgroundColor: '#fff' }}>
                 <Header examInfo = {examInfo} params={this.props.params} location={this.props.location} />
                 <FullScoreTrend examInfo = {examInfo} examStudentsInfo = {examStudentsInfo} />
                 <ScoreDistribution
-                examInfo = {examInfo}
-                examStudentsInfo = {examStudentsInfo}
-                examClassesInfo = {examClassesInfo}
-                studentsGroupByClass = {studentsGroupByClass}
-                levels = {levels}
-                changeLevels = {this.props.changeLevels} />
+                    examInfo = {examInfo}
+                    examStudentsInfo = {examStudentsInfo}
+                    examClassesInfo = {examClassesInfo}
+                    studentsGroupByClass = {studentsGroupByClass}
+                    levels = {levels}
+                    changeLevels = {this.props.changeLevels} />
                 <SubjectDistribution
-                examInfo = {examInfo}
-                examStudentsInfo = {examStudentsInfo}
-                examPapersInfo = {examPapersInfo}
-                examClassesInfo = {examClassesInfo}
-                studentsGroupByClass = {studentsGroupByClass}
-                allStudentsPaperMap = {allStudentsPaperMap}
-                levels = {levels}
-                headers = {headers}/>
+                    examInfo = {examInfo}
+                    examStudentsInfo = {examStudentsInfo}
+                    examPapersInfo = {examPapersInfo}
+                    examClassesInfo = {examClassesInfo}
+                    studentsGroupByClass = {studentsGroupByClass}
+                    allStudentsPaperMap = {allStudentsPaperMap}
+                    levels = {levels}
+                    headers = {headers}/>
                 <ClassPerformance
-                examInfo = {examInfo}
-                examStudentsInfo = {examStudentsInfo}
-                examPapersInfo = {examPapersInfo}
-                examClassesInfo = {examClassesInfo}
-                studentsGroupByClass = {studentsGroupByClass}
-                levels = {levels}
-                headers = {headers} />
+                    examInfo = {examInfo}
+                    examStudentsInfo = {examStudentsInfo}
+                    examPapersInfo = {examPapersInfo}
+                    examClassesInfo = {examClassesInfo}
+                    studentsGroupByClass = {studentsGroupByClass}
+                    levels = {levels}
+                    headers = {headers} />
                 <SubjectPerformance
-                examStudentsInfo={examStudentsInfo}
-                examPapersInfo={examPapersInfo}
-                allStudentsPaperMap={allStudentsPaperMap}
-                headers={headers} />
+                    examStudentsInfo={examStudentsInfo}
+                    examPapersInfo={examPapersInfo}
+                    allStudentsPaperMap={allStudentsPaperMap}
+                    headers={headers} />
                 <GroupAnalysis
-                examInfo={examInfo}
-                examStudentsInfo={examStudentsInfo}
-                studentsGroupByClass={studentsGroupByClass}
-                levels={levels} />
+                    examInfo={examInfo}
+                    examStudentsInfo={examStudentsInfo}
+                    studentsGroupByClass={studentsGroupByClass}
+                    levels={levels} />
                 <StudentPerformance
-                examInfo={examInfo}
-                examStudentsInfo={examStudentsInfo}
-                allStudentsPaperMap={allStudentsPaperMap}
-                headers={headers} />
+                    examInfo={examInfo}
+                    examStudentsInfo={examStudentsInfo}
+                    allStudentsPaperMap={allStudentsPaperMap}
+                    headers={headers} />
             </div>
         )
     }

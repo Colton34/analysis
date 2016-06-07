@@ -11,6 +11,7 @@ import {initParams, convertJS} from '../../lib/util';
 
 import styles from './Home.css';
 import _ from 'lodash';
+import Spinkit from '../../common/Spinkit';
 
 let questionnaireItem = [
     '非常喜欢',
@@ -182,7 +183,12 @@ class Home extends React.Component {
 
     render() {
         var examList = (List.isList(this.props.home.examList)) ? this.props.home.examList.toJS() : this.props.home.examList;
-        if(!examList || examList.length == 0) return (<div></div>); //其实这个时候应该显示loading....
+        if(!examList || examList.length == 0) 
+            return (  
+                <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
+                    <Spinkit/>
+                </div>
+            );
 
 
         return (
