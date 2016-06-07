@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 15:23:57
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-03 14:44:40
+* @Last Modified time: 2016-06-06 19:09:38
 */
 
 'use strict';
@@ -29,6 +29,9 @@ page.customHeaders = {
 page.onInitialized = function() {
     page.customHeaders = {};
 };
+
+var defaultFormat = {width: 1024, height: 1540}
+page.paperSize = defaultFormat;
 
 //TODO: 这里写死了hostname是因为phantomjs对于当前项目压缩混淆后的代码执行不能正确渲染，所以要单独启动一个没有压缩混淆后的
 //server来支持渲染（当然可以使用简单的webserver来做临时渲染server，但这里方便直接使用了原工程webserver，而且自带auth）
