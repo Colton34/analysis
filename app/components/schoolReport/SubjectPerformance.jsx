@@ -9,6 +9,7 @@ import {makeSegmentsStudentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap} from '../../lib/constants';
 
 import styles from '../../common/common.css';
+import TableView from './TableView';
 
 var {Header, Title, Body, Footer} = Modal;
 
@@ -235,7 +236,7 @@ console.log('updateLevelPercentages : ', newLevelPercentages);
 
                 {/*--------------------------------  学科考试表现基本指标表格 -------------------------------------*/}
 
-                    <Table tableData={subjectExamTableData} />
+                    <TableView tableData={subjectExamTableData}/>
                     <p className={styles.tips}>
                         学科基本指标的数据虽一目了然，但其中也包含了许多考试信息，值得学校的关注，具体分析和理解各个指标：
                         <br />
@@ -261,7 +262,7 @@ console.log('updateLevelPercentages : ', newLevelPercentages);
                     <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>
                         设置等级参数
                     </a>
-                    <Table tableData={subjectLevelExamTableData} />
+                    <TableView tableData={subjectLevelExamTableData} />
 
                     {/*--------------------------------  TODO: 暂时空缺的和学科难易程度相关的数据 -------------------------------------*/}
                     <p>（3）有关学科命题</p>

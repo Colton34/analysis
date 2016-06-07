@@ -9,8 +9,9 @@ import {makeSegments, makeFactor, makeSegmentsStudentsCount} from '../../api/exa
 import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
 import styles from '../../common/common.css';
+import TableView from './TableView';
 
-const AverageTable = ({tableHeaderData, tableBodyData}) => {
+const AverageTable = ({tableHeaderData, tableData}) => {
 
     return (
         <table  style={{border: '1px solid #d7d7d7', borderCollapse: 'collapse', width: '100%' }}>
@@ -25,7 +26,7 @@ const AverageTable = ({tableHeaderData, tableBodyData}) => {
                         })
                     }
                 </tr>
-                <tr>
+                <tr style={{ backgroundColor: '#f4faee' }}>
                 {
                     _.map(_.range(tableHeaderData.length), (num) => {
                         return _.map(_.range(2), (index) => {
@@ -37,7 +38,7 @@ const AverageTable = ({tableHeaderData, tableBodyData}) => {
                 }
                 </tr>
                 {
-                    _.map(tableBodyData, (tdList, bindex) => {
+                    _.map(tableData, (tdList, bindex) => {
                         return (
                             <tr key={'tr' + bindex}>
                                 {
@@ -80,11 +81,21 @@ class ClassPerformance extends React.Component {
     }
 
     onClickDropdownList(classItem) {
-        if(_.includes(this.classList, classItem)) return;
+        //if(_.includes(this.classList, classItem)) return;
         console.log('change the choosen class = ', classItem.key);
-        this.setState({
-            currentClasses: this.classList.splice(0, 1, classItem)
-        });
+        var {currentClasses} = this.state;
+        if (_.includes(currentClasses)) return;
+        else if (classItem.selected){
+            currentClasses.push(classItem);
+            this.setState({
+                currentClasses: currentClasses
+            });
+        } else {
+            this.setState({
+                currentClasses: _.without(currentClasses, classItem)
+            });    
+        }
+        
 
         // if(!lineChartMockData[chosenClass]) return ;
         // var obj = {};
@@ -113,7 +124,7 @@ class ClassPerformance extends React.Component {
         var factorsTableData = theClassExamMeanFactorsTable(examInfo, subjectMeanInfo, studentsGroupByClass, headers);
         var groupTableData = theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo);
 //自定义Module数据结构：
-        var _this = this;
+        var _this = this;   
         var meanTableHeaderData = _.map(headers, (headerObj) => headerObj.subject);
 
         var config = {
@@ -182,43 +193,44 @@ class ClassPerformance extends React.Component {
                     {/*--------------------------------  班级考试表现的趋势图表 -------------------------------------*/}
                     <p>班级学生总分分布趋势图：</p>
                     <span style={{position: 'absolute', right: 0}}>
-                        <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList}/>
+                        <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true}/>
                     </span>
                     <ReactHighcharts config={config} style={{ margin: '0 auto', marginTop: 40 }}></ReactHighcharts>
 
                     {/*--------------------------------  班级考试基本表现平均分表格 -------------------------------------*/}
                     <p>（3）从平均水平看，全校和班级的各学科平均得分率见下表所示：</p>
-                    <AverageTable tableHeaderData={meanTableHeaderData} tableBodyData={meanTableBodyData}/>
+                    <TableView tableHeaderData={meanTableHeaderData} tableData={meanTableBodyData} TableComponent={AverageTable}/>
 
                     {/* 如果样式一样的话，那么这个“显示更多班级”可以抽出来了，属于Table的一部分--逻辑是一样的 */}
                     {/*  _.keys(studentsGroupByClass).length > 5 ? (<a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
                         点击查看更多班级数据 V
                     </a>) : ''   */}
-                    <p>表中各个班级的平均得分率高低一目了然，在此不再赘述。</p>
-
+                    <div className={styles.tips}>
+                        <p>数据图表说明部分：表中各个班级的平均分与平均得分率的高低，一目了然。</p>
+                        <p>平均分：表达的是一个代表性水平的指标。但各班也有各班的具体情况，不仅要看平均分数的高低，还要看各班在自身水平基础上，可能有的学科表现更好，有的学科表现不足。即下面第（4）点分析的内容。</p>
+                    </div>
                     {/*--------------------------------  班级考试基本表现贡献指数表格 -------------------------------------*/}
                     <p>
                         (4) 各班的平均得分率看起来有高有低，也不能简单通过排队就评价教学质量的高低，需要结合各班具有自身的具体情况和原因基于客观分析（比如有尖子班、普通版之分）。
                         但相对于班级自身综合水平而言，各班各学科的平均得分率贡献指数（见下表）可以反映出各个班级教学对其自身综合水平影响的大小。（指数值为正，是促使提高；
                         为负， 是拖后腿。）
                     </p>
-                    <Table tableData={factorsTableData}/>
+                    <TableView tableData={factorsTableData} reserveRows={6}/>
 
                     {/* _.keys(studentsGroupByClass).length > 5 ? (<a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
                         点击查看更多班级数据 V
                     </a>) : ''  */}
 
                     <div className={styles.tips}>
-                        <p>说明：</p>
-                        <p>平均贡献指数： 指每个学科凭据得分率 - 总体平均得分率，该数值可以更加直观的反映出班级对每个学科在教学上的综合水平影响程度。</p>
-                        <p>从以上数据统计来看， 1班、2班、5班、8班在 数学、英语学科上贡献较高。</p>
+                        <p>班级的学科平均得分率水平贡献指数：</p>
+                        <p>指班级的学科得分率与全校各班级该学科的平均得分率之间的差值，反应班级该学科水平对整体贡献的大小。</p>
                     </div>
 
                 {/*--------------------------------  班级考试基本表现学生分组表格 -------------------------------------*/}
                     <p>
                         （5）将学校分数从高到低，分为十足学生，每一组学生之间的水平相差不大，按这样方式，我们可以看见各班在这样的7组中所存在的人数如下：
                     </p>
-                    <Table tableData={groupTableData}/>
+                    <TableView tableData={groupTableData} reserveRows={6}/>
                     {/*  _.keys(studentsGroupByClass).length > 5 ? (                <a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
                         点击查看更多班级数据 V
                     </a>) : ''    */}
@@ -350,7 +362,7 @@ function theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo, groupLengt
     var groupStudentsInfo = makeGroupStudentsInfo(groupLength, examStudentsInfo);
 
     var groupHeaders = _.map(_.range(groupLength), (index) => {
-        return {index: index, title: '第' + numberMap[index+1] + '组<br />(前)' + (index+1) + '0%)', id: index }
+        return {index: index, title: '第' + numberMap[index+1] + '组<br/>(前' + (index+1) + '0%)', id: index }
     });
     var titleHeader = _.concat(['班级'], _.map(groupHeaders, (headerObj, index) => headerObj.title));
 

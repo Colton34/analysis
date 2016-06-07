@@ -17,7 +17,7 @@ const Table = ({tableData}) => {
                     {
                         _.map(tableData[0], (th,index) => {
                             return (
-                                <th key={index} className={styles['table-unit']}>{th}</th>
+                                <th key={index} className={styles['table-unit']} dangerouslySetInnerHTML={{__html:th}}></th>
                             )
                         })
                     }

@@ -50,12 +50,13 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
                 总分分布趋势
             </div>
             <div className={styles['school-report-content']}>
-                <p style={{ marginTop: 40 }}>总分趋势分布图，表达了全小学生总分的人数分布。相对于学校总平均水平而言，高分段人数比低分段人数 要多 ， 可能同时存在有 尖子生很给力 的现象。</p>
+                <p style={{ marginTop: 40 }}>总学生总分趋势的分布图：是这次考试检测全校学生学生综合水平状况的一个基本表现特征。</p>
+                <p>总分分布曲线图如下：</p>
                 <ReactHighcharts config={config} style={{ margin: '0 auto', marginTop: 40 }}></ReactHighcharts>
-                <div style={{ width: 760, height: 90, backgroundColor: '#e9f7f0', margin: '0 auto', marginTop: 20, padding: 15 }}>
-                    <p style={{ marginBottom: 20 }}>说明: </p>
+                <div style={{ width: 760, minHeight: 90, backgroundColor: '#e9f7f0', margin: '0 auto', marginTop: 20, padding: 15 }}>
+                    <p style={{ marginBottom: 20 }}>对于这次考试: </p>
 
-                    总分分布趋势可以看出学校本次考试从低到高分的学生人数分布情况， 更加直观的展示出本次考试的总体水平。
+                    从总分分布曲线图来看，基本呈现“钟型分布”，即中档学生人数较多，两端（高分段，低分段）学生人数较少，这种分布属于正常状态，但作为学校水平性考试，还是希望高分段学生人数更多为好
                 </div>
             </div>
         </div>

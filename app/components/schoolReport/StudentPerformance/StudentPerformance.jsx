@@ -4,19 +4,75 @@ import _ from 'lodash';
 
 import styles from '../../../common/common.css';
 import localStyle from './studentPerformance.css';
+import Radium from 'radium';
+import TableView from '../TableView';
 
+var localCss = {
+    btn: {
+        display: 'inline-block', width: 115, height: 20, color: '#333', lineHeight: '20px', textDecoration: 'none', textAlign: 'center', border: '1px solid #e9e8e6',
+        ':hover': { textDecoration: 'none' },
+        ':link': { textDecoration: 'none' }
+    },
+
+}
+
+const Table = ({tableHeaderData, isGood, inputNum, current, tableData}) => {
+    return (
+        <table  style={{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', width: '100%' }}>
+            <tbody>
+                <tr >
+                    <th rowSpan="2" className={styles['table-unit']}>班级</th>
+                    {
+                        _.map(tableHeaderData, (th, index) => {
+                            return (
+                                <th key={index} className={styles['table-unit']}>{th}</th>
+                            )
+                        })
+                    }
+                </tr>
+                <tr>
+                    {
+                        _.map(tableHeaderData, (th, index) => {
+                            return (
+                                <th key={index} className={styles['table-unit']}>{(isGood ? '前' : '后') + inputNum + (current.key == 'ranking' ? '名' : '%') }</th>
+                            )
+                        })
+                    }
+                </tr>
+                {
+                    _.map(tableData, (rowData, rindex) => {
+                        return (
+                            <tr key={rindex}>
+                                {
+                                    _.map(rowData, (data, index) => {
+                                        return (
+                                            <td key={index} className={styles['table-unit']}>
+                                                {data}
+                                            </td>
+                                        )
+                                    })
+                                }
+                            </tr>
+                        )
+                    })
+                }
+            </tbody>
+        </table>
+    )
+}
 /**
  * 传入 “前 或 后”  studentPosition
  * 学科列表 subjectList
  * 班级&成绩列表 classData
  *
  */
+@Radium
 class StudentPerformanceTable extends React.Component {
-//变动的交互模块和当前显示的模块是同一个模块--这种方式应该是比较好处理的。就像之前select所控制的图表，那么select和图表就应该在一起
-//dropList的数据就在此Table中
+    //变动的交互模块和当前显示的模块是同一个模块--这种方式应该是比较好处理的。就像之前select所控制的图表，那么select和图表就应该在一起
+    //dropList的数据就在此Table中
     constructor(props) {
         super(props);
-        this.selectItems = [{key: 'ranking', value: '名词统计'}, {key: 'percentage', value: '比例统计'}];
+        this.selectItems = [{ key: 'ranking', value: '名次统计' }, { key: 'percentage', value: '比例统计' }];
         this.isValid = true;
         this.state = {
             active: false,
@@ -27,7 +83,20 @@ class StudentPerformanceTable extends React.Component {
             inputNum: 30
         }
     }
-
+    handleBodyClick(event) {
+        if($(event.target).parents('#dropdownList').length === 0) {
+            this.setState({
+                active: false
+            })
+         }
+    }
+    componentDidMount() {
+        this.clickHandlerRef = this.handleBodyClick.bind(this);
+        $('body').bind('click', this.clickHandlerRef)
+    }
+    componentWillUnmount() {
+        $('body').unbind('click', this.clickHandlerRef);
+    }
     toggleList() {
         this.setState({ active: !this.state.active })
     }
@@ -49,16 +118,16 @@ class StudentPerformanceTable extends React.Component {
 
         //不同类型所要求的数值的规则不同
         var newConfig = {};
-        if(this.state.current.key == 'ranking') {
-            if(value > this.props.examInfo.realStudentsCount) {
+        if (this.state.current.key == 'ranking') {
+            if (value > this.props.examInfo.realStudentsCount) {
                 this.isValid = false;
                 return;
             } else {
                 newConfig.rankingNum = value;
                 newConfig.inputNum = value;
             }
-        } else if(this.state.current.key == 'percentage') {
-            if(value > 100) {
+        } else if (this.state.current.key == 'percentage') {
+            if (value > 100) {
                 this.isValid = false;
                 return;
             } else {
@@ -72,28 +141,27 @@ class StudentPerformanceTable extends React.Component {
     }
 
     render() {
-//Props数据结构：
+        //Props数据结构：
         var {examInfo, examStudentsInfo, allStudentsPaperMap, headers, isGood, tableHeaderData} = this.props;
-//算法数据结构：
+        //算法数据结构：
         //如果是ranking，那么直接就是value, 如果是percentage，那么需要算出来value
         var countFlag = (this.state.current.key == 'ranking') ? this.state.rankingNum : _.ceil(_.multiply(_.divide(this.state.percentageNum, 100), examInfo.realStudentsCount));
         var tableBodyData = theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, headers, isGood, countFlag);
-//自定义Module数据结构：
+        //自定义Module数据结构：
         var _this = this;
 
         return (
             <div>
-                {/* 下拉列表--TODO: 需要重构 */}
                 <div style={{ position: 'absolute', right: 180 }}>
-                    <a className={localStyle.btn} href="javascript:void(0)" onClick={this.toggleList.bind(this) }>
+                    <a key={'ddbtn-head'} style={localCss.btn} href="javascript:void(0)" onClick={this.toggleList.bind(this) }>
                         {this.state.current.value}
                     </a>
-                    <ul className={this.state.active ? localStyle.list : localStyle.hide}>
+                    <ul id='dropDownList' className={this.state.active ? localStyle.list : localStyle.hide}>
                         {
                             _.map(_this.state.coveredItems, (item, index) => {
                                 return (
                                     <li key={index}>
-                                        <a style={Object.assign({}, localStyle.btn, { backgroundColor: '#f2f2f2', color: '#333' }) } href="javascript:void(0)" onClick={this.chooseItem.bind(this, item) }>
+                                        <a key={'ddbtn-' + index} style={[localCss.btn, { backgroundColor: '#f2f2f2', color: '#333' }]} href="javascript:void(0)" onClick={this.chooseItem.bind(this, item) }>
                                             {item.value}
                                         </a>
                                     </li>
@@ -106,47 +174,8 @@ class StudentPerformanceTable extends React.Component {
                 <div style={{ float: 'right', marginRight: -90, marginBottom: 10 }}>
                     年级{(isGood) ? '前' : '后'}<input defaultValue={_this.state.inputNum} onBlur={_this.onInputChange.bind(_this) } style={{ display: 'inline-block', width: 45, height: 22, lineHeight: '22px' }}/> {_this.state.current.key === 'ranking' ? '名' : '%'}
                 </div>
+                <TableView TableComponent={Table} tableHeaderData={tableHeaderData} isGood={isGood} inputNum={this.state.inputNum} current={this.state.current} tableData={tableBodyData}/>
 
-                <table  style={{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', width: '100%' }}>
-                    <tbody>
-                        <tr >
-                            <th rowSpan="2" className={styles['table-unit']}>班级</th>
-                            {
-                                _.map(tableHeaderData, (th, index) => {
-                                    return (
-                                        <th key={index} className={styles['table-unit']}>{th}</th>
-                                    )
-                                })
-                            }
-                        </tr>
-                        <tr>
-                            {
-                                _.map(tableHeaderData, (th, index) => {
-                                    return (
-                                        <th key={index} className={styles['table-unit']}>{(isGood ? '前' : '后') + _this.state.inputNum + (_this.state.current.key == 'ranking' ? '名' : '%') }</th>
-                                    )
-                                })
-                            }
-                        </tr>
-                        {
-                            _.map(tableBodyData, (rowData, rindex) => {
-                                return (
-                                    <tr key={rindex}>
-                                        {
-                                            _.map(rowData, (data, index) => {
-                                                return (
-                                                    <td key={index} className={styles['table-unit']}>
-                                                        {data}
-                                                    </td>
-                                                )
-                                            })
-                                        }
-                                    </tr>
-                                )
-                            })
-                        }
-                    </tbody>
-                </table>
             </div>
         )
     }
@@ -154,21 +183,21 @@ class StudentPerformanceTable extends React.Component {
 
 
 const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, headers}) => {
-//算法数据结构：
+    //算法数据结构：
 
-//自定义Module数据结构：
+    //自定义Module数据结构：
     var topStudents = _.takeRight(examStudentsInfo, 10);
     var lowStudents = _.take(examStudentsInfo, 10);
     var tableHeaderData = _.map(headers, (headerObj) => headerObj.subject);
 
     return (
-        <div className={styles['school-report-layout']} style={{paddingBottom: 100}}>
+        <div className={styles['school-report-layout']} style={{ paddingBottom: 100 }}>
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
             <div style={{ padding: '0 10px', position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 300 }}>
                 学校有必要知道的学生重点信息
             </div>
 
-        {/*--------------------------------  有关学生重要信息的图表 -------------------------------------*/}
+            {/*--------------------------------  有关学生重要信息的图表 -------------------------------------*/}
             <div className={styles['school-report-content']}>
                 <p>（1）这次考试，全校总分前后十名的学生是：</p>
                 <div>
@@ -181,7 +210,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                                         return (
                                             <div key={index} className={localStyle['student-box']}>
                                                 <div style={{ fontSize: 14, color: '#3bba80' }}>{student.name}</div>
-                                                <div style={{ fontSize: 12 }}>({student.class+'班'}) </div>
+                                                <div style={{ fontSize: 12 }}>({student.class + '班'}) </div>
                                             </div>
                                         )
                                     })
@@ -196,7 +225,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                                         return (
                                             <div key={index} className={localStyle['student-box']}>
                                                 <div style={{ fontSize: 14, color: '#f68a72' }}>{student.name}</div>
-                                                <div style={{ fontSize: 12 }}>({student.class+'班'}) </div>
+                                                <div style={{ fontSize: 12 }}>({student.class + '班'}) </div>
                                             </div>
                                         )
                                     })
@@ -206,7 +235,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                     </div>
                 </div>
 
-            {/*--------------------------------  有关学生重要信息的表格 -------------------------------------*/}
+                {/*--------------------------------  有关学生重要信息的表格 -------------------------------------*/}
                 <div style={{ marginTop: 60 }}>
                     <p>（2）全校各个班级在各个学科优秀的学生人数，见下表：</p>
                     <StudentPerformanceTable
@@ -216,7 +245,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                         headers={headers}
                         isGood={true}
                         tableHeaderData={tableHeaderData}
-                    />
+                        />
                 </div>
                 <div style={{ marginTop: 40 }}>
                     <p>（3）全校各班级在各学科欠佳的学生数，如下表所示。希望相应班级任课教师多多帮助他们进步。</p>
@@ -227,7 +256,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                         headers={headers}
                         isGood={false}
                         tableHeaderData={tableHeaderData}
-                    />
+                        />
                 </div>
                 <div style={{ marginTop: 30 }}>
                     注：每个学生都有精准的个人学业诊断分析报告，学生或家长可免费通过“好分数网”查阅个人考试的基本情况。网址：
@@ -291,7 +320,7 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
         _.each(headers, (headerObj, index) => {
             value[headerObj.id] ? row.push(value[headerObj.id]) : row.push(0);
         });
-        row.unshift(examInfo.gradeName+className+'班');
+        row.unshift(examInfo.gradeName + className + '班');
         table.push(row);
     });
 

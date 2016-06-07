@@ -12,12 +12,13 @@ import {NUMBER_MAP as numberMap} from '../../lib/constants';
 import {makeSegmentsStudentsCount} from '../../api/exam';
 
 import DropdownList from '../../common/DropdownList';
-
+import TableView from './TableView';
 var {Header, Title, Body, Footer} = Modal;
 
 let localStyle = {
     dialogInput: {width: 150,height: 50},
-    btn: {lineHeight: '50px', width: 150, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',margin: '0 30px'}
+    btn: {lineHeight: '50px', width: 150, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',margin: '0 30px'},
+    tableShowAllBtn: { color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }
 }
 
 const Table = ({tableData, levels}) => {
@@ -32,7 +33,6 @@ const Table = ({tableData, levels}) => {
             width: '100%'
         }
     }
-
     return (
         <table  style={Object.assign({},{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', overflow: 'scroll'}, widthProp)}>
             <tbody>
@@ -425,9 +425,8 @@ class ScoreDistribution extends React.Component {
             }
 
         };
-
         return (
-            <div style={{ position: 'relative' }}>
+            <div style={{ position: 'relative', zIndex: 1}}>
                 <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
 
                 <div style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 280 }}>
@@ -448,7 +447,7 @@ class ScoreDistribution extends React.Component {
                             _.map(levels, (levObj, levelKey) => {
                                 return (
                                     <span key={levelKey}>
-                                        {numberMap[(levelKey + 1)]} 档分数线为
+                                        {numberMap[(+levelKey + 1)]} 档分数线为
                                         <span className={style['school-report-dynamic']}>{levels[(levTotal-1-levelKey)+''].score}</span>
                                         分{levelKey == levTotal - 1 ? '' : '，'}
                                     </span>
@@ -467,13 +466,8 @@ class ScoreDistribution extends React.Component {
                     {/*--------------------------------  总分分档上线学生表格 -------------------------------------*/}
 
                     <p style={{ marginBottom: 20 }}>各班的上线情况见下表：</p>
-                    <div style={{width: '100%', overflow: 'scroll'}}>
-                        <Table tableData={tableData} levels={levels} />
-                    </div>
-
-                    {/*  TODO: 当前没有对多于5个的时候有收缩，所以这里也就没有必要展现全部的按钮了，因为已经是全部了   {_.keys(studentsGroupByClass).length > 5 ? (<a  href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
-                        点击查看更多班级数据 V
-                    </a>) : ''} */}
+                    <TableView tableData={tableData} levels={levels} TableComponent={Table}/>
+                    
                     {/*--------------------------------  饼图的select -------------------------------------*/}
                     <span style={{ position: 'absolute', right: 0, marginTop: 40 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this)} classList={_this.classList}/></span>
 
