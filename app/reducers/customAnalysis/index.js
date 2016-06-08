@@ -32,7 +32,8 @@ import {
     DELE_SUBJECT,
     SET_PAGE_INDEX,
     CHANGE_CURRENT_SUBJECT_NAME,
-    DISCARD_CURRENT_SUBJECT
+    DISCARD_CURRENT_SUBJECT,
+    UPDATE_SUBJECT_SQM
 } from '../../lib/constants';
 
 export default function reducer(state, action) {
@@ -143,6 +144,9 @@ export default function reducer(state, action) {
             var nextState = state.set('currentSubject',Map({ src: Map({}), groupMap: {}, name: '', SQM: Map({})}));
             nextState = nextState.set('status', '');
             nextState = nextState.set('pageIndex', 0);
+            return nextState;
+        case UPDATE_SUBJECT_SQM:
+            var nextState = state.setIn(['resultSet', action.subjectName, 'SQM'], action.newSqm);
             return nextState;
     }
     return state;

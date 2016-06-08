@@ -16,9 +16,11 @@ import {initHomeAction} from '../../reducers/home/actions';
 import {changeQuesitonNameAction, setGroupMapAction, setPageIndexAction,
         saveCurrentSubjectAction, setAnalysisNameAction, setCreateStatusAction,
         editSubjectAction, delSubjectAction, changeCurrentSubjectNameAction,
-        discardCurrentSubjectAction} from '../../reducers/customAnalysis/actions';
+        discardCurrentSubjectAction, updateSubjectSqmAction} from '../../reducers/customAnalysis/actions';
 import {initParams} from '../../lib/util';
-import {NEXT_PAGE,PREV_PAGE} from '../../lib/constants'
+import {NEXT_PAGE,PREV_PAGE} from '../../lib/constants';
+import matrixBase from '../../lib/matrixBase';
+
 /**
  * {
  *  timeRange : {startDate : '', endDate : ''},
@@ -74,7 +76,34 @@ class CustomizeAnalysis extends React.Component {
             this.props.setPageIndex(NEXT_PAGE);
         }
     }
-    
+    onGenerateAnalysis() {
+        var resultSet = Map.isMap(this.props.resultSet) ? this.props.resultSet.toJS() : this.props.resultSet;
+        for (var subjectName in resultSet) {
+            var newSQM = this.deleteStudentFromSQM(resultSet[subjectName])
+            this.props.updateSubjectSqm(subjectName, newSQM);
+        }
+        alert('敬请期待！');
+    }
+    deleteStudentFromSQM(subject){
+        var result = subject.SQM;
+        if (subject.groupMap) {
+            var students = this.map2Students(subject.groupMap);
+            var xuehaoArray = _.map(students, function (item) {
+                return item.kaohao;
+            });
+            result = matrixBase.getByNames(subject.SQM, 'row', 'kaohao', xuehaoArray);
+        }
+        return result;
+    }
+    map2Students(map) {
+        var res = [];
+        for (var i in map) {
+            if (map[i].status == 'inUse') {
+                res = res.concat(map[i].array);
+            }
+        }
+        return res;
+    }
     render() {
         var {status, pageIndex} = this.props;
         var examList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList;
@@ -99,7 +128,8 @@ class CustomizeAnalysis extends React.Component {
                         setAnalysisName={this.props.setAnalysisName}
                         changeToCreateStatus={this.props.setCreateStatus} 
                         onEditSubject={this.props.onEditSubject} 
-                        onDelSubject={this.props.onDelSubject} />
+                        onDelSubject={this.props.onDelSubject} 
+                        onGenerateAnalysis={this.onGenerateAnalysis.bind(this)}/>
 
                 }
                 {
@@ -179,6 +209,7 @@ function mapDispatchToProps(dispatch) {
         onEditSubject: bindActionCreators(editSubjectAction, dispatch),
         onDelSubject: bindActionCreators(delSubjectAction, dispatch),
         changeCurrentSubjectName: bindActionCreators(changeCurrentSubjectNameAction, dispatch),
-        discardCurrentSubject: bindActionCreators(discardCurrentSubjectAction, dispatch) 
+        discardCurrentSubject: bindActionCreators(discardCurrentSubjectAction, dispatch),
+        updateSubjectSqm: bindActionCreators(updateSubjectSqmAction, dispatch)
     }
 }

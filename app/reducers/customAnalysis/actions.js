@@ -14,7 +14,8 @@ import {
     SET_MERGED_SQM, CHANGE_QUESTION_NAME, SET_GROUP_MAP,
     SET_PAGE_INDEX, SAVE_CURRENT_SUBJECT, SET_ANALYSIS_NAME,
     SET_CREATE_STATUS, EDIT_SUBJECT, DELE_SUBJECT,
-    CHANGE_CURRENT_SUBJECT_NAME, DISCARD_CURRENT_SUBJECT} from '../../lib/constants';
+    CHANGE_CURRENT_SUBJECT_NAME, DISCARD_CURRENT_SUBJECT,
+    UPDATE_SUBJECT_SQM} from '../../lib/constants';
 import {fetchPaper} from '../../api/exam';
 import {initParams} from '../../lib/util';
 
@@ -130,5 +131,13 @@ export function changeCurrentSubjectNameAction (subjectName) {
 export function discardCurrentSubjectAction() {
     return {
         type: DISCARD_CURRENT_SUBJECT
+    }
+}
+
+export function updateSubjectSqmAction(subjectName, newSqm) {
+    return {
+        type: UPDATE_SUBJECT_SQM,
+        subjectName: subjectName,
+        newSqm: newSqm
     }
 }

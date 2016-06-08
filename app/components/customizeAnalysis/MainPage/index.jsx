@@ -14,6 +14,7 @@ import _ from 'lodash';
  * resultSet: 已录入的学科信息；
  * onEditSubject: 点击学科列表中的“编辑”时调用的回调函数
  * onDelSubject: 点击“删除”时调用的回调函数；
+ * onGenerateAnalysis
  */
 class MainPage extends React.Component {
 
@@ -32,9 +33,6 @@ class MainPage extends React.Component {
     onDelSubject(subjectName) {
         
         this.props.onDelSubject(subjectName);
-    }
-    onGenerateAnalysis(){
-        alert('敬请期待!');
     }
     render() {
         var { resultSet, analysisName} = this.props;
@@ -92,7 +90,7 @@ class MainPage extends React.Component {
                                             }
                                         </tbody>
                                     </table>
-                                    <button  onClick={this.onGenerateAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>生成报表</button>
+                                    <button onClick={this.props.onGenerateAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>生成报表</button>
                                 </div>
                             )
                     }
