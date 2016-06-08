@@ -71,7 +71,7 @@ const TeacherHelper = () => {
         <div>
             <div className={styles.title}>老师小助手</div>
             <div className={styles['instruction-book']}></div>
-            <div className={styles['instruction-video']}></div>
+            <a href='/faq?section=intro&sub=introVideo' className={styles['instruction-video']} ></a>
         </div>
     )
 }
@@ -180,7 +180,7 @@ class Home extends React.Component {
         var params = initParams(this.props.params, this.props.location, {'request': window.request});
         this.props.initHome(params);
     }
-
+    
     render() {
         var examList = (List.isList(this.props.home.examList)) ? this.props.home.examList.toJS() : this.props.home.examList;
         if(!examList || examList.length == 0) 
