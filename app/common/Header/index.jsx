@@ -17,9 +17,9 @@ class HeaderMenu extends React.Component {
                     <a href="/" className={style['menu-nav']} style={localStyle.headerLink} key={'headerLink-0'}>首页</a>
                 </li>
             </ul>
-        )    
+        )
     }
-    
+
 }
 
 //TODO:这里有交互？需要展示学生的其他信息？
@@ -46,7 +46,7 @@ let dialogProps = {
 
 @Radium
 class DropdownMenu extends React.Component {
-    
+
     render() {
         return (
             <ul id='header-dropdown' className={style['dropdown-menu']}>
@@ -62,7 +62,7 @@ class DropdownMenu extends React.Component {
 
 
 class HeaderComponent extends React.Component {
-    //({user, actions}) => 
+    //({user, actions}) =>
     constructor(props) {
         super(props);
         this.state = {
@@ -75,10 +75,13 @@ class HeaderComponent extends React.Component {
         })
     }
     onLogout() {
-        alert('todo: 登出');
-        this.setState({
-            showDropdown: false
-        })
+        // alert('todo: 登出');
+        // this.setState({
+        //     showDropdown: false
+        // })
+        var Cookies = require('cookies-js');
+        Cookies.expire('authorization');
+        window.location = '/';
     }
     componentDidMount() {
         $('body').click((event)=> {
