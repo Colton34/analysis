@@ -50,14 +50,14 @@ class CustomizeAnalysis extends React.Component {
             this.props.initHome(params);
         }
     }
-    
-   
+
+
     changeCurrentSubjectName(name) {
         console.log('======== subject name: ' + name);
-        this.props.changeCurrentSubjectName(name);   
-       
+        this.props.changeCurrentSubjectName(name);
+
     }
-   
+
     onBackHomePage() {
         location.href = '/';
     }
@@ -82,6 +82,10 @@ class CustomizeAnalysis extends React.Component {
             var newSQM = this.deleteStudentFromSQM(resultSet[subjectName])
             this.props.updateSubjectSqm(subjectName, newSQM);
         }
+
+        console.log(this.props.resultSet.toJS());//TODO：注意这里是immutable类型的
+        debugger;
+
         alert('敬请期待！');
     }
     deleteStudentFromSQM(subject){
@@ -115,26 +119,26 @@ class CustomizeAnalysis extends React.Component {
         });
         return (
             <div style={{ width: 1000, minHeight: 600, margin: '20px auto', background: '#fff', paddingBottom: 30 }}>
-                <Header 
+                <Header
                     pageIndex={pageIndex}
                     status={status}
                     onDiscardCurrent={this.props.discardCurrentSubject}
                     onBackHomePage={this.onBackHomePage} />
                 {
                     status !== 'create' &&
-                    <MainPage 
-                        resultSet={resultSet} 
-                        analysisName={this.props.analysisName} 
+                    <MainPage
+                        resultSet={resultSet}
+                        analysisName={this.props.analysisName}
                         setAnalysisName={this.props.setAnalysisName}
-                        changeToCreateStatus={this.props.setCreateStatus} 
-                        onEditSubject={this.props.onEditSubject} 
-                        onDelSubject={this.props.onDelSubject} 
+                        changeToCreateStatus={this.props.setCreateStatus}
+                        onEditSubject={this.props.onEditSubject}
+                        onDelSubject={this.props.onDelSubject}
                         onGenerateAnalysis={this.onGenerateAnalysis.bind(this)}/>
 
                 }
                 {
                     status === 'create' && pageIndex === 0 &&
-                    <SubjectInput 
+                    <SubjectInput
                         onNextPage={this.onNextPage.bind(this) }
                         subjectList={Object.keys(resultSet)}
                         currentSubject={currentSubject}
@@ -145,8 +149,8 @@ class CustomizeAnalysis extends React.Component {
                 {
 
                     status === 'create' && pageIndex === 1 &&
-                    <ExamSelect 
-                        examList={customExamList} 
+                    <ExamSelect
+                        examList={customExamList}
                         pageIndex={pageIndex}
                         onPrevPage={this.onPrevPage.bind(this) }
                         onNextPage={this.onNextPage.bind(this) }
@@ -157,18 +161,18 @@ class CustomizeAnalysis extends React.Component {
                 {
 
                     status === 'create' && pageIndex === 2 &&
-                    <QuestionConfirm 
-                        pageIndex={pageIndex} 
-                        onPrevPage={this.onPrevPage.bind(this) } 
+                    <QuestionConfirm
+                        pageIndex={pageIndex}
+                        onPrevPage={this.onPrevPage.bind(this) }
                         onNextPage={this.onNextPage.bind(this) }
-                        mergedSQM={currentSubject.SQM} 
+                        mergedSQM={currentSubject.SQM}
                         changeQuestionName={this.props.changeQuesitonName}/>
 
 
                 }
                 {
                     status === 'create' && pageIndex === 3 &&
-                    <StudentConfirm  
+                    <StudentConfirm
                         pageIndex={pageIndex}
                         onPrevPage={this.onPrevPage.bind(this) }
                         onNextPage={this.onNextPage.bind(this) }
