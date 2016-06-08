@@ -112,6 +112,7 @@
     "mongodb": "2.1.16",
     "mongoose": "4.4.11",
     "morgan": "1.7.0",
+    "multer": "1.1.0",
     "murmur": "0.0.2",
     "node-libs-browser": "1.0.0",
     "on-finished": "2.3.0",
@@ -156,6 +157,7 @@
     "webpack": "1.12.14",
     "webpack-dev-middleware": "1.6.1",
     "webpack-hot-middleware": "2.10.0",
-    "when": "3.7.7"
+    "when": "3.7.7",
+    "xlsx": "0.8.0"
   }
 }
