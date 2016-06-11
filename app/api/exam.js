@@ -1,9 +1,9 @@
 /*
-* @Author: HellMagic
-* @Date:   2016-05-18 18:57:37
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-31 14:15:10
-*/
+ * @Author: HellMagic
+ * @Date:   2016-05-18 18:57:37
+ * @Last Modified by:   HellMagic
+ * @Last Modified time: 2016-05-31 14:15:10
+ */
 
 
 /*
@@ -103,7 +103,7 @@ Note:
 import axios from 'axios';
 import _ from 'lodash';
 import moment from 'moment';
-require('moment/locale/zh-cn');//这是moment.local()方法的bug：http://momentjs.com/docs/#/use-it/browserify/
+require('moment/locale/zh-cn'); //这是moment.local()方法的bug：http://momentjs.com/docs/#/use-it/browserify/
 var errors = require('common-errors');
 
 import {
@@ -138,7 +138,7 @@ export function fetchHomeData(params) {
             //res.data是exams数组
             var result = formatExams(res.data);
             return Promise.resolve(result);
-        } catch(e) {
+        } catch (e) {
             console.log('错误：', e);
             return Promise.reject(new errors.Error('格式化exams错误', e));
         }
@@ -162,21 +162,27 @@ function formatExams(exams) {
 
     //result用来保存格式化后的结果；resultOrder用来对group中的不同时间戳进行排序（统一时间戳下的数组在内部排序）；finalResult将
     //result和resultOrder结合得到有序的格式化后的结果
-    var result = {}, resultOrder = [];
+    var result = {},
+        resultOrder = [];
 
     _.each(examGroupsByEventTime, function(examsItem, timeKey) {
-        var flag = {key: timeKey, value: moment(timeKey.split('.')).valueOf() };
+        var flag = {
+            key: timeKey,
+            value: moment(timeKey.split('.')).valueOf()
+        };
         resultOrder.push(flag);
         var temp = {};
         _.each(examsItem, function(exam) {
-            temp[exam._id] = {exam: exam};
+            temp[exam._id] = {
+                exam: exam
+            };
             var papersFromExamGroupByGrade = _.groupBy(exam["[papers]"], function(paper) {
                 return paper.grade;
             });
             temp[exam._id].papersMap = papersFromExamGroupByGrade;
         });
 
-        if(!result[timeKey]) result[timeKey] = [];
+        if (!result[timeKey]) result[timeKey] = [];
 
         _.each(temp, function(value, key) {
             _.each(value.papersMap, function(papers, gradeKey) {
@@ -188,7 +194,10 @@ function formatExams(exams) {
                 obj.eventTime = moment(value.exam['event_time']).format('ll');
                 obj.subjectCount = papers.length;
                 obj.papers = _.map(papers, (obj) => {
-                    return {id: obj.paper, subject: obj.subject}
+                    return {
+                        id: obj.paper,
+                        subject: obj.subject
+                    }
                 });
                 obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
                 obj.from = value.exam.from; //TODO: 这里数据库里只是存储的是数字，但是显示需要的是文字，所以需要有一个map转换
@@ -202,7 +211,10 @@ function formatExams(exams) {
     resultOrder = _.orderBy(resultOrder, ['value'], ['desc']);
     var finallyResult = [];
     _.each(resultOrder, function(item) {
-        finallyResult.push({timeKey: item.key, values: result[item.key]});
+        finallyResult.push({
+            timeKey: item.key,
+            values: result[item.key]
+        });
     });
 
     return finallyResult;
@@ -213,8 +225,8 @@ export function fetchDashboardData(params) {
     var url = examPath + '/dashboard?examid=' + params.examid + '&grade=' + params.grade;
 
     return params.request.get(url).then(function(res) {
-// console.log('=======================  dashboard res.data.keys = ', _.keys(res.data));
-//TODO: 需要赋值给reducer，然后直接展现就好；肯能还有一两个漏掉的~~~
+        // console.log('=======================  dashboard res.data.keys = ', _.keys(res.data));
+        //TODO: 需要赋值给reducer，然后直接展现就好；肯能还有一两个漏掉的~~~
         return Promise.resolve(res.data);
     });
 }
@@ -223,7 +235,7 @@ export function fetchDashboardData(params) {
 
 
 export function fetchSchoolAnalysisData(params) {
-    var url = examPath + '/school/analysis?examid=' + params.examid + '&grade=' + params.grade;//必须是通过URI编码过的
+    var url = examPath + '/school/analysis?examid=' + params.examid + '&grade=' + params.grade; //必须是通过URI编码过的
 
     var examInfo, examStudentsInfo, examPapersInfo, examClassesInfo;
     var studentsGroupByClass, allStudentsPaperMap;
@@ -240,12 +252,19 @@ export function fetchSchoolAnalysisData(params) {
         var headers = [];
         _.each(examPapersInfo, (paper, pid) => {
             var index = _.findIndex(subjectWeight, (s) => (s == paper.subject));
-            if(index >= 0) {
-                headers.push({ index: index, subject: paper.subject, id: pid });
+            if (index >= 0) {
+                headers.push({
+                    index: index,
+                    subject: paper.subject,
+                    id: pid
+                });
             }
         });
         headers = _.sortBy(headers, 'index');
-        headers.unshift({subject: '总分', id: 'totalScore' });
+        headers.unshift({
+            subject: '总分',
+            id: 'totalScore'
+        });
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = _.map(levels, (value, key) => 1);
         return Promise.resolve({
@@ -356,9 +375,9 @@ function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
     table.push(totalSchoolRow);
 
     _.each(totalScoreLevelInfo, (levInfoItem, theKey) => {
-        if(theKey == 'totalSchool') return;
+        if (theKey == 'totalSchool') return;
         var totalClassRow = makeLevelTableRow(levInfoItem);
-        totalClassRow.unshift(theKey+'班');
+        totalClassRow.unshift(theKey + '班');
         table.push(totalClassRow);
     });
 
@@ -368,7 +387,7 @@ function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
 function makeLevelTableRow(rowInfo) {
     //rowInfo每一个levelKey都有对应的对象，而且顺序是对应levels的（即和segments是一样的，都是从低到高，而显示的时候是从高到底，所以这里需要反转）
     // debugger;
-    var tempMap = _.map(rowInfo, (rowObj, levelKey) => [rowObj.count, rowObj.sumCount, rowObj.sumPercentage+'%']);
+    var tempMap = _.map(rowInfo, (rowObj, levelKey) => [rowObj.count, rowObj.sumCount, rowObj.sumPercentage + '%']);
     // debugger;
     // vat tempMap = _.map(rowInfo, (rowObj, levelKey) => [rowObj.count, rowObj.sumCount, rowObj.sumPercentage + '%']);
     return _.concat(..._.reverse(tempMap));
@@ -416,28 +435,33 @@ function makeLevelTableRow(rowInfo) {
  * }
  */
 function theTotalScoreLevelDiscription(totalScoreLevelInfo, levels) {
-//找出各个档次各个班级的累积上线率，并按照levelKey进行分组
+    //找出各个档次各个班级的累积上线率，并按照levelKey进行分组
     var totalScoreLevelInfoGroupByLevel = _.groupBy(_.concat(..._.map(totalScoreLevelInfo, (theObj, theKey) => {
-        if(theKey == 'totalSchool') return [];
+        if (theKey == 'totalSchool') return [];
         return _.map(theObj, (levObj, levelKey) => {
-            return {levelKey: levelKey, sumPercentage: levObj.sumPercentage, 'class': theKey}
+            return {
+                levelKey: levelKey,
+                sumPercentage: levObj.sumPercentage,
+                'class': theKey
+            }
         })
     })), 'levelKey');
 
     var levelClassCount = _.size(totalScoreLevelInfo) - 1;
     //根据规则得到每个档次高低的班级名称：这里是和levels中的顺序是一一对应的，即'0'是一档。。。
-    var result = {}, low, high;
+    var result = {},
+        low, high;
     _.each(levels, (levObj, levelKey) => {
-        var orderLevelTotalScore = _.sortBy(totalScoreLevelInfoGroupByLevel[levelKey], 'sumPercentage');//从低到高
-        if(orderLevelTotalScore.length == 0) return;
+        var orderLevelTotalScore = _.sortBy(totalScoreLevelInfoGroupByLevel[levelKey], 'sumPercentage'); //从低到高
+        if (orderLevelTotalScore.length == 0) return;
 
-        if(levelClassCount == 2 || levelClassCount == 3) {
+        if (levelClassCount == 2 || levelClassCount == 3) {
             low = _.map(_.take(orderLevelTotalScore, 1), (item) => item.class);
             high = _.map(_.takeRight(orderLevelTotalScore, 1), (item) => item.class);
-        } else if(levelClassCount >= 4 && levelClassCount < 7) {
+        } else if (levelClassCount >= 4 && levelClassCount < 7) {
             low = _.map(_.take(orderLevelTotalScore, 2), (item) => item.class);
             high = _.map(_.takeRight(orderLevelTotalScore, 2), (item) => item.class);
-        } else if(levelClassCount >= 7) {
+        } else if (levelClassCount >= 7) {
             low = _.map(_.take(orderLevelTotalScore, 3), (item) => item.class);
             high = _.map(_.takeRight(orderLevelTotalScore, 3), (item) => item.class);
         }
@@ -451,11 +475,11 @@ function theTotalScoreLevelDiscription(totalScoreLevelInfo, levels) {
 
 
 function theTotalScoreLevelChart(levelTotalScoreInfo, theKey) {
-// 通过 levelTotalScoreInfo[theKey] 即可获得此scope下所有学生的分档情况
+    // 通过 levelTotalScoreInfo[theKey] 即可获得此scope下所有学生的分档情况
 }
 
 function chageStudentsScope(theKey) {
-//改变观察的学生范围
+    //改变观察的学生范围
 }
 
 /**
@@ -489,8 +513,8 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
     //{<levelKey>: <students>} 其中levelKey是String类型的，并且值小代表的是低分段（但是levels中）
     //从makeSegmentsStudentsCount得到的 countsMap中的 levelKey的个数一定是 segments.length-1 个，所以省去了后面判断没有某一个levelKey对应的数据则要补充。
 
-//makeSegmentsStudentsCount 获取的是：1.和segments顺序对应的key的count，也就是说低的levelKey对应的是低分段的count  2.包含[0, segments.length-2]共
-//segments.length-1个有效值
+    //makeSegmentsStudentsCount 获取的是：1.和segments顺序对应的key的count，也就是说低的levelKey对应的是低分段的count  2.包含[0, segments.length-2]共
+    //segments.length-1个有效值
 
     var countsGroupByLevel = makeSegmentsStudentsCount(examStudentsInfo, levelSegments);
 
@@ -538,7 +562,7 @@ function changeLevels(examInfo, examStudentsInfo) {
 
 //=================================== 学科分档上线学生分布 ============================================
 //内容：一个header描述；_.size(levels)个视图单元
-    //每个单元的内容：一个当前档次各科上线表格；一个分析说明，一个离差图；一段写死的文案
+//每个单元的内容：一个当前档次各科上线表格；一个分析说明，一个离差图；一段写死的文案
 
 function theSubjectLevelTotalHeader(levels) {
 
@@ -568,11 +592,11 @@ function theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers)
     table.push(totalSchoolRow);
 
     _.each(subjectLevelInfo, (subjectLevelObj, theKey) => {
-        if(theKey == 'totalSchool') return;
+        if (theKey == 'totalSchool') return;
         var classRow = _.map(headers, (headerObj) => {
             return subjectLevelObj[headerObj.id];
         });
-        classRow.unshift(examInfo.gradeName+theKey + '班');
+        classRow.unshift(examInfo.gradeName + theKey + '班');
         table.push(classRow);
     });
 
@@ -586,12 +610,18 @@ function theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers) {
     var subjectLevelArr, maxSubjects, minSubjects;
     _.each(subjectLevelInfo, (subjectLevelObj, theKey) => {
         subjectLevelArr = _.sortBy(_.filter(_.map(subjectLevelObj, (count, key) => {
-            return {count: count, key: key};
+            return {
+                count: count,
+                key: key
+            };
         }), (obj) => obj.key != 'totalScore'), 'count');
 
         maxSubjects = _.map(_.takeRight(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject);
         minSubjects = _.map(_.take(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject);
-        result[theKey] = {maxSubjects: maxSubjects, minSubjects: minSubjects};
+        result[theKey] = {
+            maxSubjects: maxSubjects,
+            minSubjects: minSubjects
+        };
     });
 
     return result;
@@ -619,7 +649,7 @@ function theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers) {
 
  */
 function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, headers) {
-//TODO:可能需要把计算出的最大和最小作为数据结构，因为分析说明其实就是这个图表的文字版说明
+    //TODO:可能需要把计算出的最大和最小作为数据结构，因为分析说明其实就是这个图表的文字版说明
 
     //去掉总分的信息，因为最后的factors中是没有总分这一项的
     var titleHeader = _.map(headers.slice(1), (obj) => obj.subject);
@@ -627,44 +657,62 @@ function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examCl
     //构造基本的原matrix
     var originalMatrix = makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, headers);
 
-// debugger;
+    // debugger;
 
     //factorsMatrix中每一行（即一重数组的长度应该和titleHeader相同，且位置意义对应）
     var factorsMatrix = makeFactor(originalMatrix);
 
     //扫描每一行，得到最大和最小的坐标，然后到titHeader中获取科目名称，返回{subject: , count: } 班级的顺序就是studentsGroupByClass的顺序
-    var xAxons = _.map(_.keys(studentsGroupByClass), (className) => (examInfo.gradeName+className+'班'));
+    var xAxons = _.map(_.keys(studentsGroupByClass), (className) => (examInfo.gradeName + className + '班'));
     var yAxons = _.map(factorsMatrix, (factorsInfo) => {
-        var fmax = _.max(factorsInfo), fmin = _.min(factorsInfo);
+        var fmax = _.max(factorsInfo),
+            fmin = _.min(factorsInfo);
 
         var fmaxIndex = _.findIndex(factorsInfo, (item) => item == fmax);
         var fminIndex = _.findIndex(factorsInfo, (item) => item == fmin);
 
-        var fmaxSubject = titleHeader[fminIndex], fminSubject = titleHeader[fminIndex];
+        var fmaxSubject = titleHeader[fminIndex],
+            fminSubject = titleHeader[fminIndex];
 
-        return [{subject: fmaxSubject, count: fmax, nice: true}, {subject: fminSubject, count: fmin, nice: false}];
+        return [{
+            subject: fmaxSubject,
+            count: fmax,
+            nice: true
+        }, {
+            subject: fminSubject,
+            count: fmin,
+            nice: false
+        }];
     });
 
-    return {xAxons: xAxons, yAxons: yAxons }
+    return {
+        xAxons: xAxons,
+        yAxons: yAxons
+    }
 
 }
 
 
 //TODO: 这个计算的可能有问题--可能不需要这么复杂，这里只是对tableData进行横向扫表而不是charData的横向扫描。而且这里缺少全校的数据，但是离差中肯定是没有全校的数据的
 function theSubjectLevelDiscription2(classes, subjectsInfo, headers) {
-//TODO: PM--还有必要么？显示的话，不是分组，而是逐个班级显示，贡献率最大和最小
-//TODO: 其实还是chart图的数据结构，只不过一个用图表示，一个用文字说明
+    //TODO: PM--还有必要么？显示的话，不是分组，而是逐个班级显示，贡献率最大和最小
+    //TODO: 其实还是chart图的数据结构，只不过一个用图表示，一个用文字说明
     //全部打散，然后根据 科目分组，分辨出是大还是小
-    var allClassSubjectsInfo = _.concat(..._.map(subjectsInfo, (subjectInfoArr, index) => _.map(subjectInfoArr, (subjectInfoObj) => _.assign(subjectInfoObj, {class: classes[index]}))));
+    var allClassSubjectsInfo = _.concat(..._.map(subjectsInfo, (subjectInfoArr, index) => _.map(subjectInfoArr, (subjectInfoObj) => _.assign(subjectInfoObj, {
+        class: classes[index]
+    }))));
     //按照headers的顺序显示， 如果没有则跳过
     var allClassSubjectsInfoGroupBySubject = _.groupBy(allClassSubjectsInfo, 'subject');
     var result = {};
     _.each(headers, (headerObj, index) => {
         var target = allClassSubjectsInfoGroupBySubject[headerObj.subject];
-        if(!target) return;
+        if (!target) return;
         var nices = _.map(_.filter(target, (item) => item.nice), (obj) => obj.class);
         var bads = _.map(_.filter(target, (item) => !item.nice), (obj) => obj.class);
-        result[headerObj.subject] = {nices: nices, bads: bads};
+        result[headerObj.subject] = {
+            nices: nices,
+            bads: bads
+        };
     });
     return result;
 }
@@ -678,7 +726,7 @@ function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examI
 
     _.each(subjectLevelInfo, (subjectsOrTotalScoreObj, theKey) => {
         // var baseCount = (theKey == 'totalSchool') ? examInfo.realStudentsCount : examClassesInfo[theKey].realStudentsCount;
-        if(theKey == 'totalSchool') return;
+        if (theKey == 'totalSchool') return;
         // debugger;
         matrix.push(_.map(headers, (headerObj) => _.round(_.divide(subjectsOrTotalScoreObj[headerObj.id], examClassesInfo[theKey].realStudentsCount), 2)));
         // _.map(subjectsOrTotalScoreObj, (count, countKey) => _.round(_.divide(count, baseCount), 2))
@@ -716,7 +764,11 @@ function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examI
 function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examFullMark) {
     var subjectsMean = makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark);
     var schoolTotalScoreMean = _.round(_.mean(_.map(examStudentsInfo, (student) => student.score)), 2);
-    subjectsMean.totalScore = {id: 'totalScore', mean: schoolTotalScoreMean, name: '总分'};
+    subjectsMean.totalScore = {
+        id: 'totalScore',
+        mean: schoolTotalScoreMean,
+        name: '总分'
+    };
     // debugger;
 
     var result = {};
@@ -726,7 +778,7 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
 
     _.each(subjectsMean, (subMean, pid) => {
         // debugger;
-        if(pid == 'totalScore') return;
+        if (pid == 'totalScore') return;
         result.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score >= subMean.mean).length;
     });
     // debugger;
@@ -743,14 +795,17 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
 
         result[className] = temp;
     });
-    return {subjectLevelInfo: result, subjectsMean: subjectsMean}
+    return {
+        subjectLevelInfo: result,
+        subjectsMean: subjectsMean
+    }
 }
 
 //计算每一档次各科的平均分
 //算法：获取所有考生基数中 总分**等于**此档分数线 的所有考生；如果这些考生的人数不足够样本数（当前是固定值25），则扩展1分（单位），再获取，注意：
-        //  1.分数都四舍五入（包括分档线）
-        //  2.一定要滑动窗口两边的数量是相同的，保证平均分不变（注意有“选择的某个分数上没有对应学生的情况”）
-        //  3.当遇到从n中取m（其中n > m）
+//  1.分数都四舍五入（包括分档线）
+//  2.一定要滑动窗口两边的数量是相同的，保证平均分不变（注意有“选择的某个分数上没有对应学生的情况”）
+//  3.当遇到从n中取m（其中n > m）
 //  一定要保证每次取的人都是相同的（根据examStudentsInfo的顺序），这样每次计算的科目平局分才是相同的
 //  ，不断重复上述过程，直到满足样本数量
 function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark) {
@@ -759,10 +814,10 @@ function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, exam
 
     var currentLowScore, currentHighScore;
     currentLowScore = currentHighScore = _.round(levelScore);
-    while((count < 25) && (currentLowScore >= 0) && (currentHighScore <= examFullMark)) {
-        var currentLowStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore-1));
+    while ((count < 25) && (currentLowScore >= 0) && (currentHighScore <= examFullMark)) {
+        var currentLowStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore - 1));
 
-        var currentHighStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore+1));
+        var currentHighStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore + 1));
 
         var currentTargetCount = _.min([currentLowStudents.length, currentHighStudents.length]);
 
@@ -811,7 +866,7 @@ function theClassExamHeader(levels) {
 function theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers, currentClasses) {
     var classKeys = _.keys(examClassesInfo);
 
-    if(!currentClasses || currentClasses.length == 0) currentClasses = _.map(_.range(2), (index) => examClassesInfo[classKeys[index]]);//初始化的时候显示默认的2个班级
+    if (!currentClasses || currentClasses.length == 0) currentClasses = _.map(_.range(2), (index) => examClassesInfo[classKeys[index]]); //初始化的时候显示默认的2个班级
     var examStudentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
     var result = {};
 
@@ -828,7 +883,7 @@ function theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers,
 }
 
 function theClassExamMeanTable(examInfo, subjectMeanInfo, headers) {
-//TODO: 注意原型图中少画了总分这一项（有很多地方都是），而这里添加了关于总分的数据（还是第一列，跟着headers走）
+    //TODO: 注意原型图中少画了总分这一项（有很多地方都是），而这里添加了关于总分的数据（还是第一列，跟着headers走）
     var matrix = [];
 
     var totalSchoolMeanObj = subjectMeanInfo.totalSchool;
@@ -837,11 +892,11 @@ function theClassExamMeanTable(examInfo, subjectMeanInfo, headers) {
     matrix.push(totalSchoolRow);
 
     _.each(subjectMeanInfo, (subjectMeanObj, theKey) => {
-        if(theKey == 'totalSchool') return;
+        if (theKey == 'totalSchool') return;
 
         var classMeanObj = subjectMeanInfo[theKey];
         var classRow = _.concat(..._.map(headers, (headerObj) => [classMeanObj[headerObj.id].mean, classMeanObj[headerObj.id].meanRate]));
-        classRow.unshift(examInfo.gradeName+theKey+'班');
+        classRow.unshift(examInfo.gradeName + theKey + '班');
         matrix.push(classRow);
     });
     return matrix;
@@ -863,7 +918,7 @@ function theClassExamMeanFactorsTable(examInfo, subjectMeanInfo, studentsGroupBy
 
     var classKeys = _.keys(studentsGroupByClass);
     _.each(factorsMatrix, (factorsInfoRow, index) => {
-        factorsInfoRow.unshift(examInfo.gradeName+classKeys[index]+'班');
+        factorsInfoRow.unshift(examInfo.gradeName + classKeys[index] + '班');
     });
 
     factorsMatrix.unshift(titleHeader);
@@ -878,7 +933,7 @@ function makeClassExamMeanOriginalMatirx(subjectMeanInfo, headers) {
     matrix.push(_.map(headers, (headerObj) => totalSchoolMeanObj[headerObj.id].meanRate));
 
     _.each(subjectMeanInfo, (subjectMenaObj, theKey) => {
-        if(theKey == 'totalSchool') return;
+        if (theKey == 'totalSchool') return;
         matrix.push(_.map(headers, (headerObj) => subjectMenaObj[headerObj.id].meanRate));
     });
     return matrix;
@@ -907,11 +962,16 @@ function theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo, groupLengt
     var groupStudentsInfo = makeGroupStudentsInfo(groupLength, examStudentsInfo);
 
     var groupHeaders = _.map(_.range(groupLength), (index) => {
-        return {index: index, title: '第' + numberMap[index+1] + '组<br />(前)' + (index+1) + '0%)', id: index }
+        return {
+            index: index,
+            title: '第' + numberMap[index + 1] + '组<br />(前)' + (index + 1) + '0%)',
+            id: index
+        }
     });
     var titleHeader = _.concat(['班级'], _.map(groupHeaders, (headerObj, index) => headerObj.title));
 
-    var table = [], totalSchoolInfo = [];
+    var table = [],
+        totalSchoolInfo = [];
 
     table.push(titleHeader);
 
@@ -919,7 +979,11 @@ function theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo, groupLengt
     _.each(groupStudentsInfo, (groupObj, groupKey) => {
         totalSchoolInfo.push(groupObj.groupCount);
         _.each(groupObj.classStudents, (students, className) => {
-            allGroupStudentInfoArr.push({ 'class': className, groupKey: groupKey, students: students });
+            allGroupStudentInfoArr.push({
+                'class': className,
+                groupKey: groupKey,
+                students: students
+            });
         });
     });
 
@@ -936,7 +1000,7 @@ function theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo, groupLengt
             var target = _.find(groupStudentsObjArr, (sobj) => sobj.groupKey == index);
             return target ? target.students.length : 0;
         });
-        classGroupCountRow.unshift(examInfo.gradeName+className+'班');
+        classGroupCountRow.unshift(examInfo.gradeName + className + '班');
         table.push(classGroupCountRow);
     });
 
@@ -959,16 +1023,16 @@ function makeOriginalSubjectInfoRow(students, examPapersInfo, examInfo, examClas
 
     result.totalScore.mean = _.round(_.mean(_.map(students, (student) => student.score)), 2);
     result.totalScore.count = _.filter(students, (student) => student.score >= result.totalScore.mean).length;
-    result.totalScore.meanRate = _.round(_.divide(result.totalScore.mean, examInfo.fullMark), 2);//注意这里没有使用百分制
+    result.totalScore.meanRate = _.round(_.divide(result.totalScore.mean, examInfo.fullMark), 2); //注意这里没有使用百分制
 
-    result.totalScore.countPercentage = _.round(_.multiply(_.divide(result.totalScore.count, students.length), 100), 2);//注意这里使用了百分制
+    result.totalScore.countPercentage = _.round(_.multiply(_.divide(result.totalScore.count, students.length), 100), 2); //注意这里使用了百分制
     _.each(_.groupBy(_.concat(..._.map(students, (student) => student.papers)), 'paperid'), (papers, pid) => {
         var obj = {};
 
         obj.mean = _.round(_.mean(_.map(papers, (paper) => paper.score)), 2);
         obj.count = _.filter(papers, (paper) => paper.score >= obj.mean).length;
-        obj.meanRate = _.round(_.divide(obj.mean, examPapersInfo[pid].fullMark), 2);//注意这里没有使用百分制
-        obj.countPercentage = _.round(_.multiply(_.divide(obj.count, students.length), 100), 2);//注意这里使用了百分制
+        obj.meanRate = _.round(_.divide(obj.mean, examPapersInfo[pid].fullMark), 2); //注意这里没有使用百分制
+        obj.countPercentage = _.round(_.multiply(_.divide(obj.count, students.length), 100), 2); //注意这里使用了百分制
 
         result[pid] = obj;
     });
@@ -980,9 +1044,11 @@ function makeOriginalSubjectInfoRow(students, examPapersInfo, examInfo, examClas
 function makeGroupStudentsInfo(groupLength, students) {
     //需要原始的“根据考生总分排序好的” studentsInfo 数组
     //将数组内的元素分成10组，计算每一组中各个班级学生人数
-    var result = {}, flagCount = 0, totalStudentCount = students.length;
+    var result = {},
+        flagCount = 0,
+        totalStudentCount = students.length;
     _.each(_.range(groupLength), function(index) {
-        var groupCount = (index == groupLength-1) ? (totalStudentCount - flagCount) : (_.ceil(_.divide(totalStudentCount, groupLength)));
+        var groupCount = (index == groupLength - 1) ? (totalStudentCount - flagCount) : (_.ceil(_.divide(totalStudentCount, groupLength)));
         flagCount += groupCount;
 
         //当前组的学生数组：
@@ -990,7 +1056,11 @@ function makeGroupStudentsInfo(groupLength, students) {
         //对当前组的学生按照班级进行group
         var groupStudentsGroupByClass = _.groupBy(currentGroupStudents, 'class');
 
-        result[index] = { groupCount: groupCount, classStudents: groupStudentsGroupByClass, flagCount: flagCount };
+        result[index] = {
+            groupCount: groupCount,
+            classStudents: groupStudentsGroupByClass,
+            flagCount: flagCount
+        };
     });
     return result;
 }
@@ -1032,18 +1102,19 @@ function theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperM
 
 function theSubjectLevelExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, levelFactors) {
     //默认给出n个等次，然后最后添加1--代表满分，就是1档次的区间，这样才能形成对应的n个区间（则有n+1个刻度）
-//segments依然是从小到大，但这里展示的时候是从大到小（高难度档次在前）
-    levelFactors = levelFactors ? levelFactors.push(1) : [0, 0.6, 0.7, 0.85, 1];  //五个刻度，四个档次
+    //segments依然是从小到大，但这里展示的时候是从大到小（高难度档次在前）
+    levelFactors = levelFactors ? levelFactors.push(1) : [0, 0.6, 0.7, 0.85, 1]; //五个刻度，四个档次
 
-    var matrix = [], total = levelFactors.length -1;
+    var matrix = [],
+        total = levelFactors.length - 1;
     var titleHeader = _.map(_.range(total), (index) => {
-        return index==total-1 ?  letterMap[index] + '等（小于'+ levelFactors[total-index] +'）' : letterMap[index] + '等（'+ levelFactors[total-index-1] +'）';
+        return index == total - 1 ? letterMap[index] + '等（小于' + levelFactors[total - index] + '）' : letterMap[index] + '等（' + levelFactors[total - index - 1] + '）';
     });
 
     titleHeader.unshift('学科成绩分类');
     matrix.push(titleHeader);
 
-    var subjectHeaders = headers.slice(1);//没有总分这一行
+    var subjectHeaders = headers.slice(1); //没有总分这一行
 
     _.each(subjectHeaders, (headerObj, index) => {
         //每一个科目|
@@ -1062,8 +1133,8 @@ function theSubjectLevelExamTable(examStudentsInfo, examPapersInfo, allStudentsP
 }
 
 function theSubjectExamDiscription() {
-//TODO: PM--给出具体的规则。第三个文案可以写写其他简单的
-//第二个算法：各个学科各个班级的平均得分率，然后max-min，然后从中选出哪几个学科的差值较大或较小
+    //TODO: PM--给出具体的规则。第三个文案可以写写其他简单的
+    //第二个算法：各个学科各个班级的平均得分率，然后max-min，然后从中选出哪几个学科的差值较大或较小
     //班级考试基本表现中有关于 各个班级各个学科平均得分率的数据结构，可以拿来用！！！
 }
 
@@ -1079,14 +1150,15 @@ function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass,
     // levels = levels || makeDefaultLevles(examInfo, examStudentsInfo);
     levelBuffers = levelBuffers || _.map(_.range(_.size(levels)), (index) => 10);
 
-    var table = [], criticalLevelInfo = {};
+    var table = [],
+        criticalLevelInfo = {};
 
     _.each(_.range(_.size(levels)), (index) => {
         criticalLevelInfo[index] = [];
     });
 
     var titleHeader = _.map(_.range(_.size(levels)), (index) => {
-        return numberMap[index+1] + '档临界生人数';
+        return numberMap[index + 1] + '档临界生人数';
     });
     titleHeader.unshift('分档临界生');
 
@@ -1102,55 +1174,64 @@ function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass,
 
     _.each(studentsGroupByClass, (students, className) => {
         var classCounts = makeSegmentsStudentsCount(students, segments);
-        var classRow = _.filter(classCounts, (count, index) => (index % 2 == 0));//从低到高
+        var classRow = _.filter(classCounts, (count, index) => (index % 2 == 0)); //从低到高
         classRow = _.reverse(classRow); //从高到底
 
         _.each(classRow, (count, index) => {
-            criticalLevelInfo[index].push({'class': className, count: count});//因为这里使用的是反转后得到classRow，所以这里criticalLevelInfo中的
-                                                                                    //levelKey是颠倒后的，即小值代表高档
+            criticalLevelInfo[index].push({
+                'class': className,
+                count: count
+            }); //因为这里使用的是反转后得到classRow，所以这里criticalLevelInfo中的
+            //levelKey是颠倒后的，即小值代表高档
         });
 
-        classRow.unshift(examInfo.gradeName+className+'班');
+        classRow.unshift(examInfo.gradeName + className + '班');
         table.push(classRow);
     });
-// debugger;
+    // debugger;
 
-// console.log('=============== criticalStudentsTable');
-// console.log(table);
-// console.log('=====================================');
+    // console.log('=============== criticalStudentsTable');
+    // console.log(table);
+    // console.log('=====================================');
 
-//     var criticalDis = criticalStudentsDiscription(criticalLevelInfo);  Done
+    //     var criticalDis = criticalStudentsDiscription(criticalLevelInfo);  Done
 
-// console.log('=============== criticalStudentsDiscription');
-// console.log(criticalDis);
-// console.log('=====================================');
+    // console.log('=============== criticalStudentsDiscription');
+    // console.log(criticalDis);
+    // console.log('=====================================');
 
-    return {tableData: table, criticalLevelInfo: criticalLevelInfo};
+    return {
+        tableData: table,
+        criticalLevelInfo: criticalLevelInfo
+    };
 }
 
 function makeCriticalSegments(levelBuffers, levels) {
     //[<thirdScore-thirdBuffer>, <thirdScore+thirdBuffer>, ...]
     var result = [];
     _.each(levels, (levObj, levelKey) => {
-        result.push(levObj.score-levelBuffers[levelKey-0]);
-        result.push(levObj.score+levelBuffers[levelKey-0]);
+        result.push(levObj.score - levelBuffers[levelKey - 0]);
+        result.push(levObj.score + levelBuffers[levelKey - 0]);
     });
     return result;
 }
 
-function criticalStudentsDiscription(criticalLevelInfo) {  //Done
+function criticalStudentsDiscription(criticalLevelInfo) { //Done
     //上面的 criticalLevelInfo
     // 每一档
-    var result = {top: {}, low: {}};
+    var result = {
+        top: {},
+        low: {}
+    };
     _.each(criticalLevelInfo, (counts, levelKey) => {
         //多的前3 和 少的前三
-        var orderedCounts = _.sortBy(counts, 'count');// 升序
-        var top = _.map(_.takeRight(orderedCounts, 3), (cobj) => cobj.class+'班');
+        var orderedCounts = _.sortBy(counts, 'count'); // 升序
+        var top = _.map(_.takeRight(orderedCounts, 3), (cobj) => cobj.class + '班');
         result.top[levelKey] = top;
-        var low = _.map(_.take(orderedCounts, 3), (cobj) => cobj.class+'班');
+        var low = _.map(_.take(orderedCounts, 3), (cobj) => cobj.class + '班');
         result.low[levelKey] = low;
     });
-    return result;//小值代表高档
+    return result; //小值代表高档
 }
 
 //============================= 有关学生的重要信息 =============================
@@ -1163,17 +1244,21 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
         result[className] = {};
     });
 
-//总分的相关信息
+    //总分的相关信息
     var totalScoreTopStudentsGroupByClass = _.groupBy(_.takeRight(examStudentsInfo, 30), 'class');
     var totalScoreLowStudentsGroupByClass = _.groupBy(_.take(examStudentsInfo, 30), 'class');
 
     _.each(totalScoreTopStudentsGroupByClass, (students, className) => {
-        result[className].totalScore = { top: students.length };
+        result[className].totalScore = {
+            top: students.length
+        };
     });
 
     _.each(totalScoreLowStudentsGroupByClass, (students, className) => {
-        if(!result[className].totalScore) {
-            result[className].totalScore = { low: students.length };
+        if (!result[className].totalScore) {
+            result[className].totalScore = {
+                low: students.length
+            };
         } else {
             result[className].totalScore.low = students.length;
         }
@@ -1189,37 +1274,43 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
         var lowPapersGroupByClassName = _.groupBy(lowPapers, 'class_name');
 
         _.each(topPapersGroupByClassName, (cpapers, className) => {
-            result[className][pid] = { top: cpapers.length };
+            result[className][pid] = {
+                top: cpapers.length
+            };
         });
         _.each(lowPapersGroupByClassName, (cpapers, className) => {
-            if(!result[className][pid]) {
-                result[className][pid] = { low: cpapers.length };
+            if (!result[className][pid]) {
+                result[className][pid] = {
+                    low: cpapers.length
+                };
             } else {
                 result[className][pid].low = cpapers.length;
             }
         });
     });
 
-/*
-{
-    <className>: {
-        totalScore: {
-            top:
-            low:
-        },
-        <pid>: {
-            top:
-            low:
+    /*
+    {
+        <className>: {
+            totalScore: {
+                top:
+                low:
+            },
+            <pid>: {
+                top:
+                low:
+            }
         }
     }
-}
-*/
+    */
 
-//TODO: select可以变化多种计算方式，会改变matrix table的数据
-    var topMatrix = [], lowMatrix = [];
+    //TODO: select可以变化多种计算方式，会改变matrix table的数据
+    var topMatrix = [],
+        lowMatrix = [];
     _.each(result, (value, className) => {
-        var tempTop = [], tempLow = [];
-         _.each(headers, (headerObj, index) => {
+        var tempTop = [],
+            tempLow = [];
+        _.each(headers, (headerObj, index) => {
             var tempTopCount = value[headerObj.id] ? (value[headerObj.id].top ? value[headerObj.id].top : 0) : 0;
             var tempLowCount = value[headerObj.id] ? (value[headerObj.id].low ? value[headerObj.id].low : 0) : 0;
 
@@ -1227,14 +1318,17 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
             tempLow.push(tempLowCount);
         });
 
-        tempTop.unshift(examInfo.gradeName+className+'班');
-        tempLow.unshift(examInfo.gradeName+className+'班');
+        tempTop.unshift(examInfo.gradeName + className + '班');
+        tempLow.unshift(examInfo.gradeName + className + '班');
 
         topMatrix.push(tempTop);
         lowMatrix.push(tempLow);
     });
 
-    return {topTableData: topMatrix, lowTableData: lowMatrix}
+    return {
+        topTableData: topMatrix,
+        lowTableData: lowMatrix
+    }
 }
 
 
@@ -1246,10 +1340,10 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
  * @param  {Number} count [description]
  * @return {[type]}       [description]
  */
-export function makeSegments(end, start=0, count=12) {
+export function makeSegments(end, start = 0, count = 12) {
     var step = _.ceil(_.divide(_.subtract(end, start), count));
-    var result = _.range(start, end+1, step);
-    if(_.takeRight(result) < end) result.push(end);
+    var result = _.range(start, end + 1, step);
+    if (_.takeRight(result) < end) result.push(end);
     return result;
 }
 
@@ -1266,7 +1360,7 @@ export function makeSegmentsStudentsCount(students, segments) {
 
     //(_.range(segments-1))来保证肯定生成与区间段数目（segments.length-1--即横轴或Table的一行）相同的个数，没有则填充0，这样才能对齐
     //这里已经将 levelKey = -1 和 levelKey = segments.length-1 给过滤掉了
-    var result = _.map(_.range(segments.length-1), function(index) {
+    var result = _.map(_.range(segments.length - 1), function(index) {
         return (groupStudentsBySegments[index]) ? groupStudentsBySegments[index].length : 0
     });
 
@@ -1278,14 +1372,15 @@ export function makeSegmentsStudentsCount(students, segments) {
 Note: 注意这里有可能返回-1（比最小值还要小）和(segments.legnth-1)（比最大值还大）。[0~segment.length-2]是正确的值
  */
 function findScoreSegmentIndex(segments, des) {
-    var low = 0, high = segments.length-1;
-    while(low <= high) {
-        var middle = _.ceil((low + high)/2);
-        if(des == segments[middle]) {
-            return (des == segments[0]) ? middle : middle-1;
-        }else if(des <segments[middle]) {
-            high = middle - 1;
-　　    }else {
+    var low = 0,
+        high = segments.length - 1;
+    while (low <= high) {
+        var middle = _.ceil((low + high) / 2);
+        if (des == segments[middle]) {
+            return (des == segments[0]) ? middle : middle - 1;
+        } else if (des < segments[middle]) {
+            high = middle - 1;　　
+        } else {
             low = middle + 1;
         }
     }
@@ -1304,12 +1399,12 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
     //2.parseInt(levelKey)值越小level越高，其对应的segments区间段越靠后（所以两者是相反的顺序）-- 废弃（调整了levels的顺序，也是小的key代表低分段）
     //3.这里是先固定好的百分比
 
-//一定要是从'0'开始的
+    //一定要是从'0'开始的
     var levels = {
         '0': {
             score: 0,
             count: 0,
-            percentage: 60  //确认这里60%是“累计占比”--即一档+二挡+三挡总共60%
+            percentage: 60 //确认这里60%是“累计占比”--即一档+二挡+三挡总共60%
         },
         '1': {
             score: 0,
@@ -1333,10 +1428,10 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
 }
 
 export function makeFactor(originalMatrix) {
-    var tempMatrix = [];//不用map是因为避免占位
+    var tempMatrix = []; //不用map是因为避免占位
     //1.行相减
     _.each(originalMatrix, (classRow, rowIndex) => {
-        if(rowIndex == 0) return;
+        if (rowIndex == 0) return;
         var rowFactors = _.map(classRow, (perItem, columnIndex) => _.round(_.subtract(perItem, originalMatrix[0][columnIndex]), 2));
         tempMatrix.push(rowFactors);
     });
@@ -1346,7 +1441,7 @@ export function makeFactor(originalMatrix) {
     _.each(tempMatrix, (rowArr, rowIndex) => {
         var tempRow = [];
         _.each(rowArr, (tempFactor, columnIndex) => {
-            if(columnIndex == 0) return;
+            if (columnIndex == 0) return;
             tempRow.push(_.round(_.subtract(tempFactor, rowArr[0]), 2));
         });
         resultMatrix.push(tempRow);
@@ -1416,5 +1511,114 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
  */
 
 
- //********************************************************* CustomAnalysis *********************************************************
+//********************************************************* RankReport *********************************************************
+
+/*
+同SchoolAnalysis的 examInfo，examClassesInfo以及examStudentsInfo
+ */
+export function fetchRankReportdData(params) {
+    var url = examPath + '/rank/report?examid=' + params.examid + '&grade=' + params.grade;
+    return params.request.get(url).then(function(res) {
+        var {examInfo, examPapersInfo, examStudentsInfo} = res.data;
+        var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');        
+//构建需要的数据结构，最主要的是rankCache。检查allStudentsPaperMap是否符合。
+
+/*
+examInfo: {
+    name: ,
+    papers: , //注意要在这里添加 totalScore的信息
+    classes: 
+}
+
+rankCache: {
+    totalScore: {
+        <className>: [ //已经是有序的（升序）
+            {
+                kaohao: ,
+                name: ,
+                class: ,
+                score: 
+            }
+        ],
+        ...
+    },
+    <pid>: {
+        <className>: [
+            {
+                kaohao: ,
+                name: ,
+                class: ,
+                score
+            }
+        ],
+        ...
+    },
+    ...
+}
+
+ */
+        return Promise.resolve({
+            examInfo: {},
+            rankCache: {}
+        });
+    });
+}
+
+
+
+
+
+
+/*
+TODO: 班级表现中算法
+计算每个班级 ： 班级排名中位的学生的成绩-班级平均分
+组成一个数组
+从小到大排序
+也有可能都是正数或负数？对正数和负数要加判断说明
+正数：考的较差
+负数：考的较好
+此处正负和减法中减数和被减数的位置有关
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

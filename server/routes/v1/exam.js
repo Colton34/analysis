@@ -1,9 +1,9 @@
 /*
-* @Author: HellMagic
-* @Date:   2016-04-30 11:14:17
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-01 14:30:22
-*/
+ * @Author: HellMagic
+ * @Date:   2016-04-30 11:14:17
+ * @Last Modified by:   HellMagic
+ * @Last Modified time: 2016-06-01 14:30:22
+ */
 
 'use strict';
 
@@ -18,12 +18,10 @@ var exam = require('exam');
 
 //因为在express config中对该保护的路由做了verify（验证）所以就免去了在具体路由里重复的添加（TODO：但是现在权限控制还没有添加）
 router.get('/home', exam.home);
-
 //TODO: dashboard的重构
 router.get('/dashboard', exam.validateExam, exam.initExam, exam.dashboard);
-
-
-router.get('/school/analysis',  exam.validateExam, exam.initExam, exam.schoolAnalysis);
+router.get('/school/analysis', exam.validateExam, exam.initExam, exam.schoolAnalysis);
+router.get('/rank/report', exam.validateExam, exam.initExam, exam.rankReport);
 
 module.exports = router;
 

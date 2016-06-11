@@ -1,9 +1,9 @@
 /*
-* @Author: HellMagic
-* @Date:   2016-04-30 13:32:43
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-27 16:37:56
-*/
+ * @Author: HellMagic
+ * @Date:   2016-04-30 13:32:43
+ * @Last Modified by:   HellMagic
+ * @Last Modified time: 2016-05-27 16:37:56
+ */
 
 'use strict';
 
@@ -23,8 +23,8 @@ var config = require('../../config/env');
  */
 var getSchoolById = exports.getSchoolById = function(schoolid) {
     return when.promise(function(resolve, reject) {
-        peterMgr.get('@School.'+schoolid, function(err, school) {
-            if(err || !school) return reject(new errors.data.MongoDBError('find school:'+schoolid+' error', err));
+        peterMgr.get('@School.' + schoolid, function(err, school) {
+            if (err || !school) return reject(new errors.data.MongoDBError('find school:' + schoolid + ' error', err));
             resolve(school);
         });
     });
@@ -45,7 +45,7 @@ exports.getExamsBySchool = function(school) {
 function makeExamPromise(examid) {
     return when.promise(function(resolve, reject) {
         peterMgr.get('@Exam.' + examid, function(err, exam) {
-            if(err) return reject(new errors.data.MongoDBError('find exam:'+examid+ ' error', err));
+            if (err) return reject(new errors.data.MongoDBError('find exam:' + examid + ' error', err));
             resolve(exam);
         });
     });
@@ -110,13 +110,13 @@ exports.generateExamInfo = function(schoolid, examid, gradeName) {
             exam['[papers]'] = _.filter(exam['[papers]'], (paper) => paper.grade == gradeName);
             exam.fullMark = _.sum(_.map(exam['[papers]'], (paper) => paper.manfen));
             data.exam = exam;
-        } catch(e) {
+        } catch (e) {
             return when.reject(new errors.Error('generateExamInfo Error: ', e));
         }
         return getSchoolById(schoolid);
     }).then(function(school) {
         var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
-        if(!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.Error('没有找到对应的年级或者从属此年级的班级'));
+        if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.Error('没有找到对应的年级或者从属此年级的班级'));
 
         data.exam.grade = targetGrade;
         //fetchId是不带有一大串儿'0'的examid
@@ -124,6 +124,14 @@ exports.generateExamInfo = function(schoolid, examid, gradeName) {
         return when.resolve(data.exam);
     });
 };
+
+// exports.filterExam = function(examid, gradeName) {
+//     return fetchExamById(examid).then(fucntion(exam) {
+//         exam['[papers]'] = _.filter(exam['[papers]'], (paper) => paper.grade == gradeName);
+//         return when.resolve(exam);
+//     });
+// }
+
 /**
  * 通过examid查询获取一个exam实例
  * @param  {[type]} examid [description]
@@ -134,8 +142,8 @@ function fetchExamById(examid) {
 
     return when.promise(function(resolve, reject) {
         client.get(url, {}, function(err, res, body) {
-            if(err) return reject(new errors.URIError('查询rank server(exams)失败', err));
-            resolve(JSON.parse(body)[examid]);//这里必须反序列化--因为是通过网络传输的全部都是String
+            if (err) return reject(new errors.URIError('查询rank server(exams)失败', err));
+            resolve(JSON.parse(body)[examid]); //这里必须反序列化--因为是通过网络传输的全部都是String
         });
     });
 };
@@ -166,7 +174,7 @@ exports.generateExamScoresInfo = function(exam) {
         //全校此考试(exam)某年级(grade)所有考生总分信息，升序排列
         var targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
 
-        var orderedStudentScoreInfo = _.sortBy(_.concat(..._.values(targetClassesScore)), 'score');//这个数据结构已经很接近
+        var orderedStudentScoreInfo = _.sortBy(_.concat(..._.values(targetClassesScore)), 'score'); //这个数据结构已经很接近
         //examStudentsInfo的结构了，后面schoolAnalysis等页面还需要，所以会考虑缓存~~~
         //给exam补充实考和缺考人数信息：全校此年级此场考试的缺考人数=全校此年级的学生人数-全校此年级参加此场考试的人数
 
@@ -174,14 +182,14 @@ exports.generateExamScoresInfo = function(exam) {
         exam.realClasses = _.keys(targetClassesScore);
         exam.lostClasses = [], exam.realStudentsCount = 0, exam.lostStudentsCount = 0;
 
-//TODO:在这里还可以添加此班级在此场exam（而不是某一个paper）的realStudentsCount和lostStudentsCount
+        //TODO:在这里还可以添加此班级在此场exam（而不是某一个paper）的realStudentsCount和lostStudentsCount
 
         _.each(exam.grade['[classes]'], (classItem, index) => {
-            if(targetClassesScore[classItem.name]) {
+            if (targetClassesScore[classItem.name]) {
                 classItem.realStudentsCount = targetClassesScore[classItem.name].length;
                 exam.realStudentsCount += classItem.realStudentsCount;
                 classItem.lostStudentsCount = classItem['[students]'].length - classItem.realStudentsCount;
-                exam.lostStudentsCount += classItem.lostStudentsCount;//各个真正参加考试的班级中缺考的人数
+                exam.lostStudentsCount += classItem.lostStudentsCount; //各个真正参加考试的班级中缺考的人数
             } else {
                 exam.lostClasses.push(classItem.name);
             }
@@ -189,9 +197,11 @@ exports.generateExamScoresInfo = function(exam) {
 
 
 
-
         exam.realClasses = _.keys(targetClassesScore);
-        return when.resolve({classScoreMap: targetClassesScore, orderedScoresArr: orderedStudentScoreInfo});
+        return when.resolve({
+            classScoreMap: targetClassesScore,
+            orderedScoresArr: orderedStudentScoreInfo
+        });
     });
 };
 
@@ -199,7 +209,7 @@ function fetchExamScoresById(examid) {
     var url = config.testRankBaseUrl + '/scores' + '?' + 'examid=' + examid;
     return when.promise(function(resolve, reject) {
         client.get(url, {}, function(err, res, body) {
-            if(err) return reject(new errors.URIError('查询rank server(scores)失败', err));
+            if (err) return reject(new errors.URIError('查询rank server(scores)失败', err));
             var data = JSON.parse(body);
             var keys = _.keys(data);
             resolve(data[keys[0]]);
@@ -211,7 +221,7 @@ exports.getPapersInfoByExam = function(exam) {
     var findPapersPromises = _.map(exam["[papers]"], function(pobj) {
         return when.promise(function(resolve, reject) {
             peterMgr.get(pobj.paper, function(err, paper) {
-                if(err) return reject(new errors.data.MongoDBError('find paper:'+pid+' error', err));
+                if (err) return reject(new errors.data.MongoDBError('find paper:' + pid + ' error', err));
                 resolve(paper);
             });
         });
@@ -244,8 +254,8 @@ exports.generateStudentScoreInfo = function(exam, papers, school) {
             fullMark: paper.manfen
         };
         _.each(paper["[students]"], function(student) {
-        //确认：选用学生的id作为索引（虽然也可以用kaohao--因为是在同一场考试下）
-            if(!studentScoreInfoMap[student.id]) {
+            //确认：选用学生的id作为索引（虽然也可以用kaohao--因为是在同一场考试下）
+            if (!studentScoreInfoMap[student.id]) {
                 //TODO：重构--这个赋值的操作可以使用ES6的简单方式
                 var obj = {};
                 obj.id = student.id;
@@ -256,7 +266,7 @@ exports.generateStudentScoreInfo = function(exam, papers, school) {
             }
             //这里赋给0默认值，就不能区分“缺考”（undefined）和真实考了0分
 
-//TODO:修改成student.papers = [{id: paper.id, score: <paper_score>, ...}]
+            //TODO:修改成student.papers = [{id: paper.id, score: <paper_score>, ...}]
 
             studentScoreInfoMap[student.id][paper.id] = student.score || 0;
             studentScoreInfoMap[student.id].totalScore = (studentScoreInfoMap[student.id].totalScore) ? (studentScoreInfoMap[student.id].totalScore + studentScoreInfoMap[student.id][paper.id]) : (studentScoreInfoMap[student.id][paper.id]);
@@ -278,8 +288,6 @@ exports.generateStudentScoreInfo = function(exam, papers, school) {
         classInfo: classInfo
     };
 }
-
-
 
 
 
