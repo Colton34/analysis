@@ -117,7 +117,7 @@ class ClassPerformance extends React.Component {
 //                 name: '初一1班',
 //                 data: [11.2, 9.6, 19.5, 85.5, 21.8, 12.5, 87.5, 78.5, 33.3, 8.3, 23.9, 5.6]
 //             }];
-
+        var headerInfo = theClassExamHeader(studentsGroupByClass);
         var {xAxons, yAxonses} = theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers, this.state.currentClasses);
         var subjectMeanInfo = makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass, headers);
         var meanTableBodyData = theClassExamMeanTable(examInfo, subjectMeanInfo, headers);
@@ -183,9 +183,9 @@ class ClassPerformance extends React.Component {
                         （2）考虑到各个班级有各自的具体情况，可以基于各班的自身水平来考察高端及低端学生的分布，反映出学生总分的分布趋势。通过大数据归类分析我们发现，以各班自身水平衡量，高分学生人数较多的
                         班级有：
                         {/*--------------------------------  TODO：班级考试表现的Header -------------------------------------*/}
-                        <span className={styles['school-report-dynamic']}>1班、3班</span>，
+                        <span className={styles['school-report-dynamic']}>{_.join(headerInfo.greater, '、')}</span>，
                         高分学生人数比低分学生人数较少的班级有
-                        <span className={styles['school-report-dynamic']}>6班、5班</span>。
+                        <span className={styles['school-report-dynamic']}>{_.join(headerInfo.lesser, '、')}</span>。
                         <br/>
                         （注意： 这是一各班自身水平为基础而得出的结论，不是单用学生总分在全校中的排队为依据的，可能会有特别好的班级也会出现相对于班级自身水平的高分学生人数少于低分学生人数的
                           ，说明改版机还没有充分挖掘出学生的潜力。）
@@ -246,8 +246,23 @@ class ClassPerformance extends React.Component {
 
 export default ClassPerformance;
 
-function theClassExamHeader(levels) {
-    //TODO: PM--没看懂，“较多”？“较少”？
+function theClassExamHeader(studentsGroupByClass) {
+    //对各个班级计算：1.此班级中排名中间的学生的成绩 2.此班级的平局分  3.二者的差
+    //studentsGroupByClass应该就是排好序的。
+    //问题：只能说明高分段和低分段的比较，但是不能说明是总体是高分多还是低分多，比如[1, 1, 1, 1, 1]和[99, 99, 99, 99, 99]，diff都是0
+    var results = _.map(studentsGroupByClass, (students, className) {
+        var diff = _.round(_.subtract(students[parseInt(students.length/2)] - _.mean(_.map(students, (student) => student.score))), 2);
+        return {
+            diff: diff,
+            class: className+'班'
+        }
+    });
+    //diff越小则低分段比高分段多，diff越大则高分段比低分段多。因为这里还是没有确定什么是高分，什么是低分。
+    results = _.sortBy(results, 'diff');
+    return {
+        greater: _.map(_.takeRight(results, 2), (obj) => obj.class),
+        lesser: _.map(_.take(results, 2), (obj) => obj.class)
+    }
 }
 
 //一个班级或两个班级的图表
