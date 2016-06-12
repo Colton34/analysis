@@ -80,8 +80,8 @@ class Dashboard extends React.Component {
 
 
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
-            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0)) 
-            return (  
+            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0))
+            return (
                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
                     <Spinkit/>
                  </div>
@@ -93,7 +93,7 @@ class Dashboard extends React.Component {
             <div>
                 <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: '35px auto 20px auto', paddingLeft: 20,fontSize: 16 , color: '#333'}}>
                     <a href='/' style={styles.dashboardTitleName}>
-                        {String.fromCharCode(60)} 遵义清华中学2016年1月月考
+                        {String.fromCharCode(60)} {examInfoGuide.name}
                     </a>
                 </div>
                 <div style={[styles.box, styles.common.radius]}>

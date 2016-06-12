@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-25 20:05:08
+* @Last Modified time: 2016-06-12 16:16:14
 */
 
 'use strict';
@@ -131,6 +131,7 @@ exports.dashboard = function(req, res, next) {
 
 function examInfoGuide(exam) {
     return {
+        name: exam.name,
         subjectCount: exam['[papers]'].length,
         realClassesCount: exam.realClasses.length,
         realStudentsCount: exam.realStudentsCount,
