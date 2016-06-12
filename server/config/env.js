@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-03 14:50:58
+* @Last Modified time: 2016-06-12 12:15:08
 */
 
 'use strict';
@@ -14,9 +14,9 @@ var development = {
     "alg": "HS256",
     "rankBaseUrl": 'http://ct.yunxiao.com:8156',
     "testRankBaseUrl": 'http://ct.yunxiao.com:8157',
-    "yjServer": "http://testyue.yunxiao.com",
+    "yjServer": "http://yj.yunxiao.com",//   http://testyue.yunxiao.com
     "yj2Server": "http://ct.yunxiao.com:8110",
-    "casServer": "http://testpassport.yunxiao.com",
+    "casServer": "http://passport.yunxiao.com", // http://testpassport.yunxiao.com
     "client_host": 'localhost'
     // redis: { port: 6380, host: 'ct.yunxiao.com', max_attempts : 10, auth_pass: 'yunxiao_redis_@xxx', connect_timeout: 50000 },
 };
