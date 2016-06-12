@@ -7,7 +7,8 @@ import {Link} from 'react-router';
 import {List} from 'immutable';
 
 import {initHomeAction} from '../../reducers/home/actions';
-import {initParams, convertJS} from '../../lib/util';
+import {initParams} from '../../lib/util';
+import {FROM_FLAG as fromFlag} from '../../lib/constants';
 
 import styles from './Home.css';
 import _ from 'lodash';
@@ -112,7 +113,7 @@ const ExamItem = ({timeKey, item}) => {
                     <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>创建时间: {item.eventTime}</span>
                     <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>考试科目： {item.subjectCount}</span>
                     <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>试卷满分： {item.fullMark}</span>
-                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>来自：    {item['from']}</span>
+                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>来自：    {fromFlag[item['from']]}</span>
                 </div>
                 <Link to={{ pathname: '/dashboard', query: { examid: examid, grade: encodeURI(item.grade) } }} style={{ display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#5ab2f9', color: '#fff', float: 'right', textDecoration: 'none', borderRadius: '8px' }}>
                     查看分析
@@ -180,11 +181,11 @@ class Home extends React.Component {
         var params = initParams(this.props.params, this.props.location, {'request': window.request});
         this.props.initHome(params);
     }
-    
+
     render() {
         var examList = (List.isList(this.props.home.examList)) ? this.props.home.examList.toJS() : this.props.home.examList;
-        if(!examList || examList.length == 0) 
-            return (  
+        if(!examList || examList.length == 0)
+            return (
                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
                     <Spinkit/>
                 </div>

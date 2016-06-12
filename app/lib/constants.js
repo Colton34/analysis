@@ -13,7 +13,10 @@ export const HIDE_LOADING = 'HIDE_LOADING';
 export const INIT_HOME = 'INIT_HOME';
 export const INIT_HOME_SUCCESS = 'INIT_HOME_SUCCESS';
 export const FETCH_HOME_RAW_DATA_SUCCESS = 'FETCH_HOME_RAW_DATA_SUCCESS';
-
+export const FROM_FLAG = {
+    '0': '自定义',
+    '1': '阅卷'
+};
 //================= Dashboard ==========================
 
 export const INIT_DASHBOARD = 'INIT_DASHBOARD';
@@ -90,7 +93,7 @@ export const ADD_PAPER_INFO_SUCCESS = 'ADD_PAPER_INFO_SUCCESS';
 export const SUBTRACT_PAPER_INFO = 'SUBTRACT_PAPER_INFO';
 
 export const CHECK_ALL_QUESTION = 'CHECK_ALL_QUESTION';
-export const CHECK_ONE_QUESTION = 'CHECK_ONE_QUESTION'; 
+export const CHECK_ONE_QUESTION = 'CHECK_ONE_QUESTION';
 
 export const SET_PAPER_SQM = 'SET_PAPER_SQM';
 export const SET_MERGED_SQM = 'SET_MERGED_SQM';
@@ -104,8 +107,8 @@ export const PREV_PAGE = 'PREV_PAGE';
 export const SAVE_CURRENT_SUBJECT = 'SAVE_CURRENT_SUBJECT';
 export const SET_ANALYSIS_NAME = 'SET_ANALYSIS_NAME';
 export const SET_CREATE_STATUS = 'SET_CREATE_STATUS';
-export const EDIT_SUBJECT = 'EDIT_SUBJECT'; 
-export const DELE_SUBJECT = 'DELE_SUBJECT'; 
+export const EDIT_SUBJECT = 'EDIT_SUBJECT';
+export const DELE_SUBJECT = 'DELE_SUBJECT';
 export const CHANGE_CURRENT_SUBJECT_NAME = 'CHANGE_CURRENT_SUBJECT_NAME';
 export const DISCARD_CURRENT_SUBJECT = 'DISCARD_CURRENT_SUBJECT';
-export const UPDATE_SUBJECT_SQM = 'UPDATE_SUBJECT_SQM'; 
+export const UPDATE_SUBJECT_SQM = 'UPDATE_SUBJECT_SQM';

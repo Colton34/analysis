@@ -118,7 +118,6 @@ class ClassPerformance extends React.Component {
 //                 data: [11.2, 9.6, 19.5, 85.5, 21.8, 12.5, 87.5, 78.5, 33.3, 8.3, 23.9, 5.6]
 //             }];
         var headerInfo = theClassExamHeader(studentsGroupByClass);
-        debugger;
         var {xAxons, yAxonses} = theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers, this.state.currentClasses);
         var subjectMeanInfo = makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass, headers);
         var meanTableBodyData = theClassExamMeanTable(examInfo, subjectMeanInfo, headers);
