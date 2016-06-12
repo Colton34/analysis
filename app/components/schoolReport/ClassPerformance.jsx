@@ -93,9 +93,9 @@ class ClassPerformance extends React.Component {
         } else {
             this.setState({
                 currentClasses: _.without(currentClasses, classItem)
-            });    
+            });
         }
-        
+
 
         // if(!lineChartMockData[chosenClass]) return ;
         // var obj = {};
@@ -118,13 +118,14 @@ class ClassPerformance extends React.Component {
 //                 data: [11.2, 9.6, 19.5, 85.5, 21.8, 12.5, 87.5, 78.5, 33.3, 8.3, 23.9, 5.6]
 //             }];
         var headerInfo = theClassExamHeader(studentsGroupByClass);
+        debugger;
         var {xAxons, yAxonses} = theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers, this.state.currentClasses);
         var subjectMeanInfo = makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass, headers);
         var meanTableBodyData = theClassExamMeanTable(examInfo, subjectMeanInfo, headers);
         var factorsTableData = theClassExamMeanFactorsTable(examInfo, subjectMeanInfo, studentsGroupByClass, headers);
         var groupTableData = theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo);
 //自定义Module数据结构：
-        var _this = this;   
+        var _this = this;
         var meanTableHeaderData = _.map(headers, (headerObj) => headerObj.subject);
 
         var config = {
@@ -250,7 +251,7 @@ function theClassExamHeader(studentsGroupByClass) {
     //对各个班级计算：1.此班级中排名中间的学生的成绩 2.此班级的平局分  3.二者的差
     //studentsGroupByClass应该就是排好序的。
     //问题：只能说明高分段和低分段的比较，但是不能说明是总体是高分多还是低分多，比如[1, 1, 1, 1, 1]和[99, 99, 99, 99, 99]，diff都是0
-    var results = _.map(studentsGroupByClass, (students, className) {
+    var results = _.map(studentsGroupByClass, (students, className) => {
         var diff = _.round(_.subtract(students[parseInt(students.length/2)] - _.mean(_.map(students, (student) => student.score))), 2);
         return {
             diff: diff,
