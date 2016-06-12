@@ -4,7 +4,7 @@ export const INIT_USER_ME_SUCCESS = 'INIT_USER_ME_SUCCESS';
 export const INIT_USER_ME_FAILURE = 'INIT_USER_ME_FAILURE';
 export const ALTER_COMMENT_DIALOG_STATUS = 'ALTER_COMMENT_DIALOG_STATUS';
 export const SHOW_DIALOG = 'SHOW_DIALOG';
-export const HIDE_DIALOG =  'HIDE_DIALOG';
+export const HIDE_DIALOG = 'HIDE_DIALOG';
 
 export const SHOW_LOADING = 'SHOW_LOADING';
 export const HIDE_LOADING = 'HIDE_LOADING';
@@ -53,7 +53,7 @@ export const FETCH_SCHOOL_ANALYSIS_DATA_FAILURE = 'FETCH_SCHOOL_ANALYSIS_DATA_FA
 export const CHANGE_LEVEL = 'CHANGE_LEVEL';
 export const CHANGE_LEVEL_BUFFERS = 'CHANGE_LEVEL_BUFFERS';
 
-export const SUBJECTS_WEIGHT = ['语文', '数学', '英语', '物理', '化学', '生物', '政治', '历史', '地理' ];
+export const SUBJECTS_WEIGHT = ['语文', '数学', '英语', '物理', '化学', '生物', '政治', '历史', '地理'];
 export const NUMBER_MAP = {
     1: '一',
     2: '二',
@@ -90,7 +90,7 @@ export const ADD_PAPER_INFO_SUCCESS = 'ADD_PAPER_INFO_SUCCESS';
 export const SUBTRACT_PAPER_INFO = 'SUBTRACT_PAPER_INFO';
 
 export const CHECK_ALL_QUESTION = 'CHECK_ALL_QUESTION';
-export const CHECK_ONE_QUESTION = 'CHECK_ONE_QUESTION'; 
+export const CHECK_ONE_QUESTION = 'CHECK_ONE_QUESTION';
 
 export const SET_PAPER_SQM = 'SET_PAPER_SQM';
 export const SET_MERGED_SQM = 'SET_MERGED_SQM';
@@ -104,8 +104,12 @@ export const PREV_PAGE = 'PREV_PAGE';
 export const SAVE_CURRENT_SUBJECT = 'SAVE_CURRENT_SUBJECT';
 export const SET_ANALYSIS_NAME = 'SET_ANALYSIS_NAME';
 export const SET_CREATE_STATUS = 'SET_CREATE_STATUS';
-export const EDIT_SUBJECT = 'EDIT_SUBJECT'; 
-export const DELE_SUBJECT = 'DELE_SUBJECT'; 
+export const EDIT_SUBJECT = 'EDIT_SUBJECT';
+export const DELE_SUBJECT = 'DELE_SUBJECT';
 export const CHANGE_CURRENT_SUBJECT_NAME = 'CHANGE_CURRENT_SUBJECT_NAME';
 export const DISCARD_CURRENT_SUBJECT = 'DISCARD_CURRENT_SUBJECT';
-export const UPDATE_SUBJECT_SQM = 'UPDATE_SUBJECT_SQM'; 
+export const UPDATE_SUBJECT_SQM = 'UPDATE_SUBJECT_SQM';
+
+//===================== RankReport ===========================
+export const INIT_RANKREPORT = 'INIT_RANKREPORT';
+export const INIT_RANKREPORT_SUCCESS = 'INIT_RANKREPORT_SUCCESS';
