@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-27 16:37:56
+* @Last Modified time: 2016-06-12 16:08:39
 */
 
 'use strict';
@@ -200,6 +200,7 @@ function fetchExamScoresById(examid) {
     return when.promise(function(resolve, reject) {
         client.get(url, {}, function(err, res, body) {
             if(err) return reject(new errors.URIError('查询rank server(scores)失败', err));
+            //TODO: 这里当获取到数据错误的时候，服务不会给error status，都会走成功，但是返回的字段里有error属性，因此通过判断error属性来做健壮性判断！
             var data = JSON.parse(body);
             var keys = _.keys(data);
             resolve(data[keys[0]]);
