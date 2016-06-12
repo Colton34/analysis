@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-12 12:15:08
+* @Last Modified time: 2016-06-12 12:58:38
 */
 
 'use strict';
@@ -30,9 +30,9 @@ var production = {
     "alg": "HS256",
     "rankBaseUrl": 'http://ct.yunxiao.com:8156',
     "testRankBaseUrl": 'http://ct.yunxiao.com:8157',
-    "yjServer": "http://testyue.yunxiao.com",
+    "yjServer": "http://yj.yunxiao.com",
     "yj2Server": "http://ct.yunxiao.com:8110",
-    "casServer": "http://testpassport.yunxiao.com"
+    "casServer": "http://passport.yunxiao.com"
 };
 
 var test = {
