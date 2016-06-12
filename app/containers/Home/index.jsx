@@ -102,7 +102,8 @@ const NoExamList = () => {
 }
 
 const ExamItem = ({timeKey, item}) => {
-    var examid = item.id.slice(item.id.lastIndexOf('0')+1);
+    // var examid = item.id.slice(item.id.lastIndexOf('0')+1);
+    var examid = item.id.slice(_.findIndex(item.id, (c) => c !== '0'));
     return (
         <div>
         <div style={{ width: 100, height: 130, padding: '40px 0', fontSize: 16, display: 'inline-block', position: 'absolute', left: -100 }}>{timeKey === undefined ? '' : timeKey}</div>
