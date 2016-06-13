@@ -20,7 +20,7 @@ import {changeQuesitonNameAction, setGroupMapAction, setPageIndexAction,
 import {initParams} from '../../lib/util';
 import {NEXT_PAGE,PREV_PAGE} from '../../lib/constants';
 import matrixBase from '../../lib/matrixBase';
-
+var uuid = require('node-uuid');
 /**
  * {
  *  timeRange : {startDate : '', endDate : ''},
@@ -87,7 +87,7 @@ class CustomizeAnalysis extends React.Component {
         var resultSetJS = this.props.resultSet.toJS();
         // var currentSubjectJS = this.props.currentSubject.toJS();
         var postData = makeExamSchema(resultSetJS, this.props.analysisName);
-        // debugger;
+        debugger;
 
         // alert('敬请期待！');
     }
@@ -258,21 +258,30 @@ currentSubject: {
 
 */
 function makeExamSchema(resultSet, analysisName) {
+    var subjectKeys = _.keys(resultSet);
+    var subjectsIdArr = _.map(subjectKeys, (subjectName) => {
+        return {
+            subject: subjectName,
+            id: uuid.v1(),  //如果选择这种方式生成，那么后面如果再创建就不好关联了。
+            paper: uuid.v4()
+        }
+    });
+
     var examInfo = makeExamInfo(resultSet, analysisName);
-    debugger;
-    // var examStudentsInfo = makeExamStudentsInfo(resultSet);
     // debugger;
-    // var examPapersInfo = makeExamPapersInfo(resultSet);
+    var examStudentsInfo = _.sortBy(makeExamStudentsInfo(resultSet, subjectsIdArr), 'score');
     // debugger;
-    // var examClassesInfo = makeExamClassesInfo(resultSet);
+    var examPapersInfo = makeExamPapersInfo(resultSet, subjectsIdArr);
+    // debugger;
+    var examClassesInfo = makeExamClassesInfo(resultSet);
     // debugger;
 
-    // return {
-    //     examInfo: examInfo,
-    //     examStudentsInfo: examStudentsInfo,
-    //     examPapersInfo: examPapersInfo,
-    //     examClassesInfo: examClassesInfo
-    // }
+    return {
+        examInfo: examInfo,
+        examStudentsInfo: examStudentsInfo,
+        examPapersInfo: examPapersInfo,
+        examClassesInfo: examClassesInfo
+    }
 }
 
 function makeExamInfo(resultSet, analysisName) {
@@ -319,7 +328,7 @@ function makeExamInfo(resultSet, analysisName) {
     };
 }
 
-function makeExamStudentsInfo(resultSet) {
+function makeExamStudentsInfo(resultSet, subjectsIdArr) {
 /*
 
 examStudentsInfo
@@ -336,6 +345,8 @@ examStudentsInfo
     ...
 ]
 */
+
+    // debugger;
     var studentsInfoMap = {};
     _.each(resultSet, (item, subjectName) => {
         var sqmItem = item.SQM;
@@ -349,7 +360,8 @@ examStudentsInfo
                 obj = _.assign(_.pick(studentObj, ['class', 'id', 'kaohao', 'name']), { papers: [] });
                 studentsInfoMap[studentObj.id] = obj;
             }
-            obj.papers.push({paperid: '缺少', score: studentsPaperScore[index]});
+            var ids = _.find(subjectsIdArr, (obj) => obj.subject == subjectName);
+            obj.papers.push({paperid: ids.id, score: studentsPaperScore[index]});
         });
     });
     //给所有的学生添加总分信息
@@ -359,13 +371,12 @@ examStudentsInfo
     });
 }
 
-function makeExamPapersInfo(resultSet) {
-    var result = {};
-    _.each(resultSet, (item, subjectName) => {
+function makeExamPapersInfo(resultSet, subjectsIdArr) {
+    var result = _.map(resultSet, (item, subjectName) => {
         var sqmItem = item.SQM;
         if(!sqmItem) return;
         var questions = sqmItem.x, matrix = sqmItem.m;
-        var obj = _.pick(item, ['id', 'paper', 'subject']);   //id是pid，paper是ObjectId
+        var obj = _.find(subjectsIdArr, (sobj) => sobj.subject == subjectName);    //_.pick(item, ['id', 'paper', 'subject']);   //id是pid，paper是ObjectId
         var fullMark = _.sum(_.map(questions, (questionObj) => questionObj.score));
         var realClassesArr = _.filter(item.groupMap, (obj) => obj.status == 'inUse');
         var realClasses = _.map(realClassesArr, (classObj) => classObj.name);
@@ -374,11 +385,11 @@ function makeExamPapersInfo(resultSet) {
         _.each(realClassesArr, (classObj) => {
             classCountObj[classObj.name] = classObj.count;
         });
-        result[item.id] = _.assign(obj, { fullMark: fullMark, questions: questions, realClasses: realClasses, lostClasses: [], realStudentsCount: realStudentsCount, lostStudentsCount: 0, class: classCountObj});
+        return _.assign(obj, { fullMark: fullMark, questions: questions, realClasses: realClasses, lostClasses: [], realStudentsCount: realStudentsCount, lostStudentsCount: 0, class: classCountObj});
     });
     return result;
 /*
-
+//虽然这里用到的数据结构是Map，但是因为存储的原因，只能存储数组，所以需要转换成数组。
 examPapersInfo
 {
     <pid>: {
@@ -413,7 +424,7 @@ examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义�
 }
 
 */
-    var result = {};
+    var result = [];
     _.each(resultSet, (item, subjectName) => {
         var groupMapItem = item.groupMap;
         if(!groupMapItem) return;
@@ -427,7 +438,7 @@ examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义�
             }
         });
         // realStudentsCount += _.sum(_.map(newAddClasses, (className) => groupMapItem[className].count));
-        result = _.assign(result, _.keyBy(newAddClasses, 'name'));
+        result = _.concat(result, newAddClasses);
     });
     return result;
 }
