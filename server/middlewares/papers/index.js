@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-30 19:57:47
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-31 14:13:49
+* @Last Modified time: 2016-06-13 14:50:09
 */
 
 'use strict';
@@ -19,6 +19,8 @@ exports.fetchPaper = function (req, res, next) {
         console.log('paper.subject = ', paper.subject);
         res.status(200).json({
             id: paper._id,
+            pid: paper.id,
+            answers: paper.answers,
             x: paper['[questions]'],
             y: paper['[students]'],
             m: paper['matrix']
