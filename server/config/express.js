@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-12 16:51:44
+* @Last Modified time: 2016-06-08 17:50:20
 */
 
 'use strict';
@@ -14,6 +14,7 @@ var onFinished = require('on-finished');
 var unless = require('express-unless');
 var url = require('url');
 var engines = require('consolidate');
+var when = require('when');
 var cookieParser = require('cookie-parser');
 var bodyParser = require("body-parser");
 var expressValidator = require('express-validator');
@@ -30,9 +31,10 @@ var debug = require('debug')('app:' + process.pid);
 var compiled_app_module_path = path.resolve(__dirname, '../../', 'public', 'assets', 'server.js');
 var App = require(compiled_app_module_path); // var App = require(compiled_app_module_path).default;
 
-var peterMgr = require('../lib/peter').Manager;
+// var peterMgr = require('../lib/peter').Manager;
 
-
+var peterHFS = require('peter').getManager('hfs');
+var perterFX = require('peter').getManager('fx');
 
 var mongodb = require('mongodb');
 var ObjectId = mongodb.ObjectId;
@@ -41,20 +43,59 @@ var auth = require('../middlewares/auth');
 
 // var User = require('../models/user');
 
-module.exports = function(app) {
-    debug("Starting application");
-
 //Init Peter
-    var peter = require('../lib/peter');
-    peter.bindDb(config.db, function(error) {
-        if(error) {
-            debug("Peter connection error");
-            process.exit(1);
-        } else {
-            debug("Peter connected to the database");
-        }
-    });
+    // var peter = require('../lib/peter');
+    // peter.bindDb(config.db, function(error) {
+    //     if(error) {
+    //         debug("Peter connection error");
+    //         process.exit(1);
+    //     } else {
+    //         debug("Peter connected to the database");
+    //     }
+    // });
 
+module.exports = function(app) {
+    var hsfPromise = bindHFS();
+    var fxPromise = bindFX();
+    when.all([hsfPromise, fxPromise]).then(function(msgArr) {
+        console.log('msgArr :  ', msgArr);
+        try {
+            initWebServer(app);
+        } catch(e) {
+            console.log('Init WebServer Error: ', e);
+            process.exit(1);
+        }
+    }).catch(function(err) {
+        console.log('Bind DB Error: ', err);
+        process.exit(1);
+    });
+}
+
+function bindHFS() {
+    return when.promise(function(resolve, reject) {
+        peterHFS.bindDb(config.hfsdb, function(error) {
+            if(error) {
+                console.log('bind Error : ', error);
+                return reject(error);
+            }
+            resolve('success bind HFS');
+        });
+    });
+}
+
+function bindFX() {
+    return when.promise(function(resolve, reject) {
+        perterFX.bindDb(config.fxdb, function(error) {
+            if(error) {
+                console.log('bind again error: ', error);
+                return reject(error);
+            }
+            resolve('success bind FX');
+        });
+    });
+}
+
+function initWebServer(app) {
     app.use(require('morgan')("dev"));
 
     //为了对login的时候使用cookie来存储token

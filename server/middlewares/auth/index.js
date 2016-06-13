@@ -1,8 +1,8 @@
 /*
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-03 16:41:25
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-06-08 20:14:49
 */
 
 'use strict';
@@ -13,7 +13,7 @@ var bcrypt = require('bcryptjs');
 var util = require('util');
 var jsonwebtoken = require("jsonwebtoken");
 var Router = require("express").Router;
-var murmur = require('murmur');
+var murmur = require('murmur'); //TODO: 应该是没用了，可以把此module从node中去除了
 var when = require('when');
 var errors = require('common-errors');
 var ObjectId = require('mongodb').ObjectId;

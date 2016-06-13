@@ -24,12 +24,12 @@ class Header extends React.Component {
         // var baseURL = (window.client.hostname == 'localhost') ? 'http://' + window.client.hostname + ':' + window.http_port : 'http://' + window.client.hostname
         var path = this.props.location.pathname+this.props.location.search;
 
-        params.request.post('/file/render', {url: path}).then(function(res) {
+        params.request.post('/file/render/school/report', {url: path}).then(function(res) {
             var targetFileName = res.data;
-            saveAs(window.request.defaults.baseURL+"/file/download?filename="+targetFileName);
+            saveAs(window.request.defaults.baseURL+"/file/download/school/report?filename="+targetFileName);
             //TODO: 删除文件
             setTimeout(function() {
-                params.request.delete('/file/rm?filename='+targetFileName);
+                params.request.delete('/file/rm/school/report?filename='+targetFileName);
                 _this.isDownloading = false;
             }, 4000);
         }).catch(function(err) {
