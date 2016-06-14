@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:14:17
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-14 12:07:19
+* @Last Modified time: 2016-06-14 12:42:52
 */
 
 'use strict';
@@ -22,7 +22,9 @@ var exam = require('exam');
 router.get('/home', exam.home);
 //TODO: dashboard的重构
 router.get('/dashboard', exam.validateExam, exam.initExam, exam.dashboard);
+router.get('/custom/dashboard', exam.customDashboard);
 router.get('/school/analysis',  exam.validateExam, exam.initExam, exam.schoolAnalysis);
+router.get('/custom/school/analysis', exam.customSchoolAnalysis);
 
 router.post('/custom/analysis', exam.createCustomAnalysis);
 router.put('/custom/analysis', exam.inValidCustomAnalysis);

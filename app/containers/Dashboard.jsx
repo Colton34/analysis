@@ -52,9 +52,9 @@ import Spinkit from '../common/Spinkit';
 
 @Radium
 class Dashboard extends React.Component {
-    static need = [
-        initDashboardAction
-    ];
+    // static need = [
+    //     initDashboardAction
+    // ];
 
     componentDidMount() {
         if (this.props.dashboard.haveInit) return;
@@ -76,8 +76,6 @@ class Dashboard extends React.Component {
         var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
         var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
 
-// debugger;
-
 
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
             (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0))
@@ -87,7 +85,7 @@ class Dashboard extends React.Component {
                  </div>
             );
 
-
+debugger;
 
         return (
             <div>

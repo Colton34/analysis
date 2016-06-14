@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-31 14:15:10
+* @Last Modified time: 2016-06-14 13:29:13
 */
 
 
@@ -210,7 +210,7 @@ function formatExams(exams) {
 
 //********************************************************* Dashboard *********************************************************
 export function fetchDashboardData(params) {
-    var url = examPath + '/dashboard?examid=' + params.examid + '&grade=' + params.grade;
+    var url = (params.grade) ? examPath + '/dashboard?examid=' + params.examid + '&grade=' + params.grade : examPath + '/custom/dashboard?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
 // console.log('=======================  dashboard res.data.keys = ', _.keys(res.data));
@@ -223,7 +223,7 @@ export function fetchDashboardData(params) {
 
 
 export function fetchSchoolAnalysisData(params) {
-    var url = examPath + '/school/analysis?examid=' + params.examid + '&grade=' + params.grade;//必须是通过URI编码过的
+    var url = (params.grade) ? examPath + '/school/analysis?examid=' + params.examid + '&grade=' + params.grade : examPath + '/custom/school/analysis?examid=' + params.examid;
 
     var examInfo, examStudentsInfo, examPapersInfo, examClassesInfo;
     var studentsGroupByClass, allStudentsPaperMap;

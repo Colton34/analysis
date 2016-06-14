@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-14 12:15:53
+* @Last Modified time: 2016-06-14 14:46:06
 */
 
 'use strict';
@@ -131,6 +131,51 @@ exports.dashboard = function(req, res, next) {
     // var studentSelfReportResult = studentSelfReport(examScoreArr);
 }
 
+exports.customDashboard = function(req, res, next) {
+    req.checkQuery('examid', '无效的examids').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.get(req.query.examid, function(err, exam) {  //{isValid: true}
+        //1.注意字段名和之前数据结构中不一样（如果它是个数组）
+        //2.有些是Map，但从DB中拿出来是数组
+        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
+        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
+        try {
+            var customExamInfoGuideResult = customExamInfoGuide(exam.info);
+            // console.log('==========  1');
+            var customScoreRankResult = customScoreRank(exam);
+            // console.log('============= 2');
+            var customLevelScoreReportResult = customLevelScoreReport(exam);
+            // console.log('================== 3');
+            var customClassScoreReportResult = customClassScoreReport(exam);
+            // console.log('=================== 4');
+// res.status(200).send('ok');
+
+            res.status(200).json({
+                examInfoGuide: customExamInfoGuideResult,
+                scoreRank: customScoreRankResult,
+                levelScoreReport: customLevelScoreReportResult,
+                classScoreReport: customClassScoreReportResult
+            })
+        } catch(e) {
+            next(new errors.Error('format custom dashboard error: ', e));
+        }
+    })
+
+    // res.status(200).send('ok');
+}
+
+function customExamInfoGuide(examInfo) {
+    return {
+        name: examInfo.name,
+        subjectCount: examInfo['[subjects]'].length,
+        realClassesCount: examInfo['[realClasses]'].length,
+        realStudentsCount: examInfo.realStudentsCount,
+        lostStudentsCount: examInfo.lostStudentsCount
+    }
+}
+
+
 function examInfoGuide(exam) {
     return {
         name: exam.name,
@@ -146,6 +191,14 @@ function scoreRank(examScoreArr) {
     return {
         top: _.reverse(_.takeRight(examScoreArr, 6)),
         low: _.reverse(_.take(examScoreArr, 6))
+    }
+}
+
+function customScoreRank(exam) {
+    var examStudentsInfo = exam['[studentsInfo]'];
+    return {
+        top: _.reverse(_.takeRight(examStudentsInfo, 6)),
+        low: _.reverse(_.take(examStudentsInfo, 6))
     }
 }
 
@@ -172,7 +225,36 @@ function levelScoreReport(exam, examScoreArr) {
     var totalStudentCount = exam.realStudentsCount;
     _.each(levels, (levObj, levelKey) => {
         levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
-        levObj.score = examScoreArr[levObj.count - 1] ? examScoreArr[levObj.count - 1].score : 0;
+        var targetStudent = _.takeRight(examScoreArr, levObj.count)[0];
+        levObj.score = targetStudent ? targetStudent.score : 0;
+    });
+    return levels;
+}
+
+function customLevelScoreReport(exam) {
+    var levels = {
+        0: {
+            score: 0,
+            count: 0,
+            percentage: 15
+        },
+        1: {
+            score: 0,
+            count: 0,
+            percentage: 25
+        },
+        2: {
+            score: 0,
+            count: 0,
+            percentage: 60
+        }
+    };
+    var totalStudentCount = exam.info.realStudentsCount;
+    var examStudentsInfo = exam['[studentsInfo]'];
+    _.each(levels, (levObj, levelKey) => {
+        levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
+        var targetStudent = _.takeRight(examStudentsInfo, levObj.count)[0];
+        levObj.score =  targetStudent ? targetStudent.score : 0;
     });
     return levels;
 }
@@ -184,6 +266,24 @@ function classScoreReport(examScoreArr, examScoreMap) {
         return {
             name: className,
             mean: _.round(_.mean(_.map(classesScore, (scoreObj) => scoreObj.score)), 2)
+        }
+    });
+    var orderedClassesMean = _.sortBy(classesMean, 'mean');
+    return {
+        gradeMean: scoreMean,
+        top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
+    };
+}
+
+function customClassScoreReport(exam) {
+    var examStudentsInfo = exam['[studentsInfo]'];
+    var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
+
+    var scoreMean = _.round(_.mean(_.map(examStudentsInfo, (student) => student.score)), 2);
+    var classesMean = _.map(studentsGroupByClass, (classesStudents, className) => {
+        return {
+            name: className,
+            mean: _.round(_.mean(_.map(classesStudents, (student) => student.score)), 2)
         }
     });
     var orderedClassesMean = _.sortBy(classesMean, 'mean');
@@ -237,6 +337,11 @@ exports.schoolAnalysis = function(req, res, next) {
     }).catch(function(err) {
         next(new errors.Error('schoolAnalysis Error', err));
     });
+}
+
+exports.customSchoolAnalysis = function(req, res, next) {
+    console.log('customSchoolAnalysis');
+    res.status(200).send('ok');
 }
 
 exports.createCustomAnalysis = function(req, res, next) {

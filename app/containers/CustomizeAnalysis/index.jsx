@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import {Link, browserHistory} from 'react-router';
 import {Map,List} from 'immutable';
 
 import MainPage from '../../components/customizeAnalysis/MainPage';
@@ -100,6 +101,8 @@ class CustomizeAnalysis extends React.Component {
         params.request.post(customBaseUrl, {data: postData}).then(function(res) {
             //创建成功后进入到此分析的Dashboard
             console.log('res.data = ', res.data);
+            debugger;
+            browserHistory.push('/dashboard?examid=' + res.data.examId);
         }).catch(function(err) {
             console.log('自定义分析创建失败：', err);
         });

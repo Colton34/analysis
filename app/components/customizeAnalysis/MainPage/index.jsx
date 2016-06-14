@@ -91,6 +91,7 @@ class MainPage extends React.Component {
                                         </tbody>
                                     </table>
                                     <button onClick={this.props.onGenerateAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>生成报表</button>
+
                                     <button onClick={this.props.onDeleteAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>删除报表</button>
                                 </div>
                             )
