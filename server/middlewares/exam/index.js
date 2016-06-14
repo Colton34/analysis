@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-14 14:46:06
+* @Last Modified time: 2016-06-14 16:14:25
 */
 
 'use strict';
@@ -135,7 +135,7 @@ exports.customDashboard = function(req, res, next) {
     req.checkQuery('examid', '无效的examids').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
 
-    peterFX.get(req.query.examid, function(err, exam) {  //{isValid: true}
+    peterFX.get(req.query.examid, {isValid: true}, function(err, exam) {  //{isValid: true}
         //1.注意字段名和之前数据结构中不一样（如果它是个数组）
         //2.有些是Map，但从DB中拿出来是数组
         if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
@@ -339,10 +339,136 @@ exports.schoolAnalysis = function(req, res, next) {
     });
 }
 
+
+/*
+
+examInfo:
+{
+    name:
+    gradeName:
+    startTime:
+    realClasses:
+    lostClasses:
+    realStudentsCount:
+    lostStudentsCount:
+    subjects:
+    fullMark:
+
+}
+
+examStudentsInfo
+[
+    {
+        id:
+        name:
+        class:
+        score:
+        papers: [
+            {paperid: , score: }
+        ]
+    },
+    ...
+]
+
+examPapersInfo
+{
+    <pid>: {
+        id:
+        paper:
+        subject:
+        fullMark:
+        realClasses:
+        lostClasses:
+        realStudentsCount:
+        lostStudentsCount:
+        class: {
+            <className>: <此科目此班级参加考试的人数>
+        }
+    },
+    ...
+}
+
+examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义（特别是对于统计计算，因为肯定是走哪个科目的这个班级的参加考试人数--这个在papersInfo的class中有）
+{
+    <className>: {
+        name:
+        students:
+        realStudentsCount:
+        losstStudentsCount:
+    }
+}
+
+ */
+
+
 exports.customSchoolAnalysis = function(req, res, next) {
     console.log('customSchoolAnalysis');
-    res.status(200).send('ok');
+
+    req.checkQuery('examid', '无效的examids').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.get(req.query.examid, {isValid: true}, function(err, exam) {
+        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
+        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
+
+        try {
+            var examInfo = makeExamInfo(exam.info);
+            var examStudentsInfo = makeExamStudentsInfo(exam['[studentsInfo]']);
+            var examPapersInfo = makeExamPapersInfo(exam['[papersInfo]']);
+            var examClassesInfo = makeExamClassesInfo(exam['[classesInfo]']);
+            res.status(200).json({
+                examInfo: examInfo,
+                examStudentsInfo: examStudentsInfo,
+                examPapersInfo: examPapersInfo,
+                examClassesInfo: examClassesInfo
+            });
+        } catch(e) {
+            next(new errors.Error('server format custom analysis error: ', e));
+        }
+    });
 }
+
+function makeExamInfo(examInfo) {
+    var result = _.pick(examInfo, ['name', 'startTime', 'realStudentsCount', 'lostStudentsCount', 'fullMark']);
+    result.realClasses = examInfo['[realClasses]'];
+    result.lostClasses = examInfo['[lostClasses]'];
+    result.subjects = examInfo['[subjects]'];
+    return result;
+}
+
+function makeExamStudentsInfo(examStudentsInfo) {
+    var result = _.map(examStudentsInfo, (studentItem) => {
+        var studentObj = _.pick(studentItem, ['id', 'name', 'class', 'score', 'kaohao']);
+        studentObj.papers = studentItem['[papers]'];
+        return studentObj;
+    });
+    return result;
+}
+
+function makeExamPapersInfo(examPapersInfo) {
+    var examPapersInfoArr = _.map(examPapersInfo, (paperItem) => {
+        var paperObj = _.pick(paperItem, ['id', 'paper', 'subject', 'fullMark', 'realStudentsCount', 'lostStudentsCount']);
+        paperObj = _.assign(paperObj, { realClasses: paperItem['[realClasses]'], lostClasses: paperItem['[lostClasses]']});
+        var classCountsMap = {};
+        _.each(paperItem['[class]'], (classCountItem) => {
+            classCountsMap[classCountItem.name] = classCountItem.count;
+        });
+        paperObj.class = classCountsMap;
+        return paperObj;
+    });
+    return _.keyBy(examPapersInfoArr, 'id');
+}
+
+function makeExamClassesInfo(examClassesInfo) {
+    var examClassesInfoArr = _.map(examClassesInfo, (classItem) => {
+        var classObj = _.pick(classItem, ['name', 'realStudentsCount', 'lostStudentsCount']);
+        classObj.students = classItem['[students]'];
+        return classObj;
+    });
+    return _.keyBy(examClassesInfoArr, 'name');
+}
+
+
 
 exports.createCustomAnalysis = function(req, res, next) {
 console.log('createCustomAnalysis  1');

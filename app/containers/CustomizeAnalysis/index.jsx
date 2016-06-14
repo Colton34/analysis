@@ -349,6 +349,7 @@ function makeExamInfo(resultSet, analysisName) {
 
     return {
         name: analysisName,
+        gradeName: '', //暂时先填充个空字符
         startTime: Date.now(), // new Date()
         realClasses: realClasses,
         lostClasses: [],

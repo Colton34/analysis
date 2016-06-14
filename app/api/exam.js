@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-14 13:29:13
+* @Last Modified time: 2016-06-14 15:02:18
 */
 
 
@@ -248,6 +248,7 @@ export function fetchSchoolAnalysisData(params) {
         headers.unshift({subject: '总分', id: 'totalScore' });
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = _.map(levels, (value, key) => 1);
+        debugger;
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,

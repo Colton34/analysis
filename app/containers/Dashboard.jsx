@@ -52,9 +52,9 @@ import Spinkit from '../common/Spinkit';
 
 @Radium
 class Dashboard extends React.Component {
-    // static need = [
-    //     initDashboardAction
-    // ];
+    static need = [
+        initDashboardAction
+    ];
 
     componentDidMount() {
         if (this.props.dashboard.haveInit) return;
@@ -66,8 +66,9 @@ class Dashboard extends React.Component {
     toViewSchoolAnalysis() {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
-        if (!examid || !grade) return;
-        browserHistory.push('/school/report?examid=' + examid + '&grade=' + encodeURI(grade));
+        if (!examid) return;
+        var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + encodeURI(grade) : '/school/report?examid=' + examid;
+        browserHistory.push(targetUrl);
     }
 
     render() {
@@ -84,8 +85,6 @@ class Dashboard extends React.Component {
                     <Spinkit/>
                  </div>
             );
-
-debugger;
 
         return (
             <div>
