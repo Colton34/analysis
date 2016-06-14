@@ -28,6 +28,8 @@ import PageFooter from '../Footer';
 import {ExamOrigin} from '../../../lib/constants.js';
 import matrixBase from '../../../lib/matrixBase.js';
 
+import {initParams, saveAs} from '../../../lib/util';
+
 import ownClassNames from './examSelect.css';
 
 var {Header, Title, Body, Footer} = Modal;
@@ -93,7 +95,7 @@ class ExamSelect extends React.Component {
         //var {currentSubject} = this.props;
 
         this.state = {
-            //currentPapers: currentSubject.src ? currentSubject.src : {},  
+            //currentPapers: currentSubject.src ? currentSubject.src : {},
             showDialog: false,
             startDate: moment().month(moment().month() - 12),  //默认显示一年内的考试
             endDate: moment(),
@@ -217,7 +219,7 @@ class ExamSelect extends React.Component {
         var checked = event.target.checked;
         this.props.checkOneQuestion(paperId, questionName, checked);
     }
-   
+
     doMerge(mergeType, SQMs) {
         console.log('merge matrix');
         // todo: 合并题目
@@ -295,6 +297,13 @@ class ExamSelect extends React.Component {
             examList: newList
         })
     }
+
+    downloadTPL(isLiankao) {
+        console.log('downloadTPL');
+        var path = isLiankao ? '/file/download/tpl?liankao=true' : '/file/download/tpl';
+        saveAs(window.request.defaults.baseURL+path);
+    }
+
     render() {
         //var selectedExams = Object.keys(this.state.selectedExamInfos);
         var {currentSubject} = this.props;
@@ -359,8 +368,8 @@ class ExamSelect extends React.Component {
                         <div style={{ marginBottom: 20 }}>
                             {
                                 this.props.isLiankao ?
-                                    <button className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载联考导入模板</button>
-                                    : <button className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载校考导入模板</button>
+                                    <button onClick={this.downloadTPL.bind(this, true)} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载联考导入模板</button>
+                                    : <button onClick={this.downloadTPL.bind(this, false)} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载校考导入模板</button>
                             }
                             <button className={ownClassNames['fileUpload'] + ' ' + ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']} style={{ fontSize: 12 }}>
                                 <span>导入线下考试数据</span>

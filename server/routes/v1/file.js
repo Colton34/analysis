@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:25:26
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-08 20:04:49
+* @Last Modified time: 2016-06-14 16:49:32
 */
 
 'use strict';
@@ -24,6 +24,7 @@ router.post('/render/school/report', dfile.renderSchoolReport);
 router.get('/download/school/report', dfile.downloadSchoolReport);
 router.delete('/rm/school/report', dfile.rmSchoolReport);
 
+router.get('/download/tpl', dfile.downloadExamTmp);
 router.post('/import/exam/data', upload.single('detailScore'), dfile.importExamData);
 
 module.exports = router;

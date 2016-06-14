@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-08 20:13:36
+* @Last Modified time: 2016-06-14 16:57:52
 */
 
 'use strict';
@@ -61,9 +61,10 @@ exports.rmSchoolReport = function(req, res, next) {
 }
 
 exports.downloadExamTmp = function(req, res, next) {
-    var fileUrl = path.join(__dirname, '../../../public/files/', fileName);
-    res.attachment(fileName);
-    res.download(fileUrl, '校内考试小分模板.xlsx');
+    var fileDir = path.join(__dirname, '../../../public/files');
+    var filename = (req.query && req.query.liankao) ? '联考小分模板.xlsx' : '校内考试小分模板.xlsx';
+    var fileUrl = path.join(fileDir, filename);
+    res.download(fileUrl, filename);
 }
 
 exports.importExamData = function(req, res, next) {

@@ -18,7 +18,7 @@ import PaperQuality from '../components/dashboard/paper-quality';
 import StudentReport from '../components/dashboard/student-report';
 
 import {initDashboardAction} from '../reducers/dashboard/actions';
-import {convertJS, initParams} from '../lib/util';
+import {initParams} from '../lib/util';
 
 import {Map, List} from 'immutable';
 
