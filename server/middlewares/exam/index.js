@@ -2,12 +2,14 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-12 16:16:14
+* @Last Modified time: 2016-06-14 12:15:53
 */
 
 'use strict';
 
-var peterMgr = require('../../lib/peter').Manager;
+var peterHFS = require('peter').getManager('hfs');
+var peterFX = require('peter').getManager('fx');
+
 var when = require('when');
 var _ = require('lodash');
 var errors = require('common-errors');
@@ -211,7 +213,7 @@ function classScoreReport(examScoreArr, examScoreMap) {
 
 // function getStudentInfo(studentId) {
 //     return when.promise(function(resolve, reject) {
-//         peterMgr.get('@Student' + studentId, function(err, student) {
+//         peterHFS.get('@Student' + studentId, function(err, student) {
 //             if(err) return reject(new errors.MongoDBError('find single student error : ', err));
 //             resolve(student);
 //         });
@@ -235,6 +237,43 @@ exports.schoolAnalysis = function(req, res, next) {
     }).catch(function(err) {
         next(new errors.Error('schoolAnalysis Error', err));
     });
+}
+
+exports.createCustomAnalysis = function(req, res, next) {
+console.log('createCustomAnalysis  1');
+
+    // req.checkBody('data', '无效的data').notEmpty();
+    // if(req.validationErrors()) return next(req.validationErrors());
+    if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
+
+console.log('createCustomAnalysis  2');
+
+    peterFX.create('@Exam', req.body.data, function(err, result) {
+        if(err) return next(new errors.data.MongoDBError('创建自定义分析错误', err));
+console.log('createCustomAnalysis  3');
+        res.status(200).json({examId: result});
+    });
+}
+
+// exports.deleteCustomAnalysis = function(req, res, next) {
+//     req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
+//     if(req.validationErrors()) return next(req.validationErrors());
+
+//     peterFX.destroy(req.body.examId, function(err, result) {
+//         if(err) return next(new errors.data.MongoDBError('删除自定义分析错误', err));
+//         console.log('删除的result = ', result);
+//         res.status(200).send('ok');
+//     })
+// }
+
+exports.inValidCustomAnalysis = function(req, res, next) {
+    req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.set(req.body.examId, {isValid: false}, function(err, result) {
+        if(err) return next(new errors.data.MongoDBError('更新自定义分析错误', err));
+        res.status(200).send('ok');
+    })
 }
 
 
@@ -283,8 +322,8 @@ function generateStudentsPaperInfo(exam, examClassesInfo) {
 
     var studentIds = _.map(_.concat(..._.map(exam.realClasses, (className) => examClassesInfo[className].students)), (sid) => '@Student.' + sid); //当前年级的所有参考班级的所有学生（可能会包含缺考学生，但是这样的学生其papers的length就是0了，所以也没有问题）
     return when.promise(function(resolve, reject) {
-        peterMgr.getMany(studentIds, {project: ['_id', '[papers]']}, function(err, students) {
-            if(err) return reject(new errors.Data.MongoDBError('query students error : ', err));
+        peterHFS.getMany(studentIds, {project: ['_id', '[papers]']}, function(err, students) {
+            if(err) return reject(new errors.data.MongoDBError('query students error : ', err));
             //过滤student['papers']，建立Map
             try {
                 _.each(students, (studentItem) => {
@@ -352,7 +391,7 @@ function genearteExamClassInfo(exam) {
 
 // function getPaperPromise(paperId) {
 //     return when.promise(function(resolve, reject) {
-//         peterMgr.get(paperId, function(err, paper) {
+//         peterHFS.get(paperId, function(err, paper) {
 //             if(err) return reject(new errors.Data.MongDBError('find paper: ' + paperId + '  Error', err));
 //             resolve(paper);
 //         });
@@ -606,7 +645,7 @@ About Class
 
 // console.log('paper = ', pobj.paper);
 
-//                 peterMgr.get(pobj.paper, function(err, paper) {
+//                 peterHFS.get(pobj.paper, function(err, paper) {
 //                     if(err) return reject(new errors.data.MongoDBError('find paper:'+pid+' error', err));
 //                     resolve(paper);
 //                 });
@@ -627,7 +666,7 @@ About Class
     // result.subjectCount = req.exam.papers ? req.exam.papers.length : 0;
     // var findPapersPromises = _.map(req.exam.papers, function(pid) {
     //     return when.promise(function(resolve, reject) {
-    //         peterMgr.find(pid, function(err, paper) {
+    //         peterHFS.find(pid, function(err, paper) {
     //             if(err) return reject(new errors.data.MongoDBError('find paper:'+pid+' error', err));
     //             resolve(paper);
     //         });

@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-08 17:50:20
+* @Last Modified time: 2016-06-14 12:11:26
 */
 
 'use strict';
@@ -31,10 +31,8 @@ var debug = require('debug')('app:' + process.pid);
 var compiled_app_module_path = path.resolve(__dirname, '../../', 'public', 'assets', 'server.js');
 var App = require(compiled_app_module_path); // var App = require(compiled_app_module_path).default;
 
-// var peterMgr = require('../lib/peter').Manager;
-
 var peterHFS = require('peter').getManager('hfs');
-var perterFX = require('peter').getManager('fx');
+var peterFX = require('peter').getManager('fx');
 
 var mongodb = require('mongodb');
 var ObjectId = mongodb.ObjectId;
@@ -85,7 +83,7 @@ function bindHFS() {
 
 function bindFX() {
     return when.promise(function(resolve, reject) {
-        perterFX.bindDb(config.fxdb, function(error) {
+        peterFX.bindDb(config.fxdb, function(error) {
             if(error) {
                 console.log('bind again error: ', error);
                 return reject(error);
@@ -101,8 +99,8 @@ function initWebServer(app) {
     //为了对login的时候使用cookie来存储token
     app.use(cookieParser());
 
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json({limit: '50mb'}));
+    app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
     app.use(expressValidator());
 

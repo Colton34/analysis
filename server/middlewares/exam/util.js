@@ -2,12 +2,13 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-12 16:08:39
+* @Last Modified time: 2016-06-13 20:02:52
 */
 
 'use strict';
 
-var peterMgr = require('../../lib/peter').Manager;
+var peterHFS = require('peter').getManager('hfs');
+
 var when = require('when');
 var _ = require('lodash');
 var errors = require('common-errors');
@@ -23,7 +24,7 @@ var config = require('../../config/env');
  */
 var getSchoolById = exports.getSchoolById = function(schoolid) {
     return when.promise(function(resolve, reject) {
-        peterMgr.get('@School.'+schoolid, function(err, school) {
+        peterHFS.get('@School.'+schoolid, function(err, school) {
             if(err || !school) return reject(new errors.data.MongoDBError('find school:'+schoolid+' error', err));
             resolve(school);
         });
@@ -44,7 +45,7 @@ exports.getExamsBySchool = function(school) {
 
 function makeExamPromise(examid) {
     return when.promise(function(resolve, reject) {
-        peterMgr.get('@Exam.' + examid, function(err, exam) {
+        peterHFS.get('@Exam.' + examid, function(err, exam) {
             if(err) return reject(new errors.data.MongoDBError('find exam:'+examid+ ' error', err));
             resolve(exam);
         });
@@ -211,7 +212,7 @@ function fetchExamScoresById(examid) {
 exports.getPapersInfoByExam = function(exam) {
     var findPapersPromises = _.map(exam["[papers]"], function(pobj) {
         return when.promise(function(resolve, reject) {
-            peterMgr.get(pobj.paper, function(err, paper) {
+            peterHFS.get(pobj.paper, function(err, paper) {
                 if(err) return reject(new errors.data.MongoDBError('find paper:'+pid+' error', err));
                 resolve(paper);
             });

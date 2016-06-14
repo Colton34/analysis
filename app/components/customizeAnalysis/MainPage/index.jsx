@@ -27,16 +27,16 @@ class MainPage extends React.Component {
         this.props.setAnalysisName(event.target.value);
     }
     onEditSubject(subjectName) {
-        
+
         this.props.onEditSubject(subjectName);
     }
     onDelSubject(subjectName) {
-        
+
         this.props.onDelSubject(subjectName);
     }
     render() {
         var { resultSet, analysisName} = this.props;
-        
+
         var subjectList = Object.keys(resultSet);
         return (
             <div>
@@ -71,13 +71,13 @@ class MainPage extends React.Component {
                                         <tbody>
                                             {
                                                 subjectList.map((subject, index) => {
-                                                    
+
                                                     return (
                                                         <tr key={'subject-' + index}>
                                                             <td>{subject}</td>
                                                             <td>
-                                                                您已选择{resultSet[subject].SQM.x.length}道题, 
-                                                                满分{resultSet[subject].SQM.x ? resultSet[subject].SQM.x.reduce((sum, each) =>{return sum += each.score},0): 0}, 
+                                                                您已选择{resultSet[subject].SQM.x.length}道题,
+                                                                满分{resultSet[subject].SQM.x ? resultSet[subject].SQM.x.reduce((sum, each) =>{return sum += each.score},0): 0},
                                                                 学生{resultSet[subject].SQM.y ? _.reduce(resultSet[subject].groupMap, (sum, each) => {return sum + (each.status === 'inUse' ? each.count : 0)}, 0) : 0}人
                                                             </td>
                                                             <td>
@@ -91,6 +91,7 @@ class MainPage extends React.Component {
                                         </tbody>
                                     </table>
                                     <button onClick={this.props.onGenerateAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>生成报表</button>
+                                    <button onClick={this.props.onDeleteAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>删除报表</button>
                                 </div>
                             )
                     }

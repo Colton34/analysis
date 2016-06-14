@@ -21,6 +21,9 @@ import {initParams} from '../../lib/util';
 import {NEXT_PAGE,PREV_PAGE} from '../../lib/constants';
 import matrixBase from '../../lib/matrixBase';
 var uuid = require('node-uuid');
+
+var examPath = "/exam";
+var customBaseUrl = examPath + '/custom/analysis';
 /**
  * {
  *  timeRange : {startDate : '', endDate : ''},
@@ -87,10 +90,34 @@ class CustomizeAnalysis extends React.Component {
         var resultSetJS = this.props.resultSet.toJS();
         // var currentSubjectJS = this.props.currentSubject.toJS();
         var postData = makeExamSchema(resultSetJS, this.props.analysisName);
-        debugger;
+        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        //创建成功后根据返回的examId去到其相应的dashboard--这部分API要添加新的，就不是之前的API了
+
+        // $.post(url, {data: postData}, function(data, textStatus) {
+        //     console.log('textStatus = ', textStatus);
+        //     console.log('data = ', data);
+        // });
+        params.request.post(customBaseUrl, {data: postData}).then(function(res) {
+            //创建成功后进入到此分析的Dashboard
+            console.log('res.data = ', res.data);
+        }).catch(function(err) {
+            console.log('自定义分析创建失败：', err);
+        });
+        // debugger;
 
         // alert('敬请期待！');
     }
+
+    onDeleteAnalysis() {
+        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        params.request.put(customBaseUrl, {examId: "575f845b0000031b156333fe"}).then(function(res) {
+            //删除成功后？？？
+            console.log('res.data - ', res.data);
+        }).then(function(err) {
+            console.log('');
+        })
+    }
+
     deleteStudentFromSQM(subject){
         var result = subject.SQM;
         if (subject.groupMap) {
@@ -136,8 +163,8 @@ class CustomizeAnalysis extends React.Component {
                         changeToCreateStatus={this.props.setCreateStatus}
                         onEditSubject={this.props.onEditSubject}
                         onDelSubject={this.props.onDelSubject}
-                        onGenerateAnalysis={this.onGenerateAnalysis.bind(this)}/>
-
+                        onGenerateAnalysis={this.onGenerateAnalysis.bind(this)}
+                        onDeleteAnalysis={this.onDeleteAnalysis.bind(this)}/>
                 }
                 {
                     status === 'create' && pageIndex === 0 &&
@@ -277,10 +304,11 @@ function makeExamSchema(resultSet, analysisName) {
     // debugger;
 
     return {
-        examInfo: examInfo,
-        examStudentsInfo: examStudentsInfo,
-        examPapersInfo: examPapersInfo,
-        examClassesInfo: examClassesInfo
+        "info": examInfo,
+        "[studentsInfo]": examStudentsInfo,
+        "[papersInfo]": examPapersInfo,
+        "[classesInfo]": examClassesInfo,
+        isValid: true
     }
 }
 
@@ -357,16 +385,16 @@ examStudentsInfo
         _.each(sqmItem.y, (studentObj, index) => {
             var obj = studentsInfoMap[studentObj.id];
             if(!obj) {
-                obj = _.assign(_.pick(studentObj, ['class', 'id', 'kaohao', 'name']), { papers: [] });
+                obj = _.assign(_.pick(studentObj, ['class', 'id', 'kaohao', 'name']), { "[papers]": [] });
                 studentsInfoMap[studentObj.id] = obj;
             }
             var ids = _.find(subjectsIdArr, (obj) => obj.subject == subjectName);
-            obj.papers.push({paperid: ids.id, score: studentsPaperScore[index]});
+            obj["[papers]"].push({paperid: ids.id, score: studentsPaperScore[index]});
         });
     });
     //给所有的学生添加总分信息
     return _.map(studentsInfoMap, (studentObj, studentId) => {
-        var totalScore = _.sum(_.map(studentObj.papers, (paperObj) => paperObj.score));
+        var totalScore = _.sum(_.map(studentObj["[papers]"], (paperObj) => paperObj.score));
         return _.assign(studentObj, {score: totalScore});
     });
 }
@@ -381,11 +409,10 @@ function makeExamPapersInfo(resultSet, subjectsIdArr) {
         var realClassesArr = _.filter(item.groupMap, (obj) => obj.status == 'inUse');
         var realClasses = _.map(realClassesArr, (classObj) => classObj.name);
         var realStudentsCount = _.sum(_.map(realClassesArr, (classObj) => classObj.count));
-        var classCountObj = {};
-        _.each(realClassesArr, (classObj) => {
-            classCountObj[classObj.name] = classObj.count;
+        var classCountArr = _.map(realClassesArr, (classObj) => {
+            return { name: classObj.name, count: classObj.count };
         });
-        return _.assign(obj, { fullMark: fullMark, questions: questions, realClasses: realClasses, lostClasses: [], realStudentsCount: realStudentsCount, lostStudentsCount: 0, class: classCountObj});
+        return _.assign(obj, { fullMark: fullMark, "[questions]": questions, "[realClasses]": realClasses, "[lostClasses]": [], realStudentsCount: realStudentsCount, lostStudentsCount: 0, "[class]": classCountArr});
     });
     return result;
 /*
@@ -432,7 +459,7 @@ examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义�
         var newAddClasses = _.map(_.difference(selectedClasses, result), (className) => {
             return {
                 name: className,
-                students: groupMapItem[className].array,
+                "[students]": groupMapItem[className].array,
                 realStudentsCount: groupMapItem[className].count,
                 lostStudentsCount: 0
             }
@@ -605,19 +632,4 @@ examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义�
  */
 
 
-/*
-TODO:
-1.补充paper丢失的信息：id, paperObjectId等
-2.调试当前的API
-3.自定义分析在所有其他模块中也是可以的
-4.实现删除自定义分析
 
-5.实现自定义分析中下载模板
-6.实现自定义分中导入考试和考生数据（这个可能需要和PM对一下）
-
-7.提醒阿甘修复合并题目中的bug
-
-a.构思，记录问题，等待讨论
-b.实现和当前Schema一直的存储
-
- */
