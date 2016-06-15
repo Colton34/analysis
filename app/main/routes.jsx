@@ -19,17 +19,17 @@ import HelpCenter from '../components/HelpCenter';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Test} />
-        </Route>
-    );
-};
-
-/*
             <IndexRoute component={Home} />
             <Route path='dashboard' component={Dashboard} />
             <Route path='school/report' component={SchoolReport} />
             <Route path='add/analysis' component={CustomizeAnalysis}/>
             <Route path='faq' component={HelpCenter}/>
+        </Route>
+    );
+};
+
+/*
+
 
         /:examId/
 

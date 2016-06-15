@@ -100,15 +100,10 @@ class CustomizeAnalysis extends React.Component {
         // });
         params.request.post(customBaseUrl, {data: postData}).then(function(res) {
             //创建成功后进入到此分析的Dashboard
-            console.log('res.data = ', res.data);
-            debugger;
             browserHistory.push('/dashboard?examid=' + res.data.examId);
         }).catch(function(err) {
             console.log('自定义分析创建失败：', err);
         });
-        // debugger;
-
-        // alert('敬请期待！');
     }
 
     onDeleteAnalysis() {
@@ -299,13 +294,9 @@ function makeExamSchema(resultSet, analysisName) {
     });
 
     var examInfo = makeExamInfo(resultSet, analysisName);
-    // debugger;
     var examStudentsInfo = _.sortBy(makeExamStudentsInfo(resultSet, subjectsIdArr), 'score');
-    // debugger;
     var examPapersInfo = makeExamPapersInfo(resultSet, subjectsIdArr);
-    // debugger;
     var examClassesInfo = makeExamClassesInfo(resultSet);
-    // debugger;
 
     return {
         "info": examInfo,
@@ -379,7 +370,6 @@ examStudentsInfo
 ]
 */
 
-    // debugger;
     var studentsInfoMap = {};
     _.each(resultSet, (item, subjectName) => {
         var sqmItem = item.SQM;
