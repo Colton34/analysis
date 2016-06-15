@@ -1,13 +1,14 @@
 /*
- * @Author: HellMagic
- * @Date:   2016-04-30 13:32:43
- * @Last Modified by:   HellMagic
- * @Last Modified time: 2016-05-27 16:37:56
- */
+* @Author: HellMagic
+* @Date:   2016-04-30 13:32:43
+* @Last Modified by:   HellMagic
+* @Last Modified time: 2016-06-15 21:15:00
+*/
 
 'use strict';
 
-var peterMgr = require('../../lib/peter').Manager;
+var peterHFS = require('peter').getManager('hfs');
+
 var when = require('when');
 var _ = require('lodash');
 var errors = require('common-errors');
@@ -23,8 +24,8 @@ var config = require('../../config/env');
  */
 var getSchoolById = exports.getSchoolById = function(schoolid) {
     return when.promise(function(resolve, reject) {
-        peterMgr.get('@School.' + schoolid, function(err, school) {
-            if (err || !school) return reject(new errors.data.MongoDBError('find school:' + schoolid + ' error', err));
+        peterHFS.get('@School.'+schoolid, function(err, school) {
+            if(err || !school) return reject(new errors.data.MongoDBError('find school:'+schoolid+' error', err));
             resolve(school);
         });
     });
@@ -44,8 +45,8 @@ exports.getExamsBySchool = function(school) {
 
 function makeExamPromise(examid) {
     return when.promise(function(resolve, reject) {
-        peterMgr.get('@Exam.' + examid, function(err, exam) {
-            if (err) return reject(new errors.data.MongoDBError('find exam:' + examid + ' error', err));
+        peterHFS.get('@Exam.' + examid, function(err, exam) {
+            if(err) return reject(new errors.data.MongoDBError('find exam:'+examid+ ' error', err));
             resolve(exam);
         });
     });
@@ -209,7 +210,8 @@ function fetchExamScoresById(examid) {
     var url = config.testRankBaseUrl + '/scores' + '?' + 'examid=' + examid;
     return when.promise(function(resolve, reject) {
         client.get(url, {}, function(err, res, body) {
-            if (err) return reject(new errors.URIError('查询rank server(scores)失败', err));
+            if(err) return reject(new errors.URIError('查询rank server(scores)失败', err));
+            //TODO: 这里当获取到数据错误的时候，服务不会给error status，都会走成功，但是返回的字段里有error属性，因此通过判断error属性来做健壮性判断！
             var data = JSON.parse(body);
             var keys = _.keys(data);
             resolve(data[keys[0]]);
@@ -220,8 +222,8 @@ function fetchExamScoresById(examid) {
 exports.getPapersInfoByExam = function(exam) {
     var findPapersPromises = _.map(exam["[papers]"], function(pobj) {
         return when.promise(function(resolve, reject) {
-            peterMgr.get(pobj.paper, function(err, paper) {
-                if (err) return reject(new errors.data.MongoDBError('find paper:' + pid + ' error', err));
+            peterHFS.get(pobj.paper, function(err, paper) {
+                if(err) return reject(new errors.data.MongoDBError('find paper:'+pid+' error', err));
                 resolve(paper);
             });
         });

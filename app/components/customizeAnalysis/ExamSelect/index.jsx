@@ -28,9 +28,13 @@ import PageFooter from '../Footer';
 import {ExamOrigin} from '../../../lib/constants.js';
 import matrixBase from '../../../lib/matrixBase.js';
 
+import {initParams, saveAs} from '../../../lib/util';
+
 import ownClassNames from './examSelect.css';
 
 var {Header, Title, Body, Footer} = Modal;
+
+var FileUpload = require('../../../common/FileUpload');
 
 var examList = [
     {
@@ -93,7 +97,7 @@ class ExamSelect extends React.Component {
         //var {currentSubject} = this.props;
 
         this.state = {
-            //currentPapers: currentSubject.src ? currentSubject.src : {},  
+            //currentPapers: currentSubject.src ? currentSubject.src : {},
             showDialog: false,
             startDate: moment().month(moment().month() - 12),  //默认显示一年内的考试
             endDate: moment(),
@@ -217,7 +221,7 @@ class ExamSelect extends React.Component {
         var checked = event.target.checked;
         this.props.checkOneQuestion(paperId, questionName, checked);
     }
-   
+
     doMerge(mergeType, SQMs) {
         console.log('merge matrix');
         // todo: 合并题目
@@ -295,6 +299,13 @@ class ExamSelect extends React.Component {
             examList: newList
         })
     }
+
+    downloadTPL(isLiankao) {
+        console.log('downloadTPL');
+        var path = isLiankao ? '/file/download/tpl?liankao=true' : '/file/download/tpl';
+        saveAs(window.request.defaults.baseURL+path);
+    }
+
     render() {
         //var selectedExams = Object.keys(this.state.selectedExamInfos);
         var {currentSubject} = this.props;
@@ -302,6 +313,30 @@ class ExamSelect extends React.Component {
         var {examList} = this.state;
 
         var paperIds = Object.keys(currentPapers);
+
+        var options = {
+            baseUrl : '/api/v1/file/import/exam/data',
+            chooseAndUpload : true,
+            fileFieldName : 'importData', //指定上传文件的名字，而不是使用默认的呃file.name，这个名字和multer的single对应。
+            chooseFile : function(files){
+                console.log('filename',typeof files == 'string' ? files : files[0].name);
+            },
+            uploading : function(progress){
+                console.log('loading...',progress.loaded/progress.total+'%');
+            },
+            uploadSuccess : function(resp){
+                /*通过mill找到对应的文件，删除对应tmpFile*/
+                console.log('upload success',resp);
+            },
+            uploadError : function(err){
+                console.log('Error: ', err);
+            },
+            uploadFail : function(resp){
+                console.log('Fail: ', resp);
+            }
+        };
+
+
         return (
             <div>
                 <div className={ownClassNames['container']}>
@@ -359,13 +394,14 @@ class ExamSelect extends React.Component {
                         <div style={{ marginBottom: 20 }}>
                             {
                                 this.props.isLiankao ?
-                                    <button className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载联考导入模板</button>
-                                    : <button className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载校考导入模板</button>
+                                    <button onClick={this.downloadTPL.bind(this, true)} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载联考导入模板</button>
+                                    : <button onClick={this.downloadTPL.bind(this, false)} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载校考导入模板</button>
                             }
-                            <button className={ownClassNames['fileUpload'] + ' ' + ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']} style={{ fontSize: 12 }}>
-                                <span>导入线下考试数据</span>
-                                <input type="file" name="detailScore" id="btn-upload-detail-score-excel" className={ownClassNames['upload-input']}/>
-                            </button>
+                            <FileUpload options={options}>
+                                <button ref="chooseAndUpload" className={ownClassNames['fileUpload'] + ' ' + ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']} style={{ fontSize: 12 }}>
+                                    导入线下考试数据
+                                </button>
+                            </FileUpload>
                         </div>
                         <div className={ownClassNames['right-main']}>
                             {
@@ -532,3 +568,11 @@ function mapDispatchToProps(dispatch) {
         setMergedSqm: bindActionCreators(setMergedSqmAction, dispatch)
     }
 }
+
+
+/*
+
+                                    <span>导入线下考试数据</span>
+                                    <input type="file" name="detailScore" id="btn-upload-detail-score-excel" className={ownClassNames['upload-input']}/>
+
+ */

@@ -13,7 +13,10 @@ export const HIDE_LOADING = 'HIDE_LOADING';
 export const INIT_HOME = 'INIT_HOME';
 export const INIT_HOME_SUCCESS = 'INIT_HOME_SUCCESS';
 export const FETCH_HOME_RAW_DATA_SUCCESS = 'FETCH_HOME_RAW_DATA_SUCCESS';
-
+export const FROM_FLAG = {
+    '0': '自定义',
+    '1': '阅卷'
+};
 //================= Dashboard ==========================
 
 export const INIT_DASHBOARD = 'INIT_DASHBOARD';
@@ -113,3 +116,4 @@ export const UPDATE_SUBJECT_SQM = 'UPDATE_SUBJECT_SQM';
 //===================== RankReport ===========================
 export const INIT_RANKREPORT = 'INIT_RANKREPORT';
 export const INIT_RANKREPORT_SUCCESS = 'INIT_RANKREPORT_SUCCESS';
+

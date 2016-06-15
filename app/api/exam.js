@@ -1,9 +1,9 @@
 /*
- * @Author: HellMagic
- * @Date:   2016-05-18 18:57:37
- * @Last Modified by:   HellMagic
- * @Last Modified time: 2016-05-31 14:15:10
- */
+* @Author: HellMagic
+* @Date:   2016-05-18 18:57:37
+* @Last Modified by:   HellMagic
+* @Last Modified time: 2016-06-15 21:20:34
+*/
 
 
 /*
@@ -222,7 +222,7 @@ function formatExams(exams) {
 
 //********************************************************* Dashboard *********************************************************
 export function fetchDashboardData(params) {
-    var url = examPath + '/dashboard?examid=' + params.examid + '&grade=' + params.grade;
+    var url = (params.grade) ? examPath + '/dashboard?examid=' + params.examid + '&grade=' + params.grade : examPath + '/custom/dashboard?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
         // console.log('=======================  dashboard res.data.keys = ', _.keys(res.data));
@@ -235,7 +235,7 @@ export function fetchDashboardData(params) {
 
 
 export function fetchSchoolAnalysisData(params) {
-    var url = examPath + '/school/analysis?examid=' + params.examid + '&grade=' + params.grade; //必须是通过URI编码过的
+    var url = (params.grade) ? examPath + '/school/analysis?examid=' + params.examid + '&grade=' + params.grade : examPath + '/custom/school/analysis?examid=' + params.examid;
 
     var examInfo, examStudentsInfo, examPapersInfo, examClassesInfo;
     var studentsGroupByClass, allStudentsPaperMap;
@@ -267,6 +267,7 @@ export function fetchSchoolAnalysisData(params) {
         });
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = _.map(levels, (value, key) => 1);
+        debugger;
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
@@ -1520,14 +1521,14 @@ export function fetchRankReportdData(params) {
     var url = examPath + '/rank/report?examid=' + params.examid + '&grade=' + params.grade;
     return params.request.get(url).then(function(res) {
         var {examInfo, examPapersInfo, examStudentsInfo} = res.data;
-        var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');        
+        var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
 //构建需要的数据结构，最主要的是rankCache。检查allStudentsPaperMap是否符合。
 
 /*
 examInfo: {
     name: ,
     papers: , //注意要在这里添加 totalScore的信息
-    classes: 
+    classes:
 }
 
 rankCache: {
@@ -1537,7 +1538,7 @@ rankCache: {
                 kaohao: ,
                 name: ,
                 class: ,
-                score: 
+                score:
             }
         ],
         ...

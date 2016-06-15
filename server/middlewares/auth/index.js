@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-03 16:41:25
+* @Last Modified time: 2016-06-13 20:00:56
 */
 
 'use strict';
@@ -13,7 +13,7 @@ var bcrypt = require('bcryptjs');
 var util = require('util');
 var jsonwebtoken = require("jsonwebtoken");
 var Router = require("express").Router;
-var murmur = require('murmur');
+var murmur = require('murmur'); //TODO: 应该是没用了，可以把此module从node中去除了
 var when = require('when');
 var errors = require('common-errors');
 var ObjectId = require('mongodb').ObjectId;
@@ -21,7 +21,7 @@ var ObjectId = require('mongodb').ObjectId;
 
 var debug = require('debug')('app:utils:' + process.pid);
 
-var peterMgr = require('../../lib/peter').Manager;
+var peterHFS = require('peter').getManager('hfs');
 
 var UnauthorizedAccessError = require('../../errors/UnauthorizedAccessError');
 var BadRequestError = require('../../errors/BadRequestError');
@@ -90,7 +90,7 @@ console.log('userid = ', userid);
 
 //         return when.promise(function(resolve, reject) {
 //             //照当前来看是不再需要查询的，因为decord里就有几乎我们要的信息了，id, name,schoolId
-//             peterMgr.get('@Teacher.'+userid, function(err, user) {
+//             peterHFS.get('@Teacher.'+userid, function(err, user) {
 //                 if(err) return reject(new DBError('500', {message: 'find user error'}));
 
 // console.log('user.name = ', user.name);
@@ -127,7 +127,7 @@ console.log('userid = ', userid);
 //     var hash = murmur.hash128(value).hex().substr(0, 24);
 
 //     when.promise(function(resolve, reject) {
-//         peterMgr.get('@UserIndex.' + hash, function(err, result) {
+//         peterHFS.get('@UserIndex.' + hash, function(err, result) {
 //             if(err) return reject(new DBError('500', { message: 'get user index error' }));
 //             var target = _.find(result['[list]'], function(item) {
 //                 return value == item.key;
@@ -137,7 +137,7 @@ console.log('userid = ', userid);
 //         });
 //     }).then(function(target) {
 //         return when.promise(function(resolve, reject) {
-//             peterMgr.get(target.userid, ['_id', 'pass'], function(err, result) {
+//             peterHFS.get(target.userid, ['_id', 'pass'], function(err, result) {
 //                 if(err) return reject(new DBError('500', { message: 'find user error' }));
 //                 if(!result) return reject(new UnauthorizedAccessError('401', { message: 'db not found user of value = ' + value}));
 
