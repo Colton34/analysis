@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 13:12:19
+* @Last Modified time: 2016-06-15 14:38:32
 */
 
 'use strict';
@@ -67,20 +67,33 @@ exports.downloadExamTmp = function(req, res, next) {
     res.download(fileUrl, filename);
 }
 
+/*
+注意：原来这里是区分联考的，这里暂时没有联考的逻辑--因为没有在auth后的user信息中看到。
+ if(req.session.user.isLiankao === result.data.isLiankao){
+     res.json(httpResult.succ(result.data));
+ }else{
+     res.json(httpResult.err_logic(`模板上传错误, 请上传${req.session.user.isLiankao ? '联考' : '校内'}模板`));
+ }
+ */
 exports.importExamData = function(req, res, next) {
     var file = req.file;
     var result = xlsxParser(file, parsePaperScore);
 
     if(result.code === 0){
         res.status(200).json(result.data);
-        //注意：原来这里是区分联考的，这里暂时没有联考的逻辑--因为没有在auth后的user信息中看到。
-         // if(req.session.user.isLiankao === result.data.isLiankao){
-         //     res.json(httpResult.succ(result.data));
-         // }else{
-         //     res.json(httpResult.err_logic(`模板上传错误, 请上传${req.session.user.isLiankao ? '联考' : '校内'}模板`));
-         // }
     }else{
-        next(new errors.Error('解析分数数据错误 : ' + result.msg));
+        next(new errors.Error('解析考试分数数据错误 : ' + result.msg));
+    }
+}
+
+exports.importExamStudent = function(req, res, next) {
+    var file = req.file;
+    var result = xlsxParser(file, parseStudentList);
+
+    if(result.code === 0) {
+        res.status(200).json(result.data);
+    } else {
+        next(new errors.Error('解析考试学生数据错误：' + result.msg));
     }
 }
 
@@ -309,6 +322,77 @@ function getWorkSheetProfile(ws) {
         var ca = XLSX.utils.decode_cell(z);
         result.maxCol = result.maxCol > ca.c ? result.maxCol : ca.c;
         result.maxRow = result.maxRow > ca.r ? result.maxRow : ca.r;
+    }
+    return result;
+}
+
+function parseStudentList(ws){
+    //code = 1,有错误; code = 0, 正确解析,内容在data
+    var result = {
+        code: 1,
+        msg: '',
+        data: {}
+    };
+
+    var cell_index, cell, cell_value;
+    var profile = getWorkSheetProfile(ws);
+    if (profile.isEmpty) {
+        result.msg = '文件内容为空';
+        return result;
+    }
+
+    var headerMapper = {
+        "学号": "xuehao",
+        "考号": "kaohao",
+        "id": "id",
+        "名字": "name",
+        "姓名": "name",
+        "班级": "class",
+        "分组": "class",
+        "class": "class"
+    };
+
+    var valueMap = {};
+    //0行是title行
+    for (var j = 0; j <= profile.maxCol; j++) {
+        cell_index = XLSX.utils.encode_cell({r: 0, c: j});
+        //确定单元格里有数据
+        if (ws[cell_index]) {
+            cell_value = ws[cell_index].v;
+            if (headerMapper[cell_value]) {
+                valueMap[j] = headerMapper[cell_value];
+            }
+        }
+    }
+
+    if(_.isEmpty(valueMap)){
+        result.msg = '文件格式错误，没有表头';
+        return result;
+    }
+
+    var students = [];
+    for(var row = 1; row <= profile.maxRow; row++){
+
+        var student = {};
+
+        for(var col = 0; col <= profile.maxCol; col++){
+            cell_index = XLSX.utils.encode_cell({r: row, c: col});
+            //确定单元格里有数据
+            if (ws[cell_index]) {
+                cell_value = ws[cell_index].v;
+                student[valueMap[col]] = cell_value;
+            }
+        }
+
+        if(!_.isEmpty(student)){
+            students.push(student);
+        }
+
+    }
+
+    if(result.msg.length == 0){
+        result.code = 0;
+        result.data = students;
     }
     return result;
 }

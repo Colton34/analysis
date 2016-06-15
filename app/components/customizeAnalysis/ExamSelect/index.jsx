@@ -34,7 +34,7 @@ import ownClassNames from './examSelect.css';
 
 var {Header, Title, Body, Footer} = Modal;
 
-var FileUpload = require('./FileUpload');
+var FileUpload = require('../../../common/FileUpload');
 
 var examList = [
     {

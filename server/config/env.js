@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-13 19:55:14
+* @Last Modified time: 2016-06-15 14:16:52
 */
 
 'use strict';
@@ -23,7 +23,7 @@ var development = {
 };
 
 var production = {
-    "db": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://fx:fx123456@server4.yunxiao.com:8300/hfs-test',  //mongodb://localhost:27017/hfs-test
+    "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://fx:fx123456@server4.yunxiao.com:8300/hfs-test',  //mongodb://localhost:27017/hfs-test
     'fxdb': 'mongodb://fx2:123456@ct.yunxiao.com:19000/fx2',
     "port": 8666,
     "client_host": 'localhost',

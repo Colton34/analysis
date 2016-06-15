@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-14 12:11:26
+* @Last Modified time: 2016-06-15 14:14:33
 */
 
 'use strict';
@@ -70,6 +70,8 @@ module.exports = function(app) {
 }
 
 function bindHFS() {
+console.log('hfs mongo:   ',  config.hfsdb);
+
     return when.promise(function(resolve, reject) {
         peterHFS.bindDb(config.hfsdb, function(error) {
             if(error) {
@@ -82,6 +84,8 @@ function bindHFS() {
 }
 
 function bindFX() {
+console.log('fx mongo:   ',  config.fxdb);
+
     return when.promise(function(resolve, reject) {
         peterFX.bindDb(config.fxdb, function(error) {
             if(error) {

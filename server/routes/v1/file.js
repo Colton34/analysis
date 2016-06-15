@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:25:26
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 13:38:14
+* @Last Modified time: 2016-06-15 14:32:54
 */
 
 'use strict';
@@ -28,5 +28,5 @@ router.get('/download/tpl', dfile.downloadExamTmp);
 //注意 upload.single('xxx')中的xxx一定要和上传的表单中的filename一致！！！（不一定是file的origianl filename，一定要是上传的
 //filename）
 router.post('/import/exam/data', upload.single('importData'), dfile.importExamData);
-
+router.post('/import/exam/student', upload.single('importStudent'), dfile.importExamStudent);
 module.exports = router;
