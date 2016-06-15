@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-14 16:57:52
+* @Last Modified time: 2016-06-15 13:12:19
 */
 
 'use strict';
@@ -69,7 +69,6 @@ exports.downloadExamTmp = function(req, res, next) {
 
 exports.importExamData = function(req, res, next) {
     var file = req.file;
-
     var result = xlsxParser(file, parsePaperScore);
 
     if(result.code === 0){
@@ -97,11 +96,8 @@ function xlsxParser(file, handler){
         arr[i] = String.fromCharCode(file.buffer[i]);
     }
     var bstr = arr.join('');
-
     var wb = XLSX.read(bstr, {type: 'binary'});
-
     var first_sheet_name = wb.SheetNames[0];
-
     /* Get worksheet */
     var ws = wb.Sheets[first_sheet_name];
     return handler(ws);
@@ -290,6 +286,29 @@ function parsePaperScore(ws) {
 
     if(result.msg.length == 0){
         result.code = 0;
+    }
+    return result;
+}
+
+/**
+ * 提取概要信息
+ * @param ws
+ * @returns {{isEmpty: boolean, maxCol: number, maxRow: number}}
+ */
+function getWorkSheetProfile(ws) {
+    var result = {
+        isEmpty: true,
+        maxCol: 0,
+        maxRow: 0
+    };
+
+    for (var z in ws) {
+        /* all keys that do not begin with "!" correspond to cell addresses */
+        if (z[0] === '!') continue;
+        result.isEmpty = false;
+        var ca = XLSX.utils.decode_cell(z);
+        result.maxCol = result.maxCol > ca.c ? result.maxCol : ca.c;
+        result.maxRow = result.maxRow > ca.r ? result.maxRow : ca.r;
     }
     return result;
 }
