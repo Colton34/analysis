@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 14:38:32
+* @Last Modified time: 2016-06-15 17:28:50
 */
 
 'use strict';
@@ -15,6 +15,7 @@ var fs = require('fs');
 var tmp = require('tmp');
 
 var XLSX = require('xlsx');
+var excel = require("node-excel-export");
 // var config = require('../../config/env');
 
 var tempFileDir = path.join(__dirname, '../../..', 'tempFiles');
@@ -94,6 +95,69 @@ exports.importExamStudent = function(req, res, next) {
         res.status(200).json(result.data);
     } else {
         next(new errors.Error('解析考试学生数据错误：' + result.msg));
+    }
+}
+
+exports.exportExamStudent = function(req, res, next) {
+    if(!req.body || !req.body['students']) return next(new errors.Error('没有有效的需要导出的学生数据'));
+
+    var students = JSON.parse(req.body['students']);
+
+    console.log('students.length = ', students.length);
+
+    // var fileDir = path.join(__dirname, '../../../public/files');
+    // var filename = '校内考试小分模板.xlsx'; //  (req.query && req.query.liankao) ? '联考小分模板.xlsx' :
+    // var fileUrl = path.join(fileDir, filename);
+    // res.download(fileUrl, filename);
+
+    // res.status(200).send('ok');
+    try{
+        // students = JSON.parse(students);
+
+        var headerDark= {
+            fill: {
+                fgColor: {
+                    rgb: 'FFFFFFFF'
+                }
+            },
+            font: {
+                color: {
+                    rgb: '00000000'
+                },
+                sz: 14,
+                bold: true
+            }
+        };
+
+        var specification = {
+            'kaohao': {
+                displayName: '考号',
+                headerStyle: headerDark
+            },
+            'name': {
+                displayName: '姓名',
+                headerStyle: headerDark
+            },
+            'class' :{
+                displayName: '班级',
+                headerStyle: headerDark
+            }
+        };
+
+        var report = excel.buildExport(
+            [
+                {
+                    name: '学生列表',
+                    specification: specification,
+                    data: students // <-- Report data
+                }
+            ]
+        );
+
+        res.attachment('学生列表.xlsx');
+        res.status(200).send(report);
+    }catch(err){
+        next(new errors.Error('生成学生列表错误', err));
     }
 }
 

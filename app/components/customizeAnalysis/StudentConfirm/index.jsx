@@ -80,6 +80,26 @@ class StudentConfirm extends React.Component {
     getStudentNum() {
         return _.reduce(this.state.groupMap, function(sum, each){ return sum + (each.status === 'inUse' ? each.count : 0)}, 0);
     }
+    exportExamStudent() {
+        var students = _.concat(..._.map(_.filter(this.state.groupMap, (item, className) => item.status === 'inUse'), (obj) => obj.array));
+
+        var url = '/api/v1/file/export/exam/student';
+        // for(var key in data){
+        //     var value = typeof data[key] === 'string' ? data[key] : JSON.stringify(data[key]);
+        //     inputs += "<input type='hidden' name='" + key + "' value='" + value + "' />";
+        // }
+        // request发送请求
+        var input = "<input type='hidden' name='" + 'students' + "' value='" + JSON.stringify(students) + "' />";
+        $('<form action="' + url + '" method="' + ('post') + '">' + input + '</form>')
+            .appendTo('body').submit().remove();
+
+        // window.request.post('/file/export/exam/student', {students: students}).then(function(res) {
+
+        // }).catch(function(err) {
+        //     console.log('导出学生错误：', err);
+        // })
+    }
+
     render() {
         var {groupMap} = this.state;
         var _this = this;
@@ -123,7 +143,7 @@ class StudentConfirm extends React.Component {
                         <FileUpload options={options}>
                             <button ref="chooseAndUpload" className={ownClassNames['export-btn']}>导入考生数据</button>
                         </FileUpload>
-                        <button className={ownClassNames['export-btn']}>导出考生数据</button>
+                        <button onClick={this.exportExamStudent.bind(this, this.props.currentSubject)} className={ownClassNames['export-btn']}>导出考生数据</button>
                     </div>
 
                     <div class="clearfix">

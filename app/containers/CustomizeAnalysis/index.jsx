@@ -206,6 +206,7 @@ class CustomizeAnalysis extends React.Component {
                 {
                     status === 'create' && pageIndex === 3 &&
                     <StudentConfirm
+                        currentSubject={this.props.currentSubject}
                         pageIndex={pageIndex}
                         onPrevPage={this.onPrevPage.bind(this) }
                         onNextPage={this.onNextPage.bind(this) }

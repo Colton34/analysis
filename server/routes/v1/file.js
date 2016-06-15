@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:25:26
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 14:32:54
+* @Last Modified time: 2016-06-15 15:45:20
 */
 
 'use strict';
@@ -29,4 +29,6 @@ router.get('/download/tpl', dfile.downloadExamTmp);
 //filename）
 router.post('/import/exam/data', upload.single('importData'), dfile.importExamData);
 router.post('/import/exam/student', upload.single('importStudent'), dfile.importExamStudent);
+router.post('/export/exam/student', dfile.exportExamStudent);
+
 module.exports = router;
