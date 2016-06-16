@@ -24,7 +24,7 @@ export default (store) => {
             <Route path='school/report' component={SchoolReport} />
             <Route path='add/analysis' component={CustomizeAnalysis}/>
             <Route path='faq' component={HelpCenter}/>
-            <Route path='phb' component={RankReport}/>
+            <Route path='rank/report' component={RankReport}/>
         </Route>
     );
 };
