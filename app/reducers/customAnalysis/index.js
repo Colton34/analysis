@@ -47,7 +47,7 @@ export default function reducer(state, action) {
             // if(!action.isCached) nextState = nextState.setIn(['papersCache', action.res.pid], action.res);
             
             var nextState = null;
-            if(!state.getIn(['currentSubject','src', action.res.pid])){
+            if(!state.getIn(['currentSubject','src', action.res.id])){
                 nextState = state.setIn(['currentSubject','src', action.res.id], Map(_.assign({}, {oriSQM: Map(action.res)}, action.paperInfo, {SQM: {}})));
             }
             if(!action.isCached) nextState = nextState.setIn(['papersCache', action.res.id], action.res);
