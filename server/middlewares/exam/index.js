@@ -106,7 +106,8 @@ exports.rankReport = function(req, res, next) {
         var scoreInfoGroupByStudent = _.groupBy(allStudentsPaperScoreInfo, 'id');
         var allStudentsTotalScoreInfo = _.map(scoreInfoGroupByStudent, (studentPaperInfoArr, studentId) => {
             //把总分信息添加上去
-            var totalScore = _.sum(studentPaperInfoArr, (s) => s.paperScore);
+            // var totalScore = _.sum(studentPaperInfoArr, (s) => s.paperScore);
+            var totalScore = _.sum(_.map(studentPaperInfoArr, (s) => s.score));
             var studentBaseInfo = _.pick(studentPaperInfoArr[0], ['id', 'kaohao', 'name', 'class', 'school', 'xuehao']);
             return _.assign(studentBaseInfo, {score: totalScore, paper: 'totalScore', id: 'totalScore'});
         });
