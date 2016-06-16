@@ -659,7 +659,7 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
 //segments.length-1个有效值
 
     var countsGroupByLevel = makeSegmentsStudentsCount(examStudentsInfo, levelSegments);
-
+// debugger;
     //开始创建标准的resultInfo数据结构：
     result.totalSchool = {};
 

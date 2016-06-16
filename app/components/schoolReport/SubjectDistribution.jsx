@@ -379,21 +379,21 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
     var result = {};
     result.totalSchool = {};
 
-    result.totalSchool.totalScore = _.filter(examStudentsInfo, (student) => student.score >= levelScore).length;
+    result.totalSchool.totalScore = _.filter(examStudentsInfo, (student) => student.score > levelScore).length;
 
     _.each(subjectsMean, (subMean, pid) => {
         if (pid == 'totalScore') return;
 
-        result.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score >= subMean.mean).length;
+        result.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score > subMean.mean).length;
     });
 
     _.each(studentsGroupByClass, (classStudents, className) => {
         var temp = {};
         // var classTotalScoreMean = _.round(_.mean(_.map(classStudents, (student) => student.score)), 2);
-        temp.totalScore = _.filter(classStudents, (student) => student.score >= levelScore).length;
+        temp.totalScore = _.filter(classStudents, (student) => student.score > levelScore).length;
 
         _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
-            temp[pid] = _.filter(papers, (paper) => paper.score >= subjectsMean[pid].mean).length;
+            temp[pid] = _.filter(papers, (paper) => paper.score > subjectsMean[pid].mean).length;
         });
 
         result[className] = temp;
