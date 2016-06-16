@@ -20,7 +20,7 @@ import HelpCenter from '../components/HelpCenter';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Test} />
+            <IndexRoute component={Home} />
             <Route path='dashboard' component={Dashboard} />
             <Route path='school/report' component={SchoolReport} />
             <Route path='rank/report' component={RankReport} />

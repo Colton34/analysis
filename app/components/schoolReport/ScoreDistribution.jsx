@@ -192,7 +192,6 @@ class Dialog extends React.Component {
             return this.levels[index+''].score < this.levels[(index+1)+''].score
         });
 
-        debugger;
         if(!isValid) {
             console.log('表单验证不通过');
             return;
@@ -275,7 +274,6 @@ class Dialog extends React.Component {
     render() {
         var _this = this;
         var {examInfo, examStudentsInfo} = this.props;
-
 
         // this.levels = this.props.levels;
         this.levLastIndex = _.size(this.levels) - 1;
@@ -467,7 +465,7 @@ class ScoreDistribution extends React.Component {
 
                     <p style={{ marginBottom: 20 }}>各班的上线情况见下表：</p>
                     <TableView tableData={tableData} levels={levels} TableComponent={Table}/>
-                    
+
                     {/*--------------------------------  饼图的select -------------------------------------*/}
                     <span style={{ position: 'absolute', right: 0, marginTop: 40 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this)} classList={_this.classList}/></span>
 
