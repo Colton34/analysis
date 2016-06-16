@@ -11,10 +11,7 @@ import {
 }
 from '../../lib/constants';
 
-export
-default
-
-function reducer(state, action) {
+export default function reducer(state, action) {
 	if (_.isUndefined(state)) return initialState;
 	if (!(state instanceof InitialState)) return initialState.merge(state);
 
@@ -25,7 +22,8 @@ function reducer(state, action) {
 			_.each(action.res, function(value, key) {
 				nextState = (nextState) ? nextState.set(key, value) : state.set(key, value);
 			});
-			return nextState;
+			console.log('INIT_RANKREPORT_SUCCESS ============ ');
+			return nextState.set('haveInit', true);
 	}
 	return state;
 }

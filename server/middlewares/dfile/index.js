@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 17:28:50
+* @Last Modified time: 2016-06-15 22:24:46
 */
 
 'use strict';
@@ -102,18 +102,7 @@ exports.exportExamStudent = function(req, res, next) {
     if(!req.body || !req.body['students']) return next(new errors.Error('没有有效的需要导出的学生数据'));
 
     var students = JSON.parse(req.body['students']);
-
-    console.log('students.length = ', students.length);
-
-    // var fileDir = path.join(__dirname, '../../../public/files');
-    // var filename = '校内考试小分模板.xlsx'; //  (req.query && req.query.liankao) ? '联考小分模板.xlsx' :
-    // var fileUrl = path.join(fileDir, filename);
-    // res.download(fileUrl, filename);
-
-    // res.status(200).send('ok');
     try{
-        // students = JSON.parse(students);
-
         var headerDark= {
             fill: {
                 fgColor: {

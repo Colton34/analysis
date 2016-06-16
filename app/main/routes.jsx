@@ -11,6 +11,7 @@ import Test from '../containers/Test'
 import Home from '../containers/Home';
 import SchoolReport from '../containers/SchoolReport';
 import CustomizeAnalysis from '../containers/CustomizeAnalysis';
+import RankReport from '../containers/MyRankReport';
 import HelpCenter from '../components/HelpCenter';
 
 /*
@@ -19,16 +20,19 @@ import HelpCenter from '../components/HelpCenter';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Home} />
+            <IndexRoute component={Test} />
             <Route path='dashboard' component={Dashboard} />
             <Route path='school/report' component={SchoolReport} />
+            <Route path='rank/report' component={RankReport} />
             <Route path='add/analysis' component={CustomizeAnalysis}/>
+
             <Route path='faq' component={HelpCenter}/>
         </Route>
     );
 };
 
 /*
+
 
 
         /:examId/

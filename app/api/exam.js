@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 21:20:34
+* @Last Modified time: 2016-06-16 14:27:11
 */
 
 
@@ -1517,13 +1517,6 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
 /*
 同SchoolAnalysis的 examInfo，examClassesInfo以及examStudentsInfo
  */
-export function fetchRankReportdData(params) {
-    var url = examPath + '/rank/report?examid=' + params.examid + '&grade=' + params.grade;
-    return params.request.get(url).then(function(res) {
-        var {examInfo, examPapersInfo, examStudentsInfo} = res.data;
-        var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
-//构建需要的数据结构，最主要的是rankCache。检查allStudentsPaperMap是否符合。
-
 /*
 examInfo: {
     name: ,
@@ -1558,10 +1551,11 @@ rankCache: {
 }
 
  */
-        return Promise.resolve({
-            examInfo: {},
-            rankCache: {}
-        });
+export function fetchRankReportdData(params) {
+    var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + params.grade : examPath + '/rank/report?examid=' + params.examid;
+
+    return params.request.get(url).then(function(res) {
+        return Promise.resolve(res.data);
     });
 }
 

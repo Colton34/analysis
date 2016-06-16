@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 21:18:46
+* @Last Modified time: 2016-06-16 14:08:01
 */
 
 'use strict';
@@ -16,38 +16,158 @@ var errors = require('common-errors');
 var examUitls = require('./util');
 var moment = require('moment');
 
+// exports.rankReport = function(req, res, next) {
+//     // var grade = decodeURI(req.query.grade);
+//     // examUitls.filterExam(req.query.examid, grade).then(function(exam) {
+//     //     res.status(200).json(exam);
+//     // });
+
+//     //TODO: 使用这里的数据结构 或者 在rank-server API的scores中添加学生的信息，而不只是分数。但是这里只有总分
+//     //的信息，而没有各科的信息。所以还是需要和schoolAnalysis一样的数据结构。
+
+//     //设计：这里使用和SchoolAnalysis一样的数据结构，这样如果再有相同的需求，则可以考虑将此数据结构作为Common的。
+//     //而且在自定义分析的数据持久化Schema中也是存储的相同的数据结构。
+
+//     var exam = req.exam,
+//         examScoreMap = req.classScoreMap,
+//         examScoreArr = req.orderedScoresArr;
+//     try {
+//         req.examInfo = formatExamInfo(exam);
+//         req.examPapersInfo = generateExamPapersInfo(exam);
+//         req.examClassesInfo = genearteExamClassInfo(exam);
+//     } catch (e) {
+//         next(new errors.Error('schoolAnalysis 同步错误', e));
+//     }
+//     generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo).then(function(examStudentsInfo) {
+//         res.status(200).json({
+//             examInfo: req.examInfo,
+//             examPapersInfo: req.examPapersInfo,
+//             examClassesInfo: req.examClassesInfo,
+//             examStudentsInfo: examStudentsInfo
+//         });
+//     }).catch(function(err) {
+//         next(new errors.Error('schoolAnalysis Error', err));
+//     });
+// }
+
+
+/*
+examInfo: {
+    name: ,
+    papers: [{pid: , paper: , subject: }]   , //注意要在这里添加 totalScore的信息
+    classes:
+}
+
+rankCache: {
+    totalScore: {
+        <className>: [ //已经是有序的（升序）
+            {
+                kaohao: ,
+                name: ,
+                class: ,
+                //score:
+            }
+        ],
+        ...
+    },
+    <pid>: {
+        <className>: [
+            {
+                kaohao: ,
+                name: ,
+                class: ,
+                score
+            }
+        ],
+        ...
+    },
+    ...
+}
+
+ */
+
 exports.rankReport = function(req, res, next) {
-    // var grade = decodeURI(req.query.grade);
-    // examUitls.filterExam(req.query.examid, grade).then(function(exam) {
-    //     res.status(200).json(exam);
-    // });
+    //验证过，有examid和grade
+    var grade = decodeURI(req.query.grade);
 
-    //TODO: 使用这里的数据结构 或者 在rank-server API的scores中添加学生的信息，而不只是分数。但是这里只有总分
-    //的信息，而没有各科的信息。所以还是需要和schoolAnalysis一样的数据结构。
+    //1.根据exam查找@Exam item，根据grade过滤出有效的paper
+    getValidPaper(req.query.examid, grade).then(function({papers, examName}) {
+        //2.根据paper的[students]和matrix计算学生的各科成绩
+        // [ {id, kaohao, name, class, score, paper }  ]  -- 整个年级各个学生，各个科目的object
+        var allStudentsPaperScoreInfo = _.concat(..._.map(papers, (paper) => { //学生不同的科目算作不同条目，因此是重复的学生信息
+            var scoreMatrix = paper.matrix;
+            return _.map(paper['[students]'], (student, index) => {
+                var paperScore = _.sum(scoreMatrix[index]);
+                return _.assign(student, {score: paperScore, paper: paper._id, pid: paper.id });
+            });
+        }));
 
-    //设计：这里使用和SchoolAnalysis一样的数据结构，这样如果再有相同的需求，则可以考虑将此数据结构作为Common的。
-    //而且在自定义分析的数据持久化Schema中也是存储的相同的数据结构。
-
-    var exam = req.exam,
-        examScoreMap = req.classScoreMap,
-        examScoreArr = req.orderedScoresArr;
-    try {
-        req.examInfo = formatExamInfo(exam);
-        req.examPapersInfo = generateExamPapersInfo(exam);
-        req.examClassesInfo = genearteExamClassInfo(exam);
-    } catch (e) {
-        next(new errors.Error('schoolAnalysis 同步错误', e));
-    }
-    generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo).then(function(examStudentsInfo) {
-        res.status(200).json({
-            examInfo: req.examInfo,
-            examPapersInfo: req.examPapersInfo,
-            examClassesInfo: req.examClassesInfo,
-            examStudentsInfo: examStudentsInfo
+        //先根据学生分组得到其总分
+        var scoreInfoGroupByStudent = _.groupBy(allStudentsPaperScoreInfo, 'id');
+        var allStudentsTotalScoreInfo = _.map(scoreInfoGroupByStudent, (studentPaperInfoArr, studentId) => {
+            //把总分信息添加上去
+            var totalScore = _.sum(studentPaperInfoArr, (s) => s.paperScore);
+            var studentBaseInfo = _.pick(studentPaperInfoArr[0], ['id', 'kaohao', 'name', 'class', 'school', 'xuehao']);
+            return _.assign(studentBaseInfo, {score: totalScore, paper: 'totalScore', id: 'totalScore'});
         });
+
+        var allStudentsScoreInfo = _.concat(allStudentsPaperScoreInfo, allStudentsTotalScoreInfo);
+        var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
+        var rankCache = {};
+        _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperId) => {
+            //这里面都是当前科目的分数
+            rankCache[paperId] = _.groupBy(studentsScoreInfoArr, 'class');
+        });
+
+        //组织examInfo的信息：
+        var examPapers = _.map(papers, (paperObj) => {
+            return {paper: paperObj._id, pid: paperObj.id, name: paperObj.subject};
+        });
+        var examClasses = _.keys(_.groupBy(allStudentsTotalScoreInfo, 'class'));  //总分肯定是包含全部学生的，所以没必要使用allStudentsScoreInfo。
+        var examInfo = {
+            name: examName,
+            papers: examPapers,
+            classes: examClasses
+        };
+
+        res.status(200).json({
+            examInfo: examInfo,
+            rankCache: rankCache
+        })
     }).catch(function(err) {
-        next(new errors.Error('schoolAnalysis Error', err));
-    });
+        next(err);
+    })
+}
+
+function getValidPaper(examid, gradeName) {
+    var targetExam;
+    return when.promise(function(resolve, reject) {
+        peterHFS.get('@Exam.'+examid, function(err, exam) {
+            if(err) return reject(new errors.data.MongoDBError('find exam error : ', err));
+            //过滤paper
+            targetExam = exam;
+            console.log('filter前papers.length = ', exam['[papers]'].length);
+            resolve(_.filter(exam['[papers]'], (paper) => paper.grade == gradeName));
+        });
+    }).then(function(validPapers) {
+        //查找补全实体信息
+        var paperIds = _.map(validPapers, (paperObj) => paperObj.paper);
+        console.log('filter后paperIds.length = ', paperIds.length);
+        var paperPromises = _.map(paperIds, (pObjId) => {
+            return when.promise(function(resolve, reject) {
+                peterHFS.get(pObjId, function(err, paper) {
+                    if(err) return reject(new errors.data.MongoDBError('find paper error: ', err));
+                    resolve(paper);
+                });
+            });
+        });
+        return when.all(paperPromises);
+    }).then(function(papers) {
+        return {
+            papers: papers,
+            examName: targetExam.name
+        }
+    })
 }
 
 
