@@ -116,7 +116,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                 {
                                     headSeq.map((seqHead, dIndex) => {
                                         if (headSelect[seqHead] === true) {
-                                            return <td key={'tableData-' + index + dIndex} className={commonStyle['table-unit']}>{rowData[seqHead]}</td>
+                                            return <td key={'tableData-' + index + dIndex} className={commonStyle['table-unit']}>{rowData[seqHead] !== undefined ? rowData[seqHead] : '无数据'}</td>
                                         }
                                     })
                                 }
