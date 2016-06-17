@@ -80,12 +80,6 @@ export const LETTER_MAP = {
     6: 'G'
 };
 
-//考试来源：
-export const ExamOrigin = {
-    YUEJUAN: 0,
-    ZIDINGYI: 1
-}
-
 //=============== CustomAnalysis =============================
 export const ADD_PAPER_INFO = 'ADD_PAPER_INFO';
 export const ADD_PAPER_INFO_SUCCESS = 'ADD_PAPER_INFO_SUCCESS';
