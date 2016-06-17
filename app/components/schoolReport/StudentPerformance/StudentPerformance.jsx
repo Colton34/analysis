@@ -186,8 +186,8 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
     //算法数据结构：
 
     //自定义Module数据结构：
-    var topStudents = _.takeRight(examStudentsInfo, 10);
-    var lowStudents = _.take(examStudentsInfo, 10);
+    var topStudents = _.reverse(_.takeRight(examStudentsInfo, 10));
+    var lowStudents = _.reverse(_.take(examStudentsInfo, 10));
     var tableHeaderData = _.map(headers, (headerObj) => headerObj.subject);
 
     return (
