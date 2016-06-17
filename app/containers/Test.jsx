@@ -36,7 +36,6 @@ const config = {
 class Test extends React.Component {
     constructor(props) {
       super(props);
-
     }
 
     downloadFile() {
@@ -65,6 +64,11 @@ class Test extends React.Component {
                 <br />
                 <br />
                 <Link to={{ pathname: path, query: { examid: exam.id } }}>校级报告</Link>
+                <br />
+                <br />
+                <Link to={{ pathname: '/rank/report', query: { examid: '167', grade: encodeURI('高三') } }}>
+                    排行榜
+                </Link>
                 <ReactHighcharts config={config}></ReactHighcharts>
             </div>
         );

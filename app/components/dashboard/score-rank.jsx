@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 import _ from 'lodash';
 import dashboardStyle from './dashboard.css';
-
+import {Link} from 'react-router';
 /*
 
     return {
@@ -15,7 +15,7 @@ import dashboardStyle from './dashboard.css';
 
  */
 
-const ScoreRank = ({data}) => {
+const ScoreRank = ({data, examid, grade}) => {
     var flagFirstColor =  {color: '#FF0033'};
     var flagSecondColor = {color: '#54ba54'};
     var flagThirdColor =  {color: '#ce9dff'};
@@ -53,9 +53,9 @@ const ScoreRank = ({data}) => {
                     {tops}
                 </div>
             </div>
-            <div className={dashboardStyle['detail-btn']}>
+            <Link to={{ pathname: '/rank/report', query: { examid: examid, grade: grade } }} className={dashboardStyle['detail-btn']}>
                 查看详情
-            </div>
+            </Link>
         </div>
     )
 

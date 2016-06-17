@@ -18,6 +18,7 @@ import home from './home';
 import dashboard from './dashboard';
 import schoolAnalysis from './schoolAnalysis';
 import customAnalysis from './customAnalysis';
+import rankReport from './rankReport';
 
 var rootReducer = combineReducers({
     app,
@@ -25,6 +26,7 @@ var rootReducer = combineReducers({
     dashboard,
     schoolAnalysis,
     customAnalysis,
+    rankReport,
     routing
 });
 

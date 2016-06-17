@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 10:52:49
+* @Last Modified time: 2016-06-14 17:15:18
 */
 
 'use strict';
@@ -37,4 +37,16 @@ export function initParams(params, location, other) {
 export function getNumberCharacter(num) {
     if (!parseInt(num)) return ;
     return numberMapper[num.toString()];
+}
+
+export function saveAs(uri) {
+    var link = document.createElement('a');
+    if (typeof link.download === 'string') {
+        document.body.appendChild(link); //Firefox requires the link to be in the body
+        link.href = uri;
+        link.click();
+        document.body.removeChild(link); //remove the link when done
+    } else {
+        location.replace(uri);
+    }
 }
