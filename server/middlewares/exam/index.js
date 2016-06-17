@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-16 14:08:01
+* @Last Modified time: 2016-06-17 13:32:23
 */
 
 'use strict';
@@ -91,9 +91,10 @@ exports.rankReport = function(req, res, next) {
     var grade = decodeURI(req.query.grade);
 
     //1.根据exam查找@Exam item，根据grade过滤出有效的paper
-    getValidPaper(req.query.examid, grade).then(function({papers, examName}) {
+    getValidPaper(req.query.examid, grade).then(function(result) {
         //2.根据paper的[students]和matrix计算学生的各科成绩
         // [ {id, kaohao, name, class, score, paper }  ]  -- 整个年级各个学生，各个科目的object
+        var papers = result.papers, examName = result.examName;
         var allStudentsPaperScoreInfo = _.concat(..._.map(papers, (paper) => { //学生不同的科目算作不同条目，因此是重复的学生信息
             var scoreMatrix = paper.matrix;
             return _.map(paper['[students]'], (student, index) => {
