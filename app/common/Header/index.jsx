@@ -22,22 +22,10 @@ class HeaderMenu extends React.Component {
 
 }
 
-//TODO:这里有交互？需要展示学生的其他信息？
- {/*<ul className={style['user-center']}>
-            <li style={{display: 'inline-block'}}>
-              
-            </li>
-            <li style={{display: 'inline-block'}}>
-                
-                   
-                
-            </li>
-        </ul>*/}
-
-
 let dialogProps = {
     title: '我要吐槽',
-    content: <textarea  style={{ width: 550, height: 200 }}></textarea>
+    content: <textarea  style={{ width: 550, height: 200 }}></textarea>,
+    okButton: true
 }
 
 @Radium
@@ -105,7 +93,7 @@ console.log('user.name = ', this.props.user.realName);
                             <span className='caret'></span>
                         </div>
                     </a>
-                    <a href="javascript:void(0)"  onClick={this.props.actions.bind(_this, dialogProps) } style={{ float: 'right', textDecoration: 'none', color: '#5a5a5a', paddingLeft: 40, paddingTop: 30 }}>我要吐槽</a>
+                    {/*<a href="javascript:void(0)"  onClick={this.props.actions.bind(_this, dialogProps) } style={{ float: 'right', textDecoration: 'none', color: '#5a5a5a', paddingLeft: 40, paddingTop: 30 }}>我要吐槽</a>*/}
                     { this.state.showDropdown ? <DropdownMenu onLogout={this.onLogout.bind(this)}/> : ''}
                 </div>
             </div>
