@@ -2,7 +2,7 @@
  * @Author: HellMagic
  * @Date:   2016-04-30 11:14:17
  * @Last Modified by:   HellMagic
- * @Last Modified time: 2016-06-15 21:31:54
+ * @Last Modified time: 2016-06-17 14:21:56
  */
 
 'use strict';
@@ -28,6 +28,7 @@ router.get('/school/analysis',  exam.validateExam, exam.initExam, exam.schoolAna
 router.get('/custom/school/analysis', exam.customSchoolAnalysis);
 
 router.get('/rank/report', exam.validateExam, exam.rankReport);
+router.get('/custom/rank/report', exam.customRankReport);
 //TODO:
 // router.get('/custom/rank/report', exam.customRankReport);
 

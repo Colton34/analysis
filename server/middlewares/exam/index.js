@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-17 13:32:23
+* @Last Modified time: 2016-06-17 19:07:07
 */
 
 'use strict';
@@ -141,6 +141,55 @@ exports.rankReport = function(req, res, next) {
     })
 }
 
+exports.customRankReport = function(req, res, next) {
+    req.checkQuery('examid', '无效的examids').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    //从exam.studentsInfo中构建allStudentsScoreInfo
+    peterFX.get(req.query.examid, {isValid: true}, function(err, exam) {  //{isValid: true}
+        //1.注意字段名和之前数据结构中不一样（如果它是个数组）
+        //2.有些是Map，但从DB中拿出来是数组
+        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
+        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
+        try {
+            var examStudentsInfo = exam['[studentsInfo]'], examPapersInfo = _.keyBy(exam['[papersInfo]'], 'id');
+            if(!examStudentsInfo || examStudentsInfo.length == 0 || !examPapersInfo || examPapersInfo.length == 0) {
+                return next(new errors.Error('no valid custom exam be found'));
+            }
+            var allStudentsScoreInfo = _.concat(..._.map(exam['[studentsInfo]'], (student) => {
+                var obj = _.pick(student, ['id', 'kaohao', 'name', 'class']);
+                var totalObj = _.assign(obj, {score: student.score, paper: 'totalScore', id: 'totalScore'});
+                var paperObjs = _.map(student['[papers]'], (pObj) => {
+                    return _.assign(obj, {score: pObj.score, paper: examPapersInfo[pObj.paperid].paper, id: pObj.paperid});
+                });
+                return _.concat(totalObj, paperObjs);
+            }));
+            var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
+            var rankCache = {};
+            _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperId) => {
+                rankCache[paperId] = _.groupBy(studentsScoreInfoArr, 'class');
+            });
+
+            var examPapers = _.map(examPapersInfo, (value, pid) => {
+                return {
+                    pid: value.id, paper: value.paper, name: value.subject
+                }
+            });
+            var examInfo = {
+                name: exam.info.name,
+                papers: examPapers,
+                classes: exam.info['[realClasses]']
+            };
+            res.status(200).json({
+                examInfo: examInfo,
+                rankCache: rankCache
+            });
+        } catch(e) {
+            next(new errors.Error('format custom dashboard error: ', e));
+        }
+    })
+}
+
 function getValidPaper(examid, gradeName) {
     var targetExam;
     return when.promise(function(resolve, reject) {
@@ -196,11 +245,121 @@ exports.home = function(req, res, next) {
     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
         //2.获取此学校所产生的所有的考试信息--因为不牵涉到分数，所以这里直接读DB即可，不需要rank-server的exam api
         return examUitls.getExamsBySchool(school);
-    }).then(function(exams) {
-        res.status(200).json(exams);
+    }).then(function(originalExams) {
+        req.originalExams = originalExams;
+        return getCustomExams(req.user.id);
+    })
+    .then(function(customExams) {
+        try {
+            //但是这样做就相当于也把自定义分析当做不同分析处理了--就有可能造成自定义分析和普通分析交叉显示（而之前设计好像是自定义分析在前面）
+            var allExams = _.concat(req.originalExams, customExams);
+            var formatedExams = formatExams(allExams);
+            return when.resolve(formatedExams);
+        } catch(e) {
+            return when.reject(new errors.Error('格式化exams错误'));
+        }
+    }).then(function(formatedExams) {
+// console.log('customFormatedExams ===== ', customFormatedExams);
+        res.status(200).send(formatedExams);
     }).catch(function(err) {
         next(err);
     })
+}
+
+function getCustomExams(owner) {
+
+console.log('owner ================  ', owner);
+
+    return when.promise(function(resolve, reject) {
+        peterFX.query('@Exam', {owner: owner, 'isValid': true}, function(err, results) {
+            if(err) return reject(new errors.data.MongoDBError('find my custom analysis error: ', err));
+            //TODO: 返回formatExams函数中需要的exam参数形式
+            var names = _.map(results, (obj) => obj.info.name);
+            resolve(names);
+        });
+    });
+}
+
+
+/**
+ * 对exams进行排序格式化，从而符合首页的数据展示
+ * @param  {[type]} exams [description]
+ * @return {[type]}       [description]
+ */
+function formatExams(exams) {
+    var examGroupsByEventTime = _.groupBy(exams, function(exam) {
+        var time = moment(exam["event_time"]);
+        var year = time.get('year') + '';
+        var month = time.get('month') + 1;
+        month = (month > 9) ? (month + '') : ('0' + month);
+        var key = year + '.' + month;
+        return key;
+    });
+
+    //result用来保存格式化后的结果；resultOrder用来对group中的不同时间戳进行排序（统一时间戳下的数组在内部排序）；finalResult将
+    //result和resultOrder结合得到有序的格式化后的结果
+    var result = {},
+        resultOrder = [];
+
+// console.log('========  formatExams 1');
+
+
+    _.each(examGroupsByEventTime, function(examsItem, timeKey) {
+        var flag = {
+            key: timeKey,
+            value: moment(timeKey.split('.')).valueOf()
+        };
+        resultOrder.push(flag);
+        var temp = {};
+        _.each(examsItem, function(exam) {
+            temp[exam._id] = {
+                exam: exam
+            };
+            var papersFromExamGroupByGrade = _.groupBy(exam["[papers]"], function(paper) {
+                return paper.grade;
+            });
+            temp[exam._id].papersMap = papersFromExamGroupByGrade;
+        });
+
+        if (!result[timeKey]) result[timeKey] = [];
+// console.log('=========  formatedExams  2');
+
+        _.each(temp, function(value, key) {
+            _.each(value.papersMap, function(papers, gradeKey) {
+                var obj = {};
+                obj.examName = value.exam.name + "(年级：" + gradeKey + ")";
+                obj.grade = gradeKey;
+                obj.id = key;
+                obj.time = moment(value.exam['event_time']).valueOf();
+                obj.eventTime = moment(value.exam['event_time']).format('ll');
+                obj.subjectCount = papers.length;
+                obj.papers = _.map(papers, (obj) => {
+                    return {
+                        id: obj.paper,
+                        subject: obj.subject
+                    }
+                });
+                obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
+                obj.from = value.exam.from; //TODO: 这里数据库里只是存储的是数字，但是显示需要的是文字，所以需要有一个map转换
+
+                result[timeKey].push(obj);
+            });
+        });
+
+        result[timeKey] = _.orderBy(result[timeKey], [(obj) => obj.time], ['desc']);
+    });
+    resultOrder = _.orderBy(resultOrder, ['value'], ['desc']);
+    var finallyResult = [];
+    _.each(resultOrder, function(item) {
+        finallyResult.push({
+            timeKey: item.key,
+            values: result[item.key]
+        });
+    });
+
+// console.log('=============  formatedExams 3');
+
+    return finallyResult;
 }
 
 
@@ -629,6 +788,10 @@ function makeExamClassesInfo(examClassesInfo) {
 
 exports.createCustomAnalysis = function(req, res, next) {
     if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
+
+    var postData = req.body.data;
+    postData.owner = req.user.id;
+console.log('postData.owner = ', postData.owner);
 
     peterFX.create('@Exam', req.body.data, function(err, result) {
         if(err) return next(new errors.data.MongoDBError('创建自定义分析错误', err));
