@@ -75,9 +75,6 @@ class HeaderComponent extends React.Component {
     }
     render() {
         var _this = this;
-
-console.log('user.name = ', this.props.user.realName);
-
         return (
             <div className={style.header}>
                 <div className={style.wrapper}>

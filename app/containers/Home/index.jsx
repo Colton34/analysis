@@ -82,7 +82,6 @@ const Sidebar = () => {
         <div style={{ width: 380, backgroundColor: '#fafafa', display: 'inline-block', float: 'right', padding: '0 60px 0 80px' }}>
             <TeacherHelper/>
             <CommonQuestions/>
-            <Questionnaire/>
         </div>
     )
 }
