@@ -343,7 +343,6 @@ class RankReportTableView extends React.Component {
     }
     onSelectPageSize(event) {
         var nextPageSize= $(event.target).text();
-        console.log('next page size: ' + nextPageSize);
         this.setState({
             pageSize: parseInt(nextPageSize)
         }) 
@@ -424,7 +423,6 @@ class RankReportTableView extends React.Component {
     onSort(event) {
         var order = $(event.target).data('order');
         var headType = $(event.target).data('headtype');
-        console.log('order: ' + order + ', headType: ' + headType );
         this.setState({
             pageIndex: 0,
             pageSize: 25, 
