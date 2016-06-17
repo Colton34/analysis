@@ -23,20 +23,16 @@ class HeaderMenu extends React.Component {
 }
 
 //TODO:这里有交互？需要展示学生的其他信息？
-const HeaderUser = ({onClickAvatar}) => {
-    return (
-        <ul className={style['user-center']}>
-            <li>
-                <a href='javascript:void(0)' className={style.user}>
-                    <div className={style['user-avatar']} onClick={onClickAvatar}>
-                        <div className={style['user-avatar-img']} />
-                    </div>
-                    <div className='' style={{ width: 20, height: 20, marginLeft: 50 }}>v</div>
-                </a>
+ {/*<ul className={style['user-center']}>
+            <li style={{display: 'inline-block'}}>
+              
             </li>
-        </ul>
-    )
-}
+            <li style={{display: 'inline-block'}}>
+                
+                   
+                
+            </li>
+        </ul>*/}
 
 
 let dialogProps = {
@@ -101,7 +97,14 @@ class HeaderComponent extends React.Component {
                         <a className={style['title-a']} href='javascript:void(0)' title="好分数">好分数</a>
                     </h1>
                     <HeaderMenu />
-                    <HeaderUser onClickAvatar={this.onClickAvatar.bind(this)}/>
+                    {/* ------------------------------右侧头像、名字--------------------------------------*/ }
+                    <a href='javascript:;' onClick={this.onClickAvatar.bind(this)} style={localStyle.userInfo}>
+                        <div className={style['user-avatar']}> </div>
+                        <div className='dropdown' style={{marginLeft: 42}}>
+                            {this.props.user.realName}
+                            <span className='caret'></span>
+                        </div>
+                    </a>
                     <a href="javascript:void(0)"  onClick={this.props.actions.bind(_this, dialogProps) } style={{ float: 'right', textDecoration: 'none', color: '#5a5a5a', paddingLeft: 40, paddingTop: 30 }}>我要吐槽</a>
                     { this.state.showDropdown ? <DropdownMenu onLogout={this.onLogout.bind(this)}/> : ''}
                 </div>
@@ -121,11 +124,17 @@ var localStyle = {
     },
     headerLink: {
         ':hover': { textDecoration: 'none'}
+    },
+    userInfo: { 
+        float: 'right', position: 'relative', height: '100%', lineHeight: '78px', 
+        marginLeft: 10, cursor: 'pointer',textDecoration:'none',color: '#333',
+        ':hover': {color: '#59bde5', textDecoration: 'none'},
+        ':link': {textDecoration: 'none'}
     }
 }
 HeaderComponent.propTypes = {
     user: PropTypes.object.isRequired
 };
 
-export default HeaderComponent;
+export default Radium(HeaderComponent);
 

@@ -15,7 +15,8 @@
  * 所以可以理解为带map的函数刚好是不带map的函数的正交函数.
  * 含义可能会因为具体函数不同,以具体函数上对row/col的解释为准
  */
-import _ from 'lodash';
+import _ from 'underscore';
+
 
 var option = {
     'row': {
@@ -1134,8 +1135,7 @@ function array2map(array, key) {
  * @param type,合并两个二维矩阵有四种模式,(x1Ux2,y1+y2),(x1Ux2,y1Uy2),(x1+x2,y1Uy2),(x1+x2,y1+y2)
  */
 function mergeTwoMatrix(matrixA, matrixB, type, xKey, yKey) {
-
-    var x1 = copyHeader(matrixA, 'row');
+    var x1 = copyHeader(matrixA, 'row'); //取matrix.x
     var x2 = copyHeader(matrixB, 'row');
     var y1 = copyHeader(matrixA, 'col');
     var y2 = copyHeader(matrixB, 'col');
@@ -1187,8 +1187,8 @@ function mergeTwoMatrix(matrixA, matrixB, type, xKey, yKey) {
         var x1Ux2 = _.uniq(x1x2, false, function (item) {
             return item[xKey];
         });
-        markArrayItem(x1Ux2);
-        var x1Ux2Map = array2map(x1Ux2, xKey);
+        markArrayItem(x1Ux2);//每个Item多一个_count属性；
+        var x1Ux2Map = array2map(x1Ux2, xKey); //生成 {item[xKey] : item}
 
         var y1Uy2 = _.uniq(y1y2, false, function (item) {
             return item[yKey];
