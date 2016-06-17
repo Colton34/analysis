@@ -71,12 +71,9 @@ class HeaderComponent extends React.Component {
         })
     }
     onLogout() {
-        // alert('todo: 登出');
-        // this.setState({
-        //     showDropdown: false
-        // })
         var Cookies = require('cookies-js');
-        Cookies.expire('authorization');
+        var options = (_.includes(window.location.hostname, 'yunxiao')) ? { domain: '.yunxiao.com'} : {};
+        Cookies.expire('authorization', options);
         window.location = '/';
     }
     componentDidMount() {
@@ -90,6 +87,9 @@ class HeaderComponent extends React.Component {
     }
     render() {
         var _this = this;
+
+console.log('user.name = ', this.props.user.realName);
+
         return (
             <div className={style.header}>
                 <div className={style.wrapper}>

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-16 14:27:11
+* @Last Modified time: 2016-06-16 14:45:11
 */
 
 
@@ -267,7 +267,7 @@ export function fetchSchoolAnalysisData(params) {
         });
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = _.map(levels, (value, key) => 1);
-        debugger;
+
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
