@@ -247,7 +247,7 @@ class ExamSelect extends React.Component {
                     var
                         examName = sqm.x[0].exam,
                         paperName = sqm.x[0].paper,
-                        score = profile(sqm).manfen,
+                        score = sqm.hasOwnProperty('x') ? sqm.x.reduce(function(sum, each){ return sum + each.score}, 0) : 0,
                         result = matrixBase.sumByOrie(sqm, '第1题', 'row');
 
 
@@ -335,7 +335,6 @@ class ExamSelect extends React.Component {
                 console.log('Fail: ', resp);
             }
         };
-
 
         return (
             <div>
