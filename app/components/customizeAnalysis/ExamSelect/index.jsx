@@ -25,7 +25,7 @@ import {
     setMergedSqmAction
 } from '../../../reducers/customAnalysis/actions';
 import PageFooter from '../Footer';
-import {ExamOrigin} from '../../../lib/constants.js';
+import {FROM_FLAG as fromFlag} from '../../../lib/constants';
 import matrixBase from '../../../lib/matrixBase.js';
 
 import {initParams, saveAs} from '../../../lib/util';
@@ -40,7 +40,7 @@ var examList = [
     {
         name: '2016年永丰中学第六次月考',
         event_time: '2016-05-10T05:50:00.000Z',
-        from: ExamOrigin.YUEJUAN,
+        from: 1,
         id: 16789,
         grade: '初三',
         '[papers]': [ //注意：这里修改属性名'[papers]'为'papers'
@@ -252,7 +252,7 @@ class ExamSelect extends React.Component {
                     var
                         examName = sqm.x[0].exam,
                         paperName = sqm.x[0].paper,
-                        score = profile(sqm).manfen,
+                        score = sqm.hasOwnProperty('x') ? sqm.x.reduce(function(sum, each){ return sum + each.score}, 0) : 0,
                         result = matrixBase.sumByOrie(sqm, '第1题', 'row');
 
 
@@ -341,7 +341,6 @@ class ExamSelect extends React.Component {
             }
         };
 
-
         return (
             <div>
                 <div className={ownClassNames['container']}>
@@ -364,14 +363,13 @@ class ExamSelect extends React.Component {
                                 examList.map((exam, index) => {
                                     var date = new Date(exam.time);
 
-                                    var fromYuejuan = (exam['from'] === ExamOrigin.YUEJUAN ? true : false);
                                     return (
                                         <div className='exam-item' key={'exam-' + index}>
                                             <p id={exam.id} className='exam-name' style={{ marginBottom: 4 }}>{exam.examName}</p>
                                             <ul className={ownClassNames['exam-summary']}>
                                                 <li className={ownClassNames['exam-info-li']}>{date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + (date.getDate() + 1) }</li>
                                                 <li className={ownClassNames['exam-info-li']}>{exam.grade}</li>
-                                                <li className={ownClassNames['exam-info-li'] + ' ' + 'paper-from'}>来自<span style={fromYuejuan ? {} : { color: '#f9d061' }}>{fromYuejuan ? '阅卷' : '自定义'}</span></li>
+                                                <li className={ownClassNames['exam-info-li'] + ' ' + 'paper-from'}>来自<span style={exam['from'] == 1 ? {} : { color: '#f9d061' }}>{fromFlag[exam['from']]}</span></li>
                                             </ul>
                                             <ul className={ownClassNames['subjects']}>
                                                 {
