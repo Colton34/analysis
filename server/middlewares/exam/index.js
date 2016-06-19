@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-19 16:00:52
+* @Last Modified time: 2016-06-19 16:24:37
 */
 
 'use strict';
@@ -252,7 +252,7 @@ exports.home = function(req, res, next) {
 //     }).then(function(customExams) {
 //         try {
 //             //但是这样做就相当于也把自定义分析当做不同分析处理了--就有可能造成自定义分析和普通分析交叉显示（而之前设计好像是自定义分析在前面）
-//             var allExams = _.concat(req.originalExams, customExams);
+//             var allExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
 //             var formatedExams = formatExams(allExams);
 //             return when.resolve(formatedExams);
 //         } catch(e) {
@@ -271,6 +271,7 @@ function oldHome(req, res, next) {
         return examUitls.getExamsBySchool(school);
     }).then(function(exams) {
         try {
+            exams = _.filter(exams, (examObj) => examObj['[papers]'].length > 0);
             var formatedExams = formatExams(exams);
             return when.resolve(formatedExams);
         } catch(e) {
