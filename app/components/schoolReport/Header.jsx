@@ -44,10 +44,15 @@ class Header extends React.Component {
         var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
         var {examid, grade} = this.props.location.query;
 
+        var examid = this.props.location.query ? this.props.location.query.examid : '';
+        var grade = this.props.location.query ? this.props.location.query.grade : '';
+        if (!examid) return;
+        var targetUrl = grade ? '/dashboard?examid=' + examid + '&grade=' + encodeURI(grade) : '/dashboard?examid=' + examid;
+
         return (
             <div>
                 <div style={{ height: 110, padding: '40px 0 20px 20px', backgroundColor: '#fcfcfc', position: 'relative' }}>
-                    <a href={'/dashboard?' + 'examid=' + examid + '&grade=' + encodeURI(grade)} style={[localStyle.goBackLink,{ float: 'left'}]}>{String.fromCharCode(60) } 返回</a>
+                    <a href={targetUrl} style={[localStyle.goBackLink,{ float: 'left'}]}>{String.fromCharCode(60) } 返回</a>
                     <div style={{ margin: "0 auto", fontSize: 20, width: 600 }}>
                         <div style={{ textAlign: 'center' }}>{examInfo.name}</div>
                         <div style={{ textAlign: 'center' }}>学校总体分析诊断报告</div>
