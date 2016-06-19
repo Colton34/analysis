@@ -178,6 +178,11 @@ class ExamSelect extends React.Component {
 
     // 选中某个考试科目时载入该科目的数据；
     onSelectPaper(event) {
+        //TODO: 对所选择的paper加是不是和当前所有的paper都是同属于一个年级的校验！思路--进入到选择考试页后，一旦开始选择了一个，则设置currentGrade，然后再
+        //选择其他的paper的时候，比对paper.grade和currentGrade是不是一样，不一样则给错误提示。如果选择的paper都清空了，则currentGrade也清空，从而能修改设置
+        //新的年级~注意：年级是针对exam的，而这里一次选择只是针对一个科目的（一个科目肯定要保证所勾选的是同一年级），但是不同科目同样也要保证是同一年级！所以这个
+        //currentGrade应该是resultSet里的一个直属属性--它指代了resultSet中所有分析的科目都是来自同一年级。
+
         //对一个paper的checkbox交互，判断是增加还是减少，执行相应的action，从而执行相应的更新操作
         var checked = event.target.checked;
         var paperId = event.target.value;

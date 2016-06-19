@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-17 19:07:07
+* @Last Modified time: 2016-06-19 12:34:51
 */
 
 'use strict';
@@ -248,8 +248,7 @@ exports.home = function(req, res, next) {
     }).then(function(originalExams) {
         req.originalExams = originalExams;
         return getCustomExams(req.user.id);
-    })
-    .then(function(customExams) {
+    }).then(function(customExams) {
         try {
             //但是这样做就相当于也把自定义分析当做不同分析处理了--就有可能造成自定义分析和普通分析交叉显示（而之前设计好像是自定义分析在前面）
             var allExams = _.concat(req.originalExams, customExams);
@@ -267,15 +266,26 @@ exports.home = function(req, res, next) {
 }
 
 function getCustomExams(owner) {
-
 console.log('owner ================  ', owner);
-
     return when.promise(function(resolve, reject) {
         peterFX.query('@Exam', {owner: owner, 'isValid': true}, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('find my custom analysis error: ', err));
             //TODO: 返回formatExams函数中需要的exam参数形式
-            var names = _.map(results, (obj) => obj.info.name);
-            resolve(names);
+            // var names = _.map(results, (obj) => obj.info.name);
+            // resolve(names);
+            //需要的exam格式，从而匹配使用formatExams函数：
+            //{'_id': , 'name': , 'event_time': , 'from': 40, '[papers]': [{grade: , paper: , subject: , manfen: }, ...]}
+            resolve(_.map(results, (examItem) => {
+                var obj = _.pick(examItem.info, ['name', 'from']);
+                obj._id = examItem._id;
+                obj.event_time = examItem.info.startTime;
+                var examPapersInfo = examItem['[papersInfo]'];
+                obj['[papers]'] = _.map(examPapersInfo, (examPaperObj) => {
+                    var paperObj = _.pick(examPaperObj, ['paper', 'grade', 'subject']);
+                    paperObj.manfen = examPaperObj.fullMark;
+                    return paperObj;
+                });
+            }));
         });
     });
 }
