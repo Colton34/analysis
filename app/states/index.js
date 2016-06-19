@@ -12,13 +12,15 @@ import homeInitState from './home-state';
 import dashboardInitState from './dashboard-state';
 import schoolAnalysisState from './school-analysis-state';
 import customAnalysisState from './custom-analysis-state';
+import rankReportState from './rank-report-state';
 
 var _initState = {
     app: new gloablInitState,
     home: new homeInitState,
     dashboard: new dashboardInitState,
     schoolAnalysis: new schoolAnalysisState,
-    customAnalysis: new customAnalysisState
+    customAnalysis: new customAnalysisState,
+    rankReport: new rankReportState
 };
 
 export default _initState;

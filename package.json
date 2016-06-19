@@ -112,8 +112,11 @@
     "mongodb": "2.1.16",
     "mongoose": "4.4.11",
     "morgan": "1.7.0",
+    "multer": "1.1.0",
     "murmur": "0.0.2",
+    "node-excel-export": "1.2.0",
     "node-libs-browser": "1.0.0",
+    "node-uuid": "1.4.7",
     "on-finished": "2.3.0",
     "passport": "0.3.2",
     "passport-google-oauth": "1.0.0",
@@ -156,6 +159,7 @@
     "webpack": "1.12.14",
     "webpack-dev-middleware": "1.6.1",
     "webpack-hot-middleware": "2.10.0",
-    "when": "3.7.7"
+    "when": "3.7.7",
+    "xlsx": "0.8.0"
   }
 }

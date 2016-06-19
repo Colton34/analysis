@@ -2,17 +2,175 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-12 16:16:14
+* @Last Modified time: 2016-06-17 13:32:23
 */
 
 'use strict';
 
-var peterMgr = require('../../lib/peter').Manager;
+var peterHFS = require('peter').getManager('hfs');
+var peterFX = require('peter').getManager('fx');
+
 var when = require('when');
 var _ = require('lodash');
 var errors = require('common-errors');
 var examUitls = require('./util');
 var moment = require('moment');
+
+// exports.rankReport = function(req, res, next) {
+//     // var grade = decodeURI(req.query.grade);
+//     // examUitls.filterExam(req.query.examid, grade).then(function(exam) {
+//     //     res.status(200).json(exam);
+//     // });
+
+//     //TODO: 使用这里的数据结构 或者 在rank-server API的scores中添加学生的信息，而不只是分数。但是这里只有总分
+//     //的信息，而没有各科的信息。所以还是需要和schoolAnalysis一样的数据结构。
+
+//     //设计：这里使用和SchoolAnalysis一样的数据结构，这样如果再有相同的需求，则可以考虑将此数据结构作为Common的。
+//     //而且在自定义分析的数据持久化Schema中也是存储的相同的数据结构。
+
+//     var exam = req.exam,
+//         examScoreMap = req.classScoreMap,
+//         examScoreArr = req.orderedScoresArr;
+//     try {
+//         req.examInfo = formatExamInfo(exam);
+//         req.examPapersInfo = generateExamPapersInfo(exam);
+//         req.examClassesInfo = genearteExamClassInfo(exam);
+//     } catch (e) {
+//         next(new errors.Error('schoolAnalysis 同步错误', e));
+//     }
+//     generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo).then(function(examStudentsInfo) {
+//         res.status(200).json({
+//             examInfo: req.examInfo,
+//             examPapersInfo: req.examPapersInfo,
+//             examClassesInfo: req.examClassesInfo,
+//             examStudentsInfo: examStudentsInfo
+//         });
+//     }).catch(function(err) {
+//         next(new errors.Error('schoolAnalysis Error', err));
+//     });
+// }
+
+
+/*
+examInfo: {
+    name: ,
+    papers: [{pid: , paper: , subject: }]   , //注意要在这里添加 totalScore的信息
+    classes:
+}
+
+rankCache: {
+    totalScore: {
+        <className>: [ //已经是有序的（升序）
+            {
+                kaohao: ,
+                name: ,
+                class: ,
+                //score:
+            }
+        ],
+        ...
+    },
+    <pid>: {
+        <className>: [
+            {
+                kaohao: ,
+                name: ,
+                class: ,
+                score
+            }
+        ],
+        ...
+    },
+    ...
+}
+
+ */
+
+exports.rankReport = function(req, res, next) {
+    //验证过，有examid和grade
+    var grade = decodeURI(req.query.grade);
+
+    //1.根据exam查找@Exam item，根据grade过滤出有效的paper
+    getValidPaper(req.query.examid, grade).then(function(result) {
+        //2.根据paper的[students]和matrix计算学生的各科成绩
+        // [ {id, kaohao, name, class, score, paper }  ]  -- 整个年级各个学生，各个科目的object
+        var papers = result.papers, examName = result.examName;
+        var allStudentsPaperScoreInfo = _.concat(..._.map(papers, (paper) => { //学生不同的科目算作不同条目，因此是重复的学生信息
+            var scoreMatrix = paper.matrix;
+            return _.map(paper['[students]'], (student, index) => {
+                var paperScore = _.sum(scoreMatrix[index]);
+                return _.assign(student, {score: paperScore, paper: paper._id, pid: paper.id });
+            });
+        }));
+
+        //先根据学生分组得到其总分
+        var scoreInfoGroupByStudent = _.groupBy(allStudentsPaperScoreInfo, 'id');
+        var allStudentsTotalScoreInfo = _.map(scoreInfoGroupByStudent, (studentPaperInfoArr, studentId) => {
+            //把总分信息添加上去
+            // var totalScore = _.sum(studentPaperInfoArr, (s) => s.paperScore);
+            var totalScore = _.sum(_.map(studentPaperInfoArr, (s) => s.score));
+            var studentBaseInfo = _.pick(studentPaperInfoArr[0], ['id', 'kaohao', 'name', 'class', 'school', 'xuehao']);
+            return _.assign(studentBaseInfo, {score: totalScore, paper: 'totalScore', id: 'totalScore'});
+        });
+
+        var allStudentsScoreInfo = _.concat(allStudentsPaperScoreInfo, allStudentsTotalScoreInfo);
+        var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
+        var rankCache = {};
+        _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperId) => {
+            //这里面都是当前科目的分数
+            rankCache[paperId] = _.groupBy(studentsScoreInfoArr, 'class');
+        });
+
+        //组织examInfo的信息：
+        var examPapers = _.map(papers, (paperObj) => {
+            return {paper: paperObj._id, pid: paperObj.id, name: paperObj.subject};
+        });
+        var examClasses = _.keys(_.groupBy(allStudentsTotalScoreInfo, 'class'));  //总分肯定是包含全部学生的，所以没必要使用allStudentsScoreInfo。
+        var examInfo = {
+            name: examName,
+            papers: examPapers,
+            classes: examClasses
+        };
+
+        res.status(200).json({
+            examInfo: examInfo,
+            rankCache: rankCache
+        })
+    }).catch(function(err) {
+        next(err);
+    })
+}
+
+function getValidPaper(examid, gradeName) {
+    var targetExam;
+    return when.promise(function(resolve, reject) {
+        peterHFS.get('@Exam.'+examid, function(err, exam) {
+            if(err) return reject(new errors.data.MongoDBError('find exam error : ', err));
+            //过滤paper
+            targetExam = exam;
+            console.log('filter前papers.length = ', exam['[papers]'].length);
+            resolve(_.filter(exam['[papers]'], (paper) => paper.grade == gradeName));
+        });
+    }).then(function(validPapers) {
+        //查找补全实体信息
+        var paperIds = _.map(validPapers, (paperObj) => paperObj.paper);
+        console.log('filter后paperIds.length = ', paperIds.length);
+        var paperPromises = _.map(paperIds, (pObjId) => {
+            return when.promise(function(resolve, reject) {
+                peterHFS.get(pObjId, function(err, paper) {
+                    if(err) return reject(new errors.data.MongoDBError('find paper error: ', err));
+                    resolve(paper);
+                });
+            });
+        });
+        return when.all(paperPromises);
+    }).then(function(papers) {
+        return {
+            papers: papers,
+            examName: targetExam.name
+        }
+    })
+}
 
 
 /**
@@ -60,8 +218,8 @@ exports.home = function(req, res, next) {
 exports.validateExam = function(req, res, next) {
     req.checkQuery('examid', '无效的examids').notEmpty();
     req.checkQuery('grade', '无效的grade').notEmpty();
-    if(req.validationErrors()) return next(req.validationErrors());
-    if(req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err));
+    if (req.validationErrors()) return next(req.validationErrors());
+    if (req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err));
 
     next();
 }
@@ -103,7 +261,9 @@ exports.initExam = function(req, res, next) {
  * @return {[type]}        [description]
  */
 exports.dashboard = function(req, res, next) {
-    var exam = req.exam, examScoreMap = req.classScoreMap, examScoreArr = req.orderedScoresArr;
+    var exam = req.exam,
+        examScoreMap = req.classScoreMap,
+        examScoreArr = req.orderedScoresArr;
 
     try {
         var examInfoGuideResult = examInfoGuide(exam);
@@ -117,7 +277,7 @@ exports.dashboard = function(req, res, next) {
             levelScoreReport: levelScoreReportResult,
             classScoreReport: classScoreReportResult
         });
-    } catch(e) {
+    } catch (e) {
         next(new errors.Error('format dashboard error : ', e));
     }
 
@@ -128,6 +288,44 @@ exports.dashboard = function(req, res, next) {
     // });
     // var studentSelfReportResult = studentSelfReport(examScoreArr);
 }
+
+exports.customDashboard = function(req, res, next) {
+    req.checkQuery('examid', '无效的examids').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.get(req.query.examid, {isValid: true}, function(err, exam) {  //{isValid: true}
+        //1.注意字段名和之前数据结构中不一样（如果它是个数组）
+        //2.有些是Map，但从DB中拿出来是数组
+        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
+        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
+        try {
+            var customExamInfoGuideResult = customExamInfoGuide(exam.info);
+            var customScoreRankResult = customScoreRank(exam);
+            var customLevelScoreReportResult = customLevelScoreReport(exam);
+            var customClassScoreReportResult = customClassScoreReport(exam);
+
+            res.status(200).json({
+                examInfoGuide: customExamInfoGuideResult,
+                scoreRank: customScoreRankResult,
+                levelScoreReport: customLevelScoreReportResult,
+                classScoreReport: customClassScoreReportResult
+            })
+        } catch(e) {
+            next(new errors.Error('format custom dashboard error: ', e));
+        }
+    })
+}
+
+function customExamInfoGuide(examInfo) {
+    return {
+        name: examInfo.name,
+        subjectCount: examInfo['[subjects]'].length,
+        realClassesCount: examInfo['[realClasses]'].length,
+        realStudentsCount: examInfo.realStudentsCount,
+        lostStudentsCount: examInfo.lostStudentsCount
+    }
+}
+
 
 function examInfoGuide(exam) {
     return {
@@ -144,6 +342,14 @@ function scoreRank(examScoreArr) {
     return {
         top: _.reverse(_.takeRight(examScoreArr, 6)),
         low: _.reverse(_.take(examScoreArr, 6))
+    }
+}
+
+function customScoreRank(exam) {
+    var examStudentsInfo = exam['[studentsInfo]'];
+    return {
+        top: _.reverse(_.takeRight(examStudentsInfo, 6)),
+        low: _.reverse(_.take(examStudentsInfo, 6))
     }
 }
 
@@ -170,7 +376,36 @@ function levelScoreReport(exam, examScoreArr) {
     var totalStudentCount = exam.realStudentsCount;
     _.each(levels, (levObj, levelKey) => {
         levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
-        levObj.score = examScoreArr[levObj.count - 1] ? examScoreArr[levObj.count - 1].score : 0;
+        var targetStudent = _.takeRight(examScoreArr, levObj.count)[0];
+        levObj.score = targetStudent ? targetStudent.score : 0;
+    });
+    return levels;
+}
+
+function customLevelScoreReport(exam) {
+    var levels = {
+        0: {
+            score: 0,
+            count: 0,
+            percentage: 15
+        },
+        1: {
+            score: 0,
+            count: 0,
+            percentage: 25
+        },
+        2: {
+            score: 0,
+            count: 0,
+            percentage: 60
+        }
+    };
+    var totalStudentCount = exam.info.realStudentsCount;
+    var examStudentsInfo = exam['[studentsInfo]'];
+    _.each(levels, (levObj, levelKey) => {
+        levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
+        var targetStudent = _.takeRight(examStudentsInfo, levObj.count)[0];
+        levObj.score =  targetStudent ? targetStudent.score : 0;
     });
     return levels;
 }
@@ -182,6 +417,24 @@ function classScoreReport(examScoreArr, examScoreMap) {
         return {
             name: className,
             mean: _.round(_.mean(_.map(classesScore, (scoreObj) => scoreObj.score)), 2)
+        }
+    });
+    var orderedClassesMean = _.sortBy(classesMean, 'mean');
+    return {
+        gradeMean: scoreMean,
+        top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
+    };
+}
+
+function customClassScoreReport(exam) {
+    var examStudentsInfo = exam['[studentsInfo]'];
+    var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
+
+    var scoreMean = _.round(_.mean(_.map(examStudentsInfo, (student) => student.score)), 2);
+    var classesMean = _.map(studentsGroupByClass, (classesStudents, className) => {
+        return {
+            name: className,
+            mean: _.round(_.mean(_.map(classesStudents, (student) => student.score)), 2)
         }
     });
     var orderedClassesMean = _.sortBy(classesMean, 'mean');
@@ -211,7 +464,7 @@ function classScoreReport(examScoreArr, examScoreMap) {
 
 // function getStudentInfo(studentId) {
 //     return when.promise(function(resolve, reject) {
-//         peterMgr.get('@Student' + studentId, function(err, student) {
+//         peterHFS.get('@Student' + studentId, function(err, student) {
 //             if(err) return reject(new errors.MongoDBError('find single student error : ', err));
 //             resolve(student);
 //         });
@@ -220,9 +473,10 @@ function classScoreReport(examScoreArr, examScoreMap) {
 
 
 
-
 exports.schoolAnalysis = function(req, res, next) {
-    var exam = req.exam, examScoreMap = req.classScoreMap, examScoreArr = req.orderedScoresArr;
+    var exam = req.exam,
+        examScoreMap = req.classScoreMap,
+        examScoreArr = req.orderedScoresArr;
     try {
         req.examInfo = formatExamInfo(exam);
         req.examPapersInfo = generateExamPapersInfo(exam);
@@ -231,10 +485,178 @@ exports.schoolAnalysis = function(req, res, next) {
         next(new errors.Error('schoolAnalysis 同步错误', e));
     }
     generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo).then(function(examStudentsInfo) {
-        res.status(200).json({examInfo: req.examInfo, examPapersInfo: req.examPapersInfo, examClassesInfo: req.examClassesInfo, examStudentsInfo: examStudentsInfo});
+        res.status(200).json({
+            examInfo: req.examInfo,
+            examPapersInfo: req.examPapersInfo,
+            examClassesInfo: req.examClassesInfo,
+            examStudentsInfo: examStudentsInfo
+        });
     }).catch(function(err) {
         next(new errors.Error('schoolAnalysis Error', err));
     });
+}
+
+
+/*
+
+examInfo:
+{
+    name:
+    gradeName:
+    startTime:
+    realClasses:
+    lostClasses:
+    realStudentsCount:
+    lostStudentsCount:
+    subjects:
+    fullMark:
+
+}
+
+examStudentsInfo
+[
+    {
+        id:
+        name:
+        class:
+        score:
+        papers: [
+            {paperid: , score: }
+        ]
+    },
+    ...
+]
+
+examPapersInfo
+{
+    <pid>: {
+        id:
+        paper:
+        subject:
+        fullMark:
+        realClasses:
+        lostClasses:
+        realStudentsCount:
+        lostStudentsCount:
+        class: {
+            <className>: <此科目此班级参加考试的人数>
+        }
+    },
+    ...
+}
+
+examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义（特别是对于统计计算，因为肯定是走哪个科目的这个班级的参加考试人数--这个在papersInfo的class中有）
+{
+    <className>: {
+        name:
+        students:
+        realStudentsCount:
+        losstStudentsCount:
+    }
+}
+
+ */
+
+
+exports.customSchoolAnalysis = function(req, res, next) {
+    console.log('customSchoolAnalysis');
+
+    req.checkQuery('examid', '无效的examids').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.get(req.query.examid, {isValid: true}, function(err, exam) {
+        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
+        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
+
+        try {
+            var examInfo = makeExamInfo(exam.info);
+            var examStudentsInfo = makeExamStudentsInfo(exam['[studentsInfo]']);
+            var examPapersInfo = makeExamPapersInfo(exam['[papersInfo]']);
+            var examClassesInfo = makeExamClassesInfo(exam['[classesInfo]']);
+            res.status(200).json({
+                examInfo: examInfo,
+                examStudentsInfo: examStudentsInfo,
+                examPapersInfo: examPapersInfo,
+                examClassesInfo: examClassesInfo
+            });
+        } catch(e) {
+            next(new errors.Error('server format custom analysis error: ', e));
+        }
+    });
+}
+
+function makeExamInfo(examInfo) {
+    var result = _.pick(examInfo, ['name', 'startTime', 'realStudentsCount', 'lostStudentsCount', 'fullMark']);
+    result.realClasses = examInfo['[realClasses]'];
+    result.lostClasses = examInfo['[lostClasses]'];
+    result.subjects = examInfo['[subjects]'];
+    return result;
+}
+
+function makeExamStudentsInfo(examStudentsInfo) {
+    var result = _.map(examStudentsInfo, (studentItem) => {
+        var studentObj = _.pick(studentItem, ['id', 'name', 'class', 'score', 'kaohao']);
+        studentObj.papers = studentItem['[papers]'];
+        return studentObj;
+    });
+    return result;
+}
+
+function makeExamPapersInfo(examPapersInfo) {
+    var examPapersInfoArr = _.map(examPapersInfo, (paperItem) => {
+        var paperObj = _.pick(paperItem, ['id', 'paper', 'subject', 'fullMark', 'realStudentsCount', 'lostStudentsCount']);
+        paperObj = _.assign(paperObj, { realClasses: paperItem['[realClasses]'], lostClasses: paperItem['[lostClasses]']});
+        var classCountsMap = {};
+        _.each(paperItem['[class]'], (classCountItem) => {
+            classCountsMap[classCountItem.name] = classCountItem.count;
+        });
+        paperObj.class = classCountsMap;
+        return paperObj;
+    });
+    return _.keyBy(examPapersInfoArr, 'id');
+}
+
+function makeExamClassesInfo(examClassesInfo) {
+    var examClassesInfoArr = _.map(examClassesInfo, (classItem) => {
+        var classObj = _.pick(classItem, ['name', 'realStudentsCount', 'lostStudentsCount']);
+        classObj.students = classItem['[students]'];
+        return classObj;
+    });
+    return _.keyBy(examClassesInfoArr, 'name');
+}
+
+
+
+exports.createCustomAnalysis = function(req, res, next) {
+    if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
+
+    peterFX.create('@Exam', req.body.data, function(err, result) {
+        if(err) return next(new errors.data.MongoDBError('创建自定义分析错误', err));
+
+        res.status(200).json({examId: result});
+    });
+}
+
+//注意：(TODO：)destroy方法好像不能用
+// exports.deleteCustomAnalysis = function(req, res, next) {
+//     req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
+//     if(req.validationErrors()) return next(req.validationErrors());
+
+//     peterFX.destroy(req.body.examId, function(err, result) {
+//         if(err) return next(new errors.data.MongoDBError('删除自定义分析错误', err));
+//         console.log('删除的result = ', result);
+//         res.status(200).send('ok');
+//     })
+// }
+
+exports.inValidCustomAnalysis = function(req, res, next) {
+    req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.set(req.body.examId, {isValid: false}, function(err, result) {
+        if(err) return next(new errors.data.MongoDBError('更新自定义分析错误', err));
+        res.status(200).send('ok');
+    })
 }
 
 
@@ -252,7 +674,7 @@ function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo) {
     return generateStudentsPaperInfo(exam, examClassesInfo).then(function(studentsPaperInfo) {
         //遍历examScoreArr是为了保证有序
         _.each(examScoreArr, (scoreObj) => {
-            scoreObj.papers = studentsPaperInfo[scoreObj.id];//注意，这里id是短id...
+            scoreObj.papers = studentsPaperInfo[scoreObj.id]; //注意，这里id是短id...
         });
         return when.resolve(examScoreArr);
     });
@@ -279,23 +701,23 @@ function generateStudentsPaperInfo(exam, examClassesInfo) {
     //对每一个paper实例建立<studentId>:<paperScore>的Map。或者也可以通过查询Student实例来得到每个学生的papers信息，但是那样的话查询的压力就大了许多，但是
     //studnet.id上有索引。。。这个时间对比就不好评估了，先使用查询看看性能如何。。。
     //方法一：直接使用@Student表中已经计算好的各科的成绩，但需要过滤属于此场考试的papers才是有效的papers。使用$in操作符，或者getMany，不知道那个性能好一些
-//
+    //
 
     var studentIds = _.map(_.concat(..._.map(exam.realClasses, (className) => examClassesInfo[className].students)), (sid) => '@Student.' + sid); //当前年级的所有参考班级的所有学生（可能会包含缺考学生，但是这样的学生其papers的length就是0了，所以也没有问题）
     return when.promise(function(resolve, reject) {
-        peterMgr.getMany(studentIds, {project: ['_id', '[papers]']}, function(err, students) {
-            if(err) return reject(new errors.Data.MongoDBError('query students error : ', err));
+        peterHFS.getMany(studentIds, {project: ['_id', '[papers]']}, function(err, students) {
+            if(err) return reject(new errors.data.MongoDBError('query students error : ', err));
             //过滤student['papers']，建立Map
             try {
                 _.each(students, (studentItem) => {
                     var targetPapers = _.filter(studentItem['[papers]'], (paperItem) => _.includes(targetPaperIds, paperItem.paperid));
                     targetPapers = _.map(targetPapers, (paperItem) => _.pick(paperItem, ['paperid', 'score', 'class_name']));
                     var studentId = studentItem._id.toString();
-                    studentId = studentId.slice(_.findIndex(studentId, (c) => c!== '0'));
+                    studentId = studentId.slice(_.findIndex(studentId, (c) => c !== '0'));
                     studentsPaperInfo[studentId] = targetPapers;
                 });
                 resolve(studentsPaperInfo);
-            } catch(e) {
+            } catch (e) {
                 reject(new errors.Error('generateStudentsPaperInfo error : ', e));
             }
         });
@@ -318,7 +740,7 @@ function generateExamPapersInfo(exam) {
             paperClass[className] = classScores.length;
         });
         obj.classes = paperClass;
-        examPapersInfo[paperItem.id] = obj;//这里选用id而不是paper是因为studentInfo中paper的成绩的id是paper.id而不是objectId
+        examPapersInfo[paperItem.id] = obj; //这里选用id而不是paper是因为studentInfo中paper的成绩的id是paper.id而不是objectId
     });
 
     return examPapersInfo;
@@ -352,13 +774,12 @@ function genearteExamClassInfo(exam) {
 
 // function getPaperPromise(paperId) {
 //     return when.promise(function(resolve, reject) {
-//         peterMgr.get(paperId, function(err, paper) {
+//         peterHFS.get(paperId, function(err, paper) {
 //             if(err) return reject(new errors.Data.MongDBError('find paper: ' + paperId + '  Error', err));
 //             resolve(paper);
 //         });
 //     });
 // }
-
 
 
 
@@ -453,8 +874,6 @@ function genearteExamClassInfo(exam) {
 
 
 
-
-
 /**
  * 对所给学校所发生的所有exam进行分组排序
  * @param  {[type]} exams  此学校所发生过的所有exam
@@ -473,9 +892,9 @@ exports.testLevel = function(req, res, next) {
             });
 
             var levelScore = _.groupBy(result, function(score, index) {
-                if(score >= 600) return 'first';
-                if(score >= 520) return 'second';
-                if(score >= 400) return 'third';
+                if (score >= 600) return 'first';
+                if (score >= 520) return 'second';
+                if (score >= 400) return 'third';
                 return 'other';
             });
             res.result.testlevel = {};
@@ -606,7 +1025,7 @@ About Class
 
 // console.log('paper = ', pobj.paper);
 
-//                 peterMgr.get(pobj.paper, function(err, paper) {
+//                 peterHFS.get(pobj.paper, function(err, paper) {
 //                     if(err) return reject(new errors.data.MongoDBError('find paper:'+pid+' error', err));
 //                     resolve(paper);
 //                 });
@@ -620,6 +1039,7 @@ About Class
 //     .catch(function(err) {
 //         next(err);
 //     });
+
     // var result = {
     //     totalProblemCount: 0,
     //     totalStudentCount: 0
@@ -627,7 +1047,7 @@ About Class
     // result.subjectCount = req.exam.papers ? req.exam.papers.length : 0;
     // var findPapersPromises = _.map(req.exam.papers, function(pid) {
     //     return when.promise(function(resolve, reject) {
-    //         peterMgr.find(pid, function(err, paper) {
+    //         peterHFS.find(pid, function(err, paper) {
     //             if(err) return reject(new errors.data.MongoDBError('find paper:'+pid+' error', err));
     //             resolve(paper);
     //         });
@@ -654,4 +1074,3 @@ About Class
     // .catch(function(err) {
     //     next(err);
     // });
-

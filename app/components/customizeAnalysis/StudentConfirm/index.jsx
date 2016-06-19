@@ -4,6 +4,7 @@ import _ from 'lodash';
 import Header from '../Header'
 import Footer from '../Footer';
 
+var FileUpload = require('../../../common/FileUpload');
 
 var examInfos = {
     questionInfos: [{ "name": "第1题", "score": 3 }, { "name": "第2题", "score": 3 }, { "name": "第3题", "score": 3 }, { "name": "第4题", "score": 3 }, { "name": "第5题", "score": 3 }],
@@ -22,7 +23,7 @@ class StudentConfirm extends React.Component {
         super(props);
         var {groupMap} = this.props.currentSubject;
         this.state = {
-            groupMap: _.isEmpty(groupMap) ? this.getGroupMap() : groupMap 
+            groupMap: _.isEmpty(groupMap) ? this.getGroupMap() : groupMap
         }
     }
     getGroupMap() {
@@ -55,7 +56,7 @@ class StudentConfirm extends React.Component {
         }
         // 保存当前的groupMap信息
         this.props.onChangeGroupMap(this.state.groupMap);
-        
+
         this.props.onNextPage();
     }
     onDelGroup(groupName) {
@@ -79,9 +80,50 @@ class StudentConfirm extends React.Component {
     getStudentNum() {
         return _.reduce(this.state.groupMap, function(sum, each){ return sum + (each.status === 'inUse' ? each.count : 0)}, 0);
     }
+    exportExamStudent() {
+        var students = _.concat(..._.map(_.filter(this.state.groupMap, (item, className) => item.status === 'inUse'), (obj) => obj.array));
+
+        var url = '/api/v1/file/export/exam/student';
+        // for(var key in data){
+        //     var value = typeof data[key] === 'string' ? data[key] : JSON.stringify(data[key]);
+        //     inputs += "<input type='hidden' name='" + key + "' value='" + value + "' />";
+        // }
+        // request发送请求
+        var input = "<input type='hidden' name='" + 'students' + "' value='" + JSON.stringify(students) + "' />";
+        $('<form action="' + url + '" method="' + ('post') + '">' + input + '</form>')
+            .appendTo('body').submit().remove();
+
+        // window.request.post('/file/export/exam/student', {students: students}).then(function(res) {
+
+        // }).catch(function(err) {
+        //     console.log('导出学生错误：', err);
+        // })
+    }
+
     render() {
         var {groupMap} = this.state;
         var _this = this;
+        var options = {
+            baseUrl : '/api/v1/file/import/exam/student',
+            chooseAndUpload : true,
+            fileFieldName : 'importStudent', //指定上传文件的名字，而不是使用默认的呃file.name，这个名字和multer的single对应。
+            chooseFile : function(files){
+                console.log('filename',typeof files == 'string' ? files : files[0].name);
+            },
+            uploading : function(progress){
+                console.log('loading...',progress.loaded/progress.total+'%');
+            },
+            uploadSuccess : function(resp){
+                /*通过mill找到对应的文件，删除对应tmpFile*/
+                console.log('upload success',resp);
+            },
+            uploadError : function(err){
+                console.log('Error: ', err);
+            },
+            uploadFail : function(resp){
+                console.log('Fail: ', resp);
+            }
+        };
         return (
             <div>
                 <div className={ownClassNames['container']}>
@@ -98,11 +140,10 @@ class StudentConfirm extends React.Component {
                             <span className={ownClassNames['stats']}>{this.getStudentNum()}</span>
                             人
                         </span>
-                        <div className={ownClassNames['upload-btn']}>
-                            <span>上传考生数据</span>
-                            <input type="file" name="studentList" id="btn-upload-student-excel" className={ownClassNames['upload-input']}/>
-                        </div>
-                        <button className={ownClassNames['export-btn']}>导出考生数据</button>
+                        <FileUpload options={options}>
+                            <button ref="chooseAndUpload" className={ownClassNames['export-btn']}>导入考生数据</button>
+                        </FileUpload>
+                        <button onClick={this.exportExamStudent.bind(this, this.props.currentSubject)} className={ownClassNames['export-btn']}>导出考生数据</button>
                     </div>
 
                     <div class="clearfix">
@@ -147,9 +188,9 @@ class StudentConfirm extends React.Component {
             </div>
             <Footer pageIndex={this.props.pageIndex} onPrevPage={this.props.onPrevPage} onNextPage={this.onNextPage.bind(this)}/>
         </div>
-    )    
+    )
     }
-    
+
 }
 
 export default StudentConfirm;

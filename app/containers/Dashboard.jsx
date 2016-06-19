@@ -18,7 +18,7 @@ import PaperQuality from '../components/dashboard/paper-quality';
 import StudentReport from '../components/dashboard/student-report';
 
 import {initDashboardAction} from '../reducers/dashboard/actions';
-import {convertJS, initParams} from '../lib/util';
+import {initParams} from '../lib/util';
 
 import {Map, List} from 'immutable';
 
@@ -66,18 +66,18 @@ class Dashboard extends React.Component {
     toViewSchoolAnalysis() {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
-        if (!examid || !grade) return;
-        browserHistory.push('/school/report?examid=' + examid + '&grade=' + encodeURI(grade));
+        if (!examid) return;
+        var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + encodeURI(grade) : '/school/report?examid=' + examid;
+        browserHistory.push(targetUrl);
     }
-
     render() {
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
         var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
         var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
 
-// debugger;
-
+        var examid = this.props.location.query ? this.props.location.query.examid : '';
+        var grade = this.props.location.query ? encodeURI(this.props.location.query.grade) : '';
 
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
             (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0))
@@ -86,9 +86,6 @@ class Dashboard extends React.Component {
                     <Spinkit/>
                  </div>
             );
-
-
-
         return (
             <div>
                 <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: '35px auto 20px auto', paddingLeft: 20,fontSize: 16 , color: '#333'}}>
@@ -99,7 +96,7 @@ class Dashboard extends React.Component {
                 <div style={[styles.box, styles.common.radius]}>
                     <div style={[styles.container, styles.common.radius]}>
                         <ExamGuideComponent data={examInfoGuide} />
-                        <ScoreRank data={scoreRank} />
+                        <ScoreRank data={scoreRank} examid={examid} grade={grade}/>
                         <div key="test"   style={{cursor: 'pointer'}}className={dashboardStyle['card']} onClick={this.toViewSchoolAnalysis.bind(this) }>
                             <div className={dashboardStyle['card-title']}>学校成绩总报告</div>
                             <div className={dashboardStyle['analysis-report'] + ' ' + dashboardStyle['card-image']}></div>
