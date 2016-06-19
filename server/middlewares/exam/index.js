@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-19 14:51:00
+* @Last Modified time: 2016-06-19 16:00:52
 */
 
 'use strict';
@@ -353,9 +353,10 @@ function formatExams(exams) {
 // console.log('=========  formatedExams  2');
 
         _.each(temp, function(value, key) {
+            var justOneGrade = (_.size(value.papersMap) === 1);
             _.each(value.papersMap, function(papers, gradeKey) {
                 var obj = {};
-                obj.examName = value.exam.name + "(年级：" + gradeKey + ")";
+                obj.examName = (justOneGrade) ? value.exam.name : value.exam.name + "(年级：" + gradeKey + ")";
                 obj.grade = gradeKey;
                 obj.id = key;
                 obj.time = moment(value.exam['event_time']).valueOf();
