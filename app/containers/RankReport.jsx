@@ -170,9 +170,9 @@ class SearchWidget extends React.Component {
         return (
             <input
                 id='searchWidget'
-                ref='searchWidget' 
-                onChange={this.handleChange.bind(this)}              
-                placeholder='搜索' 
+                ref='searchWidget'
+                onChange={this.handleChange.bind(this)}
+                placeholder='搜索'
                 style={{ margin: '0 2px', height: 34, padding: '6px 12px', fontSize: 14, lineHeight: 1.42857143, color: '#555', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 4 }}/>
         )
     }
@@ -180,13 +180,13 @@ class SearchWidget extends React.Component {
 /**
  * props:
  * examInfo: 考试信息数据;
- * studentInfos: 学生相关的所有考试数据； 
+ * studentInfos: 学生相关的所有考试数据；
  * headSeq: 包含全部paper的表头渲染时的顺序
  */
 class RankReportTableView extends React.Component {
     constructor(props) {
         super(props);
-        //先把paper的基本信息加入到headerMapper中； 
+        //先把paper的基本信息加入到headerMapper中；
         _.forEach(this.props.examInfo.papers, paperObj => {
             headerMapper[paperObj.paper] = paperObj.name;
         })
@@ -247,13 +247,13 @@ class RankReportTableView extends React.Component {
             var studentGroups = _.pick(rankCache, [paperId]);
             // 获取学生kaohao,组成一个新的数组
             var kaohaoList = [];
-            
+
             _.forEach(studentGroups, (classes, paperId) => {
                 _.forEach(classes, students => {
                     _.forEach(students, student => {
                         kaohaoList.push(student.kaohao);
                     })
-                })    
+                })
             })
             // 筛选studentInfos里的学生数据
             this.setState({
@@ -294,7 +294,7 @@ class RankReportTableView extends React.Component {
                     pageSize: 25,
                     showData: [],
                     sortInfo: {}
-                })    
+                })
                 return;
             }
         } else {
@@ -303,7 +303,7 @@ class RankReportTableView extends React.Component {
             } else {
                 newCurrentClasses = _.without(newCurrentClasses, className);
             }
-        } 
+        }
         if (this.state.currentPaper.name === '全科') {
             var kaohaoMap = {};
             _.forEach(this.props.rankCache, (classes, scoreType) => {
@@ -323,7 +323,7 @@ class RankReportTableView extends React.Component {
                 sortInfo: {}
             })
         } else {
-            var kaohaoList = [];  
+            var kaohaoList = [];
             var classGroup = _.pick(this.props.rankCache[this.state.currentPaper.pid], newCurrentClasses);
             _.forEach(classGroup, (students, className) => {
                 _.forEach(students, student => {
@@ -345,7 +345,7 @@ class RankReportTableView extends React.Component {
         var nextPageSize= $(event.target).text();
         this.setState({
             pageSize: parseInt(nextPageSize)
-        }) 
+        })
     }
     onSearch(searchStr) {
         var showData = [];
@@ -425,7 +425,7 @@ class RankReportTableView extends React.Component {
         var headType = $(event.target).data('headtype');
         this.setState({
             pageIndex: 0,
-            pageSize: 25, 
+            pageSize: 25,
             sortInfo: {head: headType, order: order},
             showData: _.orderBy(this.state.showData, [headType], [order])
         })
@@ -491,7 +491,7 @@ class RankReportTableView extends React.Component {
                         <Button style={{ margin: '0 2px' }}>下载</Button>
                     </div>
                 </div>
-                <Table 
+                <Table
                     firstLineHead = {firstLineHead}
                     secondLineHead = {secondLineHead}
                     renderRows ={this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)}
@@ -532,9 +532,9 @@ class RankReportTableView extends React.Component {
     }
 }
 class RankReport extends React.Component {
-    // static need = [
-    //     initDashboardAction
-    // ];
+    static need = [
+        initRankReportAction
+    ];
 
     constructor(props) {
         super(props);
@@ -556,9 +556,9 @@ class RankReport extends React.Component {
     examInfo: {
         name: ,
         papers: [{name:, pid: }]
-        classes: 
+        classes:
     }
-    
+
     rankCache: {
         totalScore: {
             <className>: [ //已经是有序的（升序）
@@ -566,7 +566,7 @@ class RankReport extends React.Component {
                     kaohao: ,
                     name: ,
                     class: ,
-                    score: 
+                    score:
                 }
             ],
             ...
@@ -653,13 +653,16 @@ class RankReport extends React.Component {
         }
         this.getHeadSeq();
         this.generateStudentInfos();
+
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
-        var hasPrevPage = examid && grade ? true : false;
+        if (!examid) return;
+        var targetUrl = grade ? '/dashboard?examid=' + examid + '&grade=' + encodeURI(grade) : '/dashboard?examid=' + examid;
+
         return (
             <div style={{ width: 1000, minHeight: 830, backgroundColor: '#fff', margin: '0 auto', marginTop: 30 }}>
                 <div style={{ paddingLeft: 20, backgroundColor: '#fcfcfc', height: 75, lineHeight: '75px', textAlign: 'center' }}>
-                    <a href={hasPrevPage? '/dashboard?examid=' + examid + '&grade=' + grade : '/'} style={{ fontSize: 12, textDecoration: 'none', color: '#333', float: 'left' }}> {'<'} 返回</a>
+                    <a href={targetUrl} style={{ fontSize: 12, textDecoration: 'none', color: '#333', float: 'left' }}> {'<'} 返回</a>
                     <span style={{ fontSize: 16 }}>{examInfo.name}-分数排行榜</span>
                 </div>
                 <RankReportTableView
@@ -706,7 +709,7 @@ function mapDispatchToProps(dispatch) {
 	// 	var isSeachNumber = _.isNumber(parseInt(this.state.currentSearch));
 	// 	//如果是数字那么搜索学号，否则搜索姓名
 
-	// 	//根据搜索结果，再次缩小 currentStudentsInfo	
+	// 	//根据搜索结果，再次缩小 currentStudentsInfo
 	// }
 
 

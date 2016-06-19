@@ -42,7 +42,6 @@ class Header extends React.Component {
     render() {
         var {examInfo} = this.props;
         var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
-        var {examid, grade} = this.props.location.query;
 
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';

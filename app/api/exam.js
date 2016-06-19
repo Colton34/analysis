@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-16 14:45:11
+* @Last Modified time: 2016-06-19 15:03:07
 */
 
 
@@ -134,90 +134,8 @@ export function fetchHomeData(params) {
     var url = examPath + '/home';
 
     return params.request.get(url).then(function(res) {
-        try {
-            //res.data是exams数组
-            var result = formatExams(res.data);
-            return Promise.resolve(result);
-        } catch (e) {
-            console.log('错误：', e);
-            return Promise.reject(new errors.Error('格式化exams错误', e));
-        }
+        return Promise.resolve(res.data);
     })
-}
-
-/**
- * 对exams进行排序格式化，从而符合首页的数据展示
- * @param  {[type]} exams [description]
- * @return {[type]}       [description]
- */
-function formatExams(exams) {
-    var examGroupsByEventTime = _.groupBy(exams, function(exam) {
-        var time = moment(exam["event_time"]);
-        var year = time.get('year') + '';
-        var month = time.get('month') + 1;
-        month = (month > 9) ? (month + '') : ('0' + month);
-        var key = year + '.' + month;
-        return key;
-    });
-
-    //result用来保存格式化后的结果；resultOrder用来对group中的不同时间戳进行排序（统一时间戳下的数组在内部排序）；finalResult将
-    //result和resultOrder结合得到有序的格式化后的结果
-    var result = {},
-        resultOrder = [];
-
-    _.each(examGroupsByEventTime, function(examsItem, timeKey) {
-        var flag = {
-            key: timeKey,
-            value: moment(timeKey.split('.')).valueOf()
-        };
-        resultOrder.push(flag);
-        var temp = {};
-        _.each(examsItem, function(exam) {
-            temp[exam._id] = {
-                exam: exam
-            };
-            var papersFromExamGroupByGrade = _.groupBy(exam["[papers]"], function(paper) {
-                return paper.grade;
-            });
-            temp[exam._id].papersMap = papersFromExamGroupByGrade;
-        });
-
-        if (!result[timeKey]) result[timeKey] = [];
-
-        _.each(temp, function(value, key) {
-            _.each(value.papersMap, function(papers, gradeKey) {
-                var obj = {};
-                obj.examName = value.exam.name + "(年级：" + gradeKey + ")";
-                obj.grade = gradeKey;
-                obj.id = key;
-                obj.time = moment(value.exam['event_time']).valueOf();
-                obj.eventTime = moment(value.exam['event_time']).format('ll');
-                obj.subjectCount = papers.length;
-                obj.papers = _.map(papers, (obj) => {
-                    return {
-                        id: obj.paper,
-                        subject: obj.subject
-                    }
-                });
-                obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
-                obj.from = value.exam.from; //TODO: 这里数据库里只是存储的是数字，但是显示需要的是文字，所以需要有一个map转换
-
-                result[timeKey].push(obj);
-            });
-        });
-
-        result[timeKey] = _.orderBy(result[timeKey], [(obj) => obj.time], ['desc']);
-    });
-    resultOrder = _.orderBy(resultOrder, ['value'], ['desc']);
-    var finallyResult = [];
-    _.each(resultOrder, function(item) {
-        finallyResult.push({
-            timeKey: item.key,
-            values: result[item.key]
-        });
-    });
-
-    return finallyResult;
 }
 
 //********************************************************* Dashboard *********************************************************
@@ -1552,7 +1470,7 @@ rankCache: {
 
  */
 export function fetchRankReportdData(params) {
-    var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + params.grade : examPath + '/rank/report?examid=' + params.examid;
+    var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + params.grade : examPath + '/custom/rank/report?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);

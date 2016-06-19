@@ -1,8 +1,8 @@
 {
-  "name": "react-webpack-node",
-  "version": "1.5.3",
-  "description": "A simple Node.js app using Express 4 with Webpack, React, alt, ImmutableJS",
-  "repository": "https://github.com/choonkending/react-webpack-node",
+  "name": "yunxiao-analysis",
+  "version": "2.0.0",
+  "description": "云校分析",
+  "repository": "https://code.iyunxiao.com/yunxiao-io/analysis2-0.git",
   "main": "index.js",
   "scripts": {
     "babel": "babel --presets es2015,stage-0 --ignore node_modules,public",
@@ -19,8 +19,7 @@
     "test:watch": "cross-env NODE_ENV=test NODE_PATH=./server/middlewares npm test -- --watch --no-single-run",
     "postinstall": "npm run build"
   },
-  "author": "Choon Ken Ding",
-  "license": "MIT",
+  "author": "Yunxiao",
   "devDependencies": {
     "expect": "1.16.0",
     "karma": "0.13.22",

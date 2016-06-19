@@ -311,7 +311,7 @@ function makeExamInfo(resultSet, analysisName) {
 /*
 
     name:  ??
-    gradeName: -- 暂时先不填写
+    gradeName: -- 暂时先不填写 -- TODO: 给examInfo添加gradeName
     startTime:  --post存入的时间
     realClasses:
     lostClasses:
@@ -343,6 +343,7 @@ function makeExamInfo(resultSet, analysisName) {
         name: analysisName,
         gradeName: '', //暂时先填充个空字符
         startTime: Date.now(), // new Date()
+        from: 40,
         realClasses: realClasses,
         lostClasses: [],
         realStudentsCount: realStudentsCount,
@@ -395,6 +396,7 @@ examStudentsInfo
 }
 
 function makeExamPapersInfo(resultSet, subjectsIdArr) {
+    //TODO: 在这里给papersInfo中的每一个paper对象添加grade属性。Schema已经修改过了。
     var result = _.map(resultSet, (item, subjectName) => {
         var sqmItem = item.SQM;
         if(!sqmItem) return;

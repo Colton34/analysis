@@ -44,6 +44,15 @@ const ScoreRank = ({data, examid, grade}) => {
             </div>
         )
     });
+
+// if(grade) {
+//     console.log('-================  不可能');
+//     debugger;
+// }
+
+
+
+    var queryOptions = (grade) ? {examid: examid, grade: grade} : {examid: examid};
     return (
         <div className={dashboardStyle.card}>
             <div className={dashboardStyle['card-title']}>分数排行榜</div>
@@ -53,7 +62,7 @@ const ScoreRank = ({data, examid, grade}) => {
                     {tops}
                 </div>
             </div>
-            <Link to={{ pathname: '/rank/report', query: { examid: examid, grade: grade } }} className={dashboardStyle['detail-btn']}>
+            <Link to={{ pathname: '/rank/report', query: queryOptions }} className={dashboardStyle['detail-btn']}>
                 查看详情
             </Link>
         </div>

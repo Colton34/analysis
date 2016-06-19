@@ -77,7 +77,8 @@ class Dashboard extends React.Component {
         var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
 
         var examid = this.props.location.query ? this.props.location.query.examid : '';
-        var grade = this.props.location.query ? encodeURI(this.props.location.query.grade) : '';
+        if(!examid) return;
+        var grade = this.props.location.query.grade ? encodeURI(this.props.location.query.grade) : '';
 
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
             (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0))
