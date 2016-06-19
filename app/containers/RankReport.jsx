@@ -56,7 +56,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                     </span>
                                 </th>)
                             }
-                            return <th key={headType} colSpan={counter[headType]} className={commonStyle['table-unit']} style={{verticalAlign:'middle', minWidth: 200}}>{headerMapper[headType]}</th>
+                            return <th key={headType} colSpan={counter[headType]} className={commonStyle['table-unit']} style={{verticalAlign:'middle', minWidth: 310}}>{headerMapper[headType]}</th>
                         })
                     }
                 </tr>
@@ -65,7 +65,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                         _.without(firstLineHead, 'kaohao', 'name', 'class').map((headType, index) => {
                             return _.range(3).map(index => {
                                 if (index === 0 && secondLineHeadMap['score_' + headType]) {
-                                    return (<th key={'headType-' + index} className={commonStyle['table-unit']} style={{minWidth: 50, position:'relative'}}>
+                                    return (<th key={'headType-' + index} className={commonStyle['table-unit']} style={{minWidth: 100, position:'relative'}}>
                                         {headType === 'totalScore' ? '总分' : (headerMapper[headType] + '总分') }
                                         <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14 }}>
                                             <div className='dropup' style={_.assign({},{ width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head === ('score_' + headType) && sortInfo.order === 'asc' ? {visibility: 'hidden'} : {visibility: 'visible'})} data-order='asc' data-headtype={'score_' + headType} onClick={onSort}>
@@ -343,7 +343,6 @@ class RankReportTableView extends React.Component {
     }
     onSelectPageSize(event) {
         var nextPageSize= $(event.target).text();
-        console.log('next page size: ' + nextPageSize);
         this.setState({
             pageSize: parseInt(nextPageSize)
         }) 
@@ -424,7 +423,6 @@ class RankReportTableView extends React.Component {
     onSort(event) {
         var order = $(event.target).data('order');
         var headType = $(event.target).data('headtype');
-        console.log('order: ' + order + ', headType: ' + headType );
         this.setState({
             pageIndex: 0,
             pageSize: 25, 

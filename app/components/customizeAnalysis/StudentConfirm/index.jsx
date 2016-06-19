@@ -131,7 +131,7 @@ class StudentConfirm extends React.Component {
                     <div className={ownClassNames['content-header']}>
                         <span style={{ fontWeight: 600, marginRight: 5 }}>考生列表</span>
                         <span>您已选择
-                            <span className={ownClassNames['stats']}>3</span>
+                            <span className={ownClassNames['stats']}>{_.keys(this.props.currentSubject.src).length}</span>
                             个学科, 共
                             <span className={ownClassNames['stats']}>{_this.props.currentSubject.SQM.x.length}</span>
                             题, 满分
@@ -157,7 +157,7 @@ class StudentConfirm extends React.Component {
                         </thead>
                         <tbody>
                             {
-                                Object.keys(groupMap).map((groupName, index) => {
+                                _.orderBy(_.keys(groupMap)).map((groupName, index) => {
                                     if (groupMap[groupName].status === 'inUse') {
                                         return (
                                             <tr key={'class-'+ index} className={ownClassNames['table-row']}>
