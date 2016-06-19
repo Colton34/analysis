@@ -653,13 +653,16 @@ class RankReport extends React.Component {
         }
         this.getHeadSeq();
         this.generateStudentInfos();
+
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
-        var hasPrevPage = examid && grade ? true : false; //TODO: 设计？？？
+        if (!examid) return;
+        var targetUrl = grade ? '/dashboard?examid=' + examid + '&grade=' + encodeURI(grade) : '/dashboard?examid=' + examid;
+
         return (
             <div style={{ width: 1000, minHeight: 830, backgroundColor: '#fff', margin: '0 auto', marginTop: 30 }}>
                 <div style={{ paddingLeft: 20, backgroundColor: '#fcfcfc', height: 75, lineHeight: '75px', textAlign: 'center' }}>
-                    <a href={hasPrevPage? '/dashboard?examid=' + examid + '&grade=' + grade : '/'} style={{ fontSize: 12, textDecoration: 'none', color: '#333', float: 'left' }}> {'<'} 返回</a>
+                    <a href={targetUrl} style={{ fontSize: 12, textDecoration: 'none', color: '#333', float: 'left' }}> {'<'} 返回</a>
                     <span style={{ fontSize: 16 }}>{examInfo.name}-分数排行榜</span>
                 </div>
                 <RankReportTableView

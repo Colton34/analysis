@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-17 18:31:56
+* @Last Modified time: 2016-06-19 15:03:07
 */
 
 
@@ -1470,14 +1470,9 @@ rankCache: {
 
  */
 export function fetchRankReportdData(params) {
-
-console.log('params.grade = ', params.grade);
-
     var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + params.grade : examPath + '/custom/rank/report?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
-        console.log(_.keys(res.data));
-        debugger;
         return Promise.resolve(res.data);
     });
 }

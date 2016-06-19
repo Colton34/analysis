@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-19 12:34:51
+* @Last Modified time: 2016-06-19 14:51:00
 */
 
 'use strict';
@@ -240,25 +240,43 @@ exam实例的数组：
 ]
 */
 exports.home = function(req, res, next) {
+    oldHome(req, res, next);
     //0.通过verify已经有了req.user
     //1.获取此用户所从属的学校信息
+//     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
+//         //2.获取此学校所产生的所有的考试信息--因为不牵涉到分数，所以这里直接读DB即可，不需要rank-server的exam api
+//         return examUitls.getExamsBySchool(school);
+//     }).then(function(originalExams) {
+//         req.originalExams = originalExams;
+//         return getCustomExams(req.user.id);
+//     }).then(function(customExams) {
+//         try {
+//             //但是这样做就相当于也把自定义分析当做不同分析处理了--就有可能造成自定义分析和普通分析交叉显示（而之前设计好像是自定义分析在前面）
+//             var allExams = _.concat(req.originalExams, customExams);
+//             var formatedExams = formatExams(allExams);
+//             return when.resolve(formatedExams);
+//         } catch(e) {
+//             return when.reject(new errors.Error('格式化exams错误'));
+//         }
+//     }).then(function(formatedExams) {
+// // console.log('customFormatedExams ===== ', customFormatedExams);
+//         res.status(200).send(formatedExams);
+//     }).catch(function(err) {
+//         next(err);
+//     })
+}
+
+function oldHome(req, res, next) {
     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
-        //2.获取此学校所产生的所有的考试信息--因为不牵涉到分数，所以这里直接读DB即可，不需要rank-server的exam api
         return examUitls.getExamsBySchool(school);
-    }).then(function(originalExams) {
-        req.originalExams = originalExams;
-        return getCustomExams(req.user.id);
-    }).then(function(customExams) {
+    }).then(function(exams) {
         try {
-            //但是这样做就相当于也把自定义分析当做不同分析处理了--就有可能造成自定义分析和普通分析交叉显示（而之前设计好像是自定义分析在前面）
-            var allExams = _.concat(req.originalExams, customExams);
-            var formatedExams = formatExams(allExams);
+            var formatedExams = formatExams(exams);
             return when.resolve(formatedExams);
         } catch(e) {
             return when.reject(new errors.Error('格式化exams错误'));
         }
     }).then(function(formatedExams) {
-// console.log('customFormatedExams ===== ', customFormatedExams);
         res.status(200).send(formatedExams);
     }).catch(function(err) {
         next(err);
