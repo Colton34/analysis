@@ -202,7 +202,7 @@ class ExamSelect extends React.Component {
                 //alert('请选择同一年级的考试');
                 this.setState({
                     infoDialogMsg: '请选择同一年级的考试',
-                    showInfoDialog: true 
+                    showInfoDialog: true
                 })
                 return ;
             }
@@ -550,7 +550,7 @@ class Dialog extends React.Component {
 }
 const InfoDialog = ({content, show,onHide}) => {
     return (
-        <Modal show={ show } ref="dialog"  onHide={onHide} bsSize='sm'>
+        <Modal show={ show } onHide={onHide} bsSize='sm'>
             <Header closeButton={true} style={{fontWeight: 'bold', textAlign: 'center'}}>提示</Header>
             <Body style={{textAlign:'center'}}>
                 {content}
