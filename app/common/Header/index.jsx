@@ -82,6 +82,7 @@ class HeaderComponent extends React.Component {
                         <a className={style['title-a']} href='javascript:void(0)' title="好分数">好分数</a>
                     </h1>
                     <HeaderMenu />
+                    <a key='addAnalysisBtn' href='/add/analysis' style={localStyle.addAnalysisBtn}>+自定义分析</a>
                     {/* ------------------------------右侧头像、名字--------------------------------------*/ }
                     <a href='javascript:;' onClick={this.onClickAvatar.bind(this)} style={localStyle.userInfo}>
                         <div className={style['user-avatar']}> </div>
@@ -115,6 +116,12 @@ var localStyle = {
         marginLeft: 10, cursor: 'pointer',textDecoration:'none',color: '#333',
         ':hover': {color: '#59bde5', textDecoration: 'none'},
         ':link': {textDecoration: 'none'}
+    },
+    addAnalysisBtn: {
+        display: 'inline-block', width: 120, height: 30, color: '#fff', backgroundColor: '#2ea8eb',lineHeight: '30px', borderRadius: 20, textAlign: 'center',
+        marginTop: 25,
+        ':hover': {textDecoration:'none'},
+        ':link':  {textDecoration: 'none'}
     }
 }
 HeaderComponent.propTypes = {

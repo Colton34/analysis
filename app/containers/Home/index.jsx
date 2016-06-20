@@ -51,7 +51,10 @@ let questionList = [
 const CommonQuestions = () => {
     return (
         <div>
-            <div className={styles.title}>常见问题</div>
+            <div className={styles.title}>
+                常见问题
+                <a href='/faq' style={{float: 'right', fontSize: 12, color: '#302f2f'}}>更多</a>
+            </div>
             <ul className={styles.ul}>
                 {
                     questionList.map((q, index) => {
@@ -70,16 +73,17 @@ const CommonQuestions = () => {
 const TeacherHelper = () => {
     return (
         <div>
-            <div className={styles.title}>老师小助手</div>
-            <div className={styles['instruction-book']}></div>
-            <a href='/faq?section=intro&sub=introVideo' className={styles['instruction-video']} ></a>
+            <div className={styles.title}>老师助手</div>
+            <a href='/faq?section=intro&sub=introVideo' className={styles['video-img']} ></a>
+            <a target='_blank' href="http://kaoshi2.kss.ksyun.com/yunxiao/kaoshi2.0/pdf/%E5%A5%BD%E5%88%86%E6%95%B0%E9%98%85%E5%8D%B7%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf"
+                style={{display: 'block',marginTop: 10, height: 40, color: '#757575', lineHeight: '40px', borderBottom: '1px solid #dcdcdc'}}>下载使用说明书</a>
         </div>
     )
 }
 
 const Sidebar = () => {
     return (
-        <div style={{ width: 380, backgroundColor: '#fafafa', display: 'inline-block', float: 'right', padding: '0 60px 0 80px' }}>
+        <div style={{ width: 230, backgroundColor: '#eff1f4', display: 'inline-block', float: 'right' }}>
             <TeacherHelper/>
             <CommonQuestions/>
         </div>
@@ -100,73 +104,162 @@ const NoExamList = () => {
     )
 }
 
-const ExamItem = ({timeKey, item}) => {
-    // var examid = item.id.slice(item.id.lastIndexOf('0')+1);
-    var examid = item.id.slice(_.findIndex(item.id, (c) => c !== '0'));
-    return (
-        <div>
-        <div style={{ width: 100, height: 130, padding: '40px 0', fontSize: 16, display: 'inline-block', position: 'absolute', left: -100 }}>{timeKey === undefined ? '' : timeKey}</div>
-        <div style={{ height: 130, padding: '40px 0', borderBottom: '1px solid #bfbfbf' }}>
-            <div>
-                <div style={{ display: 'inline-block' }}>
-                    <div style={{ fontSize: 16, marginBottom: 20 }}>{item.examName}</div>
-                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>创建时间: {item.eventTime}</span>
-                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>考试科目： {item.subjectCount}</span>
-                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>试卷满分： {item.fullMark}</span>
-                    <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>来自：    {fromFlag[item['from']]}</span>
+/**
+ * props:
+ * timeKey:
+ * item
+ */
+@Radium
+class ExamItem extends React.Component {
+    // ({timeKey, item}) =>
+    constructor(props) {
+        super(props);
+
+    }
+    render() {
+        var {timeKey, item} = this.props;
+        var examid = item.id.slice(_.findIndex(item.id, (c) => c !== '0'));
+        return (
+            <div >
+                <div style={_.assign({}, { color: '#656565', borderBottom: '1px solid #f2f2f2', width: '100%', height: 50, lineHeight: '50px'}, timeKey === undefined ? { display: 'none' } : { display: 'block' }) }>
+                    {timeKey}分析列表
                 </div>
-                <Link to={{ pathname: '/dashboard', query: { examid: examid, grade: encodeURI(item.grade) } }} style={{ display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#5ab2f9', color: '#fff', float: 'right', textDecoration: 'none', borderRadius: '8px' }}>
-                    查看分析
-                </Link>
+                <div style={{ width: '100%', height: 100 }}>
+                    <div style={{ padding: '20px 0' }}>
+                        <div style={{ display: 'inline-block', width: 50, height: 50, backgroundColor: '#e1e5eb', borderRadius: '50%' }}></div>
+                        <div style={{ display: 'inline-block', marginLeft: 20 }}>
+                            <div style={{ fontSize: 16, marginBottom: 10, fontWeight: 'bold' }}>{item.examName}</div>
+                            <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>创建时间: {item.eventTime}</span>
+                            <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
+                            <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
+                            <span style={_.assign({},{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }, fromFlag[item['from']] === '自定义' ? {color: '#77bfef'}: {})}>来自：{fromFlag[item['from']]}</span>
+                        </div>
+                        <a href={'/dashboard?examid=' + examid + '&grade=' + encodeURI(item.grade)} style={localStyle.linkAnalysisBtn}>
+                            查看分析
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
-        </div>
-    )
+        )
+    }
+    
 }
 
 
-const ExamList = ({examList}) => {
-    return (
-        <div style={{ display: 'inline-block', width: 800, position: 'absolute', right: 380 }}>
-            <div style={{ borderBottom: '1px solid #bfbfbf', width: '100%', height: 70, position: 'relative', right: 0, padding: '10px 0 0 0', lineHeight: '70px' }}>
-                <Link to={{pathname: '/add/analysis'}}style={{ display: 'inline-block', width: 130, height: 40, backgroundColor: '#009966', color: '#fff', borderRadius: 5, lineHeight: '40px', textAlign: 'center' }}>
-                    创建分析
-                </Link>
-                <span style={{ color: '#aeaeae', position: 'absolute', bottom: -7, marginLeft: 10, fontSize: 14 }}>根据学校实际情况，自定义数据进行分析。比如：文理拆分、文理合并等</span>
-            </div>
-
-            {
-                examList.length ? _.map(examList, (obj) => {
-                    return _.map(obj.values, (exam, index) => {
-                        if (index === 0) {
-                            return <ExamItem key={index} timeKey={obj.timeKey} item={exam}/>
-                        } else {
-                            return <ExamItem key={index} item={exam}/>
-                        }
+class ExamList extends React.Component {
+    // ({examList})
+    constructor(props) {
+        super(props);
+        this.state = {
+            pageIndex: 0,
+            pageSize: 3,
+            pageRange: 5
+        }
+    }
+    getPage() {
+        var len = this.props.examList.length;
+        var {pageIndex, pageSize, pageRange} = this.state;
+        var maxPage   = len % pageSize == 0 ? len / pageSize : parseInt(len / pageSize) + 1;
+        var startPage = 0;
+        var endPage   = maxPage;
+        if(pageIndex - 2 < 0){
+            startPage = 0;
+            endPage = pageRange > maxPage ? maxPage : pageRange;
+        }else if(pageIndex + 2 >= maxPage){
+            startPage = maxPage - pageRange >= 0? maxPage - pageRange : 0;
+            endPage   = maxPage;
+        }else{
+            startPage = pageIndex - 2;
+            endPage   = pageIndex + 2 + 1;
+        }
+        return _.range(startPage, endPage)
+    }
+    onClickPage(event) {
+        var {pageIndex} = this.state;
+        var page = $(event.target).data('page'); 
+        switch(page) {
+            case 'prev':
+                if (pageIndex === 0) return ;
+                this.setState({
+                    pageIndex : pageIndex - 1
+                })
+                break;
+            case 'next':
+                var {pageSize} = this.state;
+                var len = this.props.examList.length;
+                var maxPage = len % pageSize === 0 ? len / pageSize : parseInt(len / pageSize) + 1;
+                if (pageIndex + 1 === maxPage) return;
+                this.setState({
+                    pageIndex : pageIndex + 1
+                })
+                break;
+            default:
+                var pageNum = _.isNaN(parseInt(page)) ? undefined : parseInt(page);
+                if (pageNum !== undefined) {
+                    this.setState({
+                        pageIndex: pageNum
                     })
-                }) : <NoExamList />
-            }
-        </div>
-    )
+                }
+        }
+    }
+    render() {
+        var {examList} = this.props;
+        var {pageIndex, pageSize} = this.state;
+        return (
+            <div style={{ display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 15, backgroundColor: '#fff' }}>
+                <div className={styles['banner-img']}></div>
+                {
+                    examList.length ? _.map(examList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize), (obj) => {
+                        return _.map(obj.values, (exam, index) => {
+                            if (index === 0) {
+                                return <ExamItem key={index} timeKey={obj.timeKey} item={exam}/>
+                            } else {
+                                return <ExamItem key={index} item={exam}/>
+                            }
+                        })
+                    }) : <NoExamList />
+                }
+                {/*-------------------------------------------分页----------------------------------------------------------*/}
+                {
+                    examList.length ? 
+                        <div style={{marginTop: 15, color: '#9a9a9a'}}>
+                            <ul style={{margin: '0 auto', width: '50%', listStyleType: 'none', textAlign: 'center'}}>
+                                <li style={localStyle.pageDirection} data-page='prev' onClick={this.onClickPage.bind(this)}>
+                                    {'<'}
+                                </li>
+                                {
+                                    this.getPage().map((num, index) => {
+                                        return (
+                                            <li key={'pageIndex-' + index} 
+                                                data-page={num} 
+                                                onClick={this.onClickPage.bind(this)} 
+                                                style={_.assign({},{display: 'inline-block', marginRight: 20, cursor: 'pointer'}, num === this.state.pageIndex? {color: '#24aef8'}: {})}> 
+                                                {num + 1}
+                                            </li>
+                                        ) 
+                                        
+                                    })
+                                }
+                                <li style={localStyle.pageDirection} data-page='next' onClick={this.onClickPage.bind(this)}>
+                                    {'>'}
+                                </li>
+                            </ul>
+                        </div> : '' 
+                }
+            </div>
+                
+        )
+    }
+    
 }
 
 const Content = ({examList}) => {
 
     return (
-        <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#fff', position:'relative'}}>
+        <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#eff1f4', position:'relative'}}>
             <ExamList examList={examList} />
             <Sidebar/>
-        </div>
-    )
-}
-
-const Welcome = () => {
-    return (
-        <div style={{ backgroundColor: '#dbdbdb', width: '100%', height: '100%' }}>
-            <div style={{ margin: '0 auto', width: 1100, paddingTop: 16 }}>
-                <h3 style={{ fontSize: 20 }}>亲爱的 魏旭老师</h3>
-                <p style={{ fontSize: 16, lineHeight: '32px' }}>欢迎使用云校考试分析系统，在互联网大数据时代，为了帮助您更好地提高教学水平，我们提供了每次考试的各种分析报告，希望您喜欢。欢迎使用云校考试分析系统，在互联网大数据时代，为了帮助您更好地提高教学水平，我们提供了每次考试的各种分析报告，希望您喜欢。</p>
-            </div>
+            <div style={{clear:'both'}}></div>
         </div>
     )
 }
@@ -194,13 +287,20 @@ class Home extends React.Component {
 
         return (
             <div >
-                <Welcome/>
                 <Content examList={examList}/>
             </div>
         );
     }
 }
-
+var localStyle= {
+    linkAnalysisBtn: { 
+        display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#fff', border:'1px solid #24aef8', color: '#24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5,
+        ':hover': {textDecoration: 'none', backgroundColor:'#24aef8', color:'#fff'}
+    },
+    pageDirection: {
+        width: 20, height: 20, borderRadius: '50%', backgroundColor: '#DADADA', color: '#fff', display: 'inline-block', marginRight: 20, cursor: 'pointer'
+    }
+}
 function mapStateToProps(state) {
     return {
         home: state.home
