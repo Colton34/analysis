@@ -46,14 +46,21 @@ export default function reducer(state, action) {
             // var nextState = state.setIn(['papersInfo', action.res.pid], action.res);
             // if(!action.isCached) nextState = nextState.setIn(['papersCache', action.res.pid], action.res);
             
-            var nextState = null;
+            var nextState = state;
             if(!state.getIn(['currentSubject','src', action.res.id])){
-                nextState = state.setIn(['currentSubject','src', action.res.id], Map(_.assign({}, {oriSQM: Map(action.res)}, action.paperInfo, {SQM: {}})));
+                if (state.getIn(['currentSubject', 'grade']) === '') {
+                    nextState = state.setIn(['currentSubject', 'grade'], action.paperInfo.grade);
+                }
+                nextState = nextState.setIn(['currentSubject','src', action.res.id], Map(_.assign({}, {oriSQM: Map(action.res)}, action.paperInfo, {SQM: {}})));
             }
             if(!action.isCached) nextState = nextState.setIn(['papersCache', action.res.id], action.res);
             return nextState;
         case SUBTRACT_PAPER_INFO:
-            return state.setIn(['currentSubject','src'], state.getIn(['currentSubject','src']).delete(action.pid));
+            var nextState = state.setIn(['currentSubject','src'], state.getIn(['currentSubject','src']).delete(action.pid));
+            if (_.keys(nextState.getIn(['currentSubject','src'])).length === 0) {
+                nextState.setIn(['currentSubject', 'grade'], '');
+            }
+            return nextState;
         case CHECK_ALL_QUESTION: 
             var questions = state.getIn(['currentSubject', 'src', action.pid, 'oriSQM', 'x']);
             var newQuestions = [];
@@ -115,7 +122,7 @@ export default function reducer(state, action) {
         case SAVE_CURRENT_SUBJECT: 
             var name = state.getIn(['currentSubject', 'name']);
             var nextState = state.setIn(['resultSet', name], state.get('currentSubject'));
-            nextState = nextState.set('currentSubject',Map({ src: Map({}), groupMap: {}, name: '', SQM: Map({})}));
+            nextState = nextState.set('currentSubject',Map({ src: Map({}), groupMap: {}, name: '', grade: '', SQM: Map({})}));
             nextState = nextState.set('status','');
             nextState = nextState.set('pageIndex', 0);
             return nextState;
@@ -141,7 +148,7 @@ export default function reducer(state, action) {
             }
             return nextState;
         case DISCARD_CURRENT_SUBJECT:
-            var nextState = state.set('currentSubject',Map({ src: Map({}), groupMap: {}, name: '', SQM: Map({})}));
+            var nextState = state.set('currentSubject',Map({ src: Map({}), groupMap: {}, name: '', grade: '', SQM: Map({})}));
             nextState = nextState.set('status', '');
             nextState = nextState.set('pageIndex', 0);
             return nextState;

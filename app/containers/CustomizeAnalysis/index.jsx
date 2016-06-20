@@ -183,6 +183,7 @@ class CustomizeAnalysis extends React.Component {
                         onPrevPage={this.onPrevPage.bind(this) }
                         onNextPage={this.onNextPage.bind(this) }
                         currentSubject={currentSubject}
+                        resultSet={resultSet}
                         />
 
                 }

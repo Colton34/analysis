@@ -29,7 +29,6 @@ import {FROM_FLAG as fromFlag} from '../../../lib/constants';
 import matrixBase from '../../../lib/matrixBase.js';
 
 import {initParams, saveAs} from '../../../lib/util';
-
 import ownClassNames from './examSelect.css';
 
 var {Header, Title, Body, Footer} = Modal;
@@ -82,7 +81,6 @@ var MERGE_TYPE = {
 
 }
 
-
 /**
  * props:
  * isLiankao: 是否联考
@@ -90,6 +88,7 @@ var MERGE_TYPE = {
  * onPrevPage: '上一步'回调函数
  * onNextPage: '下一步'回调函数
  * currentSubject: 当前分析数据
+ * resultSet: 暂存各科目数据的结构；
  */
 class ExamSelect extends React.Component {
     constructor(props) {
@@ -99,9 +98,11 @@ class ExamSelect extends React.Component {
         this.state = {
             //currentPapers: currentSubject.src ? currentSubject.src : {},
             showDialog: false,
+            showInfoDialog: false,
             startDate: moment().month(moment().month() - 12),  //默认显示一年内的考试
             endDate: moment(),
-            examList: this.props.examList
+            examList: this.props.examList,
+            infoDialogMsg: ''
         }
     }
     componentDidMount() {
@@ -178,7 +179,7 @@ class ExamSelect extends React.Component {
 
     // 选中某个考试科目时载入该科目的数据；
     onSelectPaper(event) {
-        //TODO: 对所选择的paper加是不是和当前所有的paper都是同属于一个年级的校验！思路--进入到选择考试页后，一旦开始选择了一个，则设置currentGrade，然后再
+        //对所选择的paper加是不是和当前所有的paper都是同属于一个年级的校验！思路--进入到选择考试页后，一旦开始选择了一个，则设置currentGrade，然后再
         //选择其他的paper的时候，比对paper.grade和currentGrade是不是一样，不一样则给错误提示。如果选择的paper都清空了，则currentGrade也清空，从而能修改设置
         //新的年级~注意：年级是针对exam的，而这里一次选择只是针对一个科目的（一个科目肯定要保证所勾选的是同一年级），但是不同科目同样也要保证是同一年级！所以这个
         //currentGrade应该是resultSet里的一个直属属性--它指代了resultSet中所有分析的科目都是来自同一年级。
@@ -193,12 +194,38 @@ class ExamSelect extends React.Component {
             var examName = $parent.find('.exam-name').text();
             var paperFrom = $parent.find('.paper-from').text() === '自定义' ? PAPER_FROM.upload : PAPER_FROM.system;
             var paperName = $target.data('subject');
+            var paperGrade = $target.data('grade');
 
+            //校验
+            var {currentSubject, resultSet} = this.props;
+            if (currentSubject.grade !== '' && currentSubject.grade !== paperGrade) {
+                //alert('请选择同一年级的考试');
+                this.setState({
+                    infoDialogMsg: '请选择同一年级的考试',
+                    showInfoDialog: true 
+                })
+                return ;
+            }
+            if (_.keys(resultSet).length !== 0) {
+                for (var subjectName in resultSet) {
+                    if (resultSet[subjectName].grade !== paperGrade) {
+                        //alert('科目: ' + subjectName + ', 已选择年级：' + resultSet[subjectName].grade + ',请选择相同年级.');
+                        this.setState({
+                            infoDialogMsg: '科目: ' + subjectName + ', 已选择年级：' + resultSet[subjectName].grade + ',请选择相同年级.',
+                            showInfoDialog: true
+                        })
+                        return ;
+                    } else {
+                        break ;
+                    }
+                }
+            }
             var paperInfo = {
                 from: paperFrom,
                 paperId: paperId,
                 examName: examName,
-                paperName: paperName
+                paperName: paperName,
+                grade: paperGrade
             }
             var {papersCache} = this.props;
             papersCache = Map.isMap(papersCache) ? papersCache.toJS() : papersCache;
@@ -279,6 +306,9 @@ class ExamSelect extends React.Component {
     onHideDialog() {
         this.setState({ showDialog: false });
     }
+    onHideInfoDialog() {
+        this.setState({showInfoDialog: false});
+    }
     handleChangeStart(date) {
         var self = this;
         this.setState({
@@ -340,7 +370,6 @@ class ExamSelect extends React.Component {
                 console.log('Fail: ', resp);
             }
         };
-
         return (
             <div>
                 <div className={ownClassNames['container']}>
@@ -377,7 +406,7 @@ class ExamSelect extends React.Component {
                                                         return (
                                                             <li key={'subject-' + index} className={ownClassNames['subject-li']}>
                                                                 <div className={ownClassNames['checkbox']}>
-                                                                    <input id={'checkbox-subject-' + index} type='checkbox' value={paper.id} data-subject={paper.subject}
+                                                                    <input id={'checkbox-subject-' + index} type='checkbox' value={paper.id} data-subject={paper.subject} data-grade={exam.grade}
                                                                         onChange={this.onSelectPaper.bind(this) }checked={paperIds.indexOf(paper.id) !== -1 ? true : false}/>
                                                                     <label for={'checkbox-subject-' + index}/>
                                                                     <span>{paper.subject}</span>
@@ -453,6 +482,7 @@ class ExamSelect extends React.Component {
                 <PageFooter pageIndex={this.props.pageIndex} onPrevPage={this.props.onPrevPage} onNextPage={this.onNextPage.bind(this) }/>
                 <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }
                     doMerge={this.doMerge.bind(this) } hasZipAsOne={this.state.hasZipAsOne} legalSQMs={this.state.legalSQMs}/>
+                <InfoDialog show={this.state.showInfoDialog} onHide={this.onHideInfoDialog.bind(this)} content={this.state.infoDialogMsg}/>
             </div>
         )
     }
@@ -517,6 +547,16 @@ class Dialog extends React.Component {
             </Modal>
         )
     }
+}
+const InfoDialog = ({content, show,onHide}) => {
+    return (
+        <Modal show={ show } ref="dialog"  onHide={onHide} bsSize='sm'>
+            <Header closeButton={true} style={{fontWeight: 'bold', textAlign: 'center'}}>提示</Header>
+            <Body style={{textAlign:'center'}}>
+                {content}
+            </Body>
+        </Modal>
+    )
 }
 
 let localStyle = {
