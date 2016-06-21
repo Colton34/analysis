@@ -103,6 +103,7 @@ const NoExamList = () => {
 const ExamItem = ({timeKey, item}) => {
     // var examid = item.id.slice(item.id.lastIndexOf('0')+1);
     var examid = item.id.slice(_.findIndex(item.id, (c) => c !== '0'));
+    var targetPath = (item.from === 40) ? { pathname: '/dashboard', query: { examid: examid } } : { pathname: '/dashboard', query: { examid: examid, grade: encodeURI(item.grade) } };
     return (
         <div>
         <div style={{ width: 100, height: 130, padding: '40px 0', fontSize: 16, display: 'inline-block', position: 'absolute', left: -100 }}>{timeKey === undefined ? '' : timeKey}</div>
@@ -115,7 +116,7 @@ const ExamItem = ({timeKey, item}) => {
                     <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>试卷满分： {item.fullMark}</span>
                     <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 30}}>来自：    {fromFlag[item['from']]}</span>
                 </div>
-                <Link to={{ pathname: '/dashboard', query: { examid: examid, grade: encodeURI(item.grade) } }} style={{ display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#5ab2f9', color: '#fff', float: 'right', textDecoration: 'none', borderRadius: '8px' }}>
+                <Link to={targetPath} style={{ display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#5ab2f9', color: '#fff', float: 'right', textDecoration: 'none', borderRadius: '8px' }}>
                     查看分析
                 </Link>
             </div>
