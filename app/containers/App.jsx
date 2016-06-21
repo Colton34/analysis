@@ -21,7 +21,7 @@ import Dialog from '../common/Dialog';
 
 import {initUser, alterCommentDialogStatus} from '../reducers/global-app/actions';
 import {convertJS} from '../lib/util';
-
+import commonStyle from '../common/common.css';
 
 //let actionCreators = [alterCommentDialogStatus];
 
@@ -38,7 +38,7 @@ class App extends React.Component {
         
         var currentPath = this.props.location.pathname;
         return (
-            <div style={[{backgroundColor: '#f2f2f2'},(currentPath === '/' ? {}: {paddingBottom: 30})]}>
+            <div style={[{backgroundColor: '#f2f2f2'},(currentPath === '/' ? {}: {paddingBottom: 30})]} className={commonStyle['common-font']}>
                 <Header user={user} actions={this.props.actions}/>
                 <Dialog />
                     {this.props.children}
