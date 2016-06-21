@@ -63,7 +63,8 @@ class Dashboard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            showConfirmDialog: false
+            showConfirmDialog: false,
+            loading: false
         }
     }
     componentDidMount() {
@@ -82,11 +83,17 @@ class Dashboard extends React.Component {
     }
 
     onDeleteAnalysis() {
+        this.setState({
+            showConfirmDialog: false,
+            loading: true
+        })
+        var _this = this;
         var examid = this.props.location.query.examid;
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         params.request.put(customBaseUrl, {examId: examid}).then(function(res) {
             location.href = '/';
             console.log('res.data - ', res.data);
+            
         }).then(function(err) {
             console.log('');
         })
@@ -112,7 +119,7 @@ class Dashboard extends React.Component {
         var grade = this.props.location.query.grade ? encodeURI(this.props.location.query.grade) : '';
 
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
-            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0))
+            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0) || this.state.loading)
             return (
                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
                     <Spinkit/>
