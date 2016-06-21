@@ -119,6 +119,9 @@ class ExamItem extends React.Component {
     render() {
         var {timeKey, item} = this.props;
         var examid = item.id.slice(_.findIndex(item.id, (c) => c !== '0'));
+
+        var targetUrl = (item.from === 40) ? '/dashboard?examid=' + examid : '/dashboard?examid=' + examid + '&grade=' + encodeURI(item.grade);
+
         return (
             <div >
                 <div style={_.assign({}, { color: '#656565', borderBottom: '1px solid #f2f2f2', width: '100%', height: 50, lineHeight: '50px'}, timeKey === undefined ? { display: 'none' } : { display: 'block' }) }>
@@ -136,7 +139,7 @@ class ExamItem extends React.Component {
                                 来自：<span style={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? {color: '#77bfef'}: {}}>{fromFlag[item['from']]}</span>
                             </span>
                         </div>
-                        <a href={'/dashboard?examid=' + examid + '&grade=' + encodeURI(item.grade)} style={localStyle.linkAnalysisBtn}>
+                        <a href={targetUrl} style={localStyle.linkAnalysisBtn}>
                             查看分析
                         </a>
                     </div>
@@ -144,7 +147,7 @@ class ExamItem extends React.Component {
             </div>
         )
     }
-    
+
 }
 
 @Radium
@@ -178,7 +181,7 @@ class ExamList extends React.Component {
     }
     onClickPage(event) {
         var {pageIndex} = this.state;
-        var page = $(event.target).data('page'); 
+        var page = $(event.target).data('page');
         switch(page) {
             case 'prev':
                 if (pageIndex === 0) return ;
@@ -223,7 +226,7 @@ class ExamList extends React.Component {
                 }
                 {/*-------------------------------------------分页----------------------------------------------------------*/}
                 {
-                    examList.length ? 
+                    examList.length ?
                         <div style={{marginTop: 15, color: '#9a9a9a'}}>
                             <ul style={{margin: '0 auto', width: '50%', listStyleType: 'none', textAlign: 'center'}}>
                                 <li key='pagePrev' style={localStyle.pageDirection} data-page='prev' onClick={this.onClickPage.bind(this)}>
@@ -232,27 +235,27 @@ class ExamList extends React.Component {
                                 {
                                     this.getPage().map((num, index) => {
                                         return (
-                                            <li key={'pageIndex-' + index} 
-                                                data-page={num} 
-                                                onClick={this.onClickPage.bind(this)} 
-                                                style={_.assign({},{display: 'inline-block', marginRight: 20, cursor: 'pointer'}, num === this.state.pageIndex? {color: '#24aef8'}: {})}> 
+                                            <li key={'pageIndex-' + index}
+                                                data-page={num}
+                                                onClick={this.onClickPage.bind(this)}
+                                                style={_.assign({},{display: 'inline-block', marginRight: 20, cursor: 'pointer'}, num === this.state.pageIndex? {color: '#24aef8'}: {})}>
                                                 {num + 1}
                                             </li>
-                                        ) 
-                                        
+                                        )
+
                                     })
                                 }
                                 <li key='pageNext' style={localStyle.pageDirection} data-page='next' onClick={this.onClickPage.bind(this)}>
                                     {'>'}
                                 </li>
                             </ul>
-                        </div> : '' 
+                        </div> : ''
                 }
             </div>
-                
+
         )
     }
-    
+
 }
 
 const Content = ({examList}) => {
@@ -295,7 +298,7 @@ class Home extends React.Component {
     }
 }
 var localStyle= {
-    linkAnalysisBtn: { 
+    linkAnalysisBtn: {
         display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#fff', border:'1px solid #24aef8', color: '#24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5,
         ':hover': {textDecoration: 'none', backgroundColor:'#24aef8', color:'#fff'}
     },
