@@ -3,24 +3,6 @@ import style from './Header.css';
 import {Link} from 'react-router';
 import Radium from 'radium';
 
-/*
-TODO: 清理这里没用的代码；补充完善所有的交互点--javascript(0)的地方
-*/
-
-// 需要补充其他产品的跳转链接
-@Radium
-class HeaderMenu extends React.Component {
-    render(){
-        return (
-            <ul className={style.menu}>
-                <li className={style['menu-li']}>
-                    <a href="/" className={style['menu-nav']} style={localStyle.headerLink} key={'headerLink-0'}>首页</a>
-                </li>
-            </ul>
-        )
-    }
-
-}
 
 let dialogProps = {
     title: '我要吐槽',
@@ -81,7 +63,11 @@ class HeaderComponent extends React.Component {
                     <h1 className={style.title}>
                         <a className={style['title-a']} href='javascript:void(0)' title="好分数">好分数</a>
                     </h1>
-                    <HeaderMenu />
+                    <ul className={style.menu}>
+                        <li className={style['menu-li']}>
+                            <a href="/" className={style['menu-nav']} style={localStyle.headerLink} key={'headerLink-0'}>首页</a>
+                        </li>
+                    </ul>
                     <a key='addAnalysisBtn' href='/add/analysis' style={localStyle.addAnalysisBtn}>+自定义分析</a>
                     {/* ------------------------------右侧头像、名字--------------------------------------*/ }
                     <a href='javascript:;' onClick={this.onClickAvatar.bind(this)} style={localStyle.userInfo}>
@@ -106,10 +92,12 @@ var localStyle = {
         lineHeight: '40px'
     },
     listLink: {
-        ':hover': { textDecoration: 'none',backgroundColor: '#f5f5f5',color: '#999'}
+        ':hover': { textDecoration: 'none',backgroundColor: '#f5f5f5',color: '#999'},
+        ':link': {textDecoration: 'none'}
     },
     headerLink: {
-        ':hover': { textDecoration: 'none'}
+        ':hover': { textDecoration: 'none'},
+        ':link': {textDecoration: 'none'}
     },
     userInfo: { 
         float: 'right', position: 'relative', height: '100%', lineHeight: '78px', 
