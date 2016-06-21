@@ -106,16 +106,6 @@ class CustomizeAnalysis extends React.Component {
         });
     }
 
-    onDeleteAnalysis() {
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
-        params.request.put(customBaseUrl, {examId: "575f845b0000031b156333fe"}).then(function(res) {
-            //删除成功后？？？
-            console.log('res.data - ', res.data);
-        }).then(function(err) {
-            console.log('');
-        })
-    }
-
     deleteStudentFromSQM(subject){
         var result = subject.SQM;
         if (subject.groupMap) {
@@ -162,7 +152,7 @@ class CustomizeAnalysis extends React.Component {
                         onEditSubject={this.props.onEditSubject}
                         onDelSubject={this.props.onDelSubject}
                         onGenerateAnalysis={this.onGenerateAnalysis.bind(this)}
-                        onDeleteAnalysis={this.onDeleteAnalysis.bind(this)}/>
+                        />
                 }
                 {
                     status === 'create' && pageIndex === 0 &&

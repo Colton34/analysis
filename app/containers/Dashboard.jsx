@@ -25,6 +25,8 @@ import {Map, List} from 'immutable';
 import dashboardStyle from '../components/dashboard/dashboard.css';
 import Spinkit from '../common/Spinkit';
 
+var customBaseUrl = examPath + '/custom/analysis';
+
 // 　Bgcolor:″＃F1FAFA″——做正文的背景色好，淡雅
 // 　　Bgcolor:″＃E8FFE8″——做标题的背景色较好，与上面的颜色搭配很协调
 // 　　Bgcolor:″＃E8E8FF″——做正文的背景色较好，文字颜色配黑色
@@ -70,6 +72,17 @@ class Dashboard extends React.Component {
         var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + encodeURI(grade) : '/school/report?examid=' + examid;
         browserHistory.push(targetUrl);
     }
+
+    onDeleteAnalysis(examid) {
+        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        params.request.put(customBaseUrl, {examId: examid}).then(function(res) {
+            //删除成功后？？？
+            console.log('res.data - ', res.data);
+        }).then(function(err) {
+            console.log('');
+        })
+    }
+
     render() {
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;

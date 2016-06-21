@@ -95,8 +95,6 @@ class MainPage extends React.Component {
                                         </tbody>
                                     </table>
                                     <button onClick={this.props.onGenerateAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>生成报表</button>
-
-                                    <button onClick={this.props.onDeleteAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>删除报表</button>
                                 </div>
                             )
                     }
@@ -110,4 +108,9 @@ class MainPage extends React.Component {
                     <span className={ownClassNames['header-back']} >返回</span>
                     <span className={ownClassNames['header-title']}>自定义分析</span>
                 </div>*/
+
+/*
+                                    <button onClick={this.props.onDeleteAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>删除报表</button>
+
+ */
 export default MainPage;
