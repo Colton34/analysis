@@ -88,7 +88,7 @@ class HeaderComponent extends React.Component {
                         <div className={style['user-avatar']}> </div>
                         <div className='dropdown' style={{marginLeft: 42}}>
                             {this.props.user.realName}
-                            <span className='caret'></span>
+                            <span className='caret' style={{color: '#e1e1e1'}}></span>
                         </div>
                     </a>
                     {/*<a href="javascript:void(0)"  onClick={this.props.actions.bind(_this, dialogProps) } style={{ float: 'right', textDecoration: 'none', color: '#5a5a5a', paddingLeft: 40, paddingTop: 30 }}>我要吐槽</a>*/}
