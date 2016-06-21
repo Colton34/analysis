@@ -10,7 +10,7 @@ import SubjectInput from '../../components/customizeAnalysis/SubjectInput';
 import ExamSelect from '../../components/customizeAnalysis/ExamSelect';
 import QuestionConfirm from '../../components/customizeAnalysis/QuestionConfirm';
 import StudentConfirm from '../../components/customizeAnalysis/StudentConfirm';
-import Header from '../../components/customizeAnalysis/Header';
+import PageHeader from '../../components/customizeAnalysis/Header';
 import Footer from '../../components/customizeAnalysis/Footer';
 
 import {initHomeAction} from '../../reducers/home/actions';
@@ -21,6 +21,8 @@ import {changeQuesitonNameAction, setGroupMapAction, setPageIndexAction,
 import {initParams} from '../../lib/util';
 import {NEXT_PAGE,PREV_PAGE} from '../../lib/constants';
 import matrixBase from '../../lib/matrixBase';
+import { Modal } from 'react-bootstrap';
+var {Header, Title, Body} = Modal;
 var uuid = require('node-uuid');
 
 var examPath = "/exam";
@@ -47,7 +49,8 @@ class CustomizeAnalysis extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            generatingAnalysis: false
+            generatingAnalysis: false,
+            showDialog: false
         }
     }
     componentDidMount(){
@@ -85,6 +88,12 @@ class CustomizeAnalysis extends React.Component {
     }
     onGenerateAnalysis() {
         if (this.state.generatingAnalysis === true) return;
+        if (this.props.analysisName === '') {
+            this.setState({
+                showDialog: true
+            })
+            return ;
+        }
         this.setState({
             generatingAnalysis: true
         })
@@ -133,6 +142,11 @@ class CustomizeAnalysis extends React.Component {
         }
         return res;
     }
+    onHideDialog() {
+        this.setState({
+            showDialog: false
+        })
+    }
     render() {
         var {status, pageIndex} = this.props;
         var examList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList;
@@ -144,7 +158,7 @@ class CustomizeAnalysis extends React.Component {
         });
         return (
             <div style={{ width: 1000, minHeight: 600, margin: '20px auto', background: '#fff', paddingBottom: 30 }}>
-                <Header
+                <PageHeader
                     pageIndex={pageIndex}
                     status={status}
                     onDiscardCurrent={this.props.discardCurrentSubject}
@@ -207,14 +221,22 @@ class CustomizeAnalysis extends React.Component {
                         onChangeGroupMap={this.props.setGroupMap}
                         currentSubject={currentSubject} />
                 }
-
-
+                <InfoDialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} />
             </div>
         )
     }
 }
 
-
+const InfoDialog = ({show,onHide}) => {
+    return (
+        <Modal show={ show } onHide={onHide} bsSize='sm'>
+            <Header closeButton={true} style={{fontWeight: 'bold', textAlign: 'center'}}>提示</Header>
+            <Body style={{textAlign:'center'}}>
+                请输入自定义分析名称
+            </Body>
+    </Modal>
+    )
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomizeAnalysis);
 
