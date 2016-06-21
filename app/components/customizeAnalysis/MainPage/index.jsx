@@ -15,6 +15,7 @@ import {saveAs} from '../../../lib/util';
  * onEditSubject: 点击学科列表中的“编辑”时调用的回调函数
  * onDelSubject: 点击“删除”时调用的回调函数；
  * onGenerateAnalysis
+ * isGenerating
  */
 class MainPage extends React.Component {
 
@@ -94,7 +95,7 @@ class MainPage extends React.Component {
                                             }
                                         </tbody>
                                     </table>
-                                    <button onClick={this.props.onGenerateAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>生成报表</button>
+                                    <button onClick={this.props.onGenerateAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + (this.props.isGenerating ? ownClassNames['fx-btn-disabled']:ownClassNames['fx-btn-primary'])}>生成报表</button>
                                 </div>
                             )
                     }

@@ -46,7 +46,9 @@ var customBaseUrl = examPath + '/custom/analysis';
 class CustomizeAnalysis extends React.Component {
     constructor(props) {
         super(props);
-        this.generatingAnalysis = false;
+        this.state = {
+            generatingAnalysis: false
+        }
     }
     componentDidMount(){
         // var existsExamList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList
@@ -61,7 +63,6 @@ class CustomizeAnalysis extends React.Component {
     changeCurrentSubjectName(name) {
         console.log('======== subject name: ' + name);
         this.props.changeCurrentSubjectName(name);
-
     }
 
     onBackHomePage() {
@@ -83,8 +84,10 @@ class CustomizeAnalysis extends React.Component {
         }
     }
     onGenerateAnalysis() {
-        if (this.generatingAnalysis === true) return;
-        this.generatingAnalysis = true;
+        if (this.state.generatingAnalysis === true) return;
+        this.setState({
+            generatingAnalysis: true
+        })
         var resultSet = Map.isMap(this.props.resultSet) ? this.props.resultSet.toJS() : this.props.resultSet;
         for (var subjectName in resultSet) {
             var newSQM = this.deleteStudentFromSQM(resultSet[subjectName])
@@ -156,6 +159,7 @@ class CustomizeAnalysis extends React.Component {
                         onEditSubject={this.props.onEditSubject}
                         onDelSubject={this.props.onDelSubject}
                         onGenerateAnalysis={this.onGenerateAnalysis.bind(this)}
+                        isGenerating={this.state.generatingAnalysis}
                         />
                 }
                 {
