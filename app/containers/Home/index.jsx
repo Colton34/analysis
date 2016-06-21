@@ -128,7 +128,7 @@ class ExamItem extends React.Component {
                     <div style={{ padding: '20px 0' }}>
                         <div style={{ display: 'inline-block', width: 50, height: 50, backgroundColor: '#e1e5eb', borderRadius: '50%' }}></div>
                         <div style={{ display: 'inline-block', marginLeft: 20 }}>
-                            <div style={{ fontSize: 16, marginBottom: 10, fontWeight: 'bold' }}>{item.examName}</div>
+                            <div style={{ fontSize: 16, marginBottom: 10, color: '#3f3f3f' }}>{item.examName}</div>
                             <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>创建时间: {item.eventTime}</span>
                             <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
                             <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
