@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-19 16:24:37
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-06-20 18:27:15
 */
 
 'use strict';
@@ -240,39 +240,19 @@ exam实例的数组：
 ]
 */
 exports.home = function(req, res, next) {
-    oldHome(req, res, next);
+    // oldHome(req, res, next);
     //0.通过verify已经有了req.user
     //1.获取此用户所从属的学校信息
-//     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
-//         //2.获取此学校所产生的所有的考试信息--因为不牵涉到分数，所以这里直接读DB即可，不需要rank-server的exam api
-//         return examUitls.getExamsBySchool(school);
-//     }).then(function(originalExams) {
-//         req.originalExams = originalExams;
-//         return getCustomExams(req.user.id);
-//     }).then(function(customExams) {
-//         try {
-//             //但是这样做就相当于也把自定义分析当做不同分析处理了--就有可能造成自定义分析和普通分析交叉显示（而之前设计好像是自定义分析在前面）
-//             var allExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
-//             var formatedExams = formatExams(allExams);
-//             return when.resolve(formatedExams);
-//         } catch(e) {
-//             return when.reject(new errors.Error('格式化exams错误'));
-//         }
-//     }).then(function(formatedExams) {
-// // console.log('customFormatedExams ===== ', customFormatedExams);
-//         res.status(200).send(formatedExams);
-//     }).catch(function(err) {
-//         next(err);
-//     })
-}
-
-function oldHome(req, res, next) {
     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
+        //2.获取此学校所产生的所有的考试信息--因为不牵涉到分数，所以这里直接读DB即可，不需要rank-server的exam api
         return examUitls.getExamsBySchool(school);
-    }).then(function(exams) {
+    }).then(function(originalExams) {
+        req.originalExams = originalExams;
+        return getCustomExams(req.user.id);
+    }).then(function(customExams) {
         try {
-            exams = _.filter(exams, (examObj) => examObj['[papers]'].length > 0);
-            var formatedExams = formatExams(exams);
+            var allExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
+            var formatedExams = formatExams(allExams);
             return when.resolve(formatedExams);
         } catch(e) {
             return when.reject(new errors.Error('格式化exams错误'));
@@ -285,13 +265,9 @@ function oldHome(req, res, next) {
 }
 
 function getCustomExams(owner) {
-console.log('owner ================  ', owner);
     return when.promise(function(resolve, reject) {
         peterFX.query('@Exam', {owner: owner, 'isValid': true}, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('find my custom analysis error: ', err));
-            //TODO: 返回formatExams函数中需要的exam参数形式
-            // var names = _.map(results, (obj) => obj.info.name);
-            // resolve(names);
             //需要的exam格式，从而匹配使用formatExams函数：
             //{'_id': , 'name': , 'event_time': , 'from': 40, '[papers]': [{grade: , paper: , subject: , manfen: }, ...]}
             resolve(_.map(results, (examItem) => {
@@ -304,6 +280,7 @@ console.log('owner ================  ', owner);
                     paperObj.manfen = examPaperObj.fullMark;
                     return paperObj;
                 });
+                return obj;
             }));
         });
     });
@@ -330,9 +307,6 @@ function formatExams(exams) {
     var result = {},
         resultOrder = [];
 
-// console.log('========  formatExams 1');
-
-
     _.each(examGroupsByEventTime, function(examsItem, timeKey) {
         var flag = {
             key: timeKey,
@@ -351,7 +325,6 @@ function formatExams(exams) {
         });
 
         if (!result[timeKey]) result[timeKey] = [];
-// console.log('=========  formatedExams  2');
 
         _.each(temp, function(value, key) {
             var justOneGrade = (_.size(value.papersMap) === 1);
@@ -378,6 +351,7 @@ function formatExams(exams) {
 
         result[timeKey] = _.orderBy(result[timeKey], [(obj) => obj.time], ['desc']);
     });
+
     resultOrder = _.orderBy(resultOrder, ['value'], ['desc']);
     var finallyResult = [];
     _.each(resultOrder, function(item) {
@@ -386,9 +360,6 @@ function formatExams(exams) {
             values: result[item.key]
         });
     });
-
-// console.log('=============  formatedExams 3');
-
     return finallyResult;
 }
 
@@ -654,7 +625,7 @@ function customClassScoreReport(exam) {
 // function getStudentInfo(studentId) {
 //     return when.promise(function(resolve, reject) {
 //         peterHFS.get('@Student' + studentId, function(err, student) {
-//             if(err) return reject(new errors.MongoDBError('find single student error : ', err));
+//             if(err) return reject(new errors.data.MongoDBError('find single student error : ', err));
 //             resolve(student);
 //         });
 //     });
@@ -950,6 +921,26 @@ function genearteExamClassInfo(exam) {
     });
     return examClassesInfo;
 }
+
+
+// function oldHome(req, res, next) {
+//     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
+//         return examUitls.getExamsBySchool(school);
+//     }).then(function(exams) {
+//         try {
+//             exams = _.filter(exams, (examObj) => examObj['[papers]'].length > 0);
+//             var formatedExams = formatExams(exams);
+//             return when.resolve(formatedExams);
+//         } catch(e) {
+//             return when.reject(new errors.Error('格式化exams错误'));
+//         }
+//     }).then(function(formatedExams) {
+//         res.status(200).send(formatedExams);
+//     }).catch(function(err) {
+//         next(err);
+//     })
+// }
+
 
 //方法二：
 // return getPapersInfo(exam).then(function(papers) {

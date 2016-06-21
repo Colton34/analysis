@@ -2,10 +2,10 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-19 15:03:07
+* @Last Modified time: 2016-06-21 09:25:09
 */
 
-
+//说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
 /*
 数据结构实例：
 examInfo:
@@ -118,11 +118,12 @@ var paperPath = '/papers';
 
 
 export function fetchPaper(params) {
-    var url = paperPath + '/' + params.pid;
+    var url = (params.isFromCustom) ? paperPath + '/' + params.pid + '/exam/' + params.examId : paperPath + '/' + params.pid;
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     });
 }
+
 
 //********************************************************* Home *********************************************************
 /**
