@@ -46,6 +46,9 @@ var customBaseUrl = examPath + '/custom/analysis';
 class CustomizeAnalysis extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            generatingAnalysis: false
+        }
     }
     componentDidMount(){
         // var existsExamList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList
@@ -60,7 +63,6 @@ class CustomizeAnalysis extends React.Component {
     changeCurrentSubjectName(name) {
         console.log('======== subject name: ' + name);
         this.props.changeCurrentSubjectName(name);
-
     }
 
     onBackHomePage() {
@@ -82,6 +84,10 @@ class CustomizeAnalysis extends React.Component {
         }
     }
     onGenerateAnalysis() {
+        if (this.state.generatingAnalysis === true) return;
+        this.setState({
+            generatingAnalysis: true
+        })
         var resultSet = Map.isMap(this.props.resultSet) ? this.props.resultSet.toJS() : this.props.resultSet;
         for (var subjectName in resultSet) {
             var newSQM = this.deleteStudentFromSQM(resultSet[subjectName])
@@ -103,17 +109,8 @@ class CustomizeAnalysis extends React.Component {
             browserHistory.push('/dashboard?examid=' + res.data.examId);
         }).catch(function(err) {
             console.log('自定义分析创建失败：', err);
+            this.generatingAnalysis = false;
         });
-    }
-
-    onDeleteAnalysis() {
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
-        params.request.put(customBaseUrl, {examId: "575f845b0000031b156333fe"}).then(function(res) {
-            //删除成功后？？？
-            console.log('res.data - ', res.data);
-        }).then(function(err) {
-            console.log('');
-        })
     }
 
     deleteStudentFromSQM(subject){
@@ -162,7 +159,8 @@ class CustomizeAnalysis extends React.Component {
                         onEditSubject={this.props.onEditSubject}
                         onDelSubject={this.props.onDelSubject}
                         onGenerateAnalysis={this.onGenerateAnalysis.bind(this)}
-                        onDeleteAnalysis={this.onDeleteAnalysis.bind(this)}/>
+                        isGenerating={this.state.generatingAnalysis}
+                        />
                 }
                 {
                     status === 'create' && pageIndex === 0 &&
@@ -298,7 +296,6 @@ function makeExamSchema(resultSet, analysisName) {
     var examStudentsInfo = _.sortBy(makeExamStudentsInfo(resultSet, subjectsIdArr), 'score');
     var examPapersInfo = makeExamPapersInfo(resultSet, subjectsIdArr);
     var examClassesInfo = makeExamClassesInfo(resultSet);
-debugger;
     return {
         "info": examInfo,
         "[studentsInfo]": examStudentsInfo,

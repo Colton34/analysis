@@ -565,7 +565,7 @@ const InfoDialog = ({content, show,onHide}) => {
             <Body style={{textAlign:'center'}}>
                 {content}
             </Body>
-        </Modal>
+    </Modal>
     )
 }
 

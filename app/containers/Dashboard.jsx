@@ -24,6 +24,11 @@ import {Map, List} from 'immutable';
 
 import dashboardStyle from '../components/dashboard/dashboard.css';
 import Spinkit from '../common/Spinkit';
+import { Modal } from 'react-bootstrap';
+var {Header, Title, Body, Footer} = Modal;
+
+var examPath = "/exam";
+var customBaseUrl = examPath + '/custom/analysis';
 
 // 　Bgcolor:″＃F1FAFA″——做正文的背景色好，淡雅
 // 　　Bgcolor:″＃E8FFE8″——做标题的背景色较好，与上面的颜色搭配很协调
@@ -55,7 +60,13 @@ class Dashboard extends React.Component {
     static need = [
         initDashboardAction
     ];
-
+    constructor(props) {
+        super(props);
+        this.state = {
+            showConfirmDialog: false,
+            loading: false
+        }
+    }
     componentDidMount() {
         if (this.props.dashboard.haveInit) return;
 
@@ -70,6 +81,33 @@ class Dashboard extends React.Component {
         var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + encodeURI(grade) : '/school/report?examid=' + examid;
         browserHistory.push(targetUrl);
     }
+
+    onDeleteAnalysis() {
+        this.setState({
+            showConfirmDialog: false,
+            loading: true
+        })
+        var _this = this;
+        var examid = this.props.location.query.examid;
+        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        params.request.put(customBaseUrl, {examId: examid}).then(function(res) {
+            location.href = '/';
+            console.log('res.data - ', res.data);
+            
+        }).then(function(err) {
+            console.log('');
+        })
+    }
+    onShowDialog() {
+        this.setState({
+            showConfirmDialog: true
+        })
+    }
+    onHideDialog() {
+        this.setState({
+            showConfirmDialog: false
+        })
+    }
     render() {
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
@@ -81,7 +119,7 @@ class Dashboard extends React.Component {
         var grade = this.props.location.query.grade ? encodeURI(this.props.location.query.grade) : '';
 
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
-            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0))
+            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0) || this.state.loading)
             return (
                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
                     <Spinkit/>
@@ -91,8 +129,9 @@ class Dashboard extends React.Component {
             <div>
                 <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: '35px auto 20px auto', paddingLeft: 20,fontSize: 16 , color: '#333'}}>
                     <a href='/' style={styles.dashboardTitleName}>
-                        {String.fromCharCode(60)} {examInfoGuide.name}
+                        {'<'} {examInfoGuide.name}
                     </a>
+                    <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>删除</a> 
                 </div>
                 <div style={[styles.box, styles.common.radius]}>
                     <div style={[styles.container, styles.common.radius]}>
@@ -144,6 +183,7 @@ class Dashboard extends React.Component {
                         </div>
                     </div>
                 </div>
+                <Dialog show={this.state.showConfirmDialog} onHide={this.onHideDialog.bind(this)} onConfirm={this.onDeleteAnalysis.bind(this)}/>
             </div>
         );
     }
@@ -163,6 +203,19 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
+const Dialog = ({show, onHide, onConfirm}) => {
+    return (
+        <Modal show={ show } onHide={onHide} bsSize='sm'>
+            <Header closeButton={true} style={{fontWeight: 'bold', textAlign: 'center'}}>提示</Header>
+            <Body style={{textAlign:'center'}}>
+                确定删除当前自定义分析？
+            </Body>
+            <Footer style={{textAlign: 'center'}}>
+                <a id='confirmDel' href="javascript:void(0)" style={styles.btn} onClick={onConfirm}>删除</a>
+            </Footer>
+        </Modal>
+    )
+}
 var styles = {
     common: {
         radius: {
@@ -182,7 +235,12 @@ var styles = {
         textDecoration: 'none',
         color: '#333',
         ':hover': {textDecoration: 'none', color: '#333'}
-    }
+    },
+    aBtn: {
+        textDecoration: 'none', float: 'right', fontSize: 12, color: '#333',
+        ':hover': {textDecoration: 'none'}
+    },
+    btn: {lineHeight: '34px', width: 54, height: 34,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#ee6b52',margin: '0 30px', color: '#fff', borderRadius: '4px'},
 }
 
 
