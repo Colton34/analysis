@@ -23,7 +23,7 @@ var headerMapper = {
  * renderRows:
  * onSort: 排序的函数
  */
-const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, onSort, sortInfo}) => {
+const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, onSort, sortInfo, downloadTable}) => {
     //todo: 处理一遍renderHead, 找出各个两行表头的列数，方便遍历；
     var counter = {};
     var secondLineHeadMap = {};
@@ -38,7 +38,9 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
     })
     // <table style={{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', overflow: 'scroll', width: '100%'}}>
     return (
-         <BootTable striped bordered condensed hover responsive style={{overflowX: 'scroll'}}>
+        <div>
+        <h4 onClick={downloadTable}>点击导出Table</h4>
+         <BootTable id="rankTable" striped bordered condensed hover responsive style={{overflowX: 'scroll'}}>
             <thead>
                 <tr style={{ backgroundColor: '#f4faee' }}>
                     {
@@ -126,6 +128,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                 }
             </tbody>
         </BootTable>
+        </div>
     )
 }
 
@@ -430,6 +433,9 @@ class RankReportTableView extends React.Component {
             showData: _.orderBy(this.state.showData, [headType], [order])
         })
     }
+    downloadTable() {
+
+    }
     render() {
         var {examInfo} = this.props;
         var {firstLineHead, secondLineHead} = this.getTableHead();
@@ -492,6 +498,7 @@ class RankReportTableView extends React.Component {
                     </div>
                 </div>
                 <Table
+                    downloadTable = {this.downloadTable.bind(this)}
                     firstLineHead = {firstLineHead}
                     secondLineHead = {secondLineHead}
                     renderRows ={this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)}
