@@ -183,6 +183,7 @@ class CustomizeAnalysis extends React.Component {
                         onPrevPage={this.onPrevPage.bind(this) }
                         onNextPage={this.onNextPage.bind(this) }
                         currentSubject={currentSubject}
+                        resultSet={resultSet}
                         />
 
                 }
@@ -297,7 +298,7 @@ function makeExamSchema(resultSet, analysisName) {
     var examStudentsInfo = _.sortBy(makeExamStudentsInfo(resultSet, subjectsIdArr), 'score');
     var examPapersInfo = makeExamPapersInfo(resultSet, subjectsIdArr);
     var examClassesInfo = makeExamClassesInfo(resultSet);
-
+debugger;
     return {
         "info": examInfo,
         "[studentsInfo]": examStudentsInfo,
@@ -338,10 +339,11 @@ function makeExamInfo(resultSet, analysisName) {
         realStudentsCount += _.sum(_.map(newAddClasses, (className) => groupMapItem[className].count));
         realClasses = _.concat(realClasses, newAddClasses);
     });
+    var gradeName = resultSet[subjects[0]] ? resultSet[subjects[0]].grade : '';
 
     return {
         name: analysisName,
-        gradeName: '', //暂时先填充个空字符
+        gradeName: gradeName, //暂时先填充个空字符
         startTime: Date.now(), // new Date()
         from: 40,
         realClasses: realClasses,
@@ -400,7 +402,7 @@ function makeExamPapersInfo(resultSet, subjectsIdArr) {
     var result = _.map(resultSet, (item, subjectName) => {
         var sqmItem = item.SQM;
         if(!sqmItem) return;
-        var questions = sqmItem.x, matrix = sqmItem.m;
+        var questions = sqmItem.x, students = sqmItem.y, matrix = sqmItem.m;
         var obj = _.find(subjectsIdArr, (sobj) => sobj.subject == subjectName);    //_.pick(item, ['id', 'paper', 'subject']);   //id是pid，paper是ObjectId
         var fullMark = _.sum(_.map(questions, (questionObj) => questionObj.score));
         var realClassesArr = _.filter(item.groupMap, (obj) => obj.status == 'inUse');
@@ -409,7 +411,7 @@ function makeExamPapersInfo(resultSet, subjectsIdArr) {
         var classCountArr = _.map(realClassesArr, (classObj) => {
             return { name: classObj.name, count: classObj.count };
         });
-        return _.assign(obj, { fullMark: fullMark, "[questions]": questions, "[realClasses]": realClasses, "[lostClasses]": [], realStudentsCount: realStudentsCount, lostStudentsCount: 0, "[class]": classCountArr});
+        return _.assign(obj, { grade: item.grade, fullMark: fullMark, "[questions]": questions, '[students]': students, matrix: matrix, "[realClasses]": realClasses, "[lostClasses]": [], realStudentsCount: realStudentsCount, lostStudentsCount: 0, "[class]": classCountArr});
     });
     return result;
 /*

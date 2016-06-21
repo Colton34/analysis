@@ -13,9 +13,13 @@ export const HIDE_LOADING = 'HIDE_LOADING';
 export const INIT_HOME = 'INIT_HOME';
 export const INIT_HOME_SUCCESS = 'INIT_HOME_SUCCESS';
 export const FETCH_HOME_RAW_DATA_SUCCESS = 'FETCH_HOME_RAW_DATA_SUCCESS';
+
+//注意：这两个变量值是一一对应的，如果修改其中一个，那么另一个也要修改。
+export const FROM_YUJUAN_TEXT = '阅卷';
+export const FROM_CUSTOM_TEXT = '自定义';
 export const FROM_FLAG = {
-    '0': '自定义',
-    '1': '阅卷'
+    '1': FROM_YUJUAN_TEXT,
+    '40': FROM_CUSTOM_TEXT
 };
 //================= Dashboard ==========================
 
