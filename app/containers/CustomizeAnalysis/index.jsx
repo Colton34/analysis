@@ -50,7 +50,8 @@ class CustomizeAnalysis extends React.Component {
         super(props);
         this.state = {
             generatingAnalysis: false,
-            showDialog: false
+            showDialog: false,
+            dialogMsg : ''
         }
     }
     componentDidMount(){
@@ -90,9 +91,17 @@ class CustomizeAnalysis extends React.Component {
         if (this.state.generatingAnalysis === true) return;
         if (this.props.analysisName === '') {
             this.setState({
-                showDialog: true
+                showDialog: true,
+                dialogMsg: '请输入自定义分析名称'
             })
             return ;
+        }
+        if (this.isDuplicateAnalysisName()) {
+            this.setState({
+                showDialog: true,
+                dialogMsg: '已存在相同名称的分析，请修改'
+            })
+            return;
         }
         this.setState({
             generatingAnalysis: true
@@ -146,6 +155,15 @@ class CustomizeAnalysis extends React.Component {
         this.setState({
             showDialog: false
         })
+    }
+    isDuplicateAnalysisName() {
+        for(var seq in this.props.examList) {
+            for(var examSeq in this.props.examList[seq].values) {
+                if (this.props.analysisName === this.props.examList[seq].values[examSeq].examName)
+                    return true;
+            }
+        }
+        return false;
     }
     render() {
         var {status, pageIndex} = this.props;
@@ -221,18 +239,18 @@ class CustomizeAnalysis extends React.Component {
                         onChangeGroupMap={this.props.setGroupMap}
                         currentSubject={currentSubject} />
                 }
-                <InfoDialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} />
+                <InfoDialog content={this.state.dialogMsg} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} />
             </div>
         )
     }
 }
 
-const InfoDialog = ({show,onHide}) => {
+const InfoDialog = ({content, show,onHide}) => {
     return (
         <Modal show={ show } onHide={onHide} bsSize='sm'>
             <Header closeButton={true} style={{fontWeight: 'bold', textAlign: 'center'}}>提示</Header>
             <Body style={{textAlign:'center'}}>
-                请输入自定义分析名称
+                {content}
             </Body>
     </Modal>
     )

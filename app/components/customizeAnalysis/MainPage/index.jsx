@@ -24,8 +24,9 @@ class MainPage extends React.Component {
     }
     onFenxiNameInputBlur(event) {
         var value = event.target.value;
-        if (value === this.props.analysisName) return ;
-        this.props.setAnalysisName(event.target.value);
+        var trimValue = value.replace(/\s+/g, '');
+        if (trimValue === this.props.analysisName) return ;
+        this.props.setAnalysisName(trimValue);
     }
     onEditSubject(subjectName) {
 
