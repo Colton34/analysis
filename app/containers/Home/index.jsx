@@ -145,7 +145,7 @@ class ExamItem extends React.Component {
     
 }
 
-
+@Radium
 class ExamList extends React.Component {
     // ({examList})
     constructor(props) {
@@ -224,7 +224,7 @@ class ExamList extends React.Component {
                     examList.length ? 
                         <div style={{marginTop: 15, color: '#9a9a9a'}}>
                             <ul style={{margin: '0 auto', width: '50%', listStyleType: 'none', textAlign: 'center'}}>
-                                <li style={localStyle.pageDirection} data-page='prev' onClick={this.onClickPage.bind(this)}>
+                                <li key='pagePrev' style={localStyle.pageDirection} data-page='prev' onClick={this.onClickPage.bind(this)}>
                                     {'<'}
                                 </li>
                                 {
@@ -240,7 +240,7 @@ class ExamList extends React.Component {
                                         
                                     })
                                 }
-                                <li style={localStyle.pageDirection} data-page='next' onClick={this.onClickPage.bind(this)}>
+                                <li key='pageNext' style={localStyle.pageDirection} data-page='next' onClick={this.onClickPage.bind(this)}>
                                     {'>'}
                                 </li>
                             </ul>
@@ -256,7 +256,7 @@ class ExamList extends React.Component {
 const Content = ({examList}) => {
 
     return (
-        <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#eff1f4', position:'relative'}}>
+        <div style={{ width: 1200, margin: '0 auto', minHeight: 900, backgroundColor: '#eff1f4', position:'relative', paddingBottom: 80}}>
             <ExamList examList={examList} />
             <Sidebar/>
             <div style={{clear:'both'}}></div>
@@ -298,7 +298,8 @@ var localStyle= {
         ':hover': {textDecoration: 'none', backgroundColor:'#24aef8', color:'#fff'}
     },
     pageDirection: {
-        width: 20, height: 20, borderRadius: '50%', backgroundColor: '#DADADA', color: '#fff', display: 'inline-block', marginRight: 20, cursor: 'pointer'
+        width: 20, height: 20, borderRadius: '50%', backgroundColor: '#DADADA', color: '#fff', display: 'inline-block', marginRight: 20, cursor: 'pointer', textAlign: 'center', lineHeight: '20px',
+        ':hover': {color: '#fff', backgroundColor: '#24aef8'}
     }
 }
 function mapStateToProps(state) {
