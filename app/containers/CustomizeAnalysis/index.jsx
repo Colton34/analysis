@@ -46,6 +46,7 @@ var customBaseUrl = examPath + '/custom/analysis';
 class CustomizeAnalysis extends React.Component {
     constructor(props) {
         super(props);
+        this.generatingAnalysis = false;
     }
     componentDidMount(){
         // var existsExamList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList
@@ -82,6 +83,8 @@ class CustomizeAnalysis extends React.Component {
         }
     }
     onGenerateAnalysis() {
+        if (this.generatingAnalysis === true) return;
+        this.generatingAnalysis = true;
         var resultSet = Map.isMap(this.props.resultSet) ? this.props.resultSet.toJS() : this.props.resultSet;
         for (var subjectName in resultSet) {
             var newSQM = this.deleteStudentFromSQM(resultSet[subjectName])
@@ -103,6 +106,7 @@ class CustomizeAnalysis extends React.Component {
             browserHistory.push('/dashboard?examid=' + res.data.examId);
         }).catch(function(err) {
             console.log('自定义分析创建失败：', err);
+            this.generatingAnalysis = false;
         });
     }
 
