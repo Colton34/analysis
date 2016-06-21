@@ -8,7 +8,7 @@ import {List} from 'immutable';
 
 import {initHomeAction} from '../../reducers/home/actions';
 import {initParams} from '../../lib/util';
-import {FROM_FLAG as fromFlag} from '../../lib/constants';
+import {FROM_FLAG as fromFlag, FROM_CUSTOM_TEXT} from '../../lib/constants';
 
 import styles from './Home.css';
 import _ from 'lodash';
@@ -132,7 +132,9 @@ class ExamItem extends React.Component {
                             <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>创建时间: {item.eventTime}</span>
                             <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
                             <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
-                            <span style={_.assign({},{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }, fromFlag[item['from']] === '自定义' ? {color: '#77bfef'}: {})}>来自：{fromFlag[item['from']]}</span>
+                            <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>
+                                来自：<span style={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? {color: '#77bfef'}: {}}>{fromFlag[item['from']]}</span>
+                            </span>
                         </div>
                         <a href={'/dashboard?examid=' + examid + '&grade=' + encodeURI(item.grade)} style={localStyle.linkAnalysisBtn}>
                             查看分析
