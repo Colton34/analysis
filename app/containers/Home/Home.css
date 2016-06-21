@@ -18,8 +18,7 @@
 .title {
     font-size: 16px;
     font-weight: bold;
-    border-bottom:  1px solid #bfbfbf;
-    padding: 40px 0 20px 0;
+    padding: 20px 0 10px 0;
 }
 
 .thumbup {
@@ -36,4 +35,20 @@
      margin-top: 10px; 
      padding-left: 15px; 
      line-height: 23px; 
+}
+
+.banner-img {
+    background-image: url(../../images/fx_banner.png);
+    background-size: contain;
+    width: 880px;
+    height: 80px;
+    display: block;
+}
+
+.video-img {
+   background-image: url(../../images/fxVideoLink.png);
+    background-size: contain;
+    width: 230px;
+    height: 170px;
+    display: block; 
 }

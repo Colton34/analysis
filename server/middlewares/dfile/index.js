@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 22:24:46
+* @Last Modified time: 2016-06-21 12:58:50
 */
 
 'use strict';
@@ -67,6 +67,14 @@ exports.downloadExamTmp = function(req, res, next) {
     var fileUrl = path.join(fileDir, filename);
     res.download(fileUrl, filename);
 }
+
+exports.downloadExamGuide = function(req, res, next) {
+    var fileDir = path.join(__dirname, '../../../public/files');
+    var filename = '自定义分析操作说明书.pdf';
+    var fileUrl = path.join(fileDir, filename);
+    res.download(fileUrl, filename);
+}
+
 
 /*
 注意：原来这里是区分联考的，这里暂时没有联考的逻辑--因为没有在auth后的user信息中看到。

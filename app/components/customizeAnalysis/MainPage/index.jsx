@@ -7,7 +7,7 @@
 import React from 'react';
 import ownClassNames from './mainPage.css';
 import _ from 'lodash';
-
+import {saveAs} from '../../../lib/util';
 /**
  * props:
  * analysisName: 自定义分析名称
@@ -34,6 +34,10 @@ class MainPage extends React.Component {
 
         this.props.onDelSubject(subjectName);
     }
+    downloadGuidePDF() {
+        var path = '/file/download/guide';
+        saveAs(window.request.defaults.baseURL+path);
+    }
     render() {
         var { resultSet, analysisName} = this.props;
 
@@ -43,7 +47,7 @@ class MainPage extends React.Component {
                 <div style={{ padding: '20px 30px' }}>
                     <span className={ownClassNames["content-tips"]}>
                         创建自定义分析，可以满足学校个性化数据的分析， 根据学校自己的情况，选择相关的考试科目、题、以及学校，自由组合进行相关分析。完成以下的步骤，就可以查看分析结果啦，快去试试吧！同时你可以
-                        <a href='javascript:void(0)'style={{ color: '#54bde7' }}>查看示例</a>
+                        <a onClick={this.downloadGuidePDF.bind(this)} href='javascript:void(0)'style={{ color: '#54bde7' }}>查看示例</a>
                     </span>
                     <div style={{ margin: '20px 0' }}>
                         <label className={ownClassNames.label}>分析名称</label>
@@ -91,8 +95,6 @@ class MainPage extends React.Component {
                                         </tbody>
                                     </table>
                                     <button onClick={this.props.onGenerateAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>生成报表</button>
-
-                                    <button onClick={this.props.onDeleteAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>删除报表</button>
                                 </div>
                             )
                     }
@@ -106,4 +108,9 @@ class MainPage extends React.Component {
                     <span className={ownClassNames['header-back']} >返回</span>
                     <span className={ownClassNames['header-title']}>自定义分析</span>
                 </div>*/
+
+/*
+                                    <button onClick={this.props.onDeleteAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']}>删除报表</button>
+
+ */
 export default MainPage;

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:25:26
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 15:45:20
+* @Last Modified time: 2016-06-21 12:57:04
 */
 
 'use strict';
@@ -25,6 +25,7 @@ router.get('/download/school/report', dfile.downloadSchoolReport);
 router.delete('/rm/school/report', dfile.rmSchoolReport);
 
 router.get('/download/tpl', dfile.downloadExamTmp);
+router.get('/download/guide', dfile.downloadExamGuide);
 //注意 upload.single('xxx')中的xxx一定要和上传的表单中的filename一致！！！（不一定是file的origianl filename，一定要是上传的
 //filename）
 router.post('/import/exam/data', upload.single('importData'), dfile.importExamData);

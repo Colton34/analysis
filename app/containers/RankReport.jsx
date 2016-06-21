@@ -12,6 +12,8 @@ import {DropdownButton, Button, Table as BootTable, Pagination, MenuItem} from '
 import commonStyle from '../common/common.css';
 import Spinkit from '../common/Spinkit';
 
+import {tableExport} from '../lib/tableExporter';
+
 var headerMapper = {
     kaohao: '考号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '排名', classRank: '班级排名', score: '分数'
 }
@@ -39,7 +41,6 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
     // <table style={{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', overflow: 'scroll', width: '100%'}}>
     return (
         <div>
-        <h4 onClick={downloadTable}>点击导出Table</h4>
          <BootTable id="rankTable" striped bordered condensed hover responsive style={{overflowX: 'scroll'}}>
             <thead>
                 <tr style={{ backgroundColor: '#f4faee' }}>
@@ -434,7 +435,16 @@ class RankReportTableView extends React.Component {
         })
     }
     downloadTable() {
+        // console.log('downloadTable');
+        // console.log($("#rankTable"));
+        // debugger;
+        // var newJquery = tableExport($);
 
+        $.fn.extend({tableExport: tableExport});
+        // console.log($.fn);
+        // console.log($("#rankTable"));
+        $('#rankTable').tableExport({type:'excel', escape:'false'});
+        // debugger;
     }
     render() {
         var {examInfo} = this.props;
@@ -494,7 +504,7 @@ class RankReportTableView extends React.Component {
                             })
                         }
                         </DropdownButton>
-                        <Button style={{ margin: '0 2px' }}>下载</Button>
+                        <Button onClick={this.downloadTable.bind(this)} style={{ margin: '0 2px' }}>下载</Button>
                     </div>
                 </div>
                 <Table

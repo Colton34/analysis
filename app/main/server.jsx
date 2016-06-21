@@ -62,9 +62,6 @@ function renderFullPage(renderedContent, initialState, head={
     + scripts +
     `
         <script type="text/javascript" charset="utf-8" src="/assets/app.js"></script>
-        <script type="text/javascript" charset="utf-8" src="/js/jquery-3.0.0.min.js"></script>
-        <script type="text/javascript" charset="utf-8" src="/js/tableExport.js"></script>
-        <script type="text/javascript" charset="utf-8" src="/js/jquery.base64.new.js"></script>
         </body>
         </html>
     `;
