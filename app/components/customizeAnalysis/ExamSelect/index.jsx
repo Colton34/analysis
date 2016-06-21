@@ -34,6 +34,7 @@ import ownClassNames from './examSelect.css';
 var {Header, Title, Body, Footer} = Modal;
 
 var FileUpload = require('../../../common/FileUpload');
+import {FROM_YUJUAN_TEXT, FROM_CUSTOM_TEXT} from '../../../lib/constants';
 
 var examList = [
     {
@@ -178,11 +179,15 @@ class ExamSelect extends React.Component {
     }
 
     // 选中某个考试科目时载入该科目的数据；
-    onSelectPaper(event) {
+    onSelectPaper(exam, event) {
         //对所选择的paper加是不是和当前所有的paper都是同属于一个年级的校验！思路--进入到选择考试页后，一旦开始选择了一个，则设置currentGrade，然后再
         //选择其他的paper的时候，比对paper.grade和currentGrade是不是一样，不一样则给错误提示。如果选择的paper都清空了，则currentGrade也清空，从而能修改设置
         //新的年级~注意：年级是针对exam的，而这里一次选择只是针对一个科目的（一个科目肯定要保证所勾选的是同一年级），但是不同科目同样也要保证是同一年级！所以这个
         //currentGrade应该是resultSet里的一个直属属性--它指代了resultSet中所有分析的科目都是来自同一年级。
+
+// console.log(exam);
+// console.log(event);
+// debugger;
 
         //对一个paper的checkbox交互，判断是增加还是减少，执行相应的action，从而执行相应的更新操作
         var checked = event.target.checked;
@@ -192,7 +197,8 @@ class ExamSelect extends React.Component {
             var $target = $(event.target);
             var $parent = $target.parents('.exam-item');
             var examName = $parent.find('.exam-name').text();
-            var paperFrom = $parent.find('.paper-from').text() === '自定义' ? PAPER_FROM.upload : PAPER_FROM.system;
+            //TODO: @阿甘，bug: $parent.find('.paper-from').text() 这个条件不能表示是否是upload！
+            var paperFrom = $parent.find('.paper-from').text() === FROM_CUSTOM_TEXT ? PAPER_FROM.upload : PAPER_FROM.system;
             var paperName = $target.data('subject');
             var paperGrade = $target.data('grade');
 
@@ -220,7 +226,11 @@ class ExamSelect extends React.Component {
                     }
                 }
             }
+
+            var isFromCustom = (exam.from === 40);
             var paperInfo = {
+                isFromCustom: isFromCustom,
+                examId: exam.id,
                 from: paperFrom,
                 paperId: paperId,
                 examName: examName,
@@ -407,7 +417,7 @@ class ExamSelect extends React.Component {
                                                             <li key={'subject-' + index} className={ownClassNames['subject-li']}>
                                                                 <div className={ownClassNames['checkbox']}>
                                                                     <input id={'checkbox-subject-' + index} type='checkbox' value={paper.id} data-subject={paper.subject} data-grade={exam.grade}
-                                                                        onChange={this.onSelectPaper.bind(this) }checked={paperIds.indexOf(paper.id) !== -1 ? true : false}/>
+                                                                        onChange={this.onSelectPaper.bind(this, exam) }checked={paperIds.indexOf(paper.id) !== -1 ? true : false}/>
                                                                     <label for={'checkbox-subject-' + index}/>
                                                                     <span>{paper.subject}</span>
                                                                 </div>

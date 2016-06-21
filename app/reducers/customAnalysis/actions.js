@@ -2,14 +2,14 @@
 * @Author: HellMagic
 * @Date:   2016-05-30 18:32:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-31 13:58:14
+* @Last Modified time: 2016-06-21 09:23:48
 */
 
 'use strict';
 
 
 import {
-    ADD_PAPER_INFO, ADD_PAPER_INFO_SUCCESS, SUBTRACT_PAPER_INFO, 
+    ADD_PAPER_INFO, ADD_PAPER_INFO_SUCCESS, SUBTRACT_PAPER_INFO,
     CHECK_ALL_QUESTION, CHECK_ONE_QUESTION, SET_PAPER_SQM,
     SET_MERGED_SQM, CHANGE_QUESTION_NAME, SET_GROUP_MAP,
     SET_PAGE_INDEX, SAVE_CURRENT_SUBJECT, SET_ANALYSIS_NAME,
@@ -19,11 +19,12 @@ import {
 import {fetchPaper} from '../../api/exam';
 import {initParams} from '../../lib/util';
 
+//在选择的地方知道是不是custom的，告诉到这里。这里再告诉给请求API的地方，然后那个地方再带着query去告诉server api
 export function addPaperInfoAction(papersCache, paperInfo) {
     var targetPaperId = paperInfo.paperId;
-    var params = initParams({}, {}, { 'request': window.request, pid: targetPaperId });
-    return papersCache[targetPaperId] ? 
-            { type: ADD_PAPER_INFO_SUCCESS, res: papersCache[targetPaperId], isCached: true, paperInfo: paperInfo} : 
+    var params = initParams({}, {}, { 'request': window.request, pid: targetPaperId, examId: paperInfo.examId, isFromCustom: paperInfo.isFromCustom });
+    return papersCache[targetPaperId] ?
+            { type: ADD_PAPER_INFO_SUCCESS, res: papersCache[targetPaperId], isCached: true, paperInfo: paperInfo} :
             { type: ADD_PAPER_INFO, promise: fetchPaper(params),  paperInfo: paperInfo};
 }
 
@@ -103,14 +104,14 @@ export function setAnalysisNameAction(name) {
 
 export function setCreateStatusAction() {
     return {
-        type: SET_CREATE_STATUS 
+        type: SET_CREATE_STATUS
     }
 }
 
 export function editSubjectAction(subjectName) {
     return {
         type: EDIT_SUBJECT,
-        subjectName: subjectName 
+        subjectName: subjectName
     }
 }
 
@@ -125,7 +126,7 @@ export function changeCurrentSubjectNameAction (subjectName) {
     return {
         type: CHANGE_CURRENT_SUBJECT_NAME,
         subjectName: subjectName
-    }   
+    }
 }
 
 export function discardCurrentSubjectAction() {
