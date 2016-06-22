@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
-* @Last Modified by:   liucong
-* @Last Modified time: 2016-06-20 18:27:15
+* @Last Modified by:   HellMagic
+* @Last Modified time: 2016-06-22 13:24:43
 */
 
 'use strict';
@@ -479,6 +479,7 @@ exports.customDashboard = function(req, res, next) {
 function customExamInfoGuide(examInfo) {
     return {
         name: examInfo.name,
+        from: examInfo.from,
         subjectCount: examInfo['[subjects]'].length,
         realClassesCount: examInfo['[realClasses]'].length,
         realStudentsCount: examInfo.realStudentsCount,
@@ -490,6 +491,7 @@ function customExamInfoGuide(examInfo) {
 function examInfoGuide(exam) {
     return {
         name: exam.name,
+        from: exam.from,
         subjectCount: exam['[papers]'].length,
         realClassesCount: exam.realClasses.length,
         realStudentsCount: exam.realStudentsCount,
