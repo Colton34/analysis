@@ -50,6 +50,7 @@
 
 .fx-btn2 {
     min-width: 86px;
+    min-height: 32px;
     background-color: #FFFFFF;
     border-radius: 2px;
     border: 1px solid;

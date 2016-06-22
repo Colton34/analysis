@@ -456,14 +456,14 @@ class ExamSelect extends React.Component {
                         </div>
                     </div>
                     <div className={'col-md-7'}>
-                        <div style={{ marginBottom: 20 }}>
+                        <div style={{ marginBottom: 20, position: 'relative'}}>
                             {
                                 this.props.isLiankao ?
-                                    <button onClick={this.downloadTPL.bind(this, true)} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载联考导入模板</button>
-                                    : <button onClick={this.downloadTPL.bind(this, false)} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载校考导入模板</button>
+                                    <button style={{position: 'absolute', top: 0}} onClick={this.downloadTPL.bind(this, true)} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载联考导入模板</button>
+                                    : <button style={{position: 'absolute', top: 0}} onClick={this.downloadTPL.bind(this, false)} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>下载校考导入模板</button>
                             }
-                            <FileUpload options={options}>
-                                <button ref="chooseAndUpload" className={ownClassNames['fileUpload'] + ' ' + ownClassNames['fx-btn'] + ' ' + ownClassNames['fx-btn-primary']} style={{ fontSize: 12 }}>
+                            <FileUpload options={options} style={{display: 'inline-block'}}>
+                                <button ref="chooseAndUpload" className={ownClassNames['fileUpload'] + ' ' + ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn-primary']} style={{ fontSize: 12, marginLeft: 125}}>
                                     导入线下考试数据
                                 </button>
                             </FileUpload>
