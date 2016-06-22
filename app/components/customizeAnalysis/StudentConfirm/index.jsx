@@ -25,21 +25,19 @@ class StudentConfirm extends React.Component {
         super(props);
         var {groupMap} = this.props.currentSubject;
         this.state = {
-            groupMap: _.isEmpty(groupMap) ? this.getGroupMap() : groupMap,
+            groupMap: _.isEmpty(groupMap) ? this.getGroupMap(this.props.currentSubject) : groupMap,
             showDialog: false
         }
     }
     componentWillReceiveProps(nextProps) {
-        debugger
-        var {groupMap} = nextProps.currentSubject;
-        this.state = {
-            groupMap: this.getGroupMap()
-        }
+        this.setState({
+            groupMap: this.getGroupMap(nextProps.currentSubject)
+        })
     }
-    getGroupMap() {
+    getGroupMap(currentSubject) {
         //var {examInfos} = this.props.currentSubject;
         //fixme: 获取examinfos的方法
-        var studentInfos = this.props.currentSubject.SQM.y;
+        var studentInfos = currentSubject.SQM.y;
         var groupMap = {};
         var isLiankao = studentInfos[0].school ? true : false;
         _.forEach(studentInfos, (student) => {
