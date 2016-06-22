@@ -185,10 +185,10 @@ class StudentConfirm extends React.Component {
                             <span className={ownClassNames['stats']}>{this.getStudentNum()}</span>
                             人
                         </span>
-                        <FileUpload options={options}>
-                            <button ref="chooseAndUpload" className={ownClassNames['export-btn']}>导入考生数据</button>
+                        <FileUpload options={options} style={{display: 'inline-block', float: 'right'}}>
+                            <button ref="chooseAndUpload" className={ownClassNames['upload-btn']}>上传考生数据</button>
                         </FileUpload>
-                        <button onClick={this.exportExamStudent.bind(this, this.props.currentSubject)} className={ownClassNames['export-btn']}>导出考生数据</button>
+                        <button style={{display: 'inline-block'}}onClick={this.exportExamStudent.bind(this, this.props.currentSubject)} className={ownClassNames['export-btn']}>导出考生数据</button>
                     </div>
 
                     <div class="clearfix">
