@@ -35,6 +35,7 @@ var {Header, Title, Body, Footer} = Modal;
 
 var FileUpload = require('../../../common/FileUpload');
 import {FROM_YUJUAN_TEXT, FROM_CUSTOM_TEXT, PAPER_ORIGIN} from '../../../lib/constants';
+import InfoDialog from '../../../common/InfoDialog';
 
 var examList = [
     {
@@ -154,7 +155,10 @@ class ExamSelect extends React.Component {
             }
         })
         if (legalSQMs.length === 0) {
-            alert('请先选择考试题目');
+            this.setState({
+                showInfoDialog: true,
+                infoDialogMsg: '请先选择考试题目' 
+            })
         } else if (legalSQMs.length === 1) {
             this.setState({
                 sqmMap: sqmMap
@@ -174,7 +178,7 @@ class ExamSelect extends React.Component {
         //在doMerge方法中调用this.props.onNextPage()
     }
 
-    // 选中某个考试科目时载入该科目的数据；
+    // 选中某个请先选择考试题目请先选择考试题目时载入该科目的数据；
     onSelectPaper(exam, event) {
         //对所选择的paper加是不是和当前所有的paper都是同属于一个年级的校验！思路--进入到选择考试页后，一旦开始选择了一个，则设置currentGrade，然后再
         //选择其他的paper的时候，比对paper.grade和currentGrade是不是一样，不一样则给错误提示。如果选择的paper都清空了，则currentGrade也清空，从而能修改设置
@@ -582,16 +586,7 @@ class Dialog extends React.Component {
         )
     }
 }
-const InfoDialog = ({content, show,onHide}) => {
-    return (
-        <Modal show={ show } onHide={onHide} bsSize='sm'>
-            <Header closeButton={true} style={{fontWeight: 'bold', textAlign: 'center'}}>提示</Header>
-            <Body style={{textAlign:'center'}}>
-                {content}
-            </Body>
-    </Modal>
-    )
-}
+
 
 let localStyle = {
     btn: {
