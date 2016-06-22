@@ -25,6 +25,8 @@ import {Map, List} from 'immutable';
 import dashboardStyle from '../components/dashboard/dashboard.css';
 import Spinkit from '../common/Spinkit';
 import { Modal } from 'react-bootstrap';
+import {FROM_FLAG, FROM_CUSTOM_TEXT} from '../lib/constants';
+
 var {Header, Title, Body, Footer} = Modal;
 
 var examPath = "/exam";
@@ -117,7 +119,6 @@ class Dashboard extends React.Component {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) return;
         var grade = this.props.location.query.grade ? encodeURI(this.props.location.query.grade) : '';
-
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
             (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0) || this.state.loading)
             return (
@@ -131,7 +132,9 @@ class Dashboard extends React.Component {
                     <a href='/' style={styles.dashboardTitleName}>
                         {'<'} {examInfoGuide.name}
                     </a>
-                    <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>删除</a> 
+                    {
+                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>删除</a> : ''  
+                    }                     
                 </div>
                 <div style={[styles.box, styles.common.radius]}>
                     <div style={[styles.container, styles.common.radius]}>
