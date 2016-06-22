@@ -88,6 +88,10 @@
     line-height: 30px;
 }
 
+.fx-btn-disabled {
+    background-color: #f2f2f2;
+    color: #c2c2c2;
+}
 .edit-btn {
     color: #6C737A;
     margin-right: 10px;
