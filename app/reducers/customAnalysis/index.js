@@ -60,7 +60,7 @@ export default function reducer(state, action) {
         case SUBTRACT_PAPER_INFO:
             var nextState = state.setIn(['currentSubject','src'], state.getIn(['currentSubject','src']).delete(action.pid));
             if (nextState.getIn(['currentSubject','src']).size === 0) {
-                nextState.setIn(['currentSubject', 'grade'], '');
+                nextState = nextState.setIn(['currentSubject', 'grade'], '');
             }
             return nextState;
         case CHECK_ALL_QUESTION: 
