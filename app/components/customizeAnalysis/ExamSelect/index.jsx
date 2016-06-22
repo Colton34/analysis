@@ -110,6 +110,7 @@ class ExamSelect extends React.Component {
     onNextPage() {
        var currentPapers = this.props.currentSubject.src;
         var sqmMap = {};
+        
         for (var paperId in currentPapers) {
             var currentPaper = currentPapers[paperId];
             var {examName, paperName} = currentPaper;
@@ -352,7 +353,7 @@ class ExamSelect extends React.Component {
 
     onDelUploadPaper(event) {
         var paperId = $(event.target).data('paperid');
-        this.props.subtractPaperInfo(paperId);
+        this.props.subtractPaperInfo(paperId + '');
     }
     render() {
         //var selectedExams = Object.keys(this.state.selectedExamInfos);

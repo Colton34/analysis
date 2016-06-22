@@ -59,7 +59,7 @@ export default function reducer(state, action) {
             return nextState;
         case SUBTRACT_PAPER_INFO:
             var nextState = state.setIn(['currentSubject','src'], state.getIn(['currentSubject','src']).delete(action.pid));
-            if (_.keys(nextState.getIn(['currentSubject','src'])).length === 0) {
+            if (nextState.getIn(['currentSubject','src']).size === 0) {
                 nextState.setIn(['currentSubject', 'grade'], '');
             }
             return nextState;
@@ -92,11 +92,6 @@ export default function reducer(state, action) {
         case SET_MERGED_SQM:
             var nextState = state.setIn(['currentSubject', 'SQM'], Map(action.mergedSqm));
             _.each(action.sqmMap, (sqm, pid) => {
-                if (Map.isMap(nextState.getIn(['currentSubject', 'src', pid]))) {
-                    console.log('pid:' + pid + ',values is a Map');
-                } else {
-                    console.log('pid:' + pid + ',values is not a Map');
-                }
                 nextState = nextState.setIn(['currentSubject', 'src', pid, 'SQM'], sqm);      
             })
             return nextState;   
