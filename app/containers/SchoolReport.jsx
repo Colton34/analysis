@@ -30,9 +30,9 @@ import {SUBJECTS_WEIGHT as subjectWeight} from '../lib/constants';
 import Spinkit from '../common/Spinkit';
 
 class SchoolReport extends React.Component {
-    // static need = [
-    //     initSchoolAnalysisAction
-    // ];
+    static need = [
+        initSchoolAnalysisAction
+    ];
 
     componentDidMount() {
         if (this.props.haveInit) return;
