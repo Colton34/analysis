@@ -9,23 +9,29 @@
 
 
 import {
+    PAPER_ORIGIN,
     ADD_PAPER_INFO, ADD_PAPER_INFO_SUCCESS, SUBTRACT_PAPER_INFO,
     CHECK_ALL_QUESTION, CHECK_ONE_QUESTION, SET_PAPER_SQM,
     SET_MERGED_SQM, CHANGE_QUESTION_NAME, SET_GROUP_MAP,
     SET_PAGE_INDEX, SAVE_CURRENT_SUBJECT, SET_ANALYSIS_NAME,
     SET_CREATE_STATUS, EDIT_SUBJECT, DELE_SUBJECT,
     CHANGE_CURRENT_SUBJECT_NAME, DISCARD_CURRENT_SUBJECT,
-    UPDATE_SUBJECT_SQM} from '../../lib/constants';
+    UPDATE_SUBJECT_SQM, SET_CURSUBJECT_SQM} from '../../lib/constants';
 import {fetchPaper} from '../../api/exam';
 import {initParams} from '../../lib/util';
 
 //在选择的地方知道是不是custom的，告诉到这里。这里再告诉给请求API的地方，然后那个地方再带着query去告诉server api
 export function addPaperInfoAction(papersCache, paperInfo) {
-    var targetPaperId = paperInfo.paperId;
-    var params = initParams({}, {}, { 'request': window.request, pid: targetPaperId, examId: paperInfo.examId, isFromCustom: paperInfo.isFromCustom });
-    return papersCache[targetPaperId] ?
-            { type: ADD_PAPER_INFO_SUCCESS, res: papersCache[targetPaperId], isCached: true, paperInfo: paperInfo} :
-            { type: ADD_PAPER_INFO, promise: fetchPaper(params),  paperInfo: paperInfo};
+    if (paperInfo.origin === PAPER_ORIGIN.upload) {
+        return { type: ADD_PAPER_INFO_SUCCESS, res: paperInfo.sqm, paperInfo: _.omit(paperInfo,'sqm')} 
+    } else {
+        var targetPaperId = paperInfo.paperId;
+        var params = initParams({}, {}, { 'request': window.request, pid: targetPaperId, examId: paperInfo.examId, isFromCustom: paperInfo.isFromCustom });
+        return papersCache[targetPaperId] ?
+            { type: ADD_PAPER_INFO_SUCCESS, res: papersCache[targetPaperId], isCached: true, paperInfo: paperInfo } :
+            { type: ADD_PAPER_INFO, promise: fetchPaper(params), paperInfo: paperInfo };
+    }
+    
 }
 
 export function subtractPaperInfoAction(pid) {
@@ -139,6 +145,13 @@ export function updateSubjectSqmAction(subjectName, newSqm) {
     return {
         type: UPDATE_SUBJECT_SQM,
         subjectName: subjectName,
+        newSqm: newSqm
+    }
+}
+
+export function setCurSubjectSqmAction(newSqm) {
+    return {
+        type: SET_CURSUBJECT_SQM,
         newSqm: newSqm
     }
 }

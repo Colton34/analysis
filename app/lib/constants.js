@@ -21,6 +21,11 @@ export const FROM_FLAG = {
     '1': FROM_YUJUAN_TEXT,
     '40': FROM_CUSTOM_TEXT
 };
+
+export const  PAPER_ORIGIN = {
+    system: 'system',
+    upload: 'upload'
+}
 //================= Dashboard ==========================
 
 export const INIT_DASHBOARD = 'INIT_DASHBOARD';
@@ -110,6 +115,7 @@ export const DELE_SUBJECT = 'DELE_SUBJECT';
 export const CHANGE_CURRENT_SUBJECT_NAME = 'CHANGE_CURRENT_SUBJECT_NAME';
 export const DISCARD_CURRENT_SUBJECT = 'DISCARD_CURRENT_SUBJECT';
 export const UPDATE_SUBJECT_SQM = 'UPDATE_SUBJECT_SQM';
+export const SET_CURSUBJECT_SQM = 'SET_CURSUBJECT_SQM';
 
 //===================== RankReport ===========================
 export const INIT_RANKREPORT = 'INIT_RANKREPORT';

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {Link, browserHistory} from 'react-router';
-import {Map,List} from 'immutable';
+import {Map, List} from 'immutable';
 
 import MainPage from '../../components/customizeAnalysis/MainPage';
 import SubjectInput from '../../components/customizeAnalysis/SubjectInput';
@@ -15,11 +15,11 @@ import Footer from '../../components/customizeAnalysis/Footer';
 
 import {initHomeAction} from '../../reducers/home/actions';
 import {changeQuesitonNameAction, setGroupMapAction, setPageIndexAction,
-        saveCurrentSubjectAction, setAnalysisNameAction, setCreateStatusAction,
-        editSubjectAction, delSubjectAction, changeCurrentSubjectNameAction,
-        discardCurrentSubjectAction, updateSubjectSqmAction} from '../../reducers/customAnalysis/actions';
+    saveCurrentSubjectAction, setAnalysisNameAction, setCreateStatusAction,
+    editSubjectAction, delSubjectAction, changeCurrentSubjectNameAction,
+    discardCurrentSubjectAction, updateSubjectSqmAction, setCurSubjectSqmAction} from '../../reducers/customAnalysis/actions';
 import {initParams} from '../../lib/util';
-import {NEXT_PAGE,PREV_PAGE} from '../../lib/constants';
+import {NEXT_PAGE, PREV_PAGE} from '../../lib/constants';
 import matrixBase from '../../lib/matrixBase';
 import { Modal } from 'react-bootstrap';
 var {Header, Title, Body} = Modal;
@@ -51,14 +51,14 @@ class CustomizeAnalysis extends React.Component {
         this.state = {
             generatingAnalysis: false,
             showDialog: false,
-            dialogMsg : ''
+            dialogMsg: ''
         }
     }
-    componentDidMount(){
+    componentDidMount() {
         // var existsExamList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList
-        if(this.props.examList.size === 0) {
+        if (this.props.examList.size === 0) {
             console.log('============ should init home');
-            var params = initParams(this.props.params, this.props.location, {'request': window.request});
+            var params = initParams(this.props.params, this.props.location, { 'request': window.request });
             this.props.initHome(params);
         }
     }
@@ -94,7 +94,7 @@ class CustomizeAnalysis extends React.Component {
                 showDialog: true,
                 dialogMsg: '请输入自定义分析名称'
             })
-            return ;
+            return;
         }
         if (this.isDuplicateAnalysisName()) {
             this.setState({
@@ -122,16 +122,16 @@ class CustomizeAnalysis extends React.Component {
         //     console.log('textStatus = ', textStatus);
         //     console.log('data = ', data);
         // });
-        params.request.post(customBaseUrl, {data: postData}).then(function(res) {
+        params.request.post(customBaseUrl, { data: postData }).then(function (res) {
             //创建成功后进入到此分析的Dashboard
             browserHistory.push('/dashboard?examid=' + res.data.examId);
-        }).catch(function(err) {
+        }).catch(function (err) {
             console.log('自定义分析创建失败：', err);
             this.generatingAnalysis = false;
         });
     }
 
-    deleteStudentFromSQM(subject){
+    deleteStudentFromSQM(subject) {
         var result = subject.SQM;
         if (subject.groupMap) {
             var students = this.map2Students(subject.groupMap);
@@ -157,8 +157,8 @@ class CustomizeAnalysis extends React.Component {
         })
     }
     isDuplicateAnalysisName() {
-        for(var seq in this.props.examList) {
-            for(var examSeq in this.props.examList[seq].values) {
+        for (var seq in this.props.examList) {
+            for (var examSeq in this.props.examList[seq].values) {
                 if (this.props.analysisName === this.props.examList[seq].values[examSeq].examName)
                     return true;
             }
@@ -190,7 +190,7 @@ class CustomizeAnalysis extends React.Component {
                         changeToCreateStatus={this.props.setCreateStatus}
                         onEditSubject={this.props.onEditSubject}
                         onDelSubject={this.props.onDelSubject}
-                        onGenerateAnalysis={this.onGenerateAnalysis.bind(this)}
+                        onGenerateAnalysis={this.onGenerateAnalysis.bind(this) }
                         isGenerating={this.state.generatingAnalysis}
                         />
                 }
@@ -198,9 +198,9 @@ class CustomizeAnalysis extends React.Component {
                     status === 'create' && pageIndex === 0 &&
                     <SubjectInput
                         onNextPage={this.onNextPage.bind(this) }
-                        subjectList={Object.keys(resultSet)}
+                        subjectList={Object.keys(resultSet) }
                         currentSubject={currentSubject}
-                        changeCurrentSubjectName={this.changeCurrentSubjectName.bind(this)}
+                        changeCurrentSubjectName={this.changeCurrentSubjectName.bind(this) }
                         pageIndex={pageIndex} />
 
                 }
@@ -237,22 +237,23 @@ class CustomizeAnalysis extends React.Component {
                         onPrevPage={this.onPrevPage.bind(this) }
                         onNextPage={this.onNextPage.bind(this) }
                         onChangeGroupMap={this.props.setGroupMap}
-                        currentSubject={currentSubject} />
+                        currentSubject={currentSubject}
+                        setCurSubjectSqm={this.props.setCurSubjectSqm}/>
                 }
-                <InfoDialog content={this.state.dialogMsg} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} />
+                <InfoDialog content={this.state.dialogMsg} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) } />
             </div>
         )
     }
 }
 
-const InfoDialog = ({content, show,onHide}) => {
+const InfoDialog = ({content, show, onHide}) => {
     return (
         <Modal show={ show } onHide={onHide} bsSize='sm'>
-            <Header closeButton={true} style={{fontWeight: 'bold', textAlign: 'center'}}>提示</Header>
-            <Body style={{textAlign:'center'}}>
+            <Header closeButton={true} style={{ fontWeight: 'bold', textAlign: 'center' }}>提示</Header>
+            <Body style={{ textAlign: 'center' }}>
                 {content}
             </Body>
-    </Modal>
+        </Modal>
     )
 }
 
@@ -282,7 +283,8 @@ function mapDispatchToProps(dispatch) {
         onDelSubject: bindActionCreators(delSubjectAction, dispatch),
         changeCurrentSubjectName: bindActionCreators(changeCurrentSubjectNameAction, dispatch),
         discardCurrentSubject: bindActionCreators(discardCurrentSubjectAction, dispatch),
-        updateSubjectSqm: bindActionCreators(updateSubjectSqmAction, dispatch)
+        updateSubjectSqm: bindActionCreators(updateSubjectSqmAction, dispatch),
+        setCurSubjectSqm: bindActionCreators(setCurSubjectSqmAction, dispatch)
     }
 }
 
@@ -347,33 +349,33 @@ function makeExamSchema(resultSet, analysisName) {
 }
 
 function makeExamInfo(resultSet, analysisName) {
-/*
-
-    name:  ??
-    gradeName: -- 暂时先不填写 -- TODO: 给examInfo添加gradeName
-    startTime:  --post存入的时间
-    realClasses:
-    lostClasses:
-    realStudentsCount:
-    lostStudentsCount:
-    subjects:
-    fullMark:
-
-*/
+    /*
+    
+        name:  ??
+        gradeName: -- 暂时先不填写 -- TODO: 给examInfo添加gradeName
+        startTime:  --post存入的时间
+        realClasses:
+        lostClasses:
+        realStudentsCount:
+        lostStudentsCount:
+        subjects:
+        fullMark:
+    
+    */
     var subjects = _.keys(resultSet);
     //fullMark=所有科目中所有选中的小题的积分和
     var fullMark = _.sum(_.map(resultSet, (item, subjectName) => {
         var sqmItem = item.SQM;
-        if(!sqmItem) return;
+        if (!sqmItem) return;
         return _.sum(_.map(sqmItem.x, (questionObj) => questionObj.score));
     }));
 
     var realClasses = [], realStudentsCount = 0;
     _.each(resultSet, (item, subjectName) => {
         var groupMapItem = item.groupMap;
-        if(!groupMapItem) return;
+        if (!groupMapItem) return;
         var selectedClasses = _.map(_.filter(groupMapItem, (obj, className) => obj.status == 'inUse'), (classObj, index) => classObj.name);
-        var newAddClasses = _.difference(selectedClasses ,realClasses);
+        var newAddClasses = _.difference(selectedClasses, realClasses);
         realStudentsCount += _.sum(_.map(newAddClasses, (className) => groupMapItem[className].count));
         realClasses = _.concat(realClasses, newAddClasses);
     });
@@ -394,44 +396,44 @@ function makeExamInfo(resultSet, analysisName) {
 }
 
 function makeExamStudentsInfo(resultSet, subjectsIdArr) {
-/*
-
-examStudentsInfo
-[
-    {
-        id:
-        name:
-        class:
-        score:
-        papers: [
-            {paperid: , score: }
-        ]
-    },
-    ...
-]
-*/
+    /*
+    
+    examStudentsInfo
+    [
+        {
+            id:
+            name:
+            class:
+            score:
+            papers: [
+                {paperid: , score: }
+            ]
+        },
+        ...
+    ]
+    */
 
     var studentsInfoMap = {};
     _.each(resultSet, (item, subjectName) => {
         var sqmItem = item.SQM;
-        if(!sqmItem) return;
+        if (!sqmItem) return;
         var questions = sqmItem.x, students = sqmItem.y, matrix = sqmItem.m;
         var studentsPaperScore = _.map(matrix, (questionScoresArr) => _.sum(questionScoresArr));
         //一个科目： {_count: , class: , id: , kaohao: , name: , score: }
         _.each(sqmItem.y, (studentObj, index) => {
             var obj = studentsInfoMap[studentObj.id];
-            if(!obj) {
+            if (!obj) {
                 obj = _.assign(_.pick(studentObj, ['class', 'id', 'kaohao', 'name']), { "[papers]": [] });
                 studentsInfoMap[studentObj.id] = obj;
             }
             var ids = _.find(subjectsIdArr, (obj) => obj.subject == subjectName);
-            obj["[papers]"].push({paperid: ids.id, score: studentsPaperScore[index]});
+            obj["[papers]"].push({ paperid: ids.id, score: studentsPaperScore[index] });
         });
     });
     //给所有的学生添加总分信息
     return _.map(studentsInfoMap, (studentObj, studentId) => {
         var totalScore = _.sum(_.map(studentObj["[papers]"], (paperObj) => paperObj.score));
-        return _.assign(studentObj, {score: totalScore});
+        return _.assign(studentObj, { score: totalScore });
     });
 }
 
@@ -439,7 +441,7 @@ function makeExamPapersInfo(resultSet, subjectsIdArr) {
     //TODO: 在这里给papersInfo中的每一个paper对象添加grade属性。Schema已经修改过了。
     var result = _.map(resultSet, (item, subjectName) => {
         var sqmItem = item.SQM;
-        if(!sqmItem) return;
+        if (!sqmItem) return;
         var questions = sqmItem.x, students = sqmItem.y, matrix = sqmItem.m;
         var obj = _.find(subjectsIdArr, (sobj) => sobj.subject == subjectName);    //_.pick(item, ['id', 'paper', 'subject']);   //id是pid，paper是ObjectId
         var fullMark = _.sum(_.map(questions, (questionObj) => questionObj.score));
@@ -449,49 +451,49 @@ function makeExamPapersInfo(resultSet, subjectsIdArr) {
         var classCountArr = _.map(realClassesArr, (classObj) => {
             return { name: classObj.name, count: classObj.count };
         });
-        return _.assign(obj, { grade: item.grade, fullMark: fullMark, "[questions]": questions, '[students]': students, matrix: matrix, "[realClasses]": realClasses, "[lostClasses]": [], realStudentsCount: realStudentsCount, lostStudentsCount: 0, "[class]": classCountArr});
+        return _.assign(obj, { grade: item.grade, fullMark: fullMark, "[questions]": questions, '[students]': students, matrix: matrix, "[realClasses]": realClasses, "[lostClasses]": [], realStudentsCount: realStudentsCount, lostStudentsCount: 0, "[class]": classCountArr });
     });
     return result;
-/*
-//虽然这里用到的数据结构是Map，但是因为存储的原因，只能存储数组，所以需要转换成数组。
-examPapersInfo
-{
-    <pid>: {
-        id:
-        paper:
-        subject:
-        fullMark:
-        questions:
-        realClasses:
-        lostClasses:
-        realStudentsCount:
-        lostStudentsCount:
-        class: {
-            <className>: <此科目此班级参加考试的人数>
-        }
-    },
-    ...
-}
-*/
+    /*
+    //虽然这里用到的数据结构是Map，但是因为存储的原因，只能存储数组，所以需要转换成数组。
+    examPapersInfo
+    {
+        <pid>: {
+            id:
+            paper:
+            subject:
+            fullMark:
+            questions:
+            realClasses:
+            lostClasses:
+            realStudentsCount:
+            lostStudentsCount:
+            class: {
+                <className>: <此科目此班级参加考试的人数>
+            }
+        },
+        ...
+    }
+    */
 }
 
 function makeExamClassesInfo(resultSet) {
-/*
-examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义（特别是对于统计计算，因为肯定是走哪个科目的这个班级的参加考试人数--这个在papersInfo的class中有）
-{
-    <className>: {
-        name:
-        students:
-        realStudentsCount:
-        losstStudentsCount:
+    /*
+    examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义（特别是对于统计计算，因为肯定是走哪个科目的这个班级的参加考试人数--这个在papersInfo的class中有）
+    {
+        <className>: {
+            name:
+            students:
+            realStudentsCount:
+            losstStudentsCount:
+        }
     }
-}
-
-*/
+    
+    */
     var result = [];
     _.each(resultSet, (item, subjectName) => {
         var groupMapItem = item.groupMap;
-        if(!groupMapItem) return;
+        if (!groupMapItem) return;
         var selectedClasses = _.map(_.filter(groupMapItem, (obj, className) => obj.status == 'inUse'), (classObj, index) => classObj.name);
         var newAddClasses = _.map(_.difference(selectedClasses, result), (className) => {
             return {

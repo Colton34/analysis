@@ -34,7 +34,7 @@ import ownClassNames from './examSelect.css';
 var {Header, Title, Body, Footer} = Modal;
 
 var FileUpload = require('../../../common/FileUpload');
-import {FROM_YUJUAN_TEXT, FROM_CUSTOM_TEXT} from '../../../lib/constants';
+import {FROM_YUJUAN_TEXT, FROM_CUSTOM_TEXT, PAPER_ORIGIN} from '../../../lib/constants';
 
 var examList = [
     {
@@ -67,11 +67,6 @@ var paperInfos = {
         y: [{ "name": "曾佳", "kaohao": "10210", "class": "2", "id": 3593903, "score": 100 }, { "name": "田雨灵", "kaohao": "10307", "class": "3", "id": 3593940, "score": 100 }, { "name": "梁家警", "kaohao": "10313", "class": "3", "id": 3593946, "score": 100 }, { "name": "罗治湘", "kaohao": "10609", "class": "6", "id": 3594065, "score": 100 }, { "name": "龚嘉欣", "kaohao": "10530", "class": "5", "id": 3594044, "score": 100 }],
         m: [[2, 2, 4, 1, 2], [3, 0, 7, 2, 2], [1, 2, 2, 2, 2], [2, 1, 7, 0, 2], [3, 2, 2, 2, 2]]
     }
-}
-
-var PAPER_FROM = {
-    system: 'sys',
-    upload: 'upload'
 }
 
 var MERGE_TYPE = {
@@ -197,41 +192,20 @@ class ExamSelect extends React.Component {
             var $target = $(event.target);
             var $parent = $target.parents('.exam-item');
             var examName = $parent.find('.exam-name').text();
-            //TODO: @阿甘，bug: $parent.find('.paper-from').text() 这个条件不能表示是否是upload！
-            var paperFrom = $parent.find('.paper-from').text() === FROM_CUSTOM_TEXT ? PAPER_FROM.upload : PAPER_FROM.system;
+            var paperOrigin = PAPER_ORIGIN.system;
             var paperName = $target.data('subject');
             var paperGrade = $target.data('grade');
 
-            //校验
-            var {currentSubject, resultSet} = this.props;
-            if (currentSubject.grade !== '' && currentSubject.grade !== paperGrade) {
-                //alert('请选择同一年级的考试');
-                this.setState({
-                    infoDialogMsg: '请选择同一年级的考试',
-                    showInfoDialog: true
-                })
-                return ;
-            }
-            if (_.keys(resultSet).length !== 0) {
-                for (var subjectName in resultSet) {
-                    if (resultSet[subjectName].grade !== paperGrade) {
-                        //alert('科目: ' + subjectName + ', 已选择年级：' + resultSet[subjectName].grade + ',请选择相同年级.');
-                        this.setState({
-                            infoDialogMsg: '科目: ' + subjectName + ', 已选择年级：' + resultSet[subjectName].grade + ',请选择相同年级.',
-                            showInfoDialog: true
-                        })
-                        return ;
-                    } else {
-                        break ;
-                    }
-                }
+            //校验是否同一年级
+            if (!this.isGradeValid(paperGrade)) {
+                return;
             }
 
             var isFromCustom = (exam.from === 40);
             var paperInfo = {
                 isFromCustom: isFromCustom,
                 examId: exam.id,
-                from: paperFrom,
+                origin: paperOrigin,
                 paperId: paperId,
                 examName: examName,
                 paperName: paperName,
@@ -351,6 +325,35 @@ class ExamSelect extends React.Component {
         saveAs(window.request.defaults.baseURL+path);
     }
 
+    isGradeValid(paperGrade) {
+        var {currentSubject, resultSet} = this.props;
+        if (currentSubject.grade !== '' && currentSubject.grade !== paperGrade) {
+            this.setState({
+                infoDialogMsg: '请选择同一年级的考试',
+                showInfoDialog: true
+            })
+            return false;
+        }
+        if (_.keys(resultSet).length !== 0) {
+            for (var subjectName in resultSet) {
+                if (resultSet[subjectName].grade !== paperGrade) {
+                    this.setState({
+                        infoDialogMsg: '科目: ' + subjectName + ', 已选择年级：' + resultSet[subjectName].grade + ',请选择相同年级.',
+                        showInfoDialog: true
+                    })
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+        return true;
+    }
+
+    onDelUploadPaper(event) {
+        var paperId = $(event.target).data('paperid');
+        this.props.subtractPaperInfo(paperId);
+    }
     render() {
         //var selectedExams = Object.keys(this.state.selectedExamInfos);
         var {currentSubject} = this.props;
@@ -358,7 +361,7 @@ class ExamSelect extends React.Component {
         var {examList} = this.state;
 
         var paperIds = Object.keys(currentPapers);
-
+        var _this = this;
         var options = {
             baseUrl : '/api/v1/file/import/exam/data',
             chooseAndUpload : true,
@@ -371,7 +374,26 @@ class ExamSelect extends React.Component {
             },
             uploadSuccess : function(resp){
                 /*通过mill找到对应的文件，删除对应tmpFile*/
-                console.log('upload success',resp);
+                // 检查是否同一年级
+                if (!_this.isGradeValid(resp.grade)) {
+                    return;
+                }
+                // 填充currentPaper
+                var paperInfo = {
+                    isFromCustom: false,
+                    origin: PAPER_ORIGIN.upload,
+                    paperId: _.now(),
+                    paperName: resp.subject,
+                    examName: '自定义考试数据',
+                    grade: resp.grade,
+                    sqm: resp.matrix
+                }
+                //为统一reducer处理
+                paperInfo.sqm.id = paperInfo.paperId;
+                var {papersCache} = _this.props;
+                papersCache = Map.isMap(papersCache) ? papersCache.toJS() : papersCache;
+                _this.props.addPaperInfo(papersCache, paperInfo);
+                console.log('upload success', resp);
             },
             uploadError : function(err){
                 console.log('Error: ', err);
@@ -464,6 +486,7 @@ class ExamSelect extends React.Component {
                                                     <label for={'checker-question-all-' + paperId}></label>
                                                     <span>全选</span>
                                                 </div>
+                                                {currentPapers[paperId].origin === PAPER_ORIGIN.upload ? <span style={localStyle.paperDelBtn} data-paperid={paperId} onClick={this.onDelUploadPaper.bind(this)}>删除</span>:''}
                                             </div>
                                             <div id={'qlist-' + paperId} style={{ overflow: 'auto' }}>
                                                 <ul>
@@ -594,6 +617,10 @@ let localStyle = {
             borderColor: '#56b5db',
             color: '#fff'
         }
+    },
+    paperDelBtn: {
+        float: 'right', minWidth: 10, fontSize: 12, lineHeight: '15px', height: 18, padding: '1px 1px 0 1px', borderColor: '#f16b4d', color: '#f16b4d',backgroundColor: '#fff',
+        borderRadius: 2, border: '1px solid', textAlign: 'center', display: 'inline-block', cursor: 'pointer'
     }
 }
 

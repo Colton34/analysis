@@ -15,6 +15,7 @@ import {Map} from 'immutable';
 var initialState = new InitialState;
 
 import {
+    PAPER_ORIGIN,
     ADD_PAPER_INFO_SUCCESS,
     SUBTRACT_PAPER_INFO,
     CHECK_ALL_QUESTION,
@@ -33,7 +34,8 @@ import {
     SET_PAGE_INDEX,
     CHANGE_CURRENT_SUBJECT_NAME,
     DISCARD_CURRENT_SUBJECT,
-    UPDATE_SUBJECT_SQM
+    UPDATE_SUBJECT_SQM,
+    SET_CURSUBJECT_SQM
 } from '../../lib/constants';
 
 export default function reducer(state, action) {
@@ -51,9 +53,9 @@ export default function reducer(state, action) {
                 if (state.getIn(['currentSubject', 'grade']) === '') {
                     nextState = state.setIn(['currentSubject', 'grade'], action.paperInfo.grade);
                 }
-                nextState = nextState.setIn(['currentSubject','src', action.res.id], Map(_.assign({}, {oriSQM: Map(action.res)}, action.paperInfo, {SQM: {}})));
+                nextState = nextState.setIn(['currentSubject','src', action.res.id + ''], Map(_.assign({}, {oriSQM: Map(action.res)}, action.paperInfo, {SQM: {}})));
             }
-            if(!action.isCached) nextState = nextState.setIn(['papersCache', action.res.id], action.res);
+            if(!action.isCached && action.paperInfo.origin === PAPER_ORIGIN.system) nextState = nextState.setIn(['papersCache', action.res.id], action.res);
             return nextState;
         case SUBTRACT_PAPER_INFO:
             var nextState = state.setIn(['currentSubject','src'], state.getIn(['currentSubject','src']).delete(action.pid));
@@ -90,6 +92,11 @@ export default function reducer(state, action) {
         case SET_MERGED_SQM:
             var nextState = state.setIn(['currentSubject', 'SQM'], Map(action.mergedSqm));
             _.each(action.sqmMap, (sqm, pid) => {
+                if (Map.isMap(nextState.getIn(['currentSubject', 'src', pid]))) {
+                    console.log('pid:' + pid + ',values is a Map');
+                } else {
+                    console.log('pid:' + pid + ',values is not a Map');
+                }
                 nextState = nextState.setIn(['currentSubject', 'src', pid, 'SQM'], sqm);      
             })
             return nextState;   
@@ -155,6 +162,8 @@ export default function reducer(state, action) {
         case UPDATE_SUBJECT_SQM:
             var nextState = state.setIn(['resultSet', action.subjectName, 'SQM'], action.newSqm);
             return nextState;
+        case SET_CURSUBJECT_SQM: 
+            return state.setIn(['currentSubject', 'SQM'], Map(action.newSqm));
     }
     return state;
 }

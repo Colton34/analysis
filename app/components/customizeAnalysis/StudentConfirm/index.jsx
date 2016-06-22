@@ -3,6 +3,8 @@ import ownClassNames from './studentConfirm.css';
 import _ from 'lodash';
 import Header from '../Header'
 import Footer from '../Footer';
+import matrixBase from '../../../lib/matrixBase';
+import InfoDialog from '../../../common/InfoDialog';
 
 var FileUpload = require('../../../common/FileUpload');
 
@@ -23,7 +25,15 @@ class StudentConfirm extends React.Component {
         super(props);
         var {groupMap} = this.props.currentSubject;
         this.state = {
-            groupMap: _.isEmpty(groupMap) ? this.getGroupMap() : groupMap
+            groupMap: _.isEmpty(groupMap) ? this.getGroupMap() : groupMap,
+            showDialog: false
+        }
+    }
+    componentWillReceiveProps(nextProps) {
+        debugger
+        var {groupMap} = nextProps.currentSubject;
+        this.state = {
+            groupMap: this.getGroupMap()
         }
     }
     getGroupMap() {
@@ -51,7 +61,10 @@ class StudentConfirm extends React.Component {
     onNextPage() {
         // 检查学生信息：
         if (this.getStudentNum() === 0) {
-            alert('要分析的学生数量不能为0, 请再次确认学生.');
+            this.setState({
+                showDialog: true,
+                dialogMsg: '要分析的学生数量不能为0, 请再次确认学生.'
+            })
             return;
         }
         // 保存当前的groupMap信息
@@ -100,6 +113,13 @@ class StudentConfirm extends React.Component {
         // })
     }
 
+    onHideDialog() {
+        this.setState({
+            showDialog: false,
+            dialogMsg: ''
+        })
+    }
+
     render() {
         var {groupMap} = this.state;
         var _this = this;
@@ -115,12 +135,37 @@ class StudentConfirm extends React.Component {
             },
             uploadSuccess : function(resp){
                 /*通过mill找到对应的文件，删除对应tmpFile*/
+                var result = resp;
+                var xuehaoArray = _.map(result, function (item) {
+                    return item['kaohao'];
+                });
+                var currentSQM = _this.props.currentSubject.SQM;
+                currentSQM = matrixBase.getByNames(currentSQM, 'row', 'kaohao', xuehaoArray);
+
+                //不允许上传学生之后, 与平台上的交集为0
+                if (currentSQM && currentSQM.y && currentSQM.y.length > 0) {
+                    //todo： 设置currentSubject SQM
+                    _this.props.setCurSubjectSqm(currentSQM);
+                } else {
+                    _this.setState({
+                        showDialog: true,
+                        dialogMsg: '上传的学生与系统中的学生交集为空, 请重新上传'
+                    })
+                }
                 console.log('upload success',resp);
             },
             uploadError : function(err){
+                 _this.setState({
+                        showDialog: true,
+                        dialogMsg: err
+                 })
                 console.log('Error: ', err);
             },
             uploadFail : function(resp){
+                _this.setState({
+                        showDialog: true,
+                        dialogMsg: resp
+                 })
                 console.log('Fail: ', resp);
             }
         };
@@ -185,6 +230,7 @@ class StudentConfirm extends React.Component {
                         </tbody>
                     </table>
                 </div>
+                <InfoDialog content={this.state.dialogMsg} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)}/>
             </div>
             <Footer pageIndex={this.props.pageIndex} onPrevPage={this.props.onPrevPage} onNextPage={this.onNextPage.bind(this)}/>
         </div>
