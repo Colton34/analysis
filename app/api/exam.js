@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-21 09:25:09
+* @Last Modified time: 2016-06-23 11:06:38
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -168,7 +168,7 @@ export function fetchSchoolAnalysisData(params) {
         var examClassesInfo = res.data.examClassesInfo;
         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
-        var headers = [];
+        var headers = [], restPapers = [];
         _.each(examPapersInfo, (paper, pid) => {
             var index = _.findIndex(subjectWeight, (s) => (s == paper.subject));
             if (index >= 0) {
@@ -177,6 +177,8 @@ export function fetchSchoolAnalysisData(params) {
                     subject: paper.subject,
                     id: pid
                 });
+            } else {
+                restPapers.push(paper);
             }
         });
         headers = _.sortBy(headers, 'index');
@@ -184,6 +186,7 @@ export function fetchSchoolAnalysisData(params) {
             subject: '总分',
             id: 'totalScore'
         });
+        headers = _.concat(headers, _.map(restPapers, (paper) => paper.subject));
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = _.map(levels, (value, key) => 1);
 
