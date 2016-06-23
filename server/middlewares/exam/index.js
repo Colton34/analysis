@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-22 15:40:15
+* @Last Modified time: 2016-06-23 19:43:41
 */
 
 'use strict';
@@ -15,6 +15,7 @@ var _ = require('lodash');
 var errors = require('common-errors');
 var examUitls = require('./util');
 var moment = require('moment');
+require('moment/locale/zh-cn');
 
 // exports.rankReport = function(req, res, next) {
 //     // var grade = decodeURI(req.query.grade);
