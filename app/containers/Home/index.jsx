@@ -3,8 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
-var {Link} = 'react-router';
-Link = Radium(Link);
+import {Link} from 'react-router';
 import {List} from 'immutable';
 
 import {initHomeAction} from '../../reducers/home/actions';
