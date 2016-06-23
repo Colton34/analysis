@@ -206,7 +206,7 @@ class RankReportTableView extends React.Component {
             currentClasses: this.props.examInfo.classes,
             pageIndex: 0,
             pageSize: 25,
-            showData: _.values(this.props.studentInfos),        // 计算后的待显示数据
+            showData: _.orderBy(_.values(this.props.studentInfos),['groupRank_totalScore'], ['asc']),        // 计算后的待显示数据
             headSelect: headSelect,
             headSeq: this.props.headSeq,                        // 默认显示全部表头
             sortInfo: {}                                        //{head: , order: }
