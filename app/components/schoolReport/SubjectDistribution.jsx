@@ -129,8 +129,14 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
                                 <div style={{ backgroundColor: '#e7f9f0', padding: '5px 10px', marginTop: 15 }}>
                                     <p>{levelStr}档上线数据分析表明： </p>
 
-                                    <p>对于全校，<span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].maxSubjects, '、') }学科</span>在本次考试中一档上线率贡献较大，
-                                        <span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].minSubjects, '、') }学科</span>对高层次的学生培养处于弱势，需要引起高度重视。</p>
+                                    {
+                                        (disData['totalSchool']) ? (
+                                            <p>对于全校，<span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].maxSubjects, '、') }学科</span>在本次考试中一档上线率贡献较大，
+                                                <span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].minSubjects, '、') }学科</span>对高层次的学生培养处于弱势，需要引起高度重视。</p>
+                                                ) : (<p>只要一个学科没有可比性</p>)
+                                    }
+
+
 
                                     <p style={{ margin: '10px 0' }}>对于各班级而言，各个学科的表现是不一样的，经分析，可得到如下结论：</p>
                                     {/*
@@ -211,10 +217,16 @@ class TextView extends React.Component {
             <div>
             {
                 _.map(this.state.showData, (students, className) => {
-                    return (<p key={className}>
-                        对于<span style={{ color: '#00955e' }}>{className}班，{_.join(disData[className].maxSubjects, '、') }</span>贡献较大，
-                        <span style={{ color: '#00955e' }}>{_.join(disData[className].minSubjects, '、') }</span>贡献较小；
-                    </p>)
+                    return (<div>
+                    {
+                        (disData[className]) ? (
+                                <p key={className}>
+                                    对于<span style={{ color: '#00955e' }}>{className}班，{_.join(disData[className].maxSubjects, '、') }</span>贡献较大，
+                                    <span style={{ color: '#00955e' }}>{_.join(disData[className].minSubjects, '、') }</span>贡献较小；
+                                </p>
+                            ) : (<p>只有一个科目没有可比性</p>)
+                    }
+                    </div>)
                 })
             }
             {
@@ -270,14 +282,20 @@ function theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers)
 function theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers) {
     var result = {};
 
+//注意：有的班级考的科目多，有的考的科目少。。。所以显示什么药具体到class里面。如果一个班级只考了一个科目那么result中就没有此班级
     var subjectLevelArr, maxSubjects, minSubjects;
     _.each(subjectLevelInfo, (subjectLevelObj, theKey) => {
         subjectLevelArr = _.sortBy(_.filter(_.map(subjectLevelObj, (count, key) => {
             return { count: count, key: key };
         }), (obj) => obj.key != 'totalScore'), 'count');
 
-        maxSubjects = _.map(_.takeRight(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject);
-        minSubjects = _.map(_.take(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject);
+        var baseLineCount = subjectLevelArr.length - 1;
+        var targetCount = (baseLineCount == 2 || baseLineCount == 3) ? 1 : ((baseLineCount >= 4 && baseLineCount < 7) ? 2 : ((baseLineCount >= 7) ? 3 : 0));
+
+        if(targetCount == 0) return;
+
+        maxSubjects = _.reverse(_.map(_.takeRight(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject));
+        minSubjects = _.reverse(_.map(_.take(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject));
         result[theKey] = { maxSubjects: maxSubjects, minSubjects: minSubjects };
     });
 

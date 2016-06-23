@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-22 13:24:43
+* @Last Modified time: 2016-06-22 15:40:15
 */
 
 'use strict';
@@ -748,7 +748,7 @@ exports.customSchoolAnalysis = function(req, res, next) {
 }
 
 function makeExamInfo(examInfo) {
-    var result = _.pick(examInfo, ['name', 'startTime', 'realStudentsCount', 'lostStudentsCount', 'fullMark']);
+    var result = _.pick(examInfo, ['name', 'gradeName', 'startTime', 'realStudentsCount', 'lostStudentsCount', 'fullMark']);
     result.realClasses = examInfo['[realClasses]'];
     result.lostClasses = examInfo['[lostClasses]'];
     result.subjects = examInfo['[subjects]'];

@@ -215,23 +215,25 @@ class GroupAnalysis extends React.Component {
                     <div className={styles.tips}>
                         <p>数据分析表明：</p>
                         {
-                            _.map(_.range(2), (pindex) => {
-                                    return (
-                                        <p key={pindex}>
-                                            {
-                                                _.map(_.range(_.size(levels)), (lindex) => {
-                                                    return (
-                                                        <span key={lindex} >
-                                                            <span style={(pindex == 0) ? {color: '#c96925'} : { color: '#00955e' } }>{_.join(disData[(pindex ==0) ? 'top' : 'low'][lindex], '、')}</span>{numberMap[lindex]}档临界生人数较{(pindex == 0) ? '多' : '少'}
-                                                            {(pindex == 0 && lindex == (_.size(levels)-1)) ? '可以更多的关注这几个班的同学' : (lindex == (_.size(levels)-1) ? '。' : '，')}
-                                                        </span>
-                                                    )
-                                                })
-                                            }
-                                        </p>
+                            (_.size(disData.top) == 0 || _.size(disData.low) == 0) ? (<p>只有一个班级，没有可比性</p>) : (
+                                    _.map(_.range(2), (pindex) => {
+                                            return (
+                                                <p key={pindex}>
+                                                    {
+                                                        _.map(_.range(_.size(levels)), (lindex) => {
+                                                            return (
+                                                                <span key={lindex} >
+                                                                    <span style={(pindex == 0) ? {color: '#c96925'} : { color: '#00955e' } }>{_.join(disData[(pindex ==0) ? 'top' : 'low'][lindex], '、')}</span>{numberMap[lindex]}档临界生人数较{(pindex == 0) ? '多' : '少'}
+                                                                    {(pindex == 0 && lindex == (_.size(levels)-1)) ? '可以更多的关注这几个班的同学' : (lindex == (_.size(levels)-1) ? '。' : '，')}
+                                                                </span>
+                                                            )
+                                                        })
+                                                    }
+                                                </p>
+                                            )
+                                        }
                                     )
-                                }
-                            )
+                                )
                         }
                     </div>
                 </div>
@@ -321,16 +323,21 @@ function makeCriticalSegments(levelBuffers, levels) {
     return result;
 }
 
+//TODO:如果是1个班级--即targetCount===0，即result的top和low中没有任何内容的时候，显示文案“无可比性...”
 function criticalStudentsDiscription(criticalLevelInfo) {  //Done
     //上面的 criticalLevelInfo，已经是反转后的数据了
     // 每一档
     var result = {top: {}, low: {}};
     _.each(criticalLevelInfo, (counts, levelKey) => {
-        //多的前3 和 少的前三
+        var baseLineCount = counts.length - 1;
+        var targetCount = (baseLineCount == 2 || baseLineCount == 3) ? 1 : ((baseLineCount >= 4 && baseLineCount < 7) ? 2 : ((baseLineCount >= 7) ? 3 : 0));
+
+        if(targetCount == 0) return;
+
         var orderedCounts = _.sortBy(counts, 'count');// 升序
-        var top = _.map(_.takeRight(orderedCounts, 3), (cobj) => cobj.class+'班');
+        var top = _.map(_.takeRight(orderedCounts, targetCount), (cobj) => cobj.class+'班');
         result.top[levelKey] = top;
-        var low = _.map(_.take(orderedCounts, 3), (cobj) => cobj.class+'班');
+        var low = _.map(_.take(orderedCounts, targetCount), (cobj) => cobj.class+'班');
         result.low[levelKey] = low;
     });
     return result;//小值代表高档
