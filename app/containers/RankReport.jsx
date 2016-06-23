@@ -8,11 +8,12 @@ import {Map, List} from 'immutable';
 
 import {initRankReportAction} from '../reducers/rankReport/actions';
 import {initParams} from '../lib/util';
-import {DropdownButton, Button, Table as BootTable, Pagination, MenuItem} from 'react-bootstrap';
+import {DropdownButton, Button, Table as BootTable, MenuItem} from 'react-bootstrap';
 import commonStyle from '../common/common.css';
 import Spinkit from '../common/Spinkit';
 
 import {tableExport} from '../lib/tableExporter';
+import Radium from 'radium';
 
 var headerMapper = {
     kaohao: '考号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '排名', classRank: '班级排名', score: '分数'
@@ -41,9 +42,9 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
     // <table style={{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', overflow: 'scroll', width: '100%'}}>
     return (
         <div>
-         <BootTable id="rankTable" striped bordered condensed hover responsive style={{overflowX: 'scroll'}}>
+         <BootTable id="rankTable"  bordered condensed hover responsive style={{overflowX: 'scroll'}}>
             <thead>
-                <tr style={{ backgroundColor: '#f4faee' }}>
+                <tr style={{ backgroundColor: '#fafafa' }}>
                     {
                         firstLineHead.map((headType, index) => {
                             if (_.indexOf(['kaohao', 'name', 'class'], headType) !== -1) {
@@ -63,7 +64,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                         })
                     }
                 </tr>
-                <tr style={{ backgroundColor: '#f4faee' }}>
+                <tr style={{ backgroundColor: '#fafafa' }}>
                     {
                         _.without(firstLineHead, 'kaohao', 'name', 'class').map((headType, index) => {
                             return _.range(3).map(index => {
@@ -135,9 +136,11 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
 
 /***
  * props:
- * onSearch: 搜索方法
+ * triggerFunction: 过了一定的时间后出发传入的方法;
+ * placeholder: 
+ * style: 
  */
-class SearchWidget extends React.Component {
+class InputWidget extends React.Component {
     constructor(props) {
         super(props);
         this.start = 0;
@@ -150,7 +153,7 @@ class SearchWidget extends React.Component {
         if (this.elapsed > this.MAX_DURATION && !this.hasSearch) {
             // 获取当前input的value，调用搜索的方法
             this.hasSearch = true;
-            this.props.onSearch(this.refs.searchWidget.value);
+            this.props.triggerFunction(this.refs.inputWidget.value);
         }
     }
     handleChange() {
@@ -165,7 +168,7 @@ class SearchWidget extends React.Component {
     handleBlur() {
         // 失焦时，如果没有搜索过，则搜索
         if (!this.hasSearch) {
-            this.props.onSearch(this.refs.searchWidget.value);
+            this.props.triggerFunction(this.refs.inputWidget.value);
             this.hasSearch = true;
             clearInterval(this.timer);
         }
@@ -173,11 +176,11 @@ class SearchWidget extends React.Component {
     render() {
         return (
             <input
-                id='searchWidget'
-                ref='searchWidget'
+                id='inputWidget'
+                ref='inputWidget'
                 onChange={this.handleChange.bind(this)}
-                placeholder='搜索'
-                style={{ margin: '0 2px', height: 34, padding: '6px 12px', fontSize: 14, lineHeight: 1.42857143, color: '#555', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 4 }}/>
+                placeholder={this.props.placeholder}
+                style={this.props.style ? this.props.style : { margin: '0 2px', height: 34, padding: '6px 12px', fontSize: 14, lineHeight: 1.42857143, color: '#555', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 4 }}/>
         )
     }
 }
@@ -227,7 +230,29 @@ class RankReportTableView extends React.Component {
         })
         return {firstLineHead: firstLineHead, secondLineHead: secondLineHead}
     }
-    handlePagination(nextPage) {
+    handlePagination(event) {
+        var nextPage = parseInt($(event.target).data('page'));
+        this.setState({
+            pageIndex: nextPage
+        })
+    }
+    gotoInputPage(nextPage) {
+        if (isNaN(nextPage)){
+             console.log('invalid page');
+            return;
+        }
+        if (nextPage <= 0){
+            console.log('invalid page');
+            return;
+        }
+        var len = this.state.showData.length;
+        var {pageSize} = this.state;
+        var maxPage = len % pageSize === 0 ? len / pageSize : parseInt(len / pageSize) + 1;
+        if (nextPage > maxPage){
+            console.log('invalid page');
+            return;
+        } 
+        if (nextPage - 1 === this.state.pageIndex) return;
         this.setState({
             pageIndex: nextPage - 1
         })
@@ -281,7 +306,7 @@ class RankReportTableView extends React.Component {
             })
         }
         //清空搜索框：
-        $('#searchWidget').val('');
+        $('#inputWidget').val('');
     }
     onSelectClass(event) {
         var className = event.target.value;
@@ -343,7 +368,7 @@ class RankReportTableView extends React.Component {
             })
         }
         //清空搜索框：
-        $('#searchWidget').val('');
+        $('#inputWidget').val('');
     }
     onSelectPageSize(event) {
         var nextPageSize= $(event.target).text();
@@ -437,15 +462,15 @@ class RankReportTableView extends React.Component {
     downloadTable() {
         // console.log('downloadTable');
         // console.log($("#rankTable"));
-        // debugger;
         // var newJquery = tableExport($);
 
         $.fn.extend({tableExport: tableExport});
         // console.log($.fn);
         // console.log($("#rankTable"));
         $('#rankTable').tableExport({type:'excel', escape:'false'});
-        // debugger;
     }
+    
+       
     render() {
         var {examInfo} = this.props;
         var {firstLineHead, secondLineHead} = this.getTableHead();
@@ -453,39 +478,47 @@ class RankReportTableView extends React.Component {
         var dataBegin = pageIndex * pageSize + 1;
         var dataEnd = (pageIndex + 1) * pageSize < showData.length ? (pageIndex + 1) * pageSize : showData.length;
         return (
-            <div style={{ margin: '10px 30px 40px 35px' }}>
-                <div>
-                    学科： <a onClick={this.onSelectPaper.bind(this)} data-paperid='all' style={{ textDecoration: 'none', color: this.state.currentPaper.name === '全科' ? '#4489fc' : '#333', margin: '0 10px' }} href='javascript:;'>全科</a>
-                    {
-                        examInfo.papers.map((subjectObj, index) => {
-                            return (
-                                <a key={'papers-' + index} onClick={this.onSelectPaper.bind(this)} data-paperid={subjectObj.paper} href='javascript:;' key={'subjects-' + index} style={{ textDecoration: 'none', color: this.state.currentPaper.name === subjectObj.name ? '#4489fc' : '#333', margin: '0 10px' }}>{subjectObj.name}</a>
-                            )
-                        })
-                    }
+            <div style={{ margin: '30px 30px 30px 35px' }}>
+                <div style={{border: '1px solid #eeeeee', padding: '5px 30px 0 30px'}}>
+                    <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
+                        <span style={{color: '#d0d0d0', marginRight: 10}}>学科：</span> 
+                        <a onClick={this.onSelectPaper.bind(this) } data-paperid='all' style={this.state.currentPaper.name === '全科' ? localStyle.activeSubject : localStyle.subject} href='javascript:;'>全科</a>
+                        {
+                            examInfo.papers.map((subjectObj, index) => {
+                                return (
+                                    <a key={'papers-' + index} onClick={this.onSelectPaper.bind(this) } data-paperid={subjectObj.paper} href='javascript:;' style={this.state.currentPaper.name === subjectObj.name ? localStyle.activeSubject : localStyle.subject}>{subjectObj.name}</a>
+                                )
+                            })
+                        }
+                    </div>
+                    <div style={{heigth: 50, lineHeight: '50px'}}>
+                        <span style={{color: '#d0d0d0', float: 'left'}}>班级：</span>
+                        <span style={{float: 'left', width: 800}}>
+                            <span style={{display: 'inline-block', marginRight: 30, minWidth: 50}}>
+                                <input value='全部' style={{ marginRight: 5}} onChange={this.onSelectClass.bind(this) } type='checkbox' checked={this.state.currentClasses.length === this.props.examInfo.classes.length}/>
+                                <span>全部</span>
+                            </span>
+                            {
+                                examInfo.classes.map((className, index) => {
+                                    return (
+                                        <span key={'classNames-' + index} style={{display: 'inline-block', marginRight: 30, minWidth: 50}} >
+                                            <input value={className} style={{ marginRight: 5 }}onChange={this.onSelectClass.bind(this) } type='checkbox' checked={_.indexOf(this.state.currentClasses, className) !== -1}/>
+                                            <span>{className}</span>
+                                        </span>
+                                    )
+                                })
+                            }
+                        </span>
+                        <div style={{clear: 'both'}}></div>
+                    </div>
                 </div>
-                <div style={{ marginTop: 30 }}>
-                    班级：
-                    <span>
-                        <input value='全部' onChange={this.onSelectClass.bind(this)} type='checkbox' style={{ margin: '0 10px' }} checked={this.state.currentClasses.length === this.props.examInfo.classes.length}/>
-                        <span>全部</span>
-                    </span>
-                    {
-                        examInfo.classes.map((className, index) => {
-                            return (
-                                <span key={'classNames-' + index} style={{ margin: '0 10px' }} >
-                                    <input value={className} onChange={this.onSelectClass.bind(this)} type='checkbox' checked={_.indexOf(this.state.currentClasses, className) !== -1}/>
-                                    <span>{className}</span>
-                                </span>
-                            )
-                        })
-                    }
-                </div>
-                <div style={{ margin: '10px 0 20px 0', height: 50, borderBottom: '1px solid #f2f2f2' }}>
-                    <div style={{ display: 'inline-block', fontSize: 18, fontWeight: 'bold', borderBottom: '2px solid #1e9bfc', float: 'left', height: '100%', lineHeight: '50px' }}>分数排行榜详情</div>
-                    <div style={{ display: 'inline-block', float: 'right' }}>
-                        <SearchWidget onSearch={this.onSearch.bind(this)} />
+                
+                <div style={{ margin: '10px 0 20px 0', height: 50,position: 'relative'}}>
+                    <div style={{ display: 'inline-block', fontSize: 18, fontWeight: 'bold', float: 'left', height: '100%', lineHeight: '50px' }}>排行榜详情</div>
+                    <div style={{ display: 'inline-block', position: 'absolute', right: 0, bottom: 0}}>
+                        <InputWidget triggerFunction={this.onSearch.bind(this)} placeholder='输入搜索内容'/>
                         <DropdownButton id="head-select" title={'隐藏列'} style={{ margin: '0 2px'}}>
+                        <ul style={{maxHeight: 300, maxWidth: 180, listStyleType: 'none', overflowY: 'scroll',padding: 0}}>
                         {
                             this.state.headSeq.map((head, index) => {
                                 var headName = '';
@@ -503,8 +536,9 @@ class RankReportTableView extends React.Component {
                                 )
                             })
                         }
+                        </ul>
                         </DropdownButton>
-                        <Button onClick={this.downloadTable.bind(this)} style={{ margin: '0 2px' }}>下载</Button>
+                        <Button onClick={this.downloadTable.bind(this)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff'}}>下载表格</Button>
                     </div>
                 </div>
                 <Table
@@ -530,21 +564,135 @@ class RankReportTableView extends React.Component {
                         条记录
                     </span>
                 </span>
-                <span style={_.assign({}, {float:'right'}, this.state.showData.length < pageSize ? {display: 'none'} : {display:'inline-block'})}>
-                    <Pagination
-                        prev
-                        next
-                        first
-                        last
-                        ellipsis={false}
-                        boundaryLinks
-                        items={showData.length % pageSize === 0 ? showData.length / pageSize : (parseInt(showData.length / pageSize) + 1)}
-                        maxButtons={5}
-                        activePage={pageIndex + 1}
-                        onSelect={this.handlePagination.bind(this)}/>
-                </span>
+                {
+                    showData.length > pageSize ? 
+                    <Pagination  
+                        pageIndex={pageIndex} 
+                        pageSize={pageSize} 
+                        showData={showData} 
+                        handlePagination={this.handlePagination.bind(this)} 
+                        gotoInputPage={this.gotoInputPage.bind(this)}/> : ''
+                }
                 <div style={{clear: 'both'}}></div>
             </div>
+        )
+    }
+}
+
+/**
+ * props:
+ * pageIndex, pageSize, showData,handlePagination,gotoInputPage
+ */
+@Radium
+class Pagination extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showPageDropup: false
+        }
+        this.maxVisiblePage = 10; //页码下拉列表最多显示10页
+        this.pageIndexItemHeight = 22;
+        this.pageIndexInputHeight = 40;
+    }
+    handleBodyClick(event) {
+        if($(event.target).parents('#pagination').length === 0) {
+            this.setState({
+                showPageDropup: false
+            })
+            $('#paginationInput').val('');
+         }
+    }
+    componentDidMount() {
+        this.clickHandlerRef = this.handleBodyClick.bind(this);
+        $('body').bind('click', this.clickHandlerRef);
+        
+    }
+    componentWillUnmount() {
+        $('body').unbind('click', this.clickHandlerRef);
+    }
+    togglePageDropup() {
+        this.setState({
+            showPageDropup: !this.state.showPageDropup
+        })
+    }
+    getPageRange() {
+        var len = this.props.showData.length;
+        var {pageIndex, pageSize} = this.props;
+        var maxPage   = len % pageSize === 0 ? len / pageSize : parseInt(len / pageSize) + 1;
+        var startPage = 0;
+        var endPage   = maxPage;
+        if(pageIndex - 4 < 0){
+            startPage = 0;
+            endPage = this.maxVisiblePage > maxPage ? maxPage : this.maxVisiblePage;
+        }else if(pageIndex + 5 >= maxPage){
+            startPage = maxPage - this.maxVisiblePage >= 0? maxPage - this.maxVisiblePage : 0;
+            endPage   = maxPage;
+        }else{
+            startPage = pageIndex - 4;
+            endPage   = pageIndex + 5 + 1;
+        }
+        return _.range(startPage, endPage)
+    }
+    goPage(event) {
+        // gotoInputPage方法会判断page的有效性；
+        switch($(event.target).data('type')) {
+            case 'first':
+                this.props.gotoInputPage(1);
+                break;
+            case 'prev':
+                this.props.gotoInputPage(this.props.pageIndex);
+                break;
+            case 'next':
+                this.props.gotoInputPage(this.props.pageIndex + 2)
+                break;
+            case 'last':
+                var len = this.props.showData.length;
+                var {pageSize} = this.props;
+                var maxPage = len % pageSize === 0 ? len / pageSize : parseInt(len/pageSize) + 1;
+                this.props.gotoInputPage(maxPage); 
+                break;
+            default:
+                console.log('wrong page direction type');
+                break;
+        }
+    }
+    render() {
+        var pageRange = this.getPageRange();
+        return (
+            <span style={{float: 'right', marginTop: 25}}>
+                <span style={localStyle.pageShortcut} data-type='first' onClick={this.goPage.bind(this)}>{'|<'}</span>
+                <span style={localStyle.pageShortcut} data-type='prev'  onClick={this.goPage.bind(this)}>{'<'}</span>
+                <span id='pagination' style={{ position: 'relative', marginRight: 6}}>
+                    <span style={localStyle.pageBtn} onClick={this.togglePageDropup.bind(this) }>
+                        <span style={{ fontSize: 12 }}>{this.props.pageIndex + 1}</span>
+                        <span style={{ position: 'absolute', right: 8, bottom: 15, color: '#bfbfbf' }}>
+                            <div className='dropup' style={{ height: 8 }}><span className='caret'></span></div>
+                            <div className='dropdown' style={{ height: 8 }}><span className='caret'></span></div>
+                        </span>
+                    </span>
+                    {
+                        this.state.showPageDropup ?
+                            <ul style={_.assign({}, { listStyleType: 'none', padding: 0, maxHeight: 260, width: 96, position: 'absolute', left: 0, border: '1px solid #e7e7e7', backgroundColor: '#fff' }, { top: -(pageRange.length * this.pageIndexItemHeight + this.pageIndexInputHeight) }) }>
+                                {
+                                    pageRange.map((num) => {
+                                        return (
+                                            <li key={'pageIndex-' + num} onClick={this.props.handlePagination} data-page={num} style={localStyle.pageIndexItem}>
+                                                {num + 1}
+                                                {
+                                                    this.props.pageIndex === num ? <span data-page={num} style={{ position: 'absolute', right: 12, color: '#b1b1b1' }}>{'√'}</span> : ''
+                                                }
+                                            </li>
+                                        )
+                                    })
+                                }
+                                <li><InputWidget id='paginationInput'placeholder='请输入页码' triggerFunction={this.props.gotoInputPage} style={{ display: 'inline-block', width: 84, height: 24, border: '1px solid #e7e7e7', margin: 6, paddingLeft: 6 }}/></li>
+                            </ul> : ''
+                    }
+                </span>
+                <span data-type='next' style={localStyle.pageShortcut} onClick={this.goPage.bind(this)}>{'>'}</span>
+                <span data-type='last' style={localStyle.pageShortcut} onClick={this.goPage.bind(this)}>{'>|'}</span>
+            </span>
+            
         )
     }
 }
@@ -678,9 +826,9 @@ class RankReport extends React.Component {
 
         return (
             <div style={{ width: 1000, minHeight: 830, backgroundColor: '#fff', margin: '0 auto', marginTop: 30 }}>
-                <div style={{ paddingLeft: 20, backgroundColor: '#fcfcfc', height: 75, lineHeight: '75px', textAlign: 'center' }}>
-                    <a href={targetUrl} style={{ fontSize: 12, textDecoration: 'none', color: '#333', float: 'left' }}> {'<'} 返回</a>
-                    <span style={{ fontSize: 16 }}>{examInfo.name}-分数排行榜</span>
+                <div style={{ paddingLeft: 30, backgroundColor: '#fafafa', height: 50, lineHeight: '50px' }}>
+                    <a href={targetUrl} style={{ fontSize: 12, textDecoration: 'none', color: '#59bde5', float: 'left' }}> {'<'} </a>
+                    <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span style={{color: '#b4b4b4'}}>{examInfo.name + ' > '}</span>分数排行榜</span>
                 </div>
                 <RankReportTableView
                     examInfo={this.props.examInfo}
@@ -709,7 +857,22 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-
+var localStyle = {
+    subject: {
+        display: 'inline-block', width: 50, height: 22, backgroundColor: '#fff', color: '#333', marginRight: 10, textDecoration: 'none',textAlign: 'center', lineHeight: '22px'
+    },
+    activeSubject: {
+        display: 'inline-block', width: 50, height: 22, backgroundColor: '#2ea8eb', color: '#fff',  marginRight: 10,  textDecoration: 'none', textAlign: 'center', lineHeight: '22px'
+    },
+    pageBtn: {
+        display: 'inline-block', width: 96, height: 30, lineHeight: '30px', padding: '0 8px 0 12px', border: '1px solid #e7e7e7', color: '#333', position:'relative', cursor: 'pointer'
+    },
+    pageIndexItem: {
+        height: 22, padding: '0 12px', color: '#333', cursor: 'pointer',
+        ':hover': {backgroundColor: '#f2f2f2'}
+    },
+    pageShortcut: {display: 'inline-block', width: 30, heigth: 30, border:'1px solid #eee', color: '#bfbfbf', marginRight:6, lineHeight:'30px', textAlign: 'center', cursor: 'pointer'}
+}
 //根据当前选中的班级，科目，搜索，隐藏列，显示多少条记录，currentPage的时候要重新渲染table
 
 // search也是在所勾选的范围（currentPaper、currentClasses）内search，所以一上来先根据 currentPaper、currentClasses
