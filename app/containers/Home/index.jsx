@@ -3,7 +3,8 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
-import {Link} from 'react-router';
+var {Link} = 'react-router';
+Link = Radium(Link);
 import {List} from 'immutable';
 
 import {initHomeAction} from '../../reducers/home/actions';
@@ -121,6 +122,7 @@ class ExamItem extends React.Component {
         var examid = item.id.slice(_.findIndex(item.id, (c) => c !== '0'));
 
         var targetUrl = (item.from === 40) ? '/dashboard?examid=' + examid : '/dashboard?examid=' + examid + '&grade=' + encodeURI(item.grade);
+        var queryOptions = (item.from === 40) ? { examid: examid } : {examid: examid, grade: encodeURI(item.grade)};
 
         return (
             <div >
@@ -139,9 +141,23 @@ class ExamItem extends React.Component {
                                 来自：<span style={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? {color: '#77bfef'}: {}}>{fromFlag[item['from']]}</span>
                             </span>
                         </div>
+{/*
+
                         <a href={targetUrl} style={localStyle.linkAnalysisBtn}>
                             查看分析
                         </a>
+
+                        <Link to={{ pathname: '/dashboard', query: queryOptions }}
+                        style={Object.assign({}, localStyle.linkAnalysisBtn)}>
+                            查看分析
+                        </Link>
+
+
+*/}
+                        <Link to={{ pathname: '/dashboard', query: queryOptions }}
+                            style={localStyle.linkAnalysisBtn}>
+                            查看分析
+                        </Link>
                     </div>
                 </div>
             </div>

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-21 12:58:50
+* @Last Modified time: 2016-06-23 09:49:22
 */
 
 'use strict';
@@ -41,7 +41,7 @@ exports.renderSchoolReport = function(req, res, next) {
 
     childProcess.execFile(phantom.path, childArgs, function(err, stdout, stderr) {
         if(err) return next(new errors.Error('convert html to file error', err));
-        res.status(200).send(stdout);
+        res.status(200).send(childArgs[3]);
     });
 }
 
