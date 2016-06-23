@@ -217,10 +217,10 @@ class TextView extends React.Component {
             <div>
             {
                 _.map(this.state.showData, (students, className) => {
-                    return (<div>
+                    return (<div  key={className}>
                     {
                         (disData[className]) ? (
-                                <p key={className}>
+                                <p>
                                     对于<span style={{ color: '#00955e' }}>{className}班，{_.join(disData[className].maxSubjects, '、') }</span>贡献较大，
                                     <span style={{ color: '#00955e' }}>{_.join(disData[className].minSubjects, '、') }</span>贡献较小；
                                 </p>
