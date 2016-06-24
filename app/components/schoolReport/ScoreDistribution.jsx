@@ -187,7 +187,7 @@ class Dialog extends React.Component {
         //     return;
         // }
 
-        //保证层级是正确的
+        //保证层级是正确的 --- TODO: 将临界生分析那里的上下浮动5分的判断也验证也加入到这里
         var isValid = _.every(_.range(_.size(this.levels) - 1), (index) => {
             return this.levels[index+''].score < this.levels[(index+1)+''].score
         });
@@ -205,7 +205,6 @@ class Dialog extends React.Component {
 低档次的 score 一定要比高档次的 score 低，比档次的要高（相对的，低档次的percentage和count都会比高档次的高）
  */
     onInputBlur(id, event) {
-        debugger;
         var value = parseFloat(event.target.value);
         if (!(value && _.isNumber(value) && value >= 0)) return;
         var arr = id.split('-');

@@ -120,7 +120,8 @@ function mapStateToProps(state) {
         studentsGroupByClass: state.schoolAnalysis.studentsGroupByClass,
         allStudentsPaperMap: state.schoolAnalysis.allStudentsPaperMap,
         headers: state.schoolAnalysis.headers,
-        levels: state.schoolAnalysis.levels
+        levels: state.schoolAnalysis.levels,
+        forseUpdate: state.schoolAnalysis.forseUpdate
     }
 }
 

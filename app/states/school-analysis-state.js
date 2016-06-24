@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:14:13
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-30 11:06:27
+* @Last Modified time: 2016-06-24 15:16:23
 */
 
 'use strict';
@@ -23,7 +23,8 @@ var InitialState = Record({
     allStudentsPaperMap: {},
     headers: [],
     levels: {},
-    levelBuffers: []
+    levelBuffers: [],
+    forseUpdate: false
 });
 
 export default InitialState;
