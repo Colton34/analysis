@@ -127,7 +127,7 @@ class Dashboard extends React.Component {
             );
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
-                <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#f2f2f2',  margin: '10px auto 10px auto', fontSize: 16 , color: '#333', marginLeft: -10}}>
+                <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#f2f2f2',  margin: '10px auto 10px auto', fontSize: 16 , color: '#333', paddingLeft: -10}}>
                     <Link to={{pathname: '/'}} style={styles.dashboardTitleName}> {'<'} </Link>
                     <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span style={{color: '#b4b4b4'}}>{'首页' + '  >  '}</span> {examInfoGuide.name}</span>
                     {
