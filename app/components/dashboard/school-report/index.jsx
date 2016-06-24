@@ -22,7 +22,7 @@ class SchoolReportCard extends React.Component {
     }
     toViewSchoolAnalysis() {
         var {grade, examid} = this.props;
-        var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + encodeURI(grade) : '/school/report?examid=' + examid;
+        var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + grade : '/school/report?examid=' + examid;
         browserHistory.push(targetUrl);
     }
     render() {
