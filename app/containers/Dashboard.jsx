@@ -80,7 +80,7 @@ class Dashboard extends React.Component {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
         if (!examid) return;
-        var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + encodeURI(grade) : '/school/report?examid=' + examid;
+        var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + grade : '/school/report?examid=' + examid;
         browserHistory.push(targetUrl);
     }
 
@@ -95,7 +95,6 @@ class Dashboard extends React.Component {
         params.request.put(customBaseUrl, {examId: examid}).then(function(res) {
             location.href = '/';
             console.log('res.data - ', res.data);
-            
         }).then(function(err) {
             console.log('');
         })
@@ -118,7 +117,7 @@ class Dashboard extends React.Component {
 
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) return;
-        var grade = this.props.location.query.grade ? encodeURI(this.props.location.query.grade) : '';
+        var grade = this.props.location.query.grade || '';
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
             (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0) || this.state.loading)
             return (
@@ -129,12 +128,12 @@ class Dashboard extends React.Component {
         return (
             <div>
                 <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: '35px auto 20px auto', paddingLeft: 20,fontSize: 16 , color: '#333'}}>
-                    <a href='/' style={styles.dashboardTitleName}>
+                    <Link to={{pathname: '/'}} style={styles.dashboardTitleName}>
                         {'<'} {examInfoGuide.name}
-                    </a>
+                    </Link>
                     {
-                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>删除</a> : ''  
-                    }                     
+                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>删除</a> : ''
+                    }
                 </div>
                 <div style={[styles.box, styles.common.radius]}>
                     <div style={[styles.container, styles.common.radius]}>

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-23 11:06:38
+* @Last Modified time: 2016-06-23 21:24:10
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -141,7 +141,7 @@ export function fetchHomeData(params) {
 
 //********************************************************* Dashboard *********************************************************
 export function fetchDashboardData(params) {
-    var url = (params.grade) ? examPath + '/dashboard?examid=' + params.examid + '&grade=' + params.grade : examPath + '/custom/dashboard?examid=' + params.examid;
+    var url = (params.grade) ? examPath + '/dashboard?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/dashboard?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
         // console.log('=======================  dashboard res.data.keys = ', _.keys(res.data));
@@ -154,7 +154,7 @@ export function fetchDashboardData(params) {
 
 
 export function fetchSchoolAnalysisData(params) {
-    var url = (params.grade) ? examPath + '/school/analysis?examid=' + params.examid + '&grade=' + params.grade : examPath + '/custom/school/analysis?examid=' + params.examid;
+    var url = (params.grade) ? examPath + '/school/analysis?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/school/analysis?examid=' + params.examid;
 
     var examInfo, examStudentsInfo, examPapersInfo, examClassesInfo;
     var studentsGroupByClass, allStudentsPaperMap;
@@ -188,7 +188,7 @@ export function fetchSchoolAnalysisData(params) {
         });
         headers = _.concat(headers, _.map(restPapers, (paper) => paper.subject));
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
-        var levelBuffers = _.map(levels, (value, key) => 1);
+        var levelBuffers = _.map(levels, (value, key) => 5);
 
         return Promise.resolve({
             haveInit: true,

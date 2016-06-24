@@ -120,8 +120,8 @@ class ExamItem extends React.Component {
         var {timeKey, item} = this.props;
         var examid = item.id.slice(_.findIndex(item.id, (c) => c !== '0'));
 
-        var targetUrl = (item.from === 40) ? '/dashboard?examid=' + examid : '/dashboard?examid=' + examid + '&grade=' + encodeURI(item.grade);
-        var queryOptions = (item.from === 40) ? { examid: examid } : {examid: examid, grade: encodeURI(item.grade)};
+        var targetUrl = (item.from === 40) ? '/dashboard?examid=' + examid : '/dashboard?examid=' + examid + '&grade=' + item.grade;
+        var queryOptions = (item.from === 40) ? { examid: examid } : {examid: examid, grade: item.grade};
 
         return (
             <div >

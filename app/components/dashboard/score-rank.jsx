@@ -53,6 +53,7 @@ const ScoreRank = ({data, examid, grade}) => {
 
 
     var queryOptions = (grade) ? {examid: examid, grade: grade} : {examid: examid};
+
     return (
         <div className={dashboardStyle.card}>
             <div className={dashboardStyle['card-title']}>分数排行榜</div>

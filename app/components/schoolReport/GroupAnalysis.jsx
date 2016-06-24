@@ -223,7 +223,7 @@ class GroupAnalysis extends React.Component {
                                                         _.map(_.range(_.size(levels)), (lindex) => {
                                                             return (
                                                                 <span key={lindex} >
-                                                                    <span style={(pindex == 0) ? {color: '#c96925'} : { color: '#00955e' } }>{_.join(disData[(pindex ==0) ? 'top' : 'low'][lindex], '、')}</span>{numberMap[lindex]}档临界生人数较{(pindex == 0) ? '多' : '少'}
+                                                                    <span style={(pindex == 0) ? {color: '#c96925'} : { color: '#00955e' } }>{_.join(disData[(pindex ==0) ? 'top' : 'low'][lindex], '、')}</span>{numberMap[lindex+1]}档临界生人数较{(pindex == 0) ? '多' : '少'}
                                                                     {(pindex == 0 && lindex == (_.size(levels)-1)) ? '可以更多的关注这几个班的同学' : (lindex == (_.size(levels)-1) ? '。' : '，')}
                                                                 </span>
                                                             )

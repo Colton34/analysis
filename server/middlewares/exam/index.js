@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-23 19:43:41
+* @Last Modified time: 2016-06-23 21:32:52
 */
 
 'use strict';
@@ -90,7 +90,6 @@ rankCache: {
 exports.rankReport = function(req, res, next) {
     //验证过，有examid和grade
     var grade = decodeURI(req.query.grade);
-
     //1.根据exam查找@Exam item，根据grade过滤出有效的paper
     getValidPaper(req.query.examid, grade).then(function(result) {
         //2.根据paper的[students]和matrix计算学生的各科成绩
@@ -198,7 +197,7 @@ function getValidPaper(examid, gradeName) {
             if(err) return reject(new errors.data.MongoDBError('find exam error : ', err));
             //过滤paper
             targetExam = exam;
-            console.log('filter前papers.length = ', exam['[papers]'].length);
+            console.log('filter前papers.length = ', exam['[papers]'].length, '    grade == ', gradeName);
             resolve(_.filter(exam['[papers]'], (paper) => paper.grade == gradeName));
         });
     }).then(function(validPapers) {

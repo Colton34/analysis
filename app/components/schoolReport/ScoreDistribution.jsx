@@ -205,7 +205,8 @@ class Dialog extends React.Component {
 低档次的 score 一定要比高档次的 score 低，比档次的要高（相对的，低档次的percentage和count都会比高档次的高）
  */
     onInputBlur(id, event) {
-        var value = parseInt(event.target.value);
+        debugger;
+        var value = parseFloat(event.target.value);
         if (!(value && _.isNumber(value) && value >= 0)) return;
         var arr = id.split('-');
         var type = arr[0];
@@ -249,6 +250,7 @@ class Dialog extends React.Component {
                 //     return;
                 // }
                 var targetCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
+                debugger;
                 var targetStudent = _.takeRight(examStudentsInfo, targetCount)[0];
 
                 //当修改百分比后也要换算成分数看一下是否满足相应的规则：前后要相差不少于10分（一旦修改levels，那么就自动重置levelBuffers为10）
