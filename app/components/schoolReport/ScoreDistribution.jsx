@@ -187,7 +187,7 @@ class Dialog extends React.Component {
         //     return;
         // }
 
-        //保证层级是正确的
+        //保证层级是正确的 --- TODO: 将临界生分析那里的上下浮动5分的判断也验证也加入到这里
         var isValid = _.every(_.range(_.size(this.levels) - 1), (index) => {
             return this.levels[index+''].score < this.levels[(index+1)+''].score
         });
@@ -205,7 +205,7 @@ class Dialog extends React.Component {
 低档次的 score 一定要比高档次的 score 低，比档次的要高（相对的，低档次的percentage和count都会比高档次的高）
  */
     onInputBlur(id, event) {
-        var value = parseInt(event.target.value);
+        var value = parseFloat(event.target.value);
         if (!(value && _.isNumber(value) && value >= 0)) return;
         var arr = id.split('-');
         var type = arr[0];
@@ -249,6 +249,7 @@ class Dialog extends React.Component {
                 //     return;
                 // }
                 var targetCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
+                debugger;
                 var targetStudent = _.takeRight(examStudentsInfo, targetCount)[0];
 
                 //当修改百分比后也要换算成分数看一下是否满足相应的规则：前后要相差不少于10分（一旦修改levels，那么就自动重置levelBuffers为10）
@@ -474,19 +475,21 @@ class ScoreDistribution extends React.Component {
                         <div style={{ display: 'inline-block', width: 330, backgroundColor: '#e9f7f0', paddingRight: 30,fontSize: 14 }}>
                             <p>表中显示了全校及各班各档上线人数。上线人数的多少一目了然。考虑到各班级学生总人数会存在有差异，要用上线率来比较：</p>
                             {
-                                _.map(_.range(levTotal), (index) => {
-                                    var levelStr = numberMap[(index+1)], levObj = disData[(levTotal-1-index)];
-                                    return(
-                                        <p key={index}>
-                                            {levelStr}档线
-                                            <span style={{color:'#a384ce'}}>上线率高</span>的班级有
-                                            <span className={style['school-report-dynamic']}>{_.join(_.map(levObj.high, (className) => examInfo.gradeName+className+'班'), '、')+'；'}</span>
-                                            {levelStr}档线
-                                            <span style={{color:'#a48382'}}>上线率低</span>的班级有
-                                            <span className={style['school-report-dynamic']}>{_.join(_.map(levObj.low, (className) => examInfo.gradeName+className+'班'), '、')+'；'}</span>
-                                        </p>
-                                    )
-                                })
+                                (_.size(disData) > 0) ? (
+                                        _.map(_.range(levTotal), (index) => {
+                                            var levelStr = numberMap[(index+1)], levObj = disData[(levTotal-1-index)];
+                                            return(
+                                                <p key={index}>
+                                                    {levelStr}档线
+                                                    <span style={{color:'#a384ce'}}>上线率高</span>的班级有
+                                                    <span className={style['school-report-dynamic']}>{_.join(_.map(levObj.high, (className) => examInfo.gradeName+className+'班'), '、')+'；'}</span>
+                                                    {levelStr}档线
+                                                    <span style={{color:'#a48382'}}>上线率低</span>的班级有
+                                                    <span className={style['school-report-dynamic']}>{_.join(_.map(levObj.low, (className) => examInfo.gradeName+className+'班'), '、')+'；'}</span>
+                                                </p>
+                                            )
+                                        })
+                                    ) : (<p>只有一个班级，没有可比性</p>)
                             }
                         </div>
                     {/*--------------------------------  总分分档上线学生饼图 -------------------------------------*/}
@@ -583,6 +586,8 @@ function makeLevelTableRow(rowInfo) {
  */
 function theTotalScoreLevelDiscription(totalScoreLevelInfo, levels) {
 //找出各个档次各个班级的累积上线率，并按照levelKey进行分组
+    var result = {}, low, high;
+
     var totalScoreLevelInfoGroupByLevel = _.groupBy(_.concat(..._.map(totalScoreLevelInfo, (theObj, theKey) => {
         if(theKey == 'totalSchool') return [];
         return _.map(theObj, (levObj, levelKey) => {
@@ -591,8 +596,9 @@ function theTotalScoreLevelDiscription(totalScoreLevelInfo, levels) {
     })), 'levelKey');
 
     var levelClassCount = _.size(totalScoreLevelInfo) - 1;
+//TODO: 实现文案
+    if(levelClassCount == 1) return result;
     //根据规则得到每个档次高低的班级名称：这里是和levels中的顺序是一一对应的，即'0'是一档。。。
-    var result = {}, low, high;
     _.each(levels, (levObj, levelKey) => {
         var orderLevelTotalScore = _.sortBy(totalScoreLevelInfoGroupByLevel[levelKey], 'sumPercentage');//从低到高
         if(orderLevelTotalScore.length == 0) return;
@@ -607,9 +613,10 @@ function theTotalScoreLevelDiscription(totalScoreLevelInfo, levels) {
             low = _.map(_.take(orderLevelTotalScore, 3), (item) => item.class);
             high = _.map(_.takeRight(orderLevelTotalScore, 3), (item) => item.class);
         }
+
         result[levelKey] = {
-            low: low,
-            high: high
+            low: _.reverse(low),
+            high: _.reverse(high)
         }
     });
     return result;

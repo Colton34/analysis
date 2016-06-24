@@ -81,7 +81,7 @@ class Dashboard extends React.Component {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
         if (!examid) return;
-        var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + encodeURI(grade) : '/school/report?examid=' + examid;
+        var targetUrl = grade ? '/school/report?examid=' + examid + '&grade=' + grade : '/school/report?examid=' + examid;
         browserHistory.push(targetUrl);
     }
 
@@ -96,7 +96,6 @@ class Dashboard extends React.Component {
         params.request.put(customBaseUrl, {examId: examid}).then(function(res) {
             location.href = '/';
             console.log('res.data - ', res.data);
-            
         }).then(function(err) {
             console.log('');
         })
@@ -118,7 +117,7 @@ class Dashboard extends React.Component {
         var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) return;
-        var grade = this.props.location.query.grade ? encodeURI(this.props.location.query.grade) : '';
+        var grade = this.props.location.query.grade || '';
         if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
             (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0) || this.state.loading)
             return (
@@ -129,11 +128,11 @@ class Dashboard extends React.Component {
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
                 <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#f2f2f2',  margin: '10px auto 10px auto', fontSize: 16 , color: '#333', marginLeft: -10}}>
-                    <a href='/' style={styles.dashboardTitleName}>{'<'}</a>
+                    <Link to={{pathname: '/'}} style={styles.dashboardTitleName}> {'<'} </Link>
                     <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span style={{color: '#b4b4b4'}}>{'首页' + '  >  '}</span> {examInfoGuide.name}</span>
                     {
-                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>删除</a> : ''  
-                    }                     
+                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>删除</a> : ''
+                    }
                 </div>
                 <ExamGuideComponent data={examInfoGuide} />
                 

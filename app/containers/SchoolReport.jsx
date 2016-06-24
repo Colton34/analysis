@@ -36,7 +36,6 @@ class SchoolReport extends React.Component {
 
     componentDidMount() {
         if (this.props.haveInit) return;
-
         //TODO: 将initParams的参数调换一下位置--request是肯定要有的，所以应该放在前面，不叫做other而是request
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initSchoolAnalysis(params);
@@ -121,7 +120,8 @@ function mapStateToProps(state) {
         studentsGroupByClass: state.schoolAnalysis.studentsGroupByClass,
         allStudentsPaperMap: state.schoolAnalysis.allStudentsPaperMap,
         headers: state.schoolAnalysis.headers,
-        levels: state.schoolAnalysis.levels
+        levels: state.schoolAnalysis.levels,
+        forseUpdate: state.schoolAnalysis.forseUpdate
     }
 }
 
