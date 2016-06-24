@@ -24,27 +24,23 @@ const GlobalGuideCom = ({data}) => {
 // console.log('examGuide = ', data);
 
     return (
-        <div className={dashboardStyle.card}>
-            <div className={dashboardStyle['card-title']}>考试总览</div>
-            <div  style={{marginTop: 30, marginBottom: 30}}>
-                <div style={{float: 'left', marginLeft: 40}}>
-                    <div style={styles.dataNum}>{data.subjectCount}</div>
-                    <div>考试学科数</div>
+        <div className='row'>
+            <div style={{ width: '100%', height: 90, lineHeight: '90px', backgroundColor: '#fff', borderRadius: 5 }}>
+                <div style={{ width: 275, height: 45, lineHeight: '45px', display: 'inline-block', borderRight: '1px solid #efefef', marginLeft: 25 }}>
+                    <span style={{ color: '#59bde5', fontSize: 24, marginRight: 10 }}>{data.subjectCount}</span>
+                    <span>考试学科数</span>
                 </div>
-                <div style={{float: 'right', marginRight: 40}}>
-                    <div style={styles.dataNum}>{data.realClassesCount}</div>
-                    <div>考试班级数</div>
+                <div style={{ width: 275, height: 45, lineHeight: '45px', display: 'inline-block', borderRight: '1px solid #efefef', marginLeft: 20 }}>
+                    <span style={{ color: '#59bde5', fontSize: 24, marginRight: 10 }}>{data.realClassesCount}</span>
+                    <span>考试班级数</span>
                 </div>
-            </div>
-            <div style={{clear: 'both'}}></div>
-            <div style={{marginTop:30, marginBottom: 30}}>
-                <div style={{float: 'left', marginLeft: 40}}>
-                    <div style={styles.dataNum}>{data.realStudentsCount}</div>
-                    <div>考试学生数</div>
+                <div style={{ width: 275, height: 45, lineHeight: '45px', display: 'inline-block', borderRight: '1px solid #efefef', marginLeft: 20 }}>
+                    <span style={{ color: '#59bde5', fontSize: 24, marginRight: 10 }}>{data.realStudentsCount}</span>
+                    <span>考试学生数</span>
                 </div>
-                <div style={{float: 'right', marginRight: 40}}>
-                    <div style={styles.dataNum}>{data.lostStudentsCount}</div>
-                    <div>缺考学生数</div>
+                <div style={{ width: 275, height: 45, lineHeight: '45px', display: 'inline-block', marginLeft: 20 }}>
+                    <span style={{ color: '#de5d44', fontSize: 24, marginRight: 10 }}>{data.lostStudentsCount}</span>
+                    <span>缺考学生数</span>
                 </div>
             </div>
         </div>

@@ -29,79 +29,81 @@ const ClassReport = ({data}) => {
     };
 
  */
-
-    var title = '初一年级班级平均分对比top5';
     var classNames = _.map(data['top5ClassesMean'], (obj) => obj.name+'班');
-    var classMeans = _.map(data['top5ClassesMean'], (obj) => obj.mean);
-    // var subtitle = data.data.title.concat('');
+    var gradeMeans = _.range(classNames.length).map(num => {
+        var obj = {};
+        obj.name = '年级平均分';
+        obj.value = data.gradeMean;
+        obj.y = data.gradeMean;
+        return obj;
+    })
+    var classMeans =  _.map(data['top5ClassesMean'], (obj) => {
+        var newObj = {};
+        newObj.name = obj.name + '班',
+        newObj.value = obj.mean;
+        newObj.y = obj.mean - data.gradeMean;
+        return newObj;
+    });
     var config = {
         chart: {
-            type: 'column'
+            type: 'bar'
         },
         title: {
-            text: title,
-            floating: true,
-            align: 'center',
-            y: 10,
-            style: {
-                fontSize: '5px'
-            }
+            text: ''
         },
         subtitle: {
             text: ''
         },
-        colors: ['#FDBF2A'],
+        tooltip: {
+            pointFormat: '平均分:{point.value}'
+        },
+        colors: ['#24aef8','#35d1c7'],
         xAxis: {
             categories: classNames,
-            crosshair: true
+            crosshair: true,
+            tickColor: '#fff',
+            lineColor: '#fff'
         },
         yAxis: {
             min: 0,
-            title: {
-                text: '平均分值'
-            },
-            gridLineColor: '#fff',
-            plotLines: [{
-                color: 'red',                                //线的颜色，定义为红色
-                dashStyle: 'solid',                          //默认是值，这里定义为长虚线
-                value: data.gradeMean,              //定义在那个值上显示标示线
-                width: 2,                                    //标示线的宽度，2px
-                label: {
-                    text: '年级平均分',                       //标签的内容
-                    align: 'right',                         //标签的水平位置，水平居左,默认是水平居中center
-                    x: 10,                                   //标签相对于被定位的位置水平偏移的像素，重新定位，水平居左10px
-                    style: {
-                        fontSize: '14px'
-                    }
-                },
-                zIndex: 5
-            }]
+            gridLineColor: '#fff'
         },
         plotOptions: {
             column: {
                 pointPadding: 0.2,
                 borderWidth: 0
+            },
+            series: {
+                stacking: 'normal'
             }
         },
         series: [{
-            name: '班级',
+            name: '各班平均分',
             data: classMeans
+        },{
+            name: '年级平均分',
+            data: gradeMeans
         }],
         credits: {
             enabled: false
         },
         legend: {
-            enabled: false
+            enabled: true,
+            align: 'left'
         }
     };
 
 
     return (
-        <div>
-            <div style={{ marginTop: 20 }}>
-                <ReactHighcharts config={config} style={{ maxWidth: 300, maxHeight: 200, margin: '0 auto' }}></ReactHighcharts>
+        <div style={{display: 'inline-block', height: 340, padding: '0 0 0 10px'}}  className='col-lg-4'>
+            <div style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px'}}>
+                <div id='scoreRankHeader' style={{ height: 50, lineHeight: '50px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' }}>
+                    <span style={{ color: '#333', fontSize: 16, marginRight: 10 }}>班级分析报告</span>
+                    <span style={{ color: '#333', fontSize: 12 }}>平均分TOP5</span>
+                    <span style={{ float: 'right', color: '#bfbfbf' }}>{'>'}</span>
+                </div>
+                 <ReactHighcharts config={config} style={{ maxWidth: 330, maxHeight: 230, marginTop: 30}}></ReactHighcharts>
             </div>
-            <div className={dashboardStyle['detail-btn']}>查看详情</div>
         </div>
     )
 }
