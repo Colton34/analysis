@@ -127,11 +127,14 @@ class Dashboard extends React.Component {
             );
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
-                <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#f2f2f2',  margin: '10px auto 10px auto', fontSize: 16 , color: '#333', paddingLeft: -10}}>
-                    <Link to={{pathname: '/'}} style={styles.dashboardTitleName}> {'<'} </Link>
-                    <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span style={{color: '#b4b4b4'}}>{'首页' + '  >  '}</span> {examInfoGuide.name}</span>
+                <div style={{height: 40, lineHeight: '40px', backgroundColor: '#f2f2f2',  margin: '10px auto 10px -15px', fontSize: 16 , color: '#333'}}>
+                    <Link to={{pathname: '/'}} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{color: '#59bde5'}}></i></Link>
+                    <span style={{ fontSize: 14,color: '#333', marginLeft: 20}}><span style={{color: '#b4b4b4'}}>{'首页'}<i className='icon-right-open-2'></i></span> {examInfoGuide.name}</span>
                     {
-                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>删除</a> : ''
+                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? 
+                        <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>
+                            <i className='icon-delete'></i>删除
+                        </a> : ''
                     }
                 </div>
                 <ExamGuideComponent data={examInfoGuide} />
@@ -250,8 +253,7 @@ var styles = {
         }
     },
     dashboardTitleName: {
-        textDecoration: 'none',
-        color: '#333',
+        textDecoration: 'none',display: 'inline-block', width: 10, height: 10,
         ':hover': {textDecoration: 'none', color: '#333'}
     },
     aBtn: {

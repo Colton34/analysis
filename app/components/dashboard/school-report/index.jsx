@@ -37,7 +37,9 @@ class SchoolReportCard extends React.Component {
                           onMouseLeave={this.onHeaderMouseLeave.bind(this)}
                           style={_.assign({}, localStyles.linkHeader, _this.state.hoverLink ? {color: '#27aef8'} : {color: '#333'})}>
                         <span style={{fontSize: 16, marginRight: 10 }}>校级分析报告</span>
-                        <span style={_.assign({},{ float: 'right'}, this.state.hoverLink? {color: '#27aef8'} : {color: '#bfbfbf'})}>{'>'}</span>
+                        <span style={_.assign({},{ float: 'right'}, this.state.hoverLink? {color: '#27aef8'} : {color: '#bfbfbf'})}>
+                            <i className='icon-right-open-2'></i>
+                        </span>
                     </div>
                     <div className={styles['school-report']} style={{marginTop: 30}}></div>
                 </div>

@@ -100,7 +100,7 @@ const ClassReport = ({data}) => {
                 <div id='scoreRankHeader' style={{ height: 50, lineHeight: '50px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' }}>
                     <span style={{ color: '#333', fontSize: 16, marginRight: 10 }}>班级分析报告</span>
                     <span style={{ color: '#333', fontSize: 12 }}>平均分TOP5</span>
-                    <span style={{ float: 'right', color: '#bfbfbf' }}>{'>'}</span>
+                    <span style={{ float: 'right', color: '#bfbfbf' }}><i className='icon-right-open-2'></i></span>
                 </div>
                  <ReactHighcharts config={config} style={{ maxWidth: 330, maxHeight: 230, marginTop: 30}}></ReactHighcharts>
             </div>

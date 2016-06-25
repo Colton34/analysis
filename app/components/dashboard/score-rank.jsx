@@ -106,7 +106,9 @@ class ScoreRank extends React.Component {
                           style={_.assign({}, styles.linkHeader, this.state.hoverLink ? {color: '#27aef8', textDecoration: 'none'} : {color: '#333'})}>
                         <span style={{ fontSize: 16, marginRight: 10 }}>分数排行榜</span>
                         <span style={{ fontSize: 12 }}>最高分TOP5</span>
-                        <span style={_.assign({},{ float: 'right'}, this.state.hoverLink? {color: '#27aef8'} : {color: '#bfbfbf'})}>{'>'}</span>
+                        <span style={_.assign({},{ float: 'right'}, this.state.hoverLink? {color: '#27aef8'} : {color: '#bfbfbf'})}>
+                            <i className='icon-right-open-2'></i>
+                        </span>
                     </Link>
                     
                     <Table id='topRankTable' striped responsive hover style={{ width: '100%', height: '100%', marginTop: 20 }}>
