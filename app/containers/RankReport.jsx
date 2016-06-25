@@ -139,6 +139,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
  * triggerFunction: 过了一定的时间后出发传入的方法;
  * placeholder: 
  * style: 
+ * searchIcon: 是否显示右端的放大镜icon
  */
 class InputWidget extends React.Component {
     constructor(props) {
@@ -175,12 +176,19 @@ class InputWidget extends React.Component {
     }
     render() {
         return (
-            <input
-                id='inputWidget'
-                ref='inputWidget'
-                onChange={this.handleChange.bind(this)}
-                placeholder={this.props.placeholder}
-                style={this.props.style ? this.props.style : { margin: '0 2px', height: 34, padding: '6px 12px', fontSize: 14, lineHeight: 1.42857143, color: '#555', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 4 }}/>
+            <span style={{display: 'inline-block', position: 'relative'}}>
+                <input
+                    id='inputWidget'
+                    ref='inputWidget'
+                    onChange={this.handleChange.bind(this) }
+                    placeholder={this.props.placeholder}
+                    style={this.props.style ? this.props.style : { margin: '0 2px', height: 34, padding: '6px 12px', fontSize: 14, lineHeight: 1.42857143, color: '#555', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 4 }}
+                    />
+                {
+                    this.props.searchIcon ? <i className='icon-search-2' style={{ position: 'absolute', right: 10, top: '50%', marginTop: -10, color: '#bfbfbf' }}></i> : '' 
+                }
+                
+            </span>
         )
     }
 }
@@ -516,7 +524,7 @@ class RankReportTableView extends React.Component {
                 <div style={{ margin: '10px 0 20px 0', height: 50,position: 'relative'}}>
                     <div style={{ display: 'inline-block', fontSize: 18, fontWeight: 'bold', float: 'left', height: '100%', lineHeight: '50px' }}>排行榜详情</div>
                     <div style={{ display: 'inline-block', position: 'absolute', right: 0, bottom: 0}}>
-                        <InputWidget triggerFunction={this.onSearch.bind(this)} placeholder='输入搜索内容'/>
+                        <InputWidget triggerFunction={this.onSearch.bind(this)} placeholder='输入搜索内容' searchIcon/>
                         <DropdownButton id="head-select" title={'隐藏列'} style={{ margin: '0 2px'}}>
                         <ul style={{maxHeight: 300, maxWidth: 180, listStyleType: 'none', overflowY: 'scroll',padding: 0}}>
                         {
@@ -660,8 +668,8 @@ class Pagination extends React.Component {
         var pageRange = this.getPageRange();
         return (
             <span style={{float: 'right', marginTop: 25}}>
-                <span style={localStyle.pageShortcut} data-type='first' onClick={this.goPage.bind(this)}>{'|<'}</span>
-                <span style={localStyle.pageShortcut} data-type='prev'  onClick={this.goPage.bind(this)}>{'<'}</span>
+                <span style={localStyle.pageShortcut} data-type='first' onClick={this.goPage.bind(this)}><i className='icon-to-start' data-type='first'></i></span>
+                <span style={localStyle.pageShortcut} data-type='prev'  onClick={this.goPage.bind(this)}><i className='icon-left-open-2' data-type='prev'></i></span>
                 <span id='pagination' style={{ position: 'relative', marginRight: 6}}>
                     <span style={localStyle.pageBtn} onClick={this.togglePageDropup.bind(this) }>
                         <span style={{ fontSize: 12 }}>{this.props.pageIndex + 1}</span>
@@ -679,7 +687,7 @@ class Pagination extends React.Component {
                                             <li key={'pageIndex-' + num} onClick={this.props.handlePagination} data-page={num} style={localStyle.pageIndexItem}>
                                                 {num + 1}
                                                 {
-                                                    this.props.pageIndex === num ? <span data-page={num} style={{ position: 'absolute', right: 12, color: '#b1b1b1' }}>{'√'}</span> : ''
+                                                    this.props.pageIndex === num ? <span data-page={num} style={{ position: 'absolute', right: 12, color: '#b1b1b1' }}><i className='icon-affirm-3'></i></span> : ''
                                                 }
                                             </li>
                                         )
@@ -689,8 +697,8 @@ class Pagination extends React.Component {
                             </ul> : ''
                     }
                 </span>
-                <span data-type='next' style={localStyle.pageShortcut} onClick={this.goPage.bind(this)}>{'>'}</span>
-                <span data-type='last' style={localStyle.pageShortcut} onClick={this.goPage.bind(this)}>{'>|'}</span>
+                <span data-type='next' style={localStyle.pageShortcut} onClick={this.goPage.bind(this)}><i className='icon-right-open-2' data-type='next'></i></span>
+                <span data-type='last' style={localStyle.pageShortcut} onClick={this.goPage.bind(this)}><i className='icon-to-end' data-type='last'></i></span>
             </span>
             
         )
@@ -827,7 +835,7 @@ class RankReport extends React.Component {
         return (
             <div style={{ width: 1000, minHeight: 830, backgroundColor: '#fff', margin: '0 auto', marginTop: 30 }}>
                 <div style={{ paddingLeft: 30, backgroundColor: '#fafafa', height: 50, lineHeight: '50px' }}>
-                    <a href={targetUrl} style={{ fontSize: 12, textDecoration: 'none', color: '#59bde5', float: 'left' }}> {'<'} </a>
+                    <a href={targetUrl} style={{ fontSize: 12, textDecoration: 'none', color: '#59bde5', float: 'left' }}><i className='icon-fanhui2' style={{color: '#59bde5', fontSize: 16}}></i></a>
                     <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span style={{color: '#b4b4b4'}}>{examInfo.name + ' > '}</span>分数排行榜</span>
                 </div>
                 <RankReportTableView
