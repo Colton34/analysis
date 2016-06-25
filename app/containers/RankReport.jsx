@@ -500,7 +500,7 @@ class RankReportTableView extends React.Component {
                         }
                     </div>
                     <div style={{heigth: 50, lineHeight: '50px'}}>
-                        <span style={{color: '#d0d0d0', float: 'left'}}>班级：</span>
+                        <span style={{color: '#d0d0d0', float: 'left', marginRight: 10}}>班级：</span>
                         <span style={{float: 'left', width: 800}}>
                             <span style={{display: 'inline-block', marginRight: 30, minWidth: 50}}>
                                 <input value='全部' style={{ marginRight: 5}} onChange={this.onSelectClass.bind(this) } type='checkbox' checked={this.state.currentClasses.length === this.props.examInfo.classes.length}/>
