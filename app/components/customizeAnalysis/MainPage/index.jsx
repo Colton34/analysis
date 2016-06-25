@@ -48,6 +48,7 @@ class MainPage extends React.Component {
             <div>
                 <div style={{ padding: '20px 30px' }}>
                     <span className={ownClassNames["content-tips"]}>
+                        <i className='icon-attention'></i>
                         创建自定义分析，可以满足学校个性化数据的分析， 根据学校自己的情况，选择相关的考试科目、题、以及学校，自由组合进行相关分析。完成以下的步骤，就可以查看分析结果啦，快去试试吧！同时你可以
                         <a onClick={this.downloadGuidePDF.bind(this)} href='javascript:void(0)'style={{ color: '#54bde7' }}>查看示例</a>
                     </span>
@@ -57,7 +58,7 @@ class MainPage extends React.Component {
                     </div>
                     <div style={{ margin: '20px 0' }}>
                         <label className={ownClassNames.label}>学科列表</label>
-                        <span onClick={this.props.changeToCreateStatus} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}>+添加期望分析学科</span>
+                        <span onClick={this.props.changeToCreateStatus} className={ownClassNames['fx-btn2'] + ' ' + ownClassNames['fx-btn2-primary']}><i className='icon-add-3'></i>添加期望分析学科</span>
                     </div>
                     {
                         subjectList.length === 0 ?
@@ -87,8 +88,8 @@ class MainPage extends React.Component {
                                                                 学生{resultSet[subject].SQM.y ? _.reduce(resultSet[subject].groupMap, (sum, each) => {return sum + (each.status === 'inUse' ? each.count : 0)}, 0) : 0}人
                                                             </td>
                                                             <td>
-                                                                <a onClick={this.onEditSubject.bind(this, subject)} href='javascript:void(0)'className={ownClassNames['edit-btn']}><i class="icon-edit-2"></i>编辑</a>
-                                                                <a onClick={this.onDelSubject.bind(this, subject)} href='javascript:void(0)'className={ownClassNames['edit-btn']}><i class="icon-delete"></i>删除</a>
+                                                                <a onClick={this.onEditSubject.bind(this, subject)} href='javascript:void(0)'className={ownClassNames['edit-btn']}><i className="icon-edit-2"></i>编辑</a>
+                                                                <a onClick={this.onDelSubject.bind(this, subject)} href='javascript:void(0)'className={ownClassNames['edit-btn']}><i className="icon-delete"></i>删除</a>
                                                             </td>
                                                         </tr>
                                                     )
