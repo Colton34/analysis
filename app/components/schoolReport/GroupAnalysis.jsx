@@ -190,6 +190,7 @@ class GroupAnalysis extends React.Component {
                         这个无论是对学生个人，还是对学校整体的教学成就，都有显著的积极作用。全校临界生群体规模，见下表：
                     </p>
                     <a href="javascript:void(0)" onClick={this.onShowDialog.bind(this) }className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>
+                        <i className='icon-cog-2'></i>
                         设置临界分数
                     </a>
 

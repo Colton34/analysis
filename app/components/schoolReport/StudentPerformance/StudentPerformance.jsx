@@ -9,7 +9,7 @@ import TableView from '../TableView';
 
 var localCss = {
     btn: {
-        display: 'inline-block', width: 115, height: 20, color: '#333', lineHeight: '20px', textDecoration: 'none', textAlign: 'center', border: '1px solid #e9e8e6',
+        display: 'inline-block', width: 115, height: 25, color: '#333', lineHeight: '25px', textDecoration: 'none', textAlign: 'center', border: '1px solid #e9e8e6',
         ':hover': { textDecoration: 'none' },
         ':link': { textDecoration: 'none' }
     },
@@ -153,8 +153,11 @@ class StudentPerformanceTable extends React.Component {
         return (
             <div>
                 <div style={{ position: 'absolute', right: 180 }}>
-                    <a key={'ddbtn-head'} style={localCss.btn} href="javascript:void(0)" onClick={this.toggleList.bind(this) }>
+                    <a key={'ddbtn-head'} style={[localCss.btn, {position: 'relative'}]} href="javascript:void(0)" onClick={this.toggleList.bind(this) }>
                         {this.state.current.value}
+                        <span className='dropdown' style={{ position: 'absolute', right: 10, color:'#bfbfbf' }}>
+                            <span className='caret'></span>
+                        </span> 
                     </a>
                     <ul id='dropDownList' className={this.state.active ? localStyle.list : localStyle.hide}>
                         {

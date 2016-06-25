@@ -232,7 +232,7 @@ class TextView extends React.Component {
             {
                 this.state.showAllEnable ?
                     (this.state.showAll ?
-                        <a key={'expanBtn-0'} onClick={this.onClickShowAllBtn.bind(this)} href='javascript:;' style={localStyle.expanBtn}>收缩内容^</a> :
+                        <a key={'expanBtn-0'} onClick={this.onClickShowAllBtn.bind(this)} href='javascript:;' style={localStyle.expanBtn}>收缩内容<i className='icon-up-open-2'></i></a> :
                         <a key={'expanBtn-1'} onClick={this.onClickShowAllBtn.bind(this)} href='javascript:;' style={localStyle.expanBtn}>...展开内容</a>
                        ) : ''
             }
