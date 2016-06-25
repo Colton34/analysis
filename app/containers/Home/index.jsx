@@ -70,15 +70,27 @@ const CommonQuestions = () => {
     )
 }
 
-const TeacherHelper = () => {
-    return (
-        <div>
-            <div className={styles.title}>老师助手</div>
-            <a href='/faq?section=intro&sub=introVideo' className={styles['video-img']} ></a>
-            <a target='_blank' href="http://kaoshi2.kss.ksyun.com/yunxiao/kaoshi2.0/pdf/%E5%A5%BD%E5%88%86%E6%95%B0%E9%98%85%E5%8D%B7%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf"
-                style={{display: 'block',marginTop: 10, height: 40, color: '#757575', lineHeight: '40px', borderBottom: '1px solid #dcdcdc'}}>下载使用说明书</a>
-        </div>
-    )
+@Radium
+class TeacherHelper extends React.Component {
+    
+    render(){
+        return (
+            <div>
+                <div className={styles.title}>老师助手</div>
+                <a href='/faq?section=intro&sub=introVideo' className={styles['video-img']} ></a>
+                <div style={{ display: 'block', marginTop: 10, height: 40, color: '#757575', lineHeight: '40px', borderBottom: '1px solid #dcdcdc' }}>
+                    下载使用说明书
+                    <a  className='icon-download-1'
+                        style={localStyle.downloadIcon}
+                        target='_blank'
+                        href="http://kaoshi2.kss.ksyun.com/yunxiao/kaoshi2.0/pdf/%E5%A5%BD%E5%88%86%E6%95%B0%E9%98%85%E5%8D%B7%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf" >
+                    </a>
+                </div>
+
+            </div>
+        )
+    }
+    
 }
 
 const Sidebar = () => {
@@ -109,12 +121,23 @@ const NoExamList = () => {
  * timeKey:
  * item
  */
-@Radium
 class ExamItem extends React.Component {
     // ({timeKey, item}) =>
     constructor(props) {
         super(props);
-
+        this.state = {
+            hoverLink: false
+        }
+    }
+    handleMouseEnter() {
+        this.setState({
+            hoverLink: true
+        })
+    }
+    handleMouseLeave() {
+        this.setState({
+            hoverLink: false
+        })
     }
     render() {
         var {timeKey, item} = this.props;
@@ -126,11 +149,13 @@ class ExamItem extends React.Component {
         return (
             <div >
                 <div style={_.assign({}, { color: '#656565', borderBottom: '1px solid #f2f2f2', width: '100%', height: 50, lineHeight: '50px'}, timeKey === undefined ? { display: 'none' } : { display: 'block' }) }>
-                    {timeKey}分析列表
+                    <i className='icon-clock-2' style={{color: '#d0d0d0'}}></i>{timeKey}分析列表
                 </div>
                 <div style={{ width: '100%', height: 100 }}>
                     <div style={{ padding: '20px 0' }}>
-                        <div style={{ display: 'inline-block', width: 50, height: 50, backgroundColor: '#e1e5eb', borderRadius: '50%' }}></div>
+                        <div style={{ display: 'inline-block', width: 50, height: 50, lineHeight: '50px', textAlign: 'center', backgroundColor: '#e1e5eb', borderRadius: '50%', float: 'left'}}>
+                            <i className={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? 'icon-star' : 'icon-clipboard'} style={{color: '#fff', fontSize: 20}}></i>
+                        </div>
                         <div style={{ display: 'inline-block', marginLeft: 20 }}>
                             <div style={{ fontSize: 16, marginBottom: 10, color: '#3f3f3f' }}>{item.examName}</div>
                             <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>创建时间: {item.eventTime}</span>
@@ -140,21 +165,10 @@ class ExamItem extends React.Component {
                                 来自：<span style={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? {color: '#77bfef'}: {}}>{fromFlag[item['from']]}</span>
                             </span>
                         </div>
-{/*
-
-                        <a href={targetUrl} style={localStyle.linkAnalysisBtn}>
-                            查看分析
-                        </a>
-
                         <Link to={{ pathname: '/dashboard', query: queryOptions }}
-                        style={Object.assign({}, localStyle.linkAnalysisBtn)}>
-                            查看分析
-                        </Link>
-
-
-*/}
-                        <Link to={{ pathname: '/dashboard', query: queryOptions }}
-                            style={localStyle.linkAnalysisBtn}>
+                              style={this.state.hoverLink ? localStyle.linkAnalysisBtnHover : localStyle.linkAnalysisBtn}
+                              onMouseEnter={this.handleMouseEnter.bind(this)}
+                              onMouseLeave={this.handleMouseLeave.bind(this)}>
                             查看分析
                         </Link>
                     </div>
@@ -245,7 +259,7 @@ class ExamList extends React.Component {
                         <div style={{marginTop: 15, color: '#9a9a9a'}}>
                             <ul style={{margin: '0 auto', width: '50%', listStyleType: 'none', textAlign: 'center'}}>
                                 <li key='pagePrev' style={localStyle.pageDirection} data-page='prev' onClick={this.onClickPage.bind(this)}>
-                                    {'<'}
+                                    <i data-page='prev' className='icon-left-open-2'></i>
                                 </li>
                                 {
                                     this.getPage().map((num, index) => {
@@ -261,7 +275,7 @@ class ExamList extends React.Component {
                                     })
                                 }
                                 <li key='pageNext' style={localStyle.pageDirection} data-page='next' onClick={this.onClickPage.bind(this)}>
-                                    {'>'}
+                                    <i data-page='next' className='icon-right-open-2'></i>
                                 </li>
                             </ul>
                         </div> : ''
@@ -315,11 +329,18 @@ class Home extends React.Component {
 var localStyle= {
     linkAnalysisBtn: {
         display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#fff', border:'1px solid #24aef8', color: '#24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5,
-        ':hover': {textDecoration: 'none', backgroundColor:'#24aef8', color:'#fff'}
+        
+    },
+    linkAnalysisBtnHover: {
+        display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', border:'1px solid #24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5, backgroundColor:'#24aef8', color:'#fff'
     },
     pageDirection: {
         width: 20, height: 20, borderRadius: '50%', backgroundColor: '#DADADA', color: '#fff', display: 'inline-block', marginRight: 20, cursor: 'pointer', textAlign: 'center', lineHeight: '20px',
         ':hover': {color: '#fff', backgroundColor: '#24aef8'}
+    },
+    downloadIcon: {
+        float: 'right', display: 'inline-block', width: 10, height: 10, color: '#333',
+        ':hover': {color: '#00a6f1'} 
     }
 }
 function mapStateToProps(state) {
