@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-27 15:05:24
+* @Last Modified time: 2016-06-27 20:59:15
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -1329,9 +1329,25 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
 
     var totalStudentCount = examInfo.realStudentsCount;
     _.each(levels, (levObj, levelKey) => {
-        levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
-        var student = _.takeRight(examStudentsInfo, levObj.count)[0];
-        levObj.score = student.score;
+
+        var flagCount = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
+        var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
+
+        levObj.score = targetStudent.score;
+// debugger;
+        var targetIndex;
+        if(levelKey == '0') {
+            // console.log('0', levelKey);
+            targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= levObj.score);
+            // debugger;
+        } else {
+            // console.log('1 or 2', levelKey);
+            targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > levObj.score);
+            // debugger;
+        }
+        var targetCount = examStudentsInfo.length - targetIndex;
+        // debugger;
+        levObj.count = targetCount;
     });
     return levels;
 }

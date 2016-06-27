@@ -230,7 +230,14 @@ class Dialog extends React.Component {
                 //     this.isValid = false;
                 //     return;
                 // }
-                var targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= value);//因为examStudentsInfo是有序的，所以可以用二分
+
+                // [300, 400, 500, 700]   [10, 20, 20, 20, 30, 40, 50]   7-1 = 6
+                var targetIndex;//因为examStudentsInfo是有序的，所以可以用二分
+                if(num == (_.size(this.levels) - 1)) {
+                    targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= value);
+                } else {
+                    targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > value);
+                }
                 var count = examStudentsInfo.length - targetIndex;
                 var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);
 
@@ -242,15 +249,13 @@ class Dialog extends React.Component {
                 break;
             case 'rate':
             //根据给出的百分比，得到学生的位置，然后此学生的分数即为分数线
-                // debugger;
                 // if(!((value < 100) && (!higherLevObj || (value > higherLevObj.percentage)) && (!lowerLevObj || (value < lowerLevObj.percentage)))){
                 //     console.log('所给的percentage不符合规则');
                 //     this.isValid = false;
                 //     return;
                 // }
-                var targetCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
-                debugger;
-                var targetStudent = _.takeRight(examStudentsInfo, targetCount)[0];
+                var flagCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
+                var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
 
                 //当修改百分比后也要换算成分数看一下是否满足相应的规则：前后要相差不少于10分（一旦修改levels，那么就自动重置levelBuffers为10）
                 //TODO:但是这里还是可能会有问题：因为一上来是按照默认百分比设置的，但是怎么保证默认的百分比设置对应的score就一定满足相差10分呢？
@@ -262,12 +267,19 @@ class Dialog extends React.Component {
 
                 temp.score = targetStudent.score;
                 temp.percentage = value;
+
+                var targetIndex;//因为examStudentsInfo是有序的，所以可以用二分
+                if(num == (_.size(this.levels) - 1)) {
+                    targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= temp.score);
+                } else {
+                    targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > temp.score);
+                }
+                var targetCount = examStudentsInfo.length - targetIndex;
                 temp.count = targetCount;
 
                 this.refs['score-' + num].value = targetStudent.score;
                 break;
         }
-        // debugger;
         // this.isValid = true; //TODO: 这里有bug，还是要确保所有的input都是true才对。不然，先来个错的，然后跳过这个错的，再来个对的，那么isValid就是true了。。。
         this.levels[(_.size(this.levels) - 1 - num)+''] = temp;
     }
@@ -278,7 +290,6 @@ class Dialog extends React.Component {
 
         // this.levels = this.props.levels;
         this.levLastIndex = _.size(this.levels) - 1;
-// debugger;
 //重绘要不要 来自 props
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {})}>
@@ -523,7 +534,6 @@ function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
 
     //全校信息总是table的第一行
     var totalSchoolRow = makeLevelTableRow(totalSchoolObj);
-    // debugger;
     totalSchoolRow.unshift('全校');
     table.push(totalSchoolRow);
 
@@ -539,9 +549,7 @@ function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
 
 function makeLevelTableRow(rowInfo) {
     //rowInfo每一个levelKey都有对应的对象，而且顺序是对应levels的（即和segments是一样的，都是从低到高，而显示的时候是从高到底，所以这里需要反转）
-    // debugger;
     var tempMap = _.map(rowInfo, (rowObj, levelKey) => [rowObj.count, rowObj.sumCount, rowObj.sumPercentage+'%']);
-    // debugger;
     // vat tempMap = _.map(rowInfo, (rowObj, levelKey) => [rowObj.count, rowObj.sumCount, rowObj.sumPercentage + '%']);
     return _.concat(..._.reverse(tempMap));
 }
@@ -669,7 +677,6 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
 //segments.length-1个有效值
 
     var countsGroupByLevel = makeSegmentsStudentsCount(examStudentsInfo, levelSegments);
-// debugger;
     //开始创建标准的resultInfo数据结构：
     result.totalSchool = {};
 
