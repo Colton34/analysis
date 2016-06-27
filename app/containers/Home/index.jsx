@@ -78,15 +78,12 @@ class TeacherHelper extends React.Component {
             <div>
                 <div className={styles.title}>老师助手</div>
                 <a href='/faq?section=intro&sub=introVideo' className={styles['video-img']} ></a>
-                <div style={{ display: 'block', marginTop: 10, height: 40, color: '#757575', lineHeight: '40px', borderBottom: '1px solid #dcdcdc' }}>
+                <a style={localStyle.downloadBtn}
+                    target='_blank'
+                    href="http://kaoshi2.kss.ksyun.com/yunxiao/kaoshi2.0/pdf/%E5%A5%BD%E5%88%86%E6%95%B0%E9%98%85%E5%8D%B7%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf" >
                     下载使用说明书
-                    <a  className='icon-download-1'
-                        style={localStyle.downloadIcon}
-                        target='_blank'
-                        href="http://kaoshi2.kss.ksyun.com/yunxiao/kaoshi2.0/pdf/%E5%A5%BD%E5%88%86%E6%95%B0%E9%98%85%E5%8D%B7%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf" >
-                    </a>
-                </div>
-
+                    <a className='icon-download-1' style={localStyle.downloadIcon}></a>
+                </a>
             </div>
         )
     }
@@ -147,21 +144,21 @@ class ExamItem extends React.Component {
         var queryOptions = (item.from === 40) ? { examid: examid } : {examid: examid, grade: item.grade};
 
         return (
-            <div >
-                <div style={_.assign({}, { color: '#656565', borderBottom: '1px solid #f2f2f2', width: '100%', height: 50, lineHeight: '50px'}, timeKey === undefined ? { display: 'none' } : { display: 'block' }) }>
+            <div style={this.props.isLast ? {marginBottom: 15} : {}}>
+                <div style={_.assign({}, { color: '#656565', borderBottom: '1px solid #f2f2f2', width: '100%', height: 44, lineHeight: '44px', marginTop: 15}, timeKey === undefined ? { display: 'none' } : { display: 'block' }) }>
                     <i className='icon-clock-2' style={{color: '#d0d0d0'}}></i>{timeKey}分析列表
                 </div>
-                <div style={{ width: '100%', height: 100 }}>
+                <div style={{ width: '100%'}}>
                     <div style={{ padding: '20px 0' }}>
-                        <div style={{ display: 'inline-block', width: 50, height: 50, lineHeight: '50px', textAlign: 'center', backgroundColor: '#e1e5eb', borderRadius: '50%', float: 'left'}}>
+                        <div style={{ display: 'inline-block', width: 54, height: 54, lineHeight: '54px', textAlign: 'center', backgroundColor: '#e1e5eb', borderRadius: '50%', float: 'left'}}>
                             <i className={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? 'icon-star' : 'icon-clipboard'} style={{color: '#fff', fontSize: 20}}></i>
                         </div>
                         <div style={{ display: 'inline-block', marginLeft: 20 }}>
-                            <div style={{ fontSize: 16, marginBottom: 10, color: '#3f3f3f' }}>{item.examName}</div>
-                            <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>创建时间: {item.eventTime}</span>
-                            <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
-                            <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
-                            <span style={{ fontSize: 12, color: '#c5c5c5', marginRight: 15 }}>
+                            <div style={{ fontSize: 16, marginBottom: 12, color: '#3f3f3f' }}>{item.examName}</div>
+                            <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>创建时间: {item.eventTime}</span>
+                            <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
+                            <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
+                            <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>
                                 来自：<span style={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? {color: '#77bfef'}: {}}>{fromFlag[item['from']]}</span>
                             </span>
                         </div>
@@ -240,13 +237,15 @@ class ExamList extends React.Component {
         var {examList} = this.props;
         var {pageIndex, pageSize} = this.state;
         return (
-            <div style={{ display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 15, backgroundColor: '#fff' }}>
+            <div style={{ display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 30, backgroundColor: '#fff' }}>
                 <div className={styles['banner-img']}></div>
                 {
                     examList.length ? _.map(examList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize), (obj) => {
                         return _.map(obj.values, (exam, index) => {
                             if (index === 0) {
                                 return <ExamItem key={index} timeKey={obj.timeKey} item={exam}/>
+                            } else if (index === obj.values.length - 1){
+                                return <ExamItem key={index} item={exam} isLast/>
                             } else {
                                 return <ExamItem key={index} item={exam}/>
                             }
@@ -262,12 +261,13 @@ class ExamList extends React.Component {
                                     <i data-page='prev' className='icon-left-open-2'></i>
                                 </li>
                                 {
-                                    this.getPage().map((num, index) => {
+                                    this.getPage().map((num, index, arr) => {
+                                        
                                         return (
                                             <li key={'pageIndex-' + index}
                                                 data-page={num}
                                                 onClick={this.onClickPage.bind(this)}
-                                                style={_.assign({},{display: 'inline-block', marginRight: 20, cursor: 'pointer'}, num === this.state.pageIndex? {color: '#24aef8'}: {})}>
+                                                style={_.assign({},{display: 'inline-block', cursor: 'pointer', fontSize: 16, color: '#999'}, num === this.state.pageIndex? {color: '#59bde5'}: {}, index === arr.length -1 ? {marginRight: 22} : {marginRight: 18})}>
                                                 {num + 1}
                                             </li>
                                         )
@@ -328,19 +328,22 @@ class Home extends React.Component {
 }
 var localStyle= {
     linkAnalysisBtn: {
-        display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', backgroundColor: '#fff', border:'1px solid #24aef8', color: '#24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5,
+        display: 'inline-block', width: 100, height: 34, lineHeight: '34px', textAlign: 'center', backgroundColor: '#fff', border:'1px solid #24aef8', color: '#24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5,
         
     },
     linkAnalysisBtnHover: {
-        display: 'inline-block', width: 130, height: 40, lineHeight: '40px', textAlign: 'center', border:'1px solid #24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5, backgroundColor:'#24aef8', color:'#fff'
+        display: 'inline-block', width: 100, height: 34, lineHeight: '34px', textAlign: 'center', border:'1px solid #24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5, backgroundColor:'#24aef8', color:'#fff'
     },
     pageDirection: {
-        width: 20, height: 20, borderRadius: '50%', backgroundColor: '#DADADA', color: '#fff', display: 'inline-block', marginRight: 20, cursor: 'pointer', textAlign: 'center', lineHeight: '20px',
-        ':hover': {color: '#fff', backgroundColor: '#24aef8'}
+        width: 22, height: 22, borderRadius: '50%', backgroundColor: '#e7e7e7', color: '#fff', display: 'inline-block', marginRight: 22, cursor: 'pointer', textAlign: 'center', lineHeight: '22px',
+        ':hover': {color: '#fff', backgroundColor: '#bfbfbf'}
+    },
+    downloadBtn: { 
+        display: 'block', marginTop: 10, height: 40, width: '100%', color: '#333', lineHeight: '40px', borderBottom: '1px solid #dcdcdc',
+        ':hover': {color: '#59bde5', textDecoration: 'none'}
     },
     downloadIcon: {
-        float: 'right', display: 'inline-block', width: 10, height: 10, color: '#333',
-        ':hover': {color: '#00a6f1'} 
+        float: 'right', display: 'inline-block', width: 10, height: 10, color: '#59bde5'
     }
 }
 function mapStateToProps(state) {
