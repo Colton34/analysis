@@ -432,7 +432,10 @@ class ScoreDistribution extends React.Component {
                     总分分档上线学生人数分布
                 </div>
 
-                <span onClick={_this.onShowDialog.bind(_this)} style={{ cursor: 'pointer', color: '#b686c9', float: 'right', margin: '30px 5px 30px 0', display: 'inline-block', width: 130, height: 30 }}>?设置分档参数</span>
+                <span onClick={_this.onShowDialog.bind(_this)} style={{ cursor: 'pointer', color: '#b686c9', float: 'right', margin: '30px 5px 30px 0', display: 'inline-block', width: 130, height: 30, lineHeight: '30px'}}>
+                    <i className='icon-cog-2' style={{fontSize: 20}}></i>
+                    设置分档参数
+                </span>
 
                 <div style={{ width: 720, margin: '0 auto', clear: 'both' }}>
                     <p style={{ marginBottom: 20 }}>

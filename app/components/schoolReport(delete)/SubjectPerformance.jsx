@@ -189,6 +189,7 @@ class SubjectPerformance extends React.Component {
                     </p>
                     <p>各个学科成绩分布的结构比例情况，如下表所示：</p>
                     <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>
+                        <i className='icon-cog-2'></i>
                         设置等级参数
                     </a>
                     <Table tableData={td_subjectClassDistribution} />

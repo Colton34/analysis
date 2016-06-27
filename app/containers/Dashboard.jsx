@@ -16,6 +16,7 @@ import SubjectReport from '../components/dashboard/subject-report';
 import PaperComment from '../components/dashboard/paper-comment';
 import PaperQuality from '../components/dashboard/paper-quality';
 import StudentReport from '../components/dashboard/student-report';
+import SchoolReport from '../components/dashboard/school-report';
 
 import {initDashboardAction} from '../reducers/dashboard/actions';
 import {initParams} from '../lib/util';
@@ -114,7 +115,6 @@ class Dashboard extends React.Component {
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
         var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
         var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
-
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) return;
         var grade = this.props.location.query.grade || '';
@@ -126,16 +126,33 @@ class Dashboard extends React.Component {
                  </div>
             );
         return (
-            <div>
-                <div style={{ height: 40, width: 1200, backgroundColor: '#f2f2f2',  margin: '35px auto 20px auto', paddingLeft: 20,fontSize: 16 , color: '#333'}}>
-                    <Link to={{pathname: '/'}} style={styles.dashboardTitleName}>
-                        {'<'} {examInfoGuide.name}
-                    </Link>
+            <div style={{width: 1200, margin: '0 auto'}} className='container'>
+                <div style={{height: 40, lineHeight: '40px', backgroundColor: '#f2f2f2',  margin: '10px auto 10px -15px', fontSize: 16 , color: '#333'}}>
+                    <Link to={{pathname: '/'}} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{color: '#59bde5'}}></i></Link>
+                    <span style={{ fontSize: 14,color: '#333', marginLeft: 20}}><span style={{color: '#b4b4b4'}}>{'首页'}<i className='icon-right-open-2'></i></span> {examInfoGuide.name}</span>
                     {
-                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>删除</a> : ''
+                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? 
+                        <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>
+                            <i className='icon-delete'></i>删除
+                        </a> : ''
                     }
                 </div>
-                <div style={[styles.box, styles.common.radius]}>
+                <ExamGuideComponent data={examInfoGuide} />
+                
+            
+                {/* */}
+                <div className='row' style={{marginTop: 20}}>
+                    <ScoreRank data={scoreRank} examid={examid} grade={grade}/>
+                    <SchoolReport examid={examid} grade={grade}/>
+                </div>
+                {/* */}
+                <div className='row' style={{marginTop: 20}}>
+                    <LevelReport data={levelScoreReport}/>
+                    <SubjectReport/>
+                    <ClassReport data={classScoreReport}/>
+                </div>
+                {/**
+                    <div style={[styles.box, styles.common.radius]}>
                     <div style={[styles.container, styles.common.radius]}>
                         <ExamGuideComponent data={examInfoGuide} />
                         <ScoreRank data={scoreRank} examid={examid} grade={grade}/>
@@ -185,6 +202,8 @@ class Dashboard extends React.Component {
                         </div>
                     </div>
                 </div>
+                 */}
+                
                 <Dialog show={this.state.showConfirmDialog} onHide={this.onHideDialog.bind(this)} onConfirm={this.onDeleteAnalysis.bind(this)}/>
             </div>
         );
@@ -234,13 +253,12 @@ var styles = {
         }
     },
     dashboardTitleName: {
-        textDecoration: 'none',
-        color: '#333',
+        textDecoration: 'none',display: 'inline-block', width: 10, height: 10,
         ':hover': {textDecoration: 'none', color: '#333'}
     },
     aBtn: {
-        textDecoration: 'none', float: 'right', fontSize: 12, color: '#333',
-        ':hover': {textDecoration: 'none'}
+        textDecoration: 'none', float: 'right', fontSize: 12, color: '#ee6b52',
+        ':hover': {textDecoration: 'none', color: '#de5d44'}
     },
     btn: {lineHeight: '34px', width: 54, height: 34,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#ee6b52',margin: '0 30px', color: '#fff', borderRadius: '4px'},
 }

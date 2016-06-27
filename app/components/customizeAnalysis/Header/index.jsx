@@ -15,8 +15,8 @@ const Header = ({pageIndex, onDiscardCurrent, onBackHomePage, status}) => {
         <div className={ownClassNames.header}>
             {
                 status === 'create' ?
-                    <span onClick={onDiscardCurrent} className={ownClassNames['header-back']}><i class="icon-left-open-2"></i>返回自定义分析</span> :
-                    <span onClick={onBackHomePage} className={ownClassNames['header-back']} >返回</span>
+                    <span onClick={onDiscardCurrent} className={ownClassNames['header-back']}><i className="icon-left-open-2"></i>返回自定义分析</span> :
+                    <span onClick={onBackHomePage} className={ownClassNames['header-back']}><i className="icon-left-open-2"></i>返回</span>
             }
             {
                 status === 'create' ?

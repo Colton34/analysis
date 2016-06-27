@@ -30,7 +30,7 @@ import {NUMBER_MAP as numberMap} from '../../lib/constants';
         }
     };
  */
-
+/*
 const LevelReport = ({data}) => {
 //这里data既是levels，注意是从大到小排序好的
 
@@ -91,5 +91,79 @@ const LevelReport = ({data}) => {
         </div>
     )
 }
+*/
 
+/**
+ * props:
+ * data: 这里data既是levels，注意是从大到小排序好的
+ */
+class LevelReport extends React.Component {
+    constructor(props){
+        super(props);
+
+    }
+    onHeaderMouseEnter(){
+
+    }
+    onHeaderMouseLeave() {
+
+    }
+    render() {
+        var renderData = _.map(this.props.data, function (levObj, levelKey) {
+            var obj = {};
+            obj.name = numberMap[levelKey-0+1] + '档';
+            obj.y = levObj.percentage;
+            obj.score = levObj.score;
+            obj.count = levObj.count;
+            return obj;
+        })
+        const config = {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: 0,
+                plotShadow: false
+            },
+            tooltip: {
+                pointFormat: '分数线：<b>{point.score}</b><br>上线率：<b>{point.percentage:.1f}%</b><br>人数：{point.count}'
+            },
+            title: {
+                text: ''
+            },
+            plotOptions: {
+                pie: {
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                type: 'pie',
+                innerSize: '60%',
+                data: renderData
+            }],
+            legend: {
+                align: 'right',
+                verticalAlign: 'middle',
+                layout: 'vertical',
+                labelFormat: '{name}({score}+)'
+            },
+            credits: {
+                enabled: false
+            }
+
+        }
+        return (
+            <div style={{ display: 'inline-block', height: 340, padding: '0 10px 0 0' }}  className='col-lg-4'>
+                <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px'}}>
+                    <div id='schoolReportHeader' onMouseEnter={this.onHeaderMouseEnter} onMouseLeave={this.onHeaderMouseLeave} style={{ height: 50, lineHeight: '50px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' }}>
+                        <span style={{ color: '#333', fontSize: 16, marginRight: 10 }}>分档分析报告</span>
+                        <span style={{ float: 'right', color: '#bfbfbf' }}><i className='icon-right-open-2'></i></span>
+                    </div>
+                    <ReactHighcharts config={config} style={{ maxWidth: 330, maxHeight: 235, marginTop:20 }}></ReactHighcharts>
+                </div>
+            </div>
+        )
+    }
+}
 export default Radium(LevelReport);

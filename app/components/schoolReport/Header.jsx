@@ -51,7 +51,7 @@ class Header extends React.Component {
         return (
             <div>
                 <div style={{ height: 110, padding: '40px 0 20px 20px', backgroundColor: '#fcfcfc', position: 'relative' }}>
-                    <a href={targetUrl} style={[localStyle.goBackLink,{ float: 'left'}]}>{String.fromCharCode(60) } 返回</a>
+                    <a href={targetUrl} style={[localStyle.goBackLink,{ float: 'left'}]}><i className='icon-left-open-3'></i>返回</a>
                     <div style={{ margin: "0 auto", fontSize: 20, width: 600 }}>
                         <div style={{ textAlign: 'center' }}>{examInfo.name}</div>
                         <div style={{ textAlign: 'center' }}>学校总体分析诊断报告</div>
@@ -62,6 +62,7 @@ class Header extends React.Component {
                             width: 120, height: 30, borderRadius: '20px', backgroundColor: '#698fba', color: '#fff', lineHeight: '30px',
                             position: 'absolute', right: '30px', top: '50%', marginTop: '-15px'
                         }}>
+                        <i className='icon-tikuai-1'></i>
                         下载报告
                     </a>
                 </div>

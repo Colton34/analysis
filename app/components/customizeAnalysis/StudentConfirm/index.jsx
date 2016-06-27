@@ -206,7 +206,7 @@ class StudentConfirm extends React.Component {
                                                 <td className={ownClassNames['table-item']}>{groupMap[groupName].name}</td>
                                                 <td className={ownClassNames['table-item']}>{groupMap[groupName].count}</td>
                                                 <td className={ownClassNames['table-item']}>
-                                                    <span onClick={this.onDelGroup.bind(this,groupName)} style={{color:'#6C737A', cursor:'pointer'}}data-name="<%=item.name%>"><i class="icon-delete"></i>删除</span>
+                                                    <span onClick={this.onDelGroup.bind(this,groupName)} style={{color:'#6C737A', cursor:'pointer'}}data-name="<%=item.name%>"><i className="icon-delete"></i>删除</span>
                                                 </td>
                                             </tr>
                                         )
@@ -216,7 +216,7 @@ class StudentConfirm extends React.Component {
                                             <td className={ownClassNames['table-item']}>{groupMap[groupName].name}</td>
                                             <td className={ownClassNames['table-item']}>{groupMap[groupName].count}</td>
                                             <td className={ownClassNames['table-item']}>
-                                                <span onClick={this.onRecoverGroup.bind(this,groupName)} style={{cursor:'pointer'}}data-name="<%=item.name%>"><i class="icon-ccw-1"></i>恢复</span>
+                                                <span onClick={this.onRecoverGroup.bind(this,groupName)} style={{cursor:'pointer'}}data-name="<%=item.name%>"><i className="icon-ccw-1"></i>恢复</span>
                                             </td>
                                         </tr>
                                     )

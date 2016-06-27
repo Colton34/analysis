@@ -86,8 +86,11 @@ class DropdownList extends React.Component {
         var _this = this;
         return (
             <div id='dropdownList'>
-                <a style={[style.btn,{backgroundColor:'#00c076'}]} href="javascript:void(0)" onClick={this.toggleList.bind(this)}>
+                <a style={[style.btn,{backgroundColor:'#00c076', position: 'relative'}]} href="javascript:void(0)" onClick={this.toggleList.bind(this)}>
                     {this.state.current.value}
+                    <span className='dropdown' style={{position: 'absolute', right: 15}}>
+                        <span className='caret'></span>
+                    </span> 
                 </a >
                 {this.props.classList ? (
                     <ul style={this.state.active? style.list : style.hide}>
