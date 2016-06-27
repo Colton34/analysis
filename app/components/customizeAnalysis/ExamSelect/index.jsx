@@ -111,7 +111,7 @@ class ExamSelect extends React.Component {
     onNextPage() {
        var currentPapers = this.props.currentSubject.src;
         var sqmMap = {};
-        
+
         for (var paperId in currentPapers) {
             var currentPaper = currentPapers[paperId];
             var {examName, paperName} = currentPaper;
@@ -157,7 +157,7 @@ class ExamSelect extends React.Component {
         if (legalSQMs.length === 0) {
             this.setState({
                 showInfoDialog: true,
-                infoDialogMsg: '请先选择考试题目' 
+                infoDialogMsg: '请先选择考试题目'
             })
         } else if (legalSQMs.length === 1) {
             this.setState({
@@ -187,7 +187,6 @@ class ExamSelect extends React.Component {
 
 // console.log(exam);
 // console.log(event);
-// debugger;
 
         //对一个paper的checkbox交互，判断是增加还是减少，执行相应的action，从而执行相应的更新操作
         var checked = event.target.checked;

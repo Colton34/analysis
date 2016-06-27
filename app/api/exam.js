@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-27 13:40:31
+* @Last Modified time: 2016-06-27 15:05:24
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -238,7 +238,6 @@ export function fetchSchoolAnalysisData(params) {
 
 // var {topTableData, lowTableData} = theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, headers);
 
-// debugger;
 
 //================================================================================================
 
@@ -293,7 +292,6 @@ function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
 
     //全校信息总是table的第一行
     var totalSchoolRow = makeLevelTableRow(totalSchoolObj);
-    // debugger;
     totalSchoolRow.unshift('全校');
     table.push(totalSchoolRow);
 
@@ -309,9 +307,7 @@ function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
 
 function makeLevelTableRow(rowInfo) {
     //rowInfo每一个levelKey都有对应的对象，而且顺序是对应levels的（即和segments是一样的，都是从低到高，而显示的时候是从高到底，所以这里需要反转）
-    // debugger;
     var tempMap = _.map(rowInfo, (rowObj, levelKey) => [rowObj.count, rowObj.sumCount, rowObj.sumPercentage + '%']);
-    // debugger;
     // vat tempMap = _.map(rowInfo, (rowObj, levelKey) => [rowObj.count, rowObj.sumCount, rowObj.sumPercentage + '%']);
     return _.concat(..._.reverse(tempMap));
 }
@@ -500,7 +496,6 @@ function theSubjectLevelTotalHeader(levels) {
  */
 function theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers) {
     //此档的内容
-    // debugger;
     var table = [];
     var titleHeader = _.map(headers, (headerObj, index) => {
         return headerObj.subject + ' (' + subjectsMean[headerObj.id].mean + ')';
@@ -580,8 +575,6 @@ function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examCl
     //构造基本的原matrix
     var originalMatrix = makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, headers);
 
-    // debugger;
-
     //factorsMatrix中每一行（即一重数组的长度应该和titleHeader相同，且位置意义对应）
     var factorsMatrix = makeFactor(originalMatrix);
 
@@ -644,13 +637,11 @@ function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examI
     var matrix = []; //一维是“班级”--横着来
     //把全校的数据放到第一位
     var totalScoreObj = subjectLevelInfo.totalSchool;
-    // debugger;
     matrix.push(_.map(headers, (headerObj) => _.round(_.divide(totalScoreObj[headerObj.id], examInfo.realStudentsCount), 2)));
 
     _.each(subjectLevelInfo, (subjectsOrTotalScoreObj, theKey) => {
         // var baseCount = (theKey == 'totalSchool') ? examInfo.realStudentsCount : examClassesInfo[theKey].realStudentsCount;
         if (theKey == 'totalSchool') return;
-        // debugger;
         matrix.push(_.map(headers, (headerObj) => _.round(_.divide(subjectsOrTotalScoreObj[headerObj.id], examClassesInfo[theKey].realStudentsCount), 2)));
         // _.map(subjectsOrTotalScoreObj, (count, countKey) => _.round(_.divide(count, baseCount), 2))
         // //有可能某个班级没有考某个科目
@@ -692,7 +683,6 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
         mean: schoolTotalScoreMean,
         name: '总分'
     };
-    // debugger;
 
     var result = {};
     result.totalSchool = {};
@@ -700,11 +690,9 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
     result.totalSchool.totalScore = _.filter(examStudentsInfo, (student) => student.score > schoolTotalScoreMean).length;
 
     _.each(subjectsMean, (subMean, pid) => {
-        // debugger;
         if (pid == 'totalScore') return;
         result.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score >= subMean.mean).length;
     });
-    // debugger;
 
     _.each(studentsGroupByClass, (classStudents, className) => {
         var temp = {};
@@ -712,7 +700,6 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
         temp.totalScore = _.filter(classStudents, (student) => student.score > classTotalScoreMean).length;
 
         _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
-            // debugger;
             temp[pid] = _.filter(papers, (paper) => paper.score >= subjectsMean[pid].mean).length;
         });
 
@@ -1111,7 +1098,6 @@ function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass,
         classRow.unshift(examInfo.gradeName + className + '班');
         table.push(classRow);
     });
-    // debugger;
 
     // console.log('=============== criticalStudentsTable');
     // console.log(table);
