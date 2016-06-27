@@ -52,11 +52,11 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                 return (
                                     <th key={headType} rowSpan='2' data-headtype={headType} className={commonStyle['table-unit']} style={{ verticalAlign: 'middle', minWidth: 50, position: 'relative', cursor: 'pointer' }} onClick={onSort}>
                                         <span>{headerMapper[headType]}</span>
-                                        <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14 }}>
-                                            <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' },  sortInfo.head !== headType ? {visibility: 'visible'} : sortInfo.order === 'asc' ? { visibility: 'visible' } : { visibility: 'hidden' })}>
+                                        <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14}}>
+                                            <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' },  sortInfo.head !== headType ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333'} : { visibility: 'hidden' })}>
                                                 <span className='caret' style={{ width: '100%' }} ></span>
                                             </div>
-                                            <div className='dropdown' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' },  sortInfo.head !== headType ? {visibility: 'visible'} : sortInfo.order === 'desc' ?  { visibility: 'visible' } : { visibility: 'hidden' })}>
+                                            <div className='dropdown' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' },  sortInfo.head !== headType ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'desc' ?  { visibility: 'visible', color: '#333'} : { visibility: 'hidden' })}>
                                                 <span className='caret' style={{ width: '100%' }}></span>
                                             </div>
                                         </span>
@@ -75,10 +75,10 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                         <th key={'headType-' + index}  data-headtype={'score_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 100, position: 'relative', cursor: 'pointer'}} onClick={onSort}>
                                             {headType === 'totalScore' ? '总分' : (headerMapper[headType] + '总分') }
                                             <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14 }}>
-                                                <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('score_' + headType) ? {visibility: 'visible'} : sortInfo.order === 'asc' ? { visibility: 'visible' } : { visibility: 'hidden' }) }>
+                                                <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('score_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
                                                     <span className='caret' style={{ width: '100%' }}></span>
                                                 </div>
-                                                <div className='dropdown' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('score_' + headType) ? {visibility: 'visible'} : sortInfo.order === 'desc' ? { visibility: 'visible' } : { visibility: 'hidden' })}>
+                                                <div className='dropdown' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('score_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'desc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' })}>
                                                     <span className='caret' style={{ width: '100%' }}></span>
                                                 </div>
                                             </span>
@@ -89,10 +89,10 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                         <th key={'headType-' + index} data-headtype={'groupRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 50, position: 'relative', cursor: 'pointer'}} onClick={onSort}>
                                             {headerMapper[headType] + '排名'}
                                             <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14 }}>
-                                                <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('groupRank_' + headType) ? {visibility: 'visible'} : sortInfo.order === 'asc' ? { visibility: 'visible' } : { visibility: 'hidden' }) }>
+                                                <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('groupRank_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
                                                     <span className='caret' style={{ width: '100%' }} data-order='asc' data-headtype={'groupRank_' + headType}></span>
                                                 </div>
-                                                <div className='dropdown' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('groupRank_' + headType) ? {visibility: 'visible'} :  sortInfo.order === 'desc' ? { visibility: 'visible' } : { visibility: 'hidden' }) }>
+                                                <div className='dropdown' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('groupRank_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} :  sortInfo.order === 'desc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
                                                     <span className='caret' style={{ width: '100%' }}></span>
                                                 </div>
                                             </span>
@@ -103,10 +103,10 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                         <th key={'headType-' + index} data-headtype={'classRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 50, position: 'relative', cursor: 'pointer'}} onClick={onSort}>
                                             {headerMapper[headType] + '班级排名'}
                                             <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14 }}>
-                                                <div className='dropup'  style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('classRank_' + headType) ? {visibility: 'visible'} : sortInfo.order === 'asc' ? { visibility: 'visible' } : { visibility: 'hidden' }) }>
+                                                <div className='dropup'  style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('classRank_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
                                                     <span className='caret' style={{ width: '100%' }}></span>
                                                 </div>
-                                                <div className='dropdown'  style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('classRank_' + headType) ? {visibility: 'visible'} : sortInfo.order === 'desc' ? { visibility: 'visible' } : { visibility: 'hidden' })}>
+                                                <div className='dropdown'  style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('classRank_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'desc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' })}>
                                                     <span className='caret' style={{ width: '100%' }}></span>
                                                 </div>
                                             </span>
