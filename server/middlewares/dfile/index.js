@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-27 11:31:28
+* @Last Modified time: 2016-06-27 11:40:46
 */
 
 'use strict';
@@ -185,8 +185,6 @@ exports.exportRankReport = function(req, res, next) {
         var keys = JSON.parse(req.body.keys);
         var names = JSON.parse(req.body.names);
         var matrix = JSON.parse(req.body.matrix);
-
-console.log('keys.length = ', keys.length, '  names.length = ', names.length, '   matrix.length = ', matrix.length);
 
         var specification = {};
         _.each(keys, (k, i) => {

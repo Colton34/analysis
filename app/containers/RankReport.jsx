@@ -435,7 +435,6 @@ class RankReportTableView extends React.Component {
         })
     }
     clickDownloadTable(theRowDatas) {
-        debugger;
         downloadTable(this.state.headSeq, this.state.headSelect, headerMapper, theRowDatas);
     }
     render() {
