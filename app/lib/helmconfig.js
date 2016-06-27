@@ -28,6 +28,7 @@ const config = {
     { rel: 'stylesheet', href: '/styles/datepicker.css' },
     { rel: 'stylesheet', href: '/styles/spinkit.css' },
     { rel: 'stylesheet', href: '/styles/fontello.css' },
+    { rel: 'stylesheet', href: '/styles/global.css' },
     { rel: 'stylesheet', href: 'http://vjs.zencdn.net/5.10.2/video-js.css'}
     // SEO: If your mobile URL is different from the desktop URL,
     // add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones

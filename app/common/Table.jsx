@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './common.css';
 import _ from 'lodash';
-
+import {Table as BootTable} from 'react-bootstrap';
 /**
  * 传入一个tableData 对象,包含表格头数据(ths)和单元格数据(tds)
  * 传入的参数为 tableData
@@ -11,9 +11,9 @@ const Table = ({tableData}) => {
     var tableHeaderData = tableData[0];
     var tableBodyData = _.slice(tableData, 1);
     return (
-        <table  style={{border: '1px solid #d7d7d7', borderCollapse: 'collapse', width: '100%' }}>
+        <BootTable bordered  hover responsive >
             <tbody>
-                <tr style={{ backgroundColor: '#f4faee' }}>
+                <tr style={{ backgroundColor: '#fafafa' }}>
                     {
                         _.map(tableData[0], (th,index) => {
                             return (
@@ -40,7 +40,7 @@ const Table = ({tableData}) => {
                     })
                 }
             </tbody>
-        </table>
+        </BootTable>
     )
 }
 

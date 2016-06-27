@@ -50,9 +50,9 @@ class Header extends React.Component {
 
         return (
             <div>
-                <div style={{ height: 110, padding: '40px 0 20px 20px', backgroundColor: '#fcfcfc', position: 'relative' }}>
-                    <a href={targetUrl} style={[localStyle.goBackLink,{ float: 'left'}]}><i className='icon-left-open-3'></i>返回</a>
-                    <div style={{ margin: "0 auto", fontSize: 20, width: 600 }}>
+                <div style={{ height: 110, padding: '0 0 20px 20px', backgroundColor: '#fcfcfc', position: 'relative', display:'table-cell', width: 1000, verticalAlign: 'middle', textAlign: 'center'}}>
+                    <a href={targetUrl} style={[localStyle.goBackLink,{ float: 'left', marginTop: 20}]}><i className='icon-left-open-3'></i>返回</a>
+                    <div style={{ margin: "0 auto", fontSize: 20, width: 700 }}>
                         <div style={{ textAlign: 'center' }}>{examInfo.name}</div>
                         <div style={{ textAlign: 'center' }}>学校总体分析诊断报告</div>
                     </div>
@@ -60,14 +60,14 @@ class Header extends React.Component {
                         onClick={this.downloadFile.bind(this)}
                         style={{
                             width: 120, height: 30, borderRadius: '20px', backgroundColor: '#698fba', color: '#fff', lineHeight: '30px',
-                            position: 'absolute', right: '30px', top: '50%', marginTop: '-15px'
+                            position: 'absolute', right: '30px', top: '50%', marginTop: '-20px'
                         }}>
                         <i className='icon-tikuai-1'></i>
                         下载报告
                     </a>
                 </div>
                 <div className={styles['school-report-content']}>
-                    <p style={{ lineHeight: '2', marginTop: 40, textIndent: 28 }}>
+                    <p style={{ lineHeight: '22px', marginTop: 40, textIndent: 28, fontSize: 14}}>
                         本次考试（考试时间： <span className={styles['school-report-dynamic']}>{startTime}</span>），
                         我校<span className={styles['school-report-dynamic']}>{examInfo.gradeName}</span>年级<span className={styles['school-report-dynamic']}>{examInfo.realClasses.length}</span>个班级
                         共<span className={styles['school-report-dynamic']}>{examInfo.realStudentsCount}</span>名学生参加，进行了

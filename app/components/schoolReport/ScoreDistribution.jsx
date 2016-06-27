@@ -3,7 +3,7 @@ import style from '../../common/common.css';
 import ReactHighcharts from 'react-highcharts';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import { Modal } from 'react-bootstrap';
+import { Modal, Table as BootTable} from 'react-bootstrap';
 import _ from 'lodash';
 
 import {showDialog, hideDialog} from '../../reducers/global-app/actions';//TODO: 设计思路？？？
@@ -16,8 +16,8 @@ import TableView from './TableView';
 var {Header, Title, Body, Footer} = Modal;
 
 let localStyle = {
-    dialogInput: {width: 150,height: 50},
-    btn: {lineHeight: '50px', width: 150, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',margin: '0 30px'},
+    dialogInput: {width: 150,height: 40, border: '1px solid #e7e7e7', borderRadius: 2},
+    btn: {lineHeight: '32px', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',color: '#6a6a6a', margin: '0 6px'},
     tableShowAllBtn: { color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }
 }
 
@@ -34,9 +34,9 @@ const Table = ({tableData, levels}) => {
         }
     }
     return (
-        <table  style={Object.assign({},{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', overflow: 'scroll'}, widthProp)}>
+        <BootTable  bordered  hover responsive style={_.assign({},  widthProp)}>
             <tbody>
-                <tr style={{ backgroundColor: '#f4faee' }}>
+                <tr style={{ backgroundColor: '#fafafa' }}>
                     <th rowSpan="2" className={style['table-unit']}>班级</th>
                     {
                         _.map(_.range(levTotal), (index) =>{
@@ -48,7 +48,7 @@ const Table = ({tableData, levels}) => {
                         })
                     }
                 </tr>
-                <tr style={{ backgroundColor: '#f4faee' }}>
+                <tr style={{ backgroundColor: '#fafafa' }}>
                     {
                         _.map(_.range(levTotal), () =>{
                             return  _.map(_.range(3), (index) =>  {
@@ -80,7 +80,7 @@ const Table = ({tableData, levels}) => {
                     })
                 }
             </tbody>
-        </table>
+        </BootTable>
     )
 }
 
@@ -282,44 +282,44 @@ class Dialog extends React.Component {
 //重绘要不要 来自 props
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {})}>
-                <Header closeButton style={{textAlign: 'center'}}>
+                <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
                     分档参数设置
                 </Header>
-                <Body className="apply-content">
+                <Body style={{padding: 30}}>
                 <div style={{ minHeight: 230 }}>
-                <span style={{ float: 'right' }}>总分： {examInfo.fullMark}  最高分: {_.last(examStudentsInfo).score}</span>
-                <div style={{ clear: 'both' }}>
-                    <div>
-                        整体分档为：<input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={{ width: 150, height: 30 }} defaultValue={_this.state.levelNum} onChange={_this.onChange.bind(_this, 'levelInput') }/> {/*加个'levelInput'是几个意思？*/}
+                        <span style={{ float: 'right' }}>总分： {examInfo.fullMark}  最高分: {_.last(examStudentsInfo).score}</span>
+                        <span style={{ clear: 'both' }}>
+                            <div style={{marginBottom: 30}}>
+                                整体分档为：<input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={localStyle.dialogInput} defaultValue={_this.state.levelNum} onChange={_this.onChange.bind(_this, 'levelInput') }/> {/*加个'levelInput'是几个意思？*/}
+                            </div>
+                            <div>
+                                {
+                                    _.map(_.range(this.state.levelNum), (index) => {
+                                        return (
+                                            <div key={index} style={{marginBottom: index === this.state.levelNum -1 ? 0 : 30, textAlign: 'center'}}>
+                                                <div style={{ display: 'inline-block' }}>{numberMap[(index + 1)]}档：
+                                                    <input id={'score-' + index} ref={'score-' + index} defaultValue={this.levels[(this.levLastIndex - index) + ''].score} onBlur={_this.onInputBlur.bind(_this, 'score-' + index) } onChange={_this.onChange.bind(_this, 'score-' + index) } style={localStyle.dialogInput}/>
+                                                </div>
+                                                <div style={{ display: 'inline-block' }}>上线率：
+                                                    <input id={'rate-' + index} ref={'rate-' + index} defaultValue={this.levels[(this.levLastIndex - index) + ''].percentage} onBlur={_this.onInputBlur.bind(_this, 'rate-' + index) } onChange={_this.onChange.bind(_this, 'rate-' + index) } style={localStyle.dialogInput}/>
+                                                    %
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </span>
                     </div>
-                    <div>
-                        {
-                            _.map(_.range(this.state.levelNum), (index) => {
-                                return (
-                                    <div key={index}>
-                                        <div style={{ display: 'inline-block' }}>{numberMap[(index + 1)]}档：
-                                            <input id={'score-' + index} ref={'score-' + index} defaultValue={this.levels[(this.levLastIndex-index)+''].score} onBlur={_this.onInputBlur.bind(_this, 'score-' + index) } onChange={_this.onChange.bind(_this, 'score-' + index) } style={localStyle.dialogInput}/>
-                                        </div>
-                                        <div style={{ display: 'inline-block' }}>上线率：
-                                            <input id={'rate-' + index} ref={'rate-' + index} defaultValue={this.levels[(this.levLastIndex-index)+''].percentage} onBlur={_this.onInputBlur.bind(_this, 'rate-' + index) } onChange={_this.onChange.bind(_this, 'rate-' + index) } style={localStyle.dialogInput}/>
-                                            %
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                </div>
-            </div>
                 </Body>
-                    <Footer className="text-center" style={{textAlign: 'center',borderTop: 0}}>
-                        <a href="javascript:void(0)" style={localStyle.btn} onClick={_this.okClickHandler.bind(_this)}>
-                            确定
-                        </a>
-                        <a href="javascript:void(0)" style={localStyle.btn} onClick={this.props.onHide}>
-                            取消
-                        </a>
-                     </Footer>
+                <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0, padding: '0 0 30px 0' }}>
+                    <a href="javascript:void(0)" style={_.assign({}, localStyle.btn, { backgroundColor: '#59bde5', color: '#fff' }) } onClick={_this.okClickHandler.bind(_this) }>
+                        确定
+                    </a>
+                    <a href="javascript:void(0)" style={localStyle.btn} onClick={this.props.onHide}>
+                        取消
+                    </a>
+                </Footer>
 
 
             </Modal>

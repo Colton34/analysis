@@ -42,7 +42,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
     // <table style={{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', overflow: 'scroll', width: '100%'}}>
     return (
         <div>
-         <BootTable id="rankTable"  bordered condensed hover responsive style={{overflowX: 'scroll'}}>
+         <BootTable id="rankTable"  bordered condensed hover responsive>
             <thead>
                 <tr style={{ backgroundColor: '#fafafa' }}>
                     {

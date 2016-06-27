@@ -18,7 +18,7 @@ import TableView from './TableView';
 var {Header, Title, Body, Footer} = Modal;
 
 let localStyle = {
-    btn: {lineHeight: '50px', width: 150, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',margin: '0 30px'}
+    btn: {lineHeight: '32px', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',color: '#6a6a6a', margin: '0 6px'}
 }
 
 class Dialog extends React.Component {
@@ -100,16 +100,16 @@ class Dialog extends React.Component {
 
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this) }>
-                <Header closeButton style={{ textAlign: 'center' }}>
+                <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
                     设置临界生分数
                 </Header>
-                <Body className="apply-content">
+                <Body style={{padding: 30}}>
                     <div style={{ minHeight: 150, display: 'table', margin:'0 auto'}}>
                         <div style={{display: 'table-cell', verticalAlign: 'middle'}}>
                         {
                             _.map(this.levelBuffers, (buffer, index) => {
                                 return (
-                                    <div key={index} style={{textAlign: 'center', marginBottom:20}}>
+                                    <div key={index} style={{textAlign: 'center', marginBottom: index === this.levelBuffers.length - 1 ? 0 : 30}}>
                                         {numberMap[index+1]}档线上下浮分数：
                                         <input ref={'buffer-' + index} onBlur={_this.onInputBlur.bind(_this, index) } defaultValue={this.levelBuffers[this.levelBuffers.length-1-index]} style={{ width: 140, heigth: 28, display: 'inline-block', textAlign: 'center' }}/>分
                                     </div>
@@ -119,8 +119,8 @@ class Dialog extends React.Component {
                         </div>
                     </div>
                 </Body>
-                <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0 }}>
-                    <a href="javascript:void(0)" style={localStyle.btn} onClick={_this.okClickHandler.bind(_this) }>
+                <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0, padding: '0 0 30px 0' }}>
+                    <a href="javascript:void(0)" style={_.assign({}, localStyle.btn, { backgroundColor: '#59bde5', color: '#fff' })} onClick={_this.okClickHandler.bind(_this) }>
                         确定
                     </a>
                     <a href="javascript:void(0)" style={localStyle.btn} onClick={this.props.onHide}>
