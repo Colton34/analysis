@@ -479,21 +479,15 @@ class RankReportTableView extends React.Component {
         var dataBegin = pageIndex * pageSize + 1;
         var dataEnd = (pageIndex + 1) * pageSize < showData.length ? (pageIndex + 1) * pageSize : showData.length;
 
+// debugger;
+
+
         var theRowDatas = this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+        // debugger;
         return (
             <div style={{ margin: '30px 30px 30px 35px' }}>
                 <div style={{border: '1px solid #eeeeee', padding: '5px 30px 0 30px'}}>
-                    <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
-                        <span style={{color: '#d0d0d0', marginRight: 10}}>学科：</span>
-                        <a onClick={this.onSelectPaper.bind(this) } data-paperid='all' style={this.state.currentPaper.name === '全科' ? localStyle.activeSubject : localStyle.subject} href='javascript:;'>全科</a>
-                        {
-                            examInfo.papers.map((subjectObj, index) => {
-                                return (
-                                    <a key={'papers-' + index} onClick={this.onSelectPaper.bind(this) } data-paperid={subjectObj.paper} href='javascript:;' style={this.state.currentPaper.name === subjectObj.name ? localStyle.activeSubject : localStyle.subject}>{subjectObj.name}</a>
-                                )
-                            })
-                        }
-                    </div>
+
                     <div style={{heigth: 50, lineHeight: '50px'}}>
                         <span style={{color: '#d0d0d0', float: 'left', marginRight: 10}}>班级：</span>
                         <span style={{float: 'left', width: 800}}>
@@ -544,6 +538,8 @@ class RankReportTableView extends React.Component {
                         <Button onClick={this.clickDownloadTable.bind(this, theRowDatas)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff'}}>下载表格</Button>
                     </div>
                 </div>
+
+
                 <Table
                     firstLineHead = {firstLineHead}
                     secondLineHead = {secondLineHead}
@@ -552,6 +548,8 @@ class RankReportTableView extends React.Component {
                     headSelect = {this.state.headSelect}
                     onSort= {this.onSort.bind(this)}
                     sortInfo={this.state.sortInfo}/>
+
+
 
                 <span style={{margin: '20px 0', display: 'inline-block'}}>
                     显示第{dataBegin}到第{dataEnd}条记录，总共{this.state.showData.length}条记录
@@ -712,6 +710,9 @@ class RankReport extends React.Component {
     componentDidMount() {
         if (this.props.haveInit) return;
 
+console.log('componentDidMount rank report');
+// debugger;
+
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initRankReport(params);
 
@@ -753,16 +754,16 @@ class RankReport extends React.Component {
     }
      */
     // 根据examinfo里的paper来获取表头的显示顺序
-    getHeadSeq() {
-        _.forEach(this.props.examInfo.papers, paperObj=> {
+    getHeadSeq(examInfo) {
+        _.forEach(examInfo.papers, paperObj=> {
             _.forEach(['score', 'groupRank', 'classRank'], item => {
                 this.headSeq.push(item + '_' + paperObj.paper)
             })
         })
     }
     // 生成所有学生的待显示数据
-    generateStudentInfos() {
-         _.forEach(this.props.rankCache, (classGroup, scoreType) => {
+    generateStudentInfos(rankCache) {
+         _.forEach(rankCache, (classGroup, scoreType) => {
             var scoreMap = {};
             var allStudents = [];
             _.forEach(classGroup, (studentsArr, className) => {
@@ -818,8 +819,13 @@ class RankReport extends React.Component {
                  </div>
             )
         }
-        this.getHeadSeq();
-        this.generateStudentInfos();
+        this.getHeadSeq(examInfo);
+        this.generateStudentInfos(rankCache);
+// console.log('examInfo === ', examInfo);
+// console.log('rankCache === ', rankCache);
+// console.log('this.studentInfos === ', this.studentInfos);
+// debugger;
+// debugger;
 
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
@@ -833,8 +839,8 @@ class RankReport extends React.Component {
                     <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span style={{color: '#b4b4b4'}}>{examInfo.name + ' > '}</span>分数排行榜</span>
                 </div>
                 <RankReportTableView
-                    examInfo={this.props.examInfo}
-                    rankCache={this.props.rankCache}
+                    examInfo={examInfo}
+                    rankCache={rankCache}
                     studentInfos={this.studentInfos}
                     headSeq={this.headSeq}
                     />

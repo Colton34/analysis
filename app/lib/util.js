@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-27 11:36:20
+* @Last Modified time: 2016-06-27 15:02:16
 */
 
 'use strict';
@@ -59,7 +59,6 @@ export function downloadTable(headSeq, headSelect, headerMapper, renderRows) {
             var keys = _.split(headKey, '_');
             var names = _.map(keys, (k) => headerMapper[k]);
             var theName = _.join(_.reverse(names), '');
-            console.log('theName = ', theName);
             validColumnNames.push(theName);
         }
     });

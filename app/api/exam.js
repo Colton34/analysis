@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-23 21:24:10
+* @Last Modified time: 2016-06-27 13:40:31
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -1474,7 +1474,7 @@ rankCache: {
 
  */
 export function fetchRankReportdData(params) {
-    var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + params.grade : examPath + '/custom/rank/report?examid=' + params.examid;
+    var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/rank/report?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
