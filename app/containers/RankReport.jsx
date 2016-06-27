@@ -556,7 +556,7 @@ class RankReportTableView extends React.Component {
                     <span style={dataEnd < 25 ? {display: 'none'} : {display: 'inline-block'}}>
                         ，每页显示
                         <DropdownButton id='pageSize-select' title={pageSize} dropup style={{ margin: '0 2px' }}>
-                            <MenuItem onClick={this.onSelectPageSize.bind(this) } active={pageSize === 4}>4</MenuItem>
+                            <MenuItem onClick={this.onSelectPageSize.bind(this) } active={pageSize === 25}>25</MenuItem>
                             <MenuItem style={ this.state.showData.length > 25 ? { display: 'block' } : { display: 'none' }} onClick={this.onSelectPageSize.bind(this) } active={pageSize === 50}>50</MenuItem>
                             <MenuItem style={ this.state.showData.length > 50 ? { display: 'block' } : { display: 'none' }}  onClick={this.onSelectPageSize.bind(this) } active={pageSize === 100}>100</MenuItem>
                             <MenuItem style={ this.state.showData.length > 100 ? { display: 'block' } : { display: 'none' }} onClick={this.onSelectPageSize.bind(this) } active={pageSize === 1000}>1000</MenuItem>
