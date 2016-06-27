@@ -23,7 +23,6 @@ class RankReport extends React.Component {
         //注意：没有排序。。。
         console.log(this.props.examInfo);
         console.log(this.props.rankCache);
-        debugger;
         return (<h1>HellMagic</h1>)
     }
 }
