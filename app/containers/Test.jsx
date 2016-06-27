@@ -2,6 +2,7 @@ import React from 'react';
 import {Link} from 'react-router';
 
 import { Button } from 'react-bootstrap';
+import Navbar from 'react-bootstrap/lib/Navbar';
 
 import Radium from 'radium';
 

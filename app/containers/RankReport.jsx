@@ -7,7 +7,7 @@ import _ from 'lodash';
 import {Map, List} from 'immutable';
 
 import {initRankReportAction} from '../reducers/rankReport/actions';
-import {initParams} from '../lib/util';
+import {initParams, downloadTable} from '../lib/util';
 import {DropdownButton, Button, Table as BootTable, Pagination, MenuItem} from 'react-bootstrap';
 import commonStyle from '../common/common.css';
 import Spinkit from '../common/Spinkit';
@@ -25,7 +25,7 @@ var headerMapper = {
  * renderRows:
  * onSort: 排序的函数
  */
-const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, onSort, sortInfo, downloadTable}) => {
+const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, onSort, sortInfo}) => {
     //todo: 处理一遍renderHead, 找出各个两行表头的列数，方便遍历；
     var counter = {};
     var secondLineHeadMap = {};
@@ -41,7 +41,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
     // <table style={{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', overflow: 'scroll', width: '100%'}}>
     return (
         <div>
-         <BootTable id="rankTable" striped bordered condensed hover responsive style={{overflowX: 'scroll'}}>
+         <BootTable striped bordered condensed hover responsive style={{overflowX: 'scroll'}}>
             <thead>
                 <tr style={{ backgroundColor: '#f4faee' }}>
                     {
@@ -434,17 +434,9 @@ class RankReportTableView extends React.Component {
             showData: _.orderBy(this.state.showData, [headType], [order])
         })
     }
-    downloadTable() {
-        // console.log('downloadTable');
-        // console.log($("#rankTable"));
-        // debugger;
-        // var newJquery = tableExport($);
-
-        $.fn.extend({tableExport: tableExport});
-        // console.log($.fn);
-        // console.log($("#rankTable"));
-        $('#rankTable').tableExport({type:'excel', escape:'false'});
-        // debugger;
+    clickDownloadTable(theRowDatas) {
+        debugger;
+        downloadTable(this.state.headSeq, this.state.headSelect, headerMapper, theRowDatas);
     }
     render() {
         var {examInfo} = this.props;
@@ -452,6 +444,8 @@ class RankReportTableView extends React.Component {
         var {pageIndex, pageSize, showData} = this.state;
         var dataBegin = pageIndex * pageSize + 1;
         var dataEnd = (pageIndex + 1) * pageSize < showData.length ? (pageIndex + 1) * pageSize : showData.length;
+
+        var theRowDatas = this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
         return (
             <div style={{ margin: '10px 30px 40px 35px' }}>
                 <div>
@@ -504,14 +498,13 @@ class RankReportTableView extends React.Component {
                             })
                         }
                         </DropdownButton>
-                        <Button onClick={this.downloadTable.bind(this)} style={{ margin: '0 2px' }}>下载</Button>
+                        <Button onClick={this.clickDownloadTable.bind(this, theRowDatas)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff'}}>下载表格</Button>
                     </div>
                 </div>
                 <Table
-                    downloadTable = {this.downloadTable.bind(this)}
                     firstLineHead = {firstLineHead}
                     secondLineHead = {secondLineHead}
-                    renderRows ={this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)}
+                    renderRows ={theRowDatas}
                     headSeq = {this.state.headSeq}
                     headSelect = {this.state.headSelect}
                     onSort= {this.onSort.bind(this)}
@@ -522,7 +515,7 @@ class RankReportTableView extends React.Component {
                     <span style={dataEnd < 25 ? {display: 'none'} : {display: 'inline-block'}}>
                         ，每页显示
                         <DropdownButton id='pageSize-select' title={pageSize} dropup style={{ margin: '0 2px' }}>
-                            <MenuItem onClick={this.onSelectPageSize.bind(this) } active={pageSize === 25}>25</MenuItem>
+                            <MenuItem onClick={this.onSelectPageSize.bind(this) } active={pageSize === 4}>4</MenuItem>
                             <MenuItem style={ this.state.showData.length > 25 ? { display: 'block' } : { display: 'none' }} onClick={this.onSelectPageSize.bind(this) } active={pageSize === 50}>50</MenuItem>
                             <MenuItem style={ this.state.showData.length > 50 ? { display: 'block' } : { display: 'none' }}  onClick={this.onSelectPageSize.bind(this) } active={pageSize === 100}>100</MenuItem>
                             <MenuItem style={ this.state.showData.length > 100 ? { display: 'block' } : { display: 'none' }} onClick={this.onSelectPageSize.bind(this) } active={pageSize === 1000}>1000</MenuItem>

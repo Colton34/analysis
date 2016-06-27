@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-23 09:49:22
+* @Last Modified time: 2016-06-27 11:31:28
 */
 
 'use strict';
@@ -155,6 +155,69 @@ exports.exportExamStudent = function(req, res, next) {
         res.status(200).send(report);
     }catch(err){
         next(new errors.Error('生成学生列表错误', err));
+    }
+}
+
+exports.exportRankReport = function(req, res, next) {
+    //接收到客户端的数据，然后输出excel file
+    req.checkBody('keys', '无效的keys').notEmpty();
+    req.checkBody('names', '无效的names').notEmpty();
+    req.checkBody('matrix', '无效的matrix').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    var headerDark= {
+        fill: {
+            fgColor: {
+                rgb: 'FFFFFFFF'
+            }
+        },
+        font: {
+            color: {
+                rgb: '00000000'
+            },
+            sz: 14,
+            bold: true
+        }
+    };
+
+    //构造 specification和object data
+    try {
+        var keys = JSON.parse(req.body.keys);
+        var names = JSON.parse(req.body.names);
+        var matrix = JSON.parse(req.body.matrix);
+
+console.log('keys.length = ', keys.length, '  names.length = ', names.length, '   matrix.length = ', matrix.length);
+
+        var specification = {};
+        _.each(keys, (k, i) => {
+            specification[k] = {
+                displayName: names[i],
+                headerStyle: headerDark
+            };
+        });
+        //每一行是一个对象--对象对应key:value，构成一个对象数组
+        var datas = _.map(matrix, (sinfo) => {
+            var obj = {};
+            _.each(keys, (k, i) => {
+                obj[k] = sinfo[i];
+            });
+            return obj;
+        });
+
+        var report = excel.buildExport(
+            [
+                {
+                    name: '排行榜',
+                    specification: specification,
+                    data: datas
+                }
+            ]
+        );
+
+        res.attachment('排行榜.xlsx');
+        res.status(200).send(report);
+    } catch(e) {
+        next(new errors.Error('生成排行榜文件错误', e));
     }
 }
 
@@ -386,6 +449,7 @@ function getWorkSheetProfile(ws) {
     }
     return result;
 }
+
 
 function parseStudentList(ws){
     //code = 1,有错误; code = 0, 正确解析,内容在data
