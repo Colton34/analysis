@@ -487,7 +487,17 @@ class RankReportTableView extends React.Component {
         return (
             <div style={{ margin: '30px 30px 30px 35px' }}>
                 <div style={{border: '1px solid #eeeeee', padding: '5px 30px 0 30px'}}>
-
+                    <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
+                        <span style={{color: '#d0d0d0', marginRight: 10}}>学科：</span>
+                        <a onClick={this.onSelectPaper.bind(this) } data-paperid='all' style={this.state.currentPaper.name === '全科' ? localStyle.activeSubject : localStyle.subject} href='javascript:;'>全科</a>
+                        {
+                            examInfo.papers.map((subjectObj, index) => {
+                                return (
+                                    <a key={'papers-' + index} onClick={this.onSelectPaper.bind(this) } data-paperid={subjectObj.paper} href='javascript:;' style={this.state.currentPaper.name === subjectObj.name ? localStyle.activeSubject : localStyle.subject}>{subjectObj.name}</a>
+                                )
+                            })
+                        }
+                    </div>
                     <div style={{heigth: 50, lineHeight: '50px'}}>
                         <span style={{color: '#d0d0d0', float: 'left', marginRight: 10}}>班级：</span>
                         <span style={{float: 'left', width: 800}}>

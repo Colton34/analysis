@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-27 15:12:44
+* @Last Modified time: 2016-06-28 18:34:43
 */
 
 'use strict';
@@ -197,13 +197,11 @@ function getValidPaper(examid, gradeName) {
             if(err) return reject(new errors.data.MongoDBError('find exam error : ', err));
             //过滤paper
             targetExam = exam;
-            console.log('filter前papers.length = ', exam['[papers]'].length, '    grade == ', gradeName);
             resolve(_.filter(exam['[papers]'], (paper) => paper.grade == gradeName));
         });
     }).then(function(validPapers) {
         //查找补全实体信息
         var paperIds = _.map(validPapers, (paperObj) => paperObj.paper);
-        console.log('filter后paperIds.length = ', paperIds.length);
         var paperPromises = _.map(paperIds, (pObjId) => {
             return when.promise(function(resolve, reject) {
                 peterHFS.get(pObjId, function(err, paper) {
