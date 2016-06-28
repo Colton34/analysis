@@ -58,3 +58,35 @@
     bottom: 0;
     text-decoration: none;
 }
+
+.school-report-img {
+    background-image: url(../../images/schoolReport.png);
+    width: 535px;
+    height: 235px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+.level-report-img {
+    width: 386px;
+    height: 317px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-image: url(../../images/levelReport.png);
+}
+
+.subject-report-img {
+    width: 376px;
+    height: 317px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-image: url(../../images/subjectReport.png);
+}
+
+.class-report-img {
+    width: 386px;
+    height: 317px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-image: url(../../images/classReport.png);
+}

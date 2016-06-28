@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-28 18:34:43
+* @Last Modified time: 2016-06-28 18:40:57
 */
 
 'use strict';
@@ -500,16 +500,16 @@ function examInfoGuide(exam) {
 function scoreRank(examScoreArr) {
     //Top的排名
     return {
-        top: _.reverse(_.takeRight(examScoreArr, 5)),
-        low: _.reverse(_.take(examScoreArr, 5))
+        top: _.reverse(_.takeRight(examScoreArr, 6)),
+        low: _.reverse(_.take(examScoreArr, 6))
     }
 }
 
 function customScoreRank(exam) {
     var examStudentsInfo = exam['[studentsInfo]'];
     return {
-        top: _.reverse(_.takeRight(examStudentsInfo, 5)),
-        low: _.reverse(_.take(examStudentsInfo, 5))
+        top: _.reverse(_.takeRight(examStudentsInfo, 6)),
+        low: _.reverse(_.take(examStudentsInfo, 6))
     }
 }
 

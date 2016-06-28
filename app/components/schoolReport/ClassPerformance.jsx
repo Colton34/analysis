@@ -10,13 +10,14 @@ import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
 import styles from '../../common/common.css';
 import TableView from './TableView';
+import {Table as BootTable} from 'react-bootstrap';
 
 const AverageTable = ({tableHeaderData, tableData}) => {
 
     return (
-        <table  style={{border: '1px solid #d7d7d7', borderCollapse: 'collapse', width: '100%' }}>
+        <BootTable  bordered hover responsive>
             <tbody>
-                <tr style={{ backgroundColor: '#f4faee' }}>
+                <tr style={{ backgroundColor: '#fafafa' }}>
                     <th className={styles['table-unit']} rowSpan="2">班级</th>
                     {
                         _.map(tableHeaderData, (subject, index) => {
@@ -26,7 +27,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                         })
                     }
                 </tr>
-                <tr style={{ backgroundColor: '#f4faee' }}>
+                <tr style={{ backgroundColor: '#fafafa' }}>
                 {
                     _.map(_.range(tableHeaderData.length), (num) => {
                         return _.map(_.range(2), (index) => {
@@ -55,7 +56,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                     })
                 }
             </tbody>
-        </table>
+        </BootTable>
     )
 }
 

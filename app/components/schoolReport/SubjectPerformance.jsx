@@ -14,7 +14,7 @@ import TableView from './TableView';
 var {Header, Title, Body, Footer} = Modal;
 
 var localStyle = {
-    btn: {lineHeight: '50px', width: 150, height: 50,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',margin: '0 30px'}
+    btn: {lineHeight: '32px', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',color: '#6a6a6a', margin: '0 6px'}
 }
 
 
@@ -128,12 +128,12 @@ class Dialog extends React.Component {
 // debugger;
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {}) }>
-                <Header closeButton style={{ textAlign: 'center' }}>
+                <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
                     设置等级分数
                 </Header>
-                <Body className="apply-content">
+                <Body style={{padding: 30}}>
                     <div style={{ minHeight: 230 }}>
-                        <div style={{ borderBottom: '1px solid #f2f2f2' }}>
+                        <div style={{ borderBottom: '1px solid #f2f2f2', textAlign: 'center'}}>
                             {
                                 _.map(_.range(gradeLastIndex), (index) => {
 
@@ -142,7 +142,7 @@ class Dialog extends React.Component {
 
                                     if (index === gradeLastIndex-1 && index !== 0) {
                                         return (
-                                            <div style={{ margin: '10px 0' }} onMouseEnter={this.handleMouseEnter}  onMouseLeave={this.handleMouseLeave}  key={index}>
+                                            <div style={{ margin: '30px 0 30px 30px', textAlign: 'left'}} onMouseEnter={this.handleMouseEnter}  onMouseLeave={this.handleMouseLeave}  key={index}>
                                                 <span style={{ marginRight: 20 }}>{charStr}等：</span>
 
                                                 <span style={{ marginRight: 20 }}>表示小于满分×{ this.state.grades[gradeLastIndex-index] }%的分数的学生为{charStr}等</span>
@@ -151,7 +151,7 @@ class Dialog extends React.Component {
                                         )
                                     } else if (index === 0) {
                                         return (
-                                            <div style={{ margin: '10px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={index}>
+                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={index}>
                                                 <span style={{ marginRight: 20 }}>{charStr}等：<input ref={'grade-' + index} defaultValue={this.state.grades[gradeLastIndex-index-1]} onBlur={_this.onInputBlur.bind(_this, index)} />%</span>
                                                 <span style={{ marginRight: 20 }}>表示满分×{ this.state.grades[gradeLastIndex-index-1] }%的分数以上的学生为{charStr}等</span>
                                                 <a onClick={_this.onDeleteGrade.bind(_this, index)}  href='javascript:void(0)'style={{textDecoration:'none'}}id='deleteIcon' className='hide'>x</a>
@@ -159,7 +159,7 @@ class Dialog extends React.Component {
                                         )
                                     } else {
                                         return (
-                                            <div style={{ margin: '10px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={index}>
+                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={index}>
                                                 <span style={{ marginRight: 20 }}>{charStr}等：<input ref={'grade-' + index} defaultValue={this.state.grades[gradeLastIndex-index-1]} onBlur={_this.onInputBlur.bind(_this, index)}/>%</span>
                                                 <span style={{ marginRight: 20 }}>表示满分×{ this.state.grades[gradeLastIndex-index-1] }%到{letterMap[index-1]}等分数的学生为{charStr}等</span>
                                                 <a onClick={_this.onDeleteGrade.bind(_this, index)}  href='javascript:void(0)' style={{textDecoration:'none'}} id='deleteIcon' className='hide'>x</a>
@@ -176,8 +176,8 @@ class Dialog extends React.Component {
                         </div>
                     </div>
                 </Body>
-                <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0 }}>
-                    <a href="javascript:void(0)" style={localStyle.btn} onClick={_this.okClickHandler.bind(_this) }>
+                <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0, padding: '0 0 30px 0' }}>
+                    <a href="javascript:void(0)"  style={_.assign({}, localStyle.btn, { backgroundColor: '#59bde5', color: '#fff' }) } onClick={_this.okClickHandler.bind(_this) }>
                         确定
                     </a>
                     <a href="javascript:void(0)" style={localStyle.btn} onClick={this.props.onHide}>

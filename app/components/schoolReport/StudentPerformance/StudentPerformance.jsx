@@ -6,7 +6,7 @@ import styles from '../../../common/common.css';
 import localStyle from './studentPerformance.css';
 import Radium from 'radium';
 import TableView from '../TableView';
-
+import {Table as BootTable} from 'react-bootstrap';
 var localCss = {
     btn: {
         display: 'inline-block', width: 115, height: 25, color: '#333', lineHeight: '25px', textDecoration: 'none', textAlign: 'center', border: '1px solid #e9e8e6',
@@ -18,9 +18,9 @@ var localCss = {
 
 const Table = ({tableHeaderData, isGood, inputNum, current, tableData}) => {
     return (
-        <table  style={{ border: '1px solid #d7d7d7', borderCollapse: 'collapse', width: '100%' }}>
+        <BootTable bordered hover responsive>
             <tbody>
-                <tr >
+                <tr style={{ backgroundColor: '#fafafa' }}>
                     <th rowSpan="2" className={styles['table-unit']}>班级</th>
                     {
                         _.map(tableHeaderData, (th, index) => {
@@ -30,7 +30,7 @@ const Table = ({tableHeaderData, isGood, inputNum, current, tableData}) => {
                         })
                     }
                 </tr>
-                <tr>
+                <tr style={{ backgroundColor: '#fafafa' }}>
                     {
                         _.map(tableHeaderData, (th, index) => {
                             return (
@@ -57,7 +57,7 @@ const Table = ({tableHeaderData, isGood, inputNum, current, tableData}) => {
                     })
                 }
             </tbody>
-        </table>
+        </BootTable>
     )
 }
 /**
@@ -262,8 +262,10 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                         />
                 </div>
                 <div style={{ marginTop: 30 }}>
-                    注：每个学生都有精准的个人学业诊断分析报告，学生或家长可免费通过“好分数网”查阅个人考试的基本情况。网址：
-                    <a href="http://hfs.yunxiao.com">hfs.yunxiao.com</a>, 账户名为学生本人学号，初始密码为学生家长的电话号码。
+                    <p>
+                        注：每个学生都有精准的个人学业诊断分析报告，学生或家长可免费通过“好分数网”查阅个人考试的基本情况。网址：
+                        <a href="http://hfs.yunxiao.com">hfs.yunxiao.com</a>, 账户名为学生本人学号，初始密码为学生家长的电话号码。
+                    </p>
                 </div>
             </div>
         </div>
