@@ -50,7 +50,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                         firstLineHead.map((headType, index) => {
                             if (_.indexOf(['kaohao', 'name', 'class'], headType) !== -1) {
                                 return (
-                                    <th key={headType} rowSpan='2' data-headtype={headType} className={commonStyle['table-unit']} style={{ verticalAlign: 'middle', minWidth: 50, position: 'relative', cursor: 'pointer' }} onClick={onSort}>
+                                    <th key={headType} rowSpan='2' data-headtype={headType} className={commonStyle['table-unit']} style={{ verticalAlign: 'middle', minWidth: 50, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
                                         <span>{headerMapper[headType]}</span>
                                         <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14}}>
                                             <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' },  sortInfo.head !== headType ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333'} : { visibility: 'hidden' })}>
@@ -62,7 +62,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                         </span>
                                     </th>)
                             }
-                            return <th key={headType} colSpan={counter[headType]} className={commonStyle['table-unit']} style={{verticalAlign:'middle', minWidth: 310}}>{headerMapper[headType]}</th>
+                            return <th key={headType} colSpan={counter[headType]} className={commonStyle['table-unit']} style={{verticalAlign:'middle', minWidth: 310, borderBottomWidth: 1}}>{headerMapper[headType]}</th>
                         })
                     }
                 </tr>
@@ -72,7 +72,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                             return _.range(3).map(index => {
                                 if (index === 0 && secondLineHeadMap['score_' + headType]) {
                                     return (
-                                        <th key={'headType-' + index}  data-headtype={'score_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 100, position: 'relative', cursor: 'pointer'}} onClick={onSort}>
+                                        <th key={'headType-' + index}  data-headtype={'score_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 100, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
                                             {headType === 'totalScore' ? '总分' : (headerMapper[headType] + '总分') }
                                             <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14 }}>
                                                 <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('score_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
@@ -86,7 +86,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                 }
                                 if (index === 1 && secondLineHeadMap['groupRank_' + headType]) {
                                     return (
-                                        <th key={'headType-' + index} data-headtype={'groupRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 50, position: 'relative', cursor: 'pointer'}} onClick={onSort}>
+                                        <th key={'headType-' + index} data-headtype={'groupRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 50, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
                                             {headerMapper[headType] + '排名'}
                                             <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14 }}>
                                                 <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('groupRank_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
@@ -100,7 +100,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                 }
                                 if (index === 2 && secondLineHeadMap['classRank_' + headType]) {
                                     return (
-                                        <th key={'headType-' + index} data-headtype={'classRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 50, position: 'relative', cursor: 'pointer'}} onClick={onSort}>
+                                        <th key={'headType-' + index} data-headtype={'classRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 50, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
                                             {headerMapper[headType] + '班级排名'}
                                             <span style={{ width: 10, height: 20, position: 'absolute', top: '50%', marginTop: -14 }}>
                                                 <div className='dropup'  style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('classRank_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
