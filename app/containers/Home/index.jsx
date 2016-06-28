@@ -28,7 +28,7 @@ const Questionnaire = () => {
                 {
                     questionnaireItem.map((item, index) => {
                         return (
-                            <li key={index} style={{position: 'relative'}}>
+                            <li key={index} className={styles['question-item']} style={{position: 'relative'}}>
                                 <span>{item}</span>
                                 <span className={styles.thumbup}></span>
                             </li>
@@ -59,7 +59,7 @@ const CommonQuestions = () => {
                 {
                     questionList.map((q, index) => {
                         return (
-                            <li key={index} style={{ fontSize: 12 }}>
+                            <li key={index} style={{ fontSize: 12 }} className={styles['question-item']}>
                                 <Link to={{pathname: '/faq'}} style={{ textDecoration: 'none', color: '#333' }}>{q}</Link>
                             </li>
                         )
@@ -82,7 +82,7 @@ class TeacherHelper extends React.Component {
                     target='_blank'
                     href="http://kaoshi2.kss.ksyun.com/yunxiao/kaoshi2.0/pdf/%E5%A5%BD%E5%88%86%E6%95%B0%E9%98%85%E5%8D%B7%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf" >
                     下载使用说明书
-                    <a className='icon-download-1' style={localStyle.downloadIcon}></a>
+                    <span className='icon-download-1' style={localStyle.downloadIcon}></span>
                 </a>
             </div>
         )

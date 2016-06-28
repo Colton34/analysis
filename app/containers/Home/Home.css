@@ -24,10 +24,20 @@
 
 .ul {
      margin-top: 10px; 
-     padding-left: 15px; 
+     padding-left: 0; 
      line-height: 23px; 
+     list-style: none;
 }
-
+.question-item :before {
+    content: "• ";
+    color: #999;
+    font-size: 18px;
+}
+.question-item {
+    display: block;
+    height: 30px;
+    line-height: 30px;
+}
 .banner-img {
     background-image: url(../../images/fx_banner.png);
     background-size: contain;
