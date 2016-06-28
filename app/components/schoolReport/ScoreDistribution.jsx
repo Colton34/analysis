@@ -127,19 +127,39 @@ class Dialog extends React.Component {
 //更新levels
         var tempLevels = {};
         if(value < preLength) {
-            _.each(_.range(_.size(value)), (index) => {
-                tempLevels[index+''] = this.levels[(index+theDiff)]
+            // if(value == 1) {
+            //     // 从this.levels中拿到score，然后重新计算 count和percetage
+            //     tempLevels['0'] = {};
+            //     var targetScore = this.levels[_.size(this.levels)-1].score;
+            //     tempLevels['0'].score = targetScore;
+            //     tempLevels['0'].count = _.size(_.filter(this.props.examStudentsInfo, (s) => s.score >= targetScore));
+            //     tempLevels['0'].percentage = _.round(_.multiply(_.divide(tempLevels['0'].count, this.props.examStudentsInfo.length), 100), 2);
+            //     debugger;
+            // } else {
+            //     _.each(_.range(value), (index) => {
+            //         tempLevels[index+''] = this.levels[(index+theDiff)]
+            //     });
+            // }
+
+            _.each(_.range(value), (index) => {
+                var targetScore = this.levels[(index+theDiff)].score;
+                // debugger;
+                var targetCount = (index == 0) ? _.size(_.filter(this.props.examStudentsInfo, (s) => s.score >= targetScore)) : _.size(_.filter(this.props.examStudentsInfo, (s) => s.score > targetScore));
+                var targetPercentage = _.round(_.multiply(_.divide(targetCount, this.props.examStudentsInfo.length), 100), 2);
+                tempLevels[index+''] = {score: targetScore, count: targetCount, percentage: targetPercentage};
             });
         } else {
             _.each(_.range(theDiff), (index) => {
                 tempLevels[index+''] = {score: 0, count: 0, percentage: 0}
             });
             _.each(_.range(preLength), (index) => {
-                tempLevels[(index+theDiff)+''] = this.levels[index+'']
+                var targetScore = this.levels[index+''].score;
+                var targetCount = _.size(_.filter(this.props.examStudentsInfo, (s) => s.score > targetScore));
+                var targetPercentage = _.round(_.multiply(_.divide(targetCount, this.props.examStudentsInfo.length), 100), 2);
+                tempLevels[(index+theDiff)+''] = {score: targetScore, count: targetCount, percentage: targetPercentage};
             });
         }
         this.levels = tempLevels;
-
         this.setState({ levelNum: value });
     }
 
@@ -377,6 +397,7 @@ class ScoreDistribution extends React.Component {
 
         //算法数据结构
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
+        // debugger;
         var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
         var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels);
 
@@ -703,6 +724,7 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
     //各档的累计人数等于=上一个高档次的累计人数+当前档次的人数（最高档的累计人数和人数是相等的）
     levItem.sumCount = _.sum(_.map(_.pickBy(countsGroupByLevel, (v, k) => k >= levelKey), (count) => count));
     levItem.sumPercentage = _.round(_.multiply(_.divide(levItem.sumCount, baseCount), 100), 2);
+    // debugger;
 
     return levItem;
 }
