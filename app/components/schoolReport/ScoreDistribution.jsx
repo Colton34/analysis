@@ -113,8 +113,9 @@ class Dialog extends React.Component {
     adjustGrades() {
         var value = parseInt(this.refs.levelInput.value);
 
-        if (!(value && _.isNumber(value) && value > 0)) {
-            console.log('value 分档个数必须是正数');
+        //分档只能是这几个数字
+        if (!(_.includes([1, 2, 3, 4, 5], value))) {
+            console.log('分档值必须是包含1~5之间的数字');
             return;
         }
 
