@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link, browserHistory} from 'react-router';
-import styles from './schoolReport.css';
+import dashboardStyle from './dashboard.css';
 
 
 class SchoolReportCard extends React.Component {
@@ -30,7 +30,7 @@ class SchoolReportCard extends React.Component {
         var {examid, grade} = this.props;
         var queryOptions = (grade) ? {examid: examid, grade: grade} : {examid: examid};
         return (
-            <div style={{ display: 'inline-block', height: 340, padding: '0 0 0 10px'}}  className='col-lg-6'>
+            <div style={{ display: 'inline-block', height: 398, padding: '0 0 0 10px'}}  className='col-md-6'>
                 <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
                     <div  onClick={this.toViewSchoolAnalysis.bind(this)}
                           onMouseEnter={this.onHeaderMouseEnter.bind(this)}
@@ -41,7 +41,7 @@ class SchoolReportCard extends React.Component {
                             <i className='icon-right-open-2'></i>
                         </span>
                     </div>
-                    <div className={styles['school-report']} style={{marginTop: 30}}></div>
+                    <div className={dashboardStyle['school-report-img']} style={{marginTop: 30}}></div>
                 </div>
             </div>
         )
@@ -50,7 +50,7 @@ class SchoolReportCard extends React.Component {
 
 var localStyles = {
      linkHeader: {
-        display: 'block', height: 50, lineHeight: '50px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' 
+        display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' 
     }
 }
 export default SchoolReportCard;
