@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 21:15:00
+* @Last Modified time: 2016-06-27 16:58:24
 */
 
 'use strict';
@@ -152,6 +152,36 @@ function fetchExamById(examid) {
 /*
 问题：这里通过examid去获取scores怎么区分是哪个年级的学生的总分呢？哦，通过班级过滤。。。
  */
+/*
+Test Code:
+var lostStudentsInfo = [];
+
+// if(index == 0) {
+// var originalIds = classItem['[students]'];
+// var realIds = _.map(targetClassesScore[classItem.name], (sss) => sss.id+'');
+// var diffIds = _.difference(originalIds, realIds);
+
+// // console.log(targetClassesScore[classItem.name]);
+
+// console.log('originalIds ========');
+// console.log(originalIds);
+// console.log('realIds ============');
+// console.log(realIds);
+// console.log('diffIds ===========  ');
+// console.log(diffIds);
+// }
+
+                // var originalIds = classItem['[students]'];
+                // var realIds = _.map(targetClassesScore[classItem.name], (sss) => sss.id+'');
+                // var diffIds = _.difference(originalIds, realIds);
+                // lostStudentsInfo = _.concat(lostStudentsInfo, diffIds);
+
+
+// console.log('=====================  lost students ==============================');
+// console.log(lostStudentsInfo);
+// console.log('=====================  lost students ==============================');
+// console.log('lostStudentsInfo.length = ', lostStudentsInfo.length);
+ */
 exports.generateExamScoresInfo = function(exam) {
     //Mock Data
     //需要再添加个grade字段--用来过滤grade...这样就不用再去school中找了
@@ -184,7 +214,6 @@ exports.generateExamScoresInfo = function(exam) {
         exam.lostClasses = [], exam.realStudentsCount = 0, exam.lostStudentsCount = 0;
 
         //TODO:在这里还可以添加此班级在此场exam（而不是某一个paper）的realStudentsCount和lostStudentsCount
-
         _.each(exam.grade['[classes]'], (classItem, index) => {
             if (targetClassesScore[classItem.name]) {
                 classItem.realStudentsCount = targetClassesScore[classItem.name].length;
@@ -195,8 +224,6 @@ exports.generateExamScoresInfo = function(exam) {
                 exam.lostClasses.push(classItem.name);
             }
         });
-
-
 
         exam.realClasses = _.keys(targetClassesScore);
         return when.resolve({
