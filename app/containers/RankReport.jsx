@@ -559,7 +559,7 @@ class RankReportTableView extends React.Component {
                         }
                         </ul>
                         </DropdownButton>
-                        <Button onClick={this.clickDownloadTable.bind(this, theRowDatas)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff'}}>下载表格</Button>
+                        <Button onClick={this.clickDownloadTable.bind(this, theRowDatas)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
                     </div>
                 </div>
 
