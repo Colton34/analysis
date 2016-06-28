@@ -22,7 +22,6 @@ export default function reducer(state, action) {
 			_.each(action.res, function(value, key) {
 				nextState = (nextState) ? nextState.set(key, value) : state.set(key, value);
 			});
-			console.log('INIT_RANKREPORT_SUCCESS ============ ');
 			return nextState.set('haveInit', true);
 	}
 	return state;

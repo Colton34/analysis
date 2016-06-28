@@ -93,7 +93,6 @@ class StudentConfirm extends React.Component {
     }
     exportExamStudent() {
         var students = _.concat(..._.map(_.filter(this.state.groupMap, (item, className) => item.status === 'inUse'), (obj) => obj.array));
-
         var url = '/api/v1/file/export/exam/student';
         // for(var key in data){
         //     var value = typeof data[key] === 'string' ? data[key] : JSON.stringify(data[key]);

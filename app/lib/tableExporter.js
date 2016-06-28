@@ -95,10 +95,10 @@ jQuery.base64 = (function($) {
             consoleLog:'false'
     };
 
-    var options = $.extend(defaults, options);
+    options = $.extend(defaults, options);
     var el = this;
 
-    if(defaults.type == 'csv' || defaults.type == 'txt'){
+    if(options.type == 'csv' || options.type == 'txt'){
 
         // Header
         var tdData ="";
@@ -106,8 +106,8 @@ jQuery.base64 = (function($) {
         tdData += "\n";
             $(this).filter(':visible').find('th').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
-                        tdData += '"' + parseString($(this)) + '"' + defaults.separator;
+                    if(options.ignoreColumn.indexOf(index) == -1){
+                        tdData += '"' + parseString($(this)) + '"' + options.separator;
                     }
                 }
 
@@ -121,8 +121,8 @@ jQuery.base64 = (function($) {
         tdData += "\n";
             $(this).filter(':visible').find('td').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
-                        tdData += '"'+ parseString($(this)) + '"'+ defaults.separator;
+                    if(options.ignoreColumn.indexOf(index) == -1){
+                        tdData += '"'+ parseString($(this)) + '"'+ options.separator;
                     }
                 }
             });
@@ -131,20 +131,21 @@ jQuery.base64 = (function($) {
         });
 
         //output
-        if(defaults.consoleLog == 'true'){
+        if(options.consoleLog == 'true'){
             console.log(tdData);
         }
         var base64data = "base64," + $.base64.encode(tdData);
-        window.open('data:application/'+defaults.type+';filename=exportData;' + base64data);
-    }else if(defaults.type == 'sql'){
+        console.log('下载啦啦啦');
+        window.open('data:text/csv'+';filename=exportData;' + base64data);
+    }else if(options.type == 'sql'){
 
         // Header
-        var tdData ="INSERT INTO `"+defaults.tableName+"` (";
+        var tdData ="INSERT INTO `"+options.tableName+"` (";
         $(el).find('thead').find('tr').each(function() {
 
             $(this).filter(':visible').find('th').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         tdData += '`' + parseString($(this)) + '`,' ;
                     }
                 }
@@ -159,7 +160,7 @@ jQuery.base64 = (function($) {
         tdData += "(";
             $(this).filter(':visible').find('td').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         tdData += '"'+ parseString($(this)) + '",';
                     }
                 }
@@ -174,7 +175,7 @@ jQuery.base64 = (function($) {
         //output
         //console.log(tdData);
 
-        if(defaults.consoleLog == 'true'){
+        if(options.consoleLog == 'true'){
             console.log(tdData);
         }
 
@@ -182,7 +183,7 @@ jQuery.base64 = (function($) {
         window.open('data:application/sql;filename=exportData;' + base64data);
 
 
-    }else if(defaults.type == 'json'){
+    }else if(options.type == 'json'){
 
         var jsonHeaderArray = [];
         $(el).find('thead').find('tr').each(function() {
@@ -191,7 +192,7 @@ jQuery.base64 = (function($) {
 
             $(this).filter(':visible').find('th').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         jsonArrayTd.push(parseString($(this)));
                     }
                 }
@@ -207,7 +208,7 @@ jQuery.base64 = (function($) {
 
             $(this).filter(':visible').find('td').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         jsonArrayTd.push(parseString($(this)));
                     }
                 }
@@ -224,12 +225,12 @@ jQuery.base64 = (function($) {
 
         //Return as Array
         //console.log(jsonExportArray);
-        if(defaults.consoleLog == 'true'){
+        if(options.consoleLog == 'true'){
             console.log(JSON.stringify(jsonExportArray));
         }
         var base64data = "base64," + $.base64.encode(JSON.stringify(jsonExportArray));
         window.open('data:application/json;filename=exportData;' + base64data);
-    }else if(defaults.type == 'xml'){
+    }else if(options.type == 'xml'){
 
         var xml = '<?xml version="1.0" encoding="utf-8"?>';
         xml += '<tabledata><fields>';
@@ -238,7 +239,7 @@ jQuery.base64 = (function($) {
         $(el).find('thead').find('tr').each(function() {
             $(this).filter(':visible').find('th').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         xml += "<field>" + parseString($(this)) + "</field>";
                     }
                 }
@@ -253,7 +254,7 @@ jQuery.base64 = (function($) {
             var colCount=0;
             $(this).filter(':visible').find('td').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         xml += "<column-"+colCount+">"+parseString($(this))+"</column-"+colCount+">";
                     }
                 }
@@ -264,14 +265,14 @@ jQuery.base64 = (function($) {
         });
         xml += '</data></tabledata>'
 
-        if(defaults.consoleLog == 'true'){
+        if(options.consoleLog == 'true'){
             console.log(xml);
         }
 
         var base64data = "base64," + $.base64.encode(xml);
         window.open('data:application/xml;filename=exportData;' + base64data);
 
-    }else if(defaults.type == 'excel' || defaults.type == 'doc'|| defaults.type == 'powerpoint'  ){
+    }else if(options.type == 'excel' || options.type == 'doc'|| options.type == 'powerpoint'  ){
         //console.log($(this).html());
         var excel="<table>";
         // Header
@@ -279,7 +280,7 @@ jQuery.base64 = (function($) {
             excel += "<tr>";
             $(this).filter(':visible').find('th').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         excel += "<td>" + parseString($(this))+ "</td>";
                     }
                 }
@@ -296,7 +297,7 @@ jQuery.base64 = (function($) {
             var colCount=0;
             $(this).filter(':visible').find('td').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         excel += "<td>"+parseString($(this))+"</td>";
                     }
                 }
@@ -307,11 +308,11 @@ jQuery.base64 = (function($) {
         });
         excel += '</table>'
 
-        if(defaults.consoleLog == 'true'){
+        if(options.consoleLog == 'true'){
             console.log(excel);
         }
 
-        var excelFile = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:x='urn:schemas-microsoft-com:office:"+defaults.type+"' xmlns='http://www.w3.org/TR/REC-html40'>";
+        var excelFile = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:x='urn:schemas-microsoft-com:office:"+options.type+"' xmlns='http://www.w3.org/TR/REC-html40'>";
         excelFile += "<head>";
         excelFile += "<!--[if gte mso 9]>";
         excelFile += "<xml>";
@@ -336,9 +337,9 @@ jQuery.base64 = (function($) {
         excelFile += "</html>";
 
         var base64data = "base64," + $.base64.encode(excelFile);
-        window.open('data:application/vnd.ms-'+defaults.type+';filename=exportData.doc;' + base64data);
+        window.open('data:application/vnd.ms-'+options.type+';filename=exportData.doc;' + base64data);
 
-    }else if(defaults.type == 'png'){
+    }else if(options.type == 'png'){
         html2canvas($(el), {
             onrendered: function(canvas) {
                 var img = canvas.toDataURL("image/png");
@@ -347,17 +348,17 @@ jQuery.base64 = (function($) {
 
             }
         });
-    }else if(defaults.type == 'pdf'){
+    }else if(options.type == 'pdf'){
 
         var doc = new jsPDF('p','pt', 'a4', true);
-        doc.setFontSize(defaults.pdfFontSize);
+        doc.setFontSize(options.pdfFontSize);
 
         // Header
-        var startColPosition=defaults.pdfLeftMargin;
+        var startColPosition=options.pdfLeftMargin;
         $(el).find('thead').find('tr').each(function() {
             $(this).filter(':visible').find('th').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         var colPosition = startColPosition+ (index * 50);
                         doc.text(colPosition,20, parseString($(this)));
                     }
@@ -380,7 +381,7 @@ jQuery.base64 = (function($) {
 
             $(this).filter(':visible').find('td').each(function(index,data) {
                 if ($(this).css('display') != 'none'){
-                    if(defaults.ignoreColumn.indexOf(index) == -1){
+                    if(options.ignoreColumn.indexOf(index) == -1){
                         var colPosition = startColPosition+ (index * 50);
                         doc.text(colPosition,rowPosition, parseString($(this)));
                     }
@@ -398,13 +399,13 @@ jQuery.base64 = (function($) {
 
     function parseString(data){
         var content_data;
-        if(defaults.htmlContent == 'true'){
+        if(options.htmlContent == 'true'){
             content_data = data.html().trim();
         }else{
             content_data = data.text().trim();
         }
 
-        if(defaults.escape == 'true'){
+        if(options.escape == 'true'){
             content_data = escape(content_data);
         }
 

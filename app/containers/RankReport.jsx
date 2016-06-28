@@ -7,7 +7,7 @@ import _ from 'lodash';
 import {Map, List} from 'immutable';
 
 import {initRankReportAction} from '../reducers/rankReport/actions';
-import {initParams} from '../lib/util';
+import {initParams, downloadTable} from '../lib/util';
 import {DropdownButton, Button, Table as BootTable, MenuItem} from 'react-bootstrap';
 import commonStyle from '../common/common.css';
 import Spinkit from '../common/Spinkit';
@@ -26,7 +26,7 @@ var headerMapper = {
  * renderRows:
  * onSort: 排序的函数
  */
-const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, onSort, sortInfo, downloadTable}) => {
+const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, onSort, sortInfo}) => {
     //todo: 处理一遍renderHead, 找出各个两行表头的列数，方便遍历；
     var counter = {};
     var secondLineHeadMap = {};
@@ -142,8 +142,8 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
 /***
  * props:
  * triggerFunction: 过了一定的时间后出发传入的方法;
- * placeholder: 
- * style: 
+ * placeholder:
+ * style:
  * searchIcon: 是否显示右端的放大镜icon
  */
 class InputWidget extends React.Component {
@@ -190,9 +190,9 @@ class InputWidget extends React.Component {
                     style={this.props.style ? this.props.style : { margin: '0 2px', height: 34, padding: '6px 12px', fontSize: 14, lineHeight: 1.42857143, color: '#555', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 4 }}
                     />
                 {
-                    this.props.searchIcon ? <i className='icon-search-2' style={{ position: 'absolute', right: 10, top: '50%', marginTop: -10, color: '#bfbfbf' }}></i> : '' 
+                    this.props.searchIcon ? <i className='icon-search-2' style={{ position: 'absolute', right: 10, top: '50%', marginTop: -10, color: '#bfbfbf' }}></i> : ''
                 }
-                
+
             </span>
         )
     }
@@ -264,7 +264,7 @@ class RankReportTableView extends React.Component {
         if (nextPage > maxPage){
             console.log('invalid page');
             return;
-        } 
+        }
         if (nextPage - 1 === this.state.pageIndex) return;
         this.setState({
             pageIndex: nextPage - 1
@@ -491,38 +491,27 @@ class RankReportTableView extends React.Component {
             showData: _.orderBy(this.state.showData, [headType], [newSortInfo.order])
         })
     }
-    downloadTable() {
-        // console.log('downloadTable');
-        // console.log($("#rankTable"));
-        // var newJquery = tableExport($);
 
-        $.fn.extend({tableExport: tableExport});
-        // console.log($.fn);
-        // console.log($("#rankTable"));
-        $('#rankTable').tableExport({type:'excel', escape:'false'});
+    clickDownloadTable(theRowDatas) {
+        downloadTable(this.state.headSeq, this.state.headSelect, headerMapper, theRowDatas);
     }
-    
-       
+
     render() {
         var {examInfo} = this.props;
         var {firstLineHead, secondLineHead} = this.getTableHead();
         var {pageIndex, pageSize, showData} = this.state;
         var dataBegin = pageIndex * pageSize + 1;
         var dataEnd = (pageIndex + 1) * pageSize < showData.length ? (pageIndex + 1) * pageSize : showData.length;
+
+// debugger;
+
+
+        var theRowDatas = this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+        // debugger;
         return (
             <div style={{ margin: '30px 30px 30px 35px' }}>
                 <div style={{border: '1px solid #eeeeee', padding: '5px 30px 0 30px'}}>
-                    <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
-                        <span style={{color: '#d0d0d0', marginRight: 10}}>学科：</span> 
-                        <a onClick={this.onSelectPaper.bind(this) } data-paperid='all' style={this.state.currentPaper.name === '全科' ? localStyle.activeSubject : localStyle.subject} href='javascript:;'>全科</a>
-                        {
-                            examInfo.papers.map((subjectObj, index) => {
-                                return (
-                                    <a key={'papers-' + index} onClick={this.onSelectPaper.bind(this) } data-paperid={subjectObj.paper} href='javascript:;' style={this.state.currentPaper.name === subjectObj.name ? localStyle.activeSubject : localStyle.subject}>{subjectObj.name}</a>
-                                )
-                            })
-                        }
-                    </div>
+
                     <div style={{heigth: 50, lineHeight: '50px'}}>
                         <span style={{color: '#d0d0d0', float: 'left', marginRight: 10}}>班级：</span>
                         <span style={{float: 'left', width: 800}}>
@@ -544,7 +533,7 @@ class RankReportTableView extends React.Component {
                         <div style={{clear: 'both'}}></div>
                     </div>
                 </div>
-                
+
                 <div style={{ margin: '10px 0 20px 0', height: 50,position: 'relative'}}>
                     <div style={{ display: 'inline-block', fontSize: 18, fontWeight: 'bold', float: 'left', height: '100%', lineHeight: '50px' }}>排行榜详情</div>
                     <div style={{ display: 'inline-block', position: 'absolute', right: 0, bottom: 0}}>
@@ -570,25 +559,28 @@ class RankReportTableView extends React.Component {
                         }
                         </ul>
                         </DropdownButton>
-                        <Button onClick={this.downloadTable.bind(this)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff'}}>下载表格</Button>
+                        <Button onClick={this.clickDownloadTable.bind(this, theRowDatas)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff'}}>下载表格</Button>
                     </div>
                 </div>
+
+
                 <Table
-                    downloadTable = {this.downloadTable.bind(this)}
                     firstLineHead = {firstLineHead}
                     secondLineHead = {secondLineHead}
-                    renderRows ={this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)}
+                    renderRows ={theRowDatas}
                     headSeq = {this.state.headSeq}
                     headSelect = {this.state.headSelect}
                     onSort= {this.onSort.bind(this)}
                     sortInfo={this.state.sortInfo}/>
+
+
 
                 <span style={{margin: '20px 0', display: 'inline-block'}}>
                     显示第{dataBegin}到第{dataEnd}条记录，总共{this.state.showData.length}条记录
                     <span style={dataEnd < 25 ? {display: 'none'} : {display: 'inline-block'}}>
                         ，每页显示
                         <DropdownButton id='pageSize-select' title={pageSize} dropup style={{ margin: '0 2px' }}>
-                            <MenuItem onClick={this.onSelectPageSize.bind(this) } active={pageSize === 25}>25</MenuItem>
+                            <MenuItem onClick={this.onSelectPageSize.bind(this) } active={pageSize === 4}>4</MenuItem>
                             <MenuItem style={ this.state.showData.length > 25 ? { display: 'block' } : { display: 'none' }} onClick={this.onSelectPageSize.bind(this) } active={pageSize === 50}>50</MenuItem>
                             <MenuItem style={ this.state.showData.length > 50 ? { display: 'block' } : { display: 'none' }}  onClick={this.onSelectPageSize.bind(this) } active={pageSize === 100}>100</MenuItem>
                             <MenuItem style={ this.state.showData.length > 100 ? { display: 'block' } : { display: 'none' }} onClick={this.onSelectPageSize.bind(this) } active={pageSize === 1000}>1000</MenuItem>
@@ -597,12 +589,12 @@ class RankReportTableView extends React.Component {
                     </span>
                 </span>
                 {
-                    showData.length > pageSize ? 
-                    <Pagination  
-                        pageIndex={pageIndex} 
-                        pageSize={pageSize} 
-                        showData={showData} 
-                        handlePagination={this.handlePagination.bind(this)} 
+                    showData.length > pageSize ?
+                    <Pagination
+                        pageIndex={pageIndex}
+                        pageSize={pageSize}
+                        showData={showData}
+                        handlePagination={this.handlePagination.bind(this)}
                         gotoInputPage={this.gotoInputPage.bind(this)}/> : ''
                 }
                 <div style={{clear: 'both'}}></div>
@@ -637,7 +629,7 @@ class Pagination extends React.Component {
     componentDidMount() {
         this.clickHandlerRef = this.handleBodyClick.bind(this);
         $('body').bind('click', this.clickHandlerRef);
-        
+
     }
     componentWillUnmount() {
         $('body').unbind('click', this.clickHandlerRef);
@@ -681,7 +673,7 @@ class Pagination extends React.Component {
                 var len = this.props.showData.length;
                 var {pageSize} = this.props;
                 var maxPage = len % pageSize === 0 ? len / pageSize : parseInt(len/pageSize) + 1;
-                this.props.gotoInputPage(maxPage); 
+                this.props.gotoInputPage(maxPage);
                 break;
             default:
                 console.log('wrong page direction type');
@@ -724,7 +716,7 @@ class Pagination extends React.Component {
                 <span data-type='next' style={localStyle.pageShortcut} onClick={this.goPage.bind(this)}><i className='icon-right-open-2' data-type='next'></i></span>
                 <span data-type='last' style={localStyle.pageShortcut} onClick={this.goPage.bind(this)}><i className='icon-to-end' data-type='last'></i></span>
             </span>
-            
+
         )
     }
 }
@@ -741,6 +733,9 @@ class RankReport extends React.Component {
 
     componentDidMount() {
         if (this.props.haveInit) return;
+
+console.log('componentDidMount rank report');
+// debugger;
 
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initRankReport(params);
@@ -783,16 +778,16 @@ class RankReport extends React.Component {
     }
      */
     // 根据examinfo里的paper来获取表头的显示顺序
-    getHeadSeq() {
-        _.forEach(this.props.examInfo.papers, paperObj=> {
+    getHeadSeq(examInfo) {
+        _.forEach(examInfo.papers, paperObj=> {
             _.forEach(['score', 'groupRank', 'classRank'], item => {
                 this.headSeq.push(item + '_' + paperObj.paper)
             })
         })
     }
     // 生成所有学生的待显示数据
-    generateStudentInfos() {
-         _.forEach(this.props.rankCache, (classGroup, scoreType) => {
+    generateStudentInfos(rankCache) {
+         _.forEach(rankCache, (classGroup, scoreType) => {
             var scoreMap = {};
             var allStudents = [];
             _.forEach(classGroup, (studentsArr, className) => {
@@ -848,8 +843,13 @@ class RankReport extends React.Component {
                  </div>
             )
         }
-        this.getHeadSeq();
-        this.generateStudentInfos();
+        this.getHeadSeq(examInfo);
+        this.generateStudentInfos(rankCache);
+// console.log('examInfo === ', examInfo);
+// console.log('rankCache === ', rankCache);
+// console.log('this.studentInfos === ', this.studentInfos);
+// debugger;
+// debugger;
 
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
@@ -863,8 +863,8 @@ class RankReport extends React.Component {
                     <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span style={{color: '#b4b4b4'}}>{examInfo.name + ' > '}</span>分数排行榜</span>
                 </div>
                 <RankReportTableView
-                    examInfo={this.props.examInfo}
-                    rankCache={this.props.rankCache}
+                    examInfo={examInfo}
+                    rankCache={rankCache}
                     studentInfos={this.studentInfos}
                     headSeq={this.headSeq}
                     />
