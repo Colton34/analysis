@@ -189,7 +189,7 @@ class ClassPerformance extends React.Component {
                         <span className={styles['school-report-dynamic']}>{_.join(headerInfo.lesser, '、')}</span>。
                         <br/>
                         （注意： 这是一各班自身水平为基础而得出的结论，不是单用学生总分在全校中的排队为依据的，可能会有特别好的班级也会出现相对于班级自身水平的高分学生人数少于低分学生人数的
-                          ，说明改版机还没有充分挖掘出学生的潜力。）
+                          ，说明该班级还没有充分挖掘出学生的潜力。）
                     </p>
                     {/*--------------------------------  班级考试表现的趋势图表 -------------------------------------*/}
                     <p>班级学生总分分布趋势图：</p>
@@ -229,7 +229,7 @@ class ClassPerformance extends React.Component {
 
                 {/*--------------------------------  班级考试基本表现学生分组表格 -------------------------------------*/}
                     <p>
-                        （5）将学校分数从高到低，分为十足学生，每一组学生之间的水平相差不大，按这样方式，我们可以看见各班在这样的7组中所存在的人数如下：
+                        （5）将学校分数从高到低，分为十组学生，每一组学生之间的水平相差不大，按这样方式，我们可以看见各班在这样的十组中所存在的人数如下：
                     </p>
                     <TableView tableData={groupTableData} reserveRows={7}/>
                     {/*  _.keys(studentsGroupByClass).length > 5 ? (                <a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
@@ -237,7 +237,7 @@ class ClassPerformance extends React.Component {
                     </a>) : ''    */}
                     <div className={styles.tips}>
                         <p>说明：</p>
-                        <p>从以上数据表格中，安总人数平均分为十组，可以看见不同组（及不同分数段中）在不同班级的人数分布情况。</p>
+                        <p>从以上数据表格中，按总人数平均分为十组，可以看见不同组（及不同分数段中）在不同班级的人数分布情况。</p>
                     </div>
                 </div>
             </div>
@@ -247,12 +247,28 @@ class ClassPerformance extends React.Component {
 
 export default ClassPerformance;
 
+
+//这个是不是也要遵从：2， 4， 7 原则？
 function theClassExamHeader(studentsGroupByClass) {
     //对各个班级计算：1.此班级中排名中间的学生的成绩 2.此班级的平局分  3.二者的差
     //studentsGroupByClass应该就是排好序的。
     //问题：只能说明高分段和低分段的比较，但是不能说明是总体是高分多还是低分多，比如[1, 1, 1, 1, 1]和[99, 99, 99, 99, 99]，diff都是0
+
+    //偏度：均值 - 中位数 (纵轴就是“频数”) -- 正偏度：右侧较少，左侧较多；  负偏度：左侧较多，右侧较少。如果对应到横坐标从左到右是依次升序的分数，那么，
+    //按照偏度的大小排序，越大则低分多，高分少，低分多。
+
+/*
+        var baseLineCount = counts.length - 1;
+        var targetCount = (baseLineCount == 2 || baseLineCount == 3) ? 1 : ((baseLineCount >= 4 && baseLineCount < 7) ? 2 : ((baseLineCount >= 7) ? 3 : 0));
+
+        if(targetCount == 0) return;
+
+ */
+    var baseLineCount = _.size(studentsGroupByClass) - 1;
+    var targetCount = (baseLineCount == 2 || baseLineCount == 3) ? 1 : ((baseLineCount >= 4 && baseLineCount < 7) ? 2 : ((baseLineCount >= 7) ? 3 : 0));
+    if(targetCount == 0) return {};
     var results = _.map(studentsGroupByClass, (students, className) => {
-        var diff = _.round(_.subtract(students[parseInt(students.length/2)] - _.mean(_.map(students, (student) => student.score))), 2);
+        var diff = _.round(_.subtract(_.mean(_.map(students, (student) => student.score)), students[parseInt(students.length/2)].score), 2);
         return {
             diff: diff,
             class: className+'班'
@@ -261,8 +277,8 @@ function theClassExamHeader(studentsGroupByClass) {
     //diff越小则低分段比高分段多，diff越大则高分段比低分段多。因为这里还是没有确定什么是高分，什么是低分。
     results = _.sortBy(results, 'diff');
     return {
-        greater: _.map(_.takeRight(results, 2), (obj) => obj.class),
-        lesser: _.map(_.take(results, 2), (obj) => obj.class)
+        greater: _.map(_.take(results, targetCount), (obj) => obj.class),
+        lesser: _.map(_.takeRight(results, targetCount), (obj) => obj.class)
     }
 }
 
@@ -387,7 +403,7 @@ function theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo, groupLengt
     table.push(titleHeader);
 
     var allGroupStudentInfoArr = []; //因为后面维度不一样了，所以这里需要打散收集信息然后再group
-    _.each(groupStudentsInfo, (groupObj, groupKey) => {
+    _.each(_.reverse(groupStudentsInfo), (groupObj, groupKey) => {
         totalSchoolInfo.push(groupObj.groupCount);
         _.each(groupObj.classStudents, (students, className) => {
             allGroupStudentInfoArr.push({ 'class': className, groupKey: groupKey, students: students });

@@ -294,8 +294,8 @@ function theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers) {
 
         if(targetCount == 0) return;
 
-        maxSubjects = _.reverse(_.map(_.takeRight(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject));
-        minSubjects = _.reverse(_.map(_.take(subjectLevelArr, 2), (obj) => examPapersInfo[obj.key].subject));
+        maxSubjects = _.reverse(_.map(_.takeRight(subjectLevelArr, targetCount), (obj) => examPapersInfo[obj.key].subject));
+        minSubjects = _.reverse(_.map(_.take(subjectLevelArr, targetCount), (obj) => examPapersInfo[obj.key].subject));
         result[theKey] = { maxSubjects: maxSubjects, minSubjects: minSubjects };
     });
 

@@ -30,8 +30,9 @@ class Dialog extends React.Component {
         this.isValid = _.map(_.range(_.size(this.props.levelPcentages)), (index) => true);
         this.isUpdate = false;
         this.state = {
-            grades: this.props.levelPcentages                     //注意这里是从大到小的：  [85, 75, 60, 0]
+            grades: this.props.levelPcentages
         }
+        debugger;
     }
     okClickHandler() {
         this.props.onHide();
@@ -46,7 +47,8 @@ class Dialog extends React.Component {
 
     onAddGrade() {
         var newGrades = this.state.grades;
-        newGrades.push(1); //这里没有push 0， 是因为不能等于0，要大于0
+        newGrades.splice(1, 0, 1); //这里没有push 0， 是因为不能等于0，要大于0
+        debugger;
         this.setState({
             grades: newGrades
         })
@@ -120,7 +122,7 @@ class Dialog extends React.Component {
 
     render() {
         var _this = this, gradeLastIndex = this.state.grades.length - 1;
-
+debugger;
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {}) }>
                 <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
@@ -209,7 +211,7 @@ class SubjectPerformance extends React.Component {
     updateLevelPercentages(newLevelPercentages) {
 
 console.log('updateLevelPercentages : ', newLevelPercentages);
-
+// debugger;
         this.setState({
             levelPcentages: newLevelPercentages
         })
@@ -221,7 +223,7 @@ console.log('updateLevelPercentages : ', newLevelPercentages);
 //算法数据结构：
         //TODO：很明显，levelPercentages不影响 subjectExamTable，只会影响subjectLevelExamTable，所以最后还是抽出去
         var subjectExamTableData = theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers);
-        var subjectLevelExamTableData = theSubjectLevelExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, this.state.levelPcentages);
+        var subjectLevelExamTableData = theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, this.state.levelPcentages);
         var disData = theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap);
 //自定义Moudle数据结构：
         var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
@@ -247,18 +249,16 @@ console.log('updateLevelPercentages : ', newLevelPercentages);
                         标准差：反映了学生分数的分布离散程度，值越大表示个体之间的分数分布的离散程度越大，反之，值越小表示个体之间的分数分布的离散程度越小；<br />
                         差异系数：标准差与平均分之比，表示不同样本的相对离散程度，值越大表示相对相对离散程度越大，反之，值越小表示相对离散程度越小；<br />
                         难度：表达学科考试难易程度，难度系数值越大，表明考试越容易，难度系数值越小，考试越难；上表中的难度值明确表达了这次考试最难得学科和考试最容易的学科具体是哪个学科。
-                        <br />
-                        <br />
-                        有关学科分析还有如下几点：
                     </p>
-
+                    <br />
+                    <p>有关学科分析还有如下几点：</p>
                     {/*--------------------------------  学科考试表现分析说明 -------------------------------------*/}
                     {/* TODO: 如果联系到学科的命题难度，其相对离差从大到小的顺序是<span style={{color: 'blue'}}>生物、物理、语文</span>。 缺少*/}
                     <p>
                         （1）结合前面的分析内容，从各学科的成绩表现来看，每个学科的班级平均分得分率最高的与最低之间的离差，从大到小的顺序是，<span style={{color: 'blue'}}>{_.join(factorSubjects, '、')}</span>。离差较大的学科，反映出班级水平差距较大。离差较小的学科，反映出该学科教学效果比较整齐。（注：语文是母语，学生水平离差来的较小应该是常态）
                     </p>
 
-                    <p>各个学科成绩分布的等级结构比例情况，如下表所示：</p>
+                    <p>（2）各个学科成绩分布的等级结构比例情况，如下表所示：</p>
                     <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>
                         <i className='icon-cog-2'></i>
                         设置等级参数
@@ -313,16 +313,16 @@ function theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperM
     return table;
 }
 
-function theSubjectLevelExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, levelPcentages) {
+function theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, levelPcentages) {
     //默认给出n个等次，然后最后添加1--代表满分，就是1档次的区间，这样才能形成对应的n个区间（则有n+1个刻度）
 //segments依然是从小到大，但这里展示的时候是从大到小（高难度档次在前）
     // levelPcentages = levelPcentages ? levelPcentages.push(1) : ;  //五个刻度，四个档次
-
+debugger;
     var matrix = [], total = levelPcentages.length -1;
     var titleHeader = _.map(_.range(total), (index) => {
         return index==total-1 ?  letterMap[index] + '等（小于'+ _.round(_.divide(levelPcentages[total-index], 100), 2) +'）' : letterMap[index] + '等（'+ _.round(_.divide(levelPcentages[total-index-1], 100), 2) +'）';
     });
-
+debugger;
     titleHeader.unshift('学科成绩分类');
     matrix.push(titleHeader);
 
@@ -332,7 +332,12 @@ function theSubjectLevelExamTable(examStudentsInfo, examPapersInfo, allStudentsP
         //每一个科目|
         var paperObj = examPapersInfo[headerObj.id];
         var segments = makeSubjectLevelSegments(paperObj.fullMark, levelPcentages);
-        var result = makeSegmentsStudentsCount(examStudentsInfo, segments); //注意：低分档次的人数在前
+        // debugger;
+        // debugger;
+        //这应该是当前科目的区分段的count--而不是总分（且一定不包含总分）
+        //获取此科目下所有学生的成绩
+        var result = makeSegmentsStudentsCount(allStudentsPaperMap[paperObj.id], segments); //注意：低分档次的人数在前
+
         result = _.map(_.reverse(result), (count) => {
             var percentage = _.round(_.multiply(_.divide(count, paperObj.realStudentsCount), 100), 2);
             return percentage + '%';
