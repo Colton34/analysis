@@ -236,7 +236,7 @@ console.log('updateLevelPercentages : ', newLevelPercentages);
 
                 {/*--------------------------------  学科考试表现基本指标表格 -------------------------------------*/}
 
-                    <TableView tableData={subjectExamTableData}/>
+                    <TableView tableData={subjectExamTableData} reserveRows={6}/>
                     <p className={styles.tips}>
                         学科基本指标的数据虽一目了然，但其中也包含了许多考试信息，值得学校的关注，具体分析和理解各个指标：
                         <br />
@@ -263,7 +263,7 @@ console.log('updateLevelPercentages : ', newLevelPercentages);
                         <i className='icon-cog-2'></i>
                         设置等级参数
                     </a>
-                    <TableView tableData={subjectLevelExamTableData} />
+                    <TableView tableData={subjectLevelExamTableData} reserveRows={6}/>
 
                     {/*--------------------------------  TODO: 暂时空缺的和学科难易程度相关的数据 -------------------------------------*/}
                     <p>（3）有关学科命题</p>

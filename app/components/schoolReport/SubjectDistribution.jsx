@@ -123,7 +123,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
                             <div key={index}>
                                 {/*--------------------------------  学科分档上线学生人数分布表格 -------------------------------------*/}
                                 <p>学校各学科{levelStr}档上线学生人数表：</p>
-                                <TableView tableData={tableData} TableComponent={Table} reserveRows={6}/>
+                                <TableView tableData={tableData} TableComponent={Table} reserveRows={7}/>
 
                                 {/*--------------------------------  学科分档上线学生人数分布分析说明 -------------------------------------*/}
                                 <div style={{ backgroundColor: '#e7f9f0', padding: '5px 10px', marginTop: 15 }}>
