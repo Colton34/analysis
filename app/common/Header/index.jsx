@@ -72,7 +72,7 @@ class HeaderComponent extends React.Component {
                     {/* ------------------------------右侧头像、名字--------------------------------------*/ }
                     <a href='javascript:;' onClick={this.onClickAvatar.bind(this)} style={localStyle.userInfo}>
                         <div className={style['user-avatar']}> </div>
-                        <div className='dropdown' style={{marginLeft: 42}}>
+                        <div className='dropdown' style={{marginLeft: 48}}>
                             {this.props.user.realName}
                             <span className='caret' style={{color: '#e1e1e1'}}></span>
                         </div>
@@ -83,7 +83,6 @@ class HeaderComponent extends React.Component {
             </div>
         )
     }
-
 };
 
 var localStyle = {
@@ -100,14 +99,13 @@ var localStyle = {
         ':link': {textDecoration: 'none'}
     },
     userInfo: { 
-        float: 'right', position: 'relative', height: '100%', lineHeight: '78px', 
+        float: 'right', position: 'relative', height: '100%', lineHeight: '66px', 
         marginLeft: 10, cursor: 'pointer',textDecoration:'none',color: '#333',
         ':hover': {color: '#59bde5', textDecoration: 'none'},
         ':link': {textDecoration: 'none'}
     },
     addAnalysisBtn: {
         display: 'inline-block', width: 120, height: 30, color: '#fff', backgroundColor: '#2ea8eb',lineHeight: '30px', borderRadius: 20, textAlign: 'center',
-        marginTop: 25,
         ':hover': {textDecoration:'none'},
         ':link':  {textDecoration: 'none'}
     }
