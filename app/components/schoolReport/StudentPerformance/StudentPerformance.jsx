@@ -157,7 +157,7 @@ class StudentPerformanceTable extends React.Component {
                         {this.state.current.value}
                         <span className='dropdown' style={{ position: 'absolute', right: 10, color:'#bfbfbf' }}>
                             <span className='caret'></span>
-                        </span> 
+                        </span>
                     </a>
                     <ul id='dropDownList' className={this.state.active ? localStyle.list : localStyle.hide}>
                         {
@@ -299,6 +299,7 @@ export default StudentPerformance;
  * @return {[type]}                     [description]
  */
 function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, headers, isGood, countFlag) {
+    // debugger;
     var result = {};
     _.each(examInfo.realClasses, (className) => {
         result[className] = {};
@@ -310,17 +311,21 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
     });
     _.each(allStudentsPaperMap, (papers, pid) => {
         var orderPapers = _.sortBy(papers, 'score');
-        var subjectScoreStudentsByClass = (isGood) ? _.groupBy(_.takeRight(orderPapers, 30), 'class_name') : _.groupBy(_.take(orderPapers, 30), 'class_name');
+        var subjectScoreStudentsByClass = (isGood) ? _.groupBy(_.takeRight(orderPapers, countFlag), 'class_name') : _.groupBy(_.take(orderPapers, countFlag), 'class_name');
         _.each(examInfo.realClasses, (className, index) => {
             result[className][pid] = subjectScoreStudentsByClass[className] ? subjectScoreStudentsByClass[className].length : 0;
+            // debugger;
         });
     });
+    // debugger;
 
     var table = [];
     _.each(result, (value, className) => {
         var row = [];
         //headers就是真正考的科目+总分
         _.each(headers, (headerObj, index) => {
+            // console.log(value[headerObj.id]);
+            // debugger;
             value[headerObj.id] ? row.push(value[headerObj.id]) : row.push(0);
         });
         row.unshift(examInfo.gradeName + className + '班');

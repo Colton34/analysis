@@ -32,7 +32,7 @@ class Dialog extends React.Component {
         this.state = {
             grades: this.props.levelPcentages
         }
-        debugger;
+        // debugger;
     }
     okClickHandler() {
         this.props.onHide();
@@ -48,7 +48,8 @@ class Dialog extends React.Component {
     onAddGrade() {
         var newGrades = this.state.grades;
         newGrades.splice(1, 0, 1); //这里没有push 0， 是因为不能等于0，要大于0
-        debugger;
+        // debugger;
+        this.isUpdate = true;
         this.setState({
             grades: newGrades
         })
@@ -58,6 +59,8 @@ class Dialog extends React.Component {
         var newGrades = this.state.grades;
         var gradeLastIndex = newGrades.length - 1;
         newGrades.splice(gradeLastIndex-index-1, 1);
+        // debugger;
+        this.isUpdate = true;
         this.setState({
             grades: newGrades
         })
@@ -122,7 +125,7 @@ class Dialog extends React.Component {
 
     render() {
         var _this = this, gradeLastIndex = this.state.grades.length - 1;
-debugger;
+// debugger;
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {}) }>
                 <Header closeButton style={{ textAlign: 'center' }}>
@@ -317,12 +320,12 @@ function theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, 
     //默认给出n个等次，然后最后添加1--代表满分，就是1档次的区间，这样才能形成对应的n个区间（则有n+1个刻度）
 //segments依然是从小到大，但这里展示的时候是从大到小（高难度档次在前）
     // levelPcentages = levelPcentages ? levelPcentages.push(1) : ;  //五个刻度，四个档次
-debugger;
+// debugger;
     var matrix = [], total = levelPcentages.length -1;
     var titleHeader = _.map(_.range(total), (index) => {
         return index==total-1 ?  letterMap[index] + '等（小于'+ _.round(_.divide(levelPcentages[total-index], 100), 2) +'）' : letterMap[index] + '等（'+ _.round(_.divide(levelPcentages[total-index-1], 100), 2) +'）';
     });
-debugger;
+// debugger;
     titleHeader.unshift('学科成绩分类');
     matrix.push(titleHeader);
 
