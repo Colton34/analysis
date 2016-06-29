@@ -456,8 +456,9 @@ function makeSubjectMean(students, examPapersInfo) {
     var result = {};
     _.each(_.groupBy(_.concat(..._.map(students, (student) => student.papers)), 'paperid'), (papers, pid) => {
         var obj = {};
-
+// debugger;
         obj.mean = _.round(_.mean(_.map(papers, (paper) => paper.score)), 2);
+console.log('daozheli');
         obj.name = examPapersInfo[pid].subject; //TODO: 这里还是统一称作 'subject' 比较好
         obj.id = pid;
 

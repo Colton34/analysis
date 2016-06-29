@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-27 20:59:15
+* @Last Modified time: 2016-06-29 18:34:45
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -178,7 +178,7 @@ export function fetchSchoolAnalysisData(params) {
                     id: pid
                 });
             } else {
-                restPapers.push(paper);
+                restPapers.push({id: pid, subject: paper.subject});
             }
         });
         headers = _.sortBy(headers, 'index');
@@ -186,7 +186,9 @@ export function fetchSchoolAnalysisData(params) {
             subject: '总分',
             id: 'totalScore'
         });
-        headers = _.concat(headers, _.map(restPapers, (paper) => paper.subject));
+        // debugger;
+        headers = _.concat(headers, restPapers);
+        // debugger;
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = _.map(levels, (value, key) => 5);
 
@@ -1479,6 +1481,7 @@ export function fetchRankReportdData(params) {
     var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/rank/report?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
+        debugger;
         return Promise.resolve(res.data);
     });
 }
