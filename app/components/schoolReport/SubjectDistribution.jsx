@@ -325,16 +325,12 @@ function theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers) {
  */
 function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, headers) {
     //TODO:可能需要把计算出的最大和最小作为数据结构，因为分析说明其实就是这个图表的文字版说明
-// debugger;
     //去掉总分的信息，因为最后的factors中是没有总分这一项的
     var titleHeader = _.map(headers.slice(1), (obj) => obj.subject);
-// debugger;
     //构造基本的原matrix
     var originalMatrix = makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, headers);
-// debugger;
     //factorsMatrix中每一行（即一重数组的长度应该和titleHeader相同，且位置意义对应）
     var factorsMatrix = makeFactor(originalMatrix);
-// debugger;
     //扫描每一行，得到最大和最小的坐标，然后到titHeader中获取科目名称，返回{subject: , count: } 班级的顺序就是studentsGroupByClass的顺序
     var xAxons = _.map(_.keys(studentsGroupByClass), (className) => (examInfo.gradeName + className + '班'));
     var yAxons = _.map(factorsMatrix, (factorsInfo) => {
@@ -344,7 +340,6 @@ function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examCl
         var fminIndex = _.findIndex(factorsInfo, (item) => item == fmin);
 
         var fmaxSubject = titleHeader[fmaxIndex], fminSubject = titleHeader[fminIndex];
-// debugger;
         return [{ subject: fmaxSubject, count: fmax, nice: true }, { subject: fminSubject, count: fmin, nice: false }];
     });
 
@@ -389,7 +384,6 @@ function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examI
  */
 function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examFullMark) {
     var subjectsMean = makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark);
-// debugger;
     // var schoolTotalScoreMean = _.round(_.mean(_.map(_.filter(examStudentsInfo, (student) => student.score > levelScore), (student) => student.score)), 2); //总分的平均分 = （scope下所有学生中，分数大于此档线的所有学生成绩的平均分）== 不正确，此处总分的平均分即为设置的此档的分档线的分数
 
     subjectsMean.totalScore = { id: 'totalScore', mean: levelScore, name: '总分' };
@@ -438,19 +432,13 @@ function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, exam
         currentLowScore = currentLowScore - 1;
         currentHighScore = currentHighScore + 1;
         var currentLowStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore));
-// debugger;
         var currentHighStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentHighScore));
 
         var currentTargetCount = _.min([currentLowStudents.length, currentHighStudents.length]);
-// debugger;
-
         var currentTagretLowStudents = _.take(currentLowStudents, currentTargetCount);
         var currentTargetHighStudents = _.take(currentHighStudents, currentTargetCount);
-// debugger;
         count += _.multiply(2, currentTargetCount);
-// debugger;
         result = _.concat(result, currentTagretLowStudents, currentTargetHighStudents);
-// debugger;
     }
 
     //result即是最后获取到的满足分析条件的样本，根据此样本可以获取各个科目的平均分信息
