@@ -65,11 +65,12 @@ export function setPaperSqmAction(sqmList) {
     }
 }
 
-export function setMergedSqmAction(mergedSqm, sqmMap){
+export function setMergedSqmAction(mergedSqm, sqmMap, mergeType){
     return {
         type: SET_MERGED_SQM,
         mergedSqm: mergedSqm,
-        sqmMap: sqmMap
+        sqmMap: sqmMap,
+        mergeType: mergeType
     }
 }
 
