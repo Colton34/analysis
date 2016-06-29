@@ -805,8 +805,18 @@ console.log('componentDidMount rank report');
                 var classStudents = [];
                 _.forEach(studentsArr, (studentObj, index) => {
                     // 记录班级中各个学生的成绩
-                    classScoreMap[studentObj.score] = -1;
-                    scoreMap[studentObj.score] = -1;
+                    if (classScoreMap[studentObj.score] === undefined) {
+                        classScoreMap[studentObj.score] = {count: 1};    
+                    } else {
+                        classScoreMap[studentObj.score].count += 1;
+                    }
+                    
+                    if (scoreMap[studentObj.score] === undefined) {
+                        scoreMap[studentObj.score] = {count: 1};
+                    } else {
+                        scoreMap[studentObj.score].count += 1;
+                    }
+
                     // 添加学生信息
                     allStudents.push({kaohao: studentObj.kaohao, score: studentObj.score});
                     classStudents.push({kaohao: studentObj.kaohao, score: studentObj.score});
@@ -821,12 +831,17 @@ console.log('componentDidMount rank report');
                 var classScoreRank = _.orderBy(_.keys(classScoreMap).map(scoreStr => {return parseFloat(scoreStr)}), [], 'desc');
                 // 给班级scoreMap赋值
                 _.forEach(classScoreRank, (score, index) => {
-                    classScoreMap[score] = index;
+                    if (index === 0) {
+                        classScoreMap[score].rank = 1;
+                    } else {
+                        let preScoreObj = classScoreMap[classScoreRank[index - 1]];
+                        classScoreMap[score].rank = preScoreObj.rank + preScoreObj.count;
+                    }
                 })
                 // 遍历班级学生，赋予班级排名
                 _.forEach(classStudents, studentObj => {
                     //把studentinfos对应考号的学生排名附上
-                    this.studentInfos[studentObj.kaohao]['classRank_' + scoreType] = classScoreMap[studentObj.score] + 1;
+                    this.studentInfos[studentObj.kaohao]['classRank_' + scoreType] = classScoreMap[studentObj.score].rank;
                 })
 
             })
@@ -834,11 +849,16 @@ console.log('componentDidMount rank report');
             var scoreRank = _.orderBy(_.keys(scoreMap).map(scoreStr => {return parseFloat(scoreStr)}), [], 'desc');
             // 遍历scoreRank, 给scoreMap赋值
             _.forEach(scoreRank, (score, index ) => {
-                scoreMap[score] = index;
+                if (index === 0) {
+                    scoreMap[score].rank = 1;
+                } else {
+                    let preScoreObj = scoreMap[scoreRank[index - 1]];
+                    scoreMap[score].rank = preScoreObj.rank + preScoreObj.count;
+                }
             })
             // 遍历所有的学生信息,给学生赋群体排名
             _.forEach(allStudents, studentObj=> {
-                this.studentInfos[studentObj.kaohao]['groupRank_' + scoreType] = scoreMap[studentObj.score] + 1;
+                this.studentInfos[studentObj.kaohao]['groupRank_' + scoreType] = scoreMap[studentObj.score].rank;
             })
         })
     }
@@ -858,8 +878,6 @@ console.log('componentDidMount rank report');
 // console.log('examInfo === ', examInfo);
 // console.log('rankCache === ', rankCache);
 // console.log('this.studentInfos === ', this.studentInfos);
-// debugger;
-// debugger;
 
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
