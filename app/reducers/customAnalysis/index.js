@@ -100,7 +100,7 @@ export default function reducer(state, action) {
             var newQuestions = [];
             _.each(questions, question => {
                 if (question.default === action.oldName) {
-                    newQuestions.push(_.assign({}, question, {name: action.newName}))
+                    newQuestions.push(_.assign({}, question, {default: action.newName}))
                 } else {
                     newQuestions.push(question);
                 }
