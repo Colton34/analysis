@@ -516,7 +516,7 @@ class ExamSelect extends React.Component {
                                                     <label for={'checker-question-all-' + paperId}></label>
                                                     <span>全选</span>
                                                 </div>
-                                                {currentPapers[paperId].origin === PAPER_ORIGIN.upload ? <span style={localStyle.paperDelBtn} data-paperid={paperId} onClick={this.onDelUploadPaper.bind(this)}>删除</span>:''}
+                                                {currentPapers[paperId].origin === PAPER_ORIGIN.upload ? <span style={localStyle.paperDelBtn} key={paperId} data-paperid={paperId} onClick={this.onDelUploadPaper.bind(this)}>删除</span>:''}
                                             </div>
                                             <div id={'qlist-' + paperId} style={{ overflow: 'auto' }}>
                                                 <ul>
