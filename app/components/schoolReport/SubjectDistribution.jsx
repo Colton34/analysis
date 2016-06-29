@@ -204,10 +204,10 @@ class TextView extends React.Component {
             showAll: !this.state.showAll,
             showData: !this.state.showAll ? this.props.studentsGroupByClass : (_.pick(this.props.studentsGroupByClass, this.classNames.slice(0, 5)))
         }, ()=> {
-            if (!this.state.showAll){
-                var top = $(document).scrollTop();
-                $(document).scrollTop(top - 200);
-            }
+            // if (!this.state.showAll){
+            //     var top = $(document).scrollTop();
+            //     $(document).scrollTop(top - 200);
+            // }
         })
     }
     render() {
