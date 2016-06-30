@@ -253,6 +253,10 @@ class Dialog extends React.Component {
                 // }
 
                 // [300, 400, 500, 700]   [10, 20, 20, 20, 30, 40, 50]   7-1 = 6
+                if(value > examInfo.fullMark) {
+                    console.log('数值不合法--不能超过总分');
+                    return;
+                }
                 var targetIndex;//因为examStudentsInfo是有序的，所以可以用二分
                 if(num == (_.size(this.levels) - 1)) {
                     targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= value);
@@ -275,6 +279,10 @@ class Dialog extends React.Component {
                 //     this.isValid = false;
                 //     return;
                 // }
+                if(value > 100) {
+                    console.log('数值不合法--不能超过100%');
+                    return;
+                }
                 var flagCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
                 var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
 

@@ -125,7 +125,7 @@ class Dialog extends React.Component {
 
     render() {
         var _this = this, gradeLastIndex = this.state.grades.length - 1;
-// debugger;
+
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {}) }>
                 <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
@@ -212,9 +212,6 @@ class SubjectPerformance extends React.Component {
     }
 
     updateLevelPercentages(newLevelPercentages) {
-
-console.log('updateLevelPercentages : ', newLevelPercentages);
-// debugger;
         this.setState({
             levelPcentages: newLevelPercentages
         })
