@@ -30,7 +30,7 @@ class SchoolReportCard extends React.Component {
         var {examid, grade} = this.props;
         var queryOptions = (grade) ? {examid: examid, grade: grade} : {examid: examid};
         return (
-            <div style={{ display: 'inline-block', height: 398, padding: '0 0 0 10px'}}  className='col-md-6'>
+            <div style={{ display: 'inline-block', height: 398, padding: '0 0 0 10px', cursor: 'pointer'}} onClick={this.toViewSchoolAnalysis.bind(this)} className='col-md-6'>
                 <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
                     <div  onClick={this.toViewSchoolAnalysis.bind(this)}
                           onMouseEnter={this.onHeaderMouseEnter.bind(this)}
