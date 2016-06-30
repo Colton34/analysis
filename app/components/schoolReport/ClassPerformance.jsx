@@ -403,7 +403,7 @@ function theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo, groupLengt
     table.push(titleHeader);
 
     var allGroupStudentInfoArr = []; //因为后面维度不一样了，所以这里需要打散收集信息然后再group
-    _.each(_.reverse(groupStudentsInfo), (groupObj, groupKey) => {
+    _.each(groupStudentsInfo, (groupObj, groupKey) => {
         totalSchoolInfo.push(groupObj.groupCount);
         _.each(groupObj.classStudents, (students, className) => {
             allGroupStudentInfoArr.push({ 'class': className, groupKey: groupKey, students: students });
@@ -467,6 +467,7 @@ function makeOriginalSubjectInfoRow(students, examPapersInfo, examInfo, examClas
 function makeGroupStudentsInfo(groupLength, students) {
     //需要原始的“根据考生总分排序好的” studentsInfo 数组
     //将数组内的元素分成10组，计算每一组中各个班级学生人数
+    students = _.reverse(students);
     var result = {}, flagCount = 0, totalStudentCount = students.length;
     _.each(_.range(groupLength), function(index) {
         var groupCount = (index == groupLength-1) ? (totalStudentCount - flagCount) : (_.ceil(_.divide(totalStudentCount, groupLength)));
