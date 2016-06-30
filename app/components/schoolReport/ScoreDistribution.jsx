@@ -501,7 +501,7 @@ class ScoreDistribution extends React.Component {
                     {/*--------------------------------  总分分档上线学生表格 -------------------------------------*/}
 
                     <p style={{ marginBottom: 20 }}>各班的上线情况见下表：</p>
-                    <TableView tableData={tableData} levels={levels} TableComponent={Table}/>
+                    <TableView tableData={tableData} levels={levels} TableComponent={Table} reserveRows={6}/>
 
                     {/*--------------------------------  饼图的select -------------------------------------*/}
                     <span style={{ position: 'absolute', right: 0, marginTop: 40 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this)} classList={_this.classList}/></span>

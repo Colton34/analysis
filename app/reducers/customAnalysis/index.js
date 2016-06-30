@@ -91,6 +91,7 @@ export default function reducer(state, action) {
             return nextState;
         case SET_MERGED_SQM:
             var nextState = state.setIn(['currentSubject', 'SQM'], Map(action.mergedSqm));
+            nextState = nextState.setIn(['currentSubject', 'mergeType'], action.mergeType);
             _.each(action.sqmMap, (sqm, pid) => {
                 nextState = nextState.setIn(['currentSubject', 'src', pid, 'SQM'], sqm);      
             })
@@ -100,7 +101,7 @@ export default function reducer(state, action) {
             var newQuestions = [];
             _.each(questions, question => {
                 if (question.default === action.oldName) {
-                    newQuestions.push(_.assign({}, question, {name: action.newName}))
+                    newQuestions.push(_.assign({}, question, {default: action.newName}))
                 } else {
                     newQuestions.push(question);
                 }
@@ -124,7 +125,7 @@ export default function reducer(state, action) {
         case SAVE_CURRENT_SUBJECT: 
             var name = state.getIn(['currentSubject', 'name']);
             var nextState = state.setIn(['resultSet', name], state.get('currentSubject'));
-            nextState = nextState.set('currentSubject',Map({ src: Map({}), groupMap: {}, name: '', grade: '', SQM: Map({})}));
+            nextState = nextState.set('currentSubject',Map({ src: Map({}), groupMap: {}, name: '', grade: '', SQM: Map({}), mergeType: ''}));
             nextState = nextState.set('status','');
             nextState = nextState.set('pageIndex', 0);
             return nextState;
@@ -150,7 +151,7 @@ export default function reducer(state, action) {
             }
             return nextState;
         case DISCARD_CURRENT_SUBJECT:
-            var nextState = state.set('currentSubject',Map({ src: Map({}), groupMap: {}, name: '', grade: '', SQM: Map({})}));
+            var nextState = state.set('currentSubject',Map({ src: Map({}), groupMap: {}, name: '', grade: '', SQM: Map({}), mergeType: ''}));
             nextState = nextState.set('status', '');
             nextState = nextState.set('pageIndex', 0);
             return nextState;

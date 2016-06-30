@@ -286,9 +286,13 @@ class ExamSelect extends React.Component {
             item.default = "第" + (count++) + "题";
         });
         //console.log('========== merge result: ' + JSON.stringify(finSQM));
+        var {currentSubject} = this.props;
+        if (mergeType === currentSubject.mergeType && currentSubject.SQM !== undefined && !this.diff(finSQM.x, currentSubject.SQM.x)) {
+            this.props.onNextPage();
+            return;
+        }
         // 保存finSQM & 每个paper的SQM
-        this.props.setMergedSqm(finSQM, this.state.sqmMap);
-        // 跳转到下一页
+        this.props.setMergedSqm(finSQM, this.state.sqmMap, mergeType);
         this.props.onNextPage();
     }
     onHideDialog() {
@@ -357,6 +361,28 @@ class ExamSelect extends React.Component {
     onDelUploadPaper(event) {
         var paperId = $(event.target).data('paperid');
         this.props.subtractPaperInfo(paperId + '');
+    }
+
+    /**
+     * 比较两个SQM.x对象是否有差别, 忽略'default'字段
+     */
+    diff(x1, x2){
+        var result = true;
+        if(x1 && x2 && x1.length === x2.length){
+            for(var i in x1){
+                result &= x1[i].exam == x2[i].exam &&
+                x1[i].name == x2[i].name &&
+                x1[i].paper == x2[i].paper &&
+                x1[i].score == x2[i].score;
+                if(!result){
+                    break;
+                }
+            }
+        }else{
+            result = false;
+        }
+
+        return !result;
     }
     render() {
         //var selectedExams = Object.keys(this.state.selectedExamInfos);
@@ -490,7 +516,7 @@ class ExamSelect extends React.Component {
                                                     <label for={'checker-question-all-' + paperId}></label>
                                                     <span>全选</span>
                                                 </div>
-                                                {currentPapers[paperId].origin === PAPER_ORIGIN.upload ? <span style={localStyle.paperDelBtn} data-paperid={paperId} onClick={this.onDelUploadPaper.bind(this)}>删除</span>:''}
+                                                {currentPapers[paperId].origin === PAPER_ORIGIN.upload ? <span style={localStyle.paperDelBtn} key={paperId} data-paperid={paperId} onClick={this.onDelUploadPaper.bind(this)}>删除</span>:''}
                                             </div>
                                             <div id={'qlist-' + paperId} style={{ overflow: 'auto' }}>
                                                 <ul>

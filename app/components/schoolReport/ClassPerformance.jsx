@@ -200,7 +200,7 @@ class ClassPerformance extends React.Component {
 
                     {/*--------------------------------  班级考试基本表现平均分表格 -------------------------------------*/}
                     <p>（3）从平均水平看，全校和班级的各学科平均得分率见下表所示：</p>
-                    <TableView tableHeaderData={meanTableHeaderData} tableData={meanTableBodyData} TableComponent={AverageTable}/>
+                    <TableView tableHeaderData={meanTableHeaderData} tableData={meanTableBodyData} TableComponent={AverageTable} reserveRows={6}/>
 
                     {/* 如果样式一样的话，那么这个“显示更多班级”可以抽出来了，属于Table的一部分--逻辑是一样的 */}
                     {/*  _.keys(studentsGroupByClass).length > 5 ? (<a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
@@ -231,7 +231,7 @@ class ClassPerformance extends React.Component {
                     <p>
                         （5）将学校分数从高到低，分为十组学生，每一组学生之间的水平相差不大，按这样方式，我们可以看见各班在这样的十组中所存在的人数如下：
                     </p>
-                    <TableView tableData={groupTableData} reserveRows={6}/>
+                    <TableView tableData={groupTableData} reserveRows={7}/>
                     {/*  _.keys(studentsGroupByClass).length > 5 ? (                <a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
                         点击查看更多班级数据 V
                     </a>) : ''    */}
