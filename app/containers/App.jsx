@@ -38,7 +38,7 @@ class App extends React.Component {
         
         var currentPath = this.props.location.pathname;
         return (
-            <div style={[{backgroundColor: '#f2f2f2'},(currentPath === '/' ? {}: {paddingBottom: 30})]} className={commonStyle['common-font']}>
+            <div style={[{backgroundColor: '#EFF1F4'},(currentPath === '/' ? {}: {paddingBottom: 30})]} className={commonStyle['common-font']}>
                 <Header user={user} actions={this.props.actions}/>
                 <Dialog />
                     {this.props.children}

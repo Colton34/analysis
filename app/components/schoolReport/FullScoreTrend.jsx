@@ -7,6 +7,16 @@ import {makeSegments, makeSegmentsStudentsCount} from '../../api/exam';
 const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
 //算法数据结构：
     var result = theTotalScoreTrenderChart(examInfo, examStudentsInfo);
+
+    // y轴数据预处理
+    result['y-axon'] = result['y-axon'].map((num, index) => {
+        var obj = {};
+        obj.y = num;
+        obj.low = index === 0 ? 0 : result['x-axon'][index - 1];
+        obj.high = result['x-axon'][index];
+        return obj;
+    }) 
+    
 //自定义Module数据结构
     var config = {
         title: {
@@ -27,13 +37,16 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
             }]
         },
         tooltip: {
-            valueSuffix: '人数'
+            formatter: function(){
+                return '分数区间：<b>[' + this.point.low + ',' + this.point.high + ')</b><br/>' + '人数:<b>' + this.point.y + '</b>'
+            }
         },
         legend: {
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle',
-            borderWidth: 0
+            borderWidth: 0,
+            enabled: false
         },
         series: [{
             name: 'school',

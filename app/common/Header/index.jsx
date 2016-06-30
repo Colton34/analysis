@@ -69,6 +69,7 @@ class HeaderComponent extends React.Component {
                         </li>
                     </ul>
                     <a key='addAnalysisBtn' href='/add/analysis' style={localStyle.addAnalysisBtn}><i className='icon-add-3'></i>自定义分析</a>
+                    
                     {/* ------------------------------右侧头像、名字--------------------------------------*/ }
                     <a href='javascript:;' onClick={this.onClickAvatar.bind(this)} style={localStyle.userInfo}>
                         <div className={style['user-avatar']}> </div>
@@ -77,6 +78,8 @@ class HeaderComponent extends React.Component {
                             <span className='caret' style={{color: '#e1e1e1'}}></span>
                         </div>
                     </a>
+
+                    <a key='versionSwitcher' href="http://fx.yunxiao.com"  style={_.assign({},localStyle.headerLink,{float: 'right', marginRight: 30, color: '#5a5a5a'})}><i className='icon-loop-alt'></i>返回旧版</a>
                     {/*<a href="javascript:void(0)"  onClick={this.props.actions.bind(_this, dialogProps) } style={{ float: 'right', textDecoration: 'none', color: '#5a5a5a', paddingLeft: 40, paddingTop: 30 }}>我要吐槽</a>*/}
                     { this.state.showDropdown ? <DropdownMenu onLogout={this.onLogout.bind(this)}/> : ''}
                 </div>
@@ -100,7 +103,7 @@ var localStyle = {
     },
     userInfo: { 
         float: 'right', position: 'relative', height: '100%', lineHeight: '66px', 
-        marginLeft: 10, cursor: 'pointer',textDecoration:'none',color: '#333',
+        cursor: 'pointer',textDecoration:'none',color: '#333',
         ':hover': {color: '#59bde5', textDecoration: 'none'},
         ':link': {textDecoration: 'none'}
     },
