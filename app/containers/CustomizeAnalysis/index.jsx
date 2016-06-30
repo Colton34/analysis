@@ -121,9 +121,11 @@ class CustomizeAnalysis extends React.Component {
             value.newSQM = newSQM;
         });
 
+debugger;
         // var resultSetJS = this.props.resultSet.toJS();
         // var currentSubjectJS = this.props.currentSubject.toJS();
         var postData = makeExamSchema(resultSet, this.props.analysisName);
+debugger;
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         //创建成功后根据返回的examId去到其相应的dashboard--这部分API要添加新的，就不是之前的API了
 
@@ -432,11 +434,11 @@ Note: studentsInfo中的papers object数组中的paperid就是paper中id，但�
         var studentsPaperScore = _.map(matrix, (questionScoresArr) => _.sum(questionScoresArr));
         //一个科目： {_count: , class: , id: , kaohao: , name: , score: }
         _.each(sqmItem.y, (studentObj, index) => {
-            var obj = studentsInfoMap[studentObj.id];
+            var obj = studentsInfoMap[studentObj.kaohao];
             // debugger;
             if (!obj) {
                 obj = _.assign(_.pick(studentObj, ['class', 'id', 'kaohao', 'name']), { "[papers]": [] });
-                studentsInfoMap[studentObj.id] = obj;
+                studentsInfoMap[studentObj.kaohao] = obj;
                 // debugger;
             }
             var ids = _.find(subjectsIdArr, (obj) => obj.subject == subjectName);
