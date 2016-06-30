@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-28 18:40:57
+* @Last Modified time: 2016-06-29 18:20:46
 */
 
 'use strict';
@@ -102,7 +102,6 @@ exports.rankReport = function(req, res, next) {
                 return _.assign(student, {score: paperScore, paper: paper._id, pid: paper.id });
             });
         }));
-
         //先根据学生分组得到其总分
         var scoreInfoGroupByStudent = _.groupBy(allStudentsPaperScoreInfo, 'id');
         var allStudentsTotalScoreInfo = _.map(scoreInfoGroupByStudent, (studentPaperInfoArr, studentId) => {
@@ -156,19 +155,48 @@ exports.customRankReport = function(req, res, next) {
             if(!examStudentsInfo || examStudentsInfo.length == 0 || !examPapersInfo || examPapersInfo.length == 0) {
                 return next(new errors.Error('no valid custom exam be found'));
             }
-            var allStudentsScoreInfo = _.concat(..._.map(exam['[studentsInfo]'], (student) => {
+            console.log('examStudentsInfo.length = ', examStudentsInfo.length);
+            var flag = 0, tempResult;
+            var allStudentsScoreInfo = _.concat(..._.map(examStudentsInfo, (student) => {
                 var obj = _.pick(student, ['id', 'kaohao', 'name', 'class']);
-                var totalObj = _.assign(obj, {score: student.score, paper: 'totalScore', id: 'totalScore'});
+                var totalObj = _.assign({score: student.score, paper: 'totalScore', pid: 'totalScore'}, obj);
+// if(flag == 0) {
+//     console.log('obj === ', obj);
+//     console.log('totalObj === ', totalObj);
+// }
+
                 var paperObjs = _.map(student['[papers]'], (pObj) => {
-                    return _.assign(obj, {score: pObj.score, paper: examPapersInfo[pObj.paperid].paper, id: pObj.paperid});
+                    return _.assign({score: pObj.score, paper: examPapersInfo[pObj.paperid].paper, pid: pObj.paperid}, obj);
                 });
-                return _.concat(totalObj, paperObjs);
+
+// if(flag == 0) {
+//     console.log('totalObj == ', totalObj);
+//     console.log('paperObjs == ', paperObjs);
+// }
+
+
+                tempResult = _.concat([totalObj], paperObjs);
+
+
+// if(flag == 0) {
+//     console.log('tempResult == ', tempResult);
+// }
+
+                flag += tempResult.length;
+                return tempResult;
             }));
+
+// console.log('flag = ', flag);
+// console.log('allStudentsScoreInfo.length = ', allStudentsScoreInfo.length);
+
             var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
             var rankCache = {};
-            _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperId) => {
-                rankCache[paperId] = _.groupBy(studentsScoreInfoArr, 'class');
+            _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperObjectId) => {
+                rankCache[paperObjectId] = _.groupBy(studentsScoreInfoArr, 'class');
             });
+
+// console.log('kyes = ', _.keys(rankCache));
+// console.log(rankCache[_.keys(rankCache)[0]]);
 
             var examPapers = _.map(examPapersInfo, (value, pid) => {
                 return {
