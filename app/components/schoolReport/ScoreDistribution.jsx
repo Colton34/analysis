@@ -549,7 +549,7 @@ class ScoreDistribution extends React.Component {
 
                     {/*--------------------------------  总分分档上线学生分析说明 -------------------------------------*/}
                     <div style={{ marginTop: 30 }}>
-                        <div className={style['tips']} style={{ display: 'inline-block', width: 330, backgroundColor: '#e9f7f0',fontSize: 14, marginTop: 0}}>
+                        <div className={style['tips']} style={{ display: 'inline-block', width: 330, backgroundColor: '#e9f7f0',fontSize: 14, marginTop: 0, minHeight: 250}}>
                             <p>表中显示了全校及各班各档上线人数。上线人数的多少一目了然。考虑到各班级学生总人数会存在有差异，要用上线率来比较：</p>
                             {
                                 (_.size(disData) > 0) ? (
