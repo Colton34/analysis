@@ -61,11 +61,13 @@ class Header extends React.Component {
 
         return (
             <div>
-                <div style={{ height: 110, padding: '0 0 20px 20px', backgroundColor: '#fcfcfc', position: 'relative', display:'table-cell', width: 1000, verticalAlign: 'middle', textAlign: 'center'}}>
-                    <a href={targetUrl} style={[localStyle.goBackLink,{ float: 'left', marginTop: 20}]}><i className='icon-left-open-3'></i>返回</a>
-                    <div style={{ margin: "0 auto", fontSize: 20, width: 700 }}>
+                <div style={{ height: 110, backgroundColor: '#fcfcfc', position: 'relative', display:'table-cell', width: 1000, verticalAlign: 'middle', textAlign: 'center'}}>
+                    <a href={targetUrl} style={[localStyle.goBackLink,{ float: 'left', margin: '20px 0 0 20px'}]}><i className='icon-left-open-3'></i>返回</a>
+                    <div style={{ margin: "0 auto", fontSize: 20, width: 700}}>
+                        
                         <div style={{ textAlign: 'center' }}>{examInfo.name}</div>
                         <div style={{ textAlign: 'center' }}>学校总体分析诊断报告</div>
+                        
                     </div>
                     <a href='javascript: void(0)' className={styles.button}
                         onClick={this.downloadFile.bind(this)}
