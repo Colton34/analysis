@@ -49,7 +49,6 @@ const ScoreRank = ({data, examid, grade}) => {
 
 // if(grade) {
 //     console.log('-================  不可能');
-//     debugger;
 // }
 
 
@@ -95,7 +94,7 @@ class ScoreRank extends React.Component {
         })
     }
     onClickScoreRank(queryOptions) {
-        var targetUrl = '/rank/report?examid=' + queryOptions.examid + (queryOptions.grade ? '&grade=' + queryOptions.grade : '' ); 
+        var targetUrl = '/rank/report?examid=' + queryOptions.examid + (queryOptions.grade ? '&grade=' + queryOptions.grade : '' );
         browserHistory.push(targetUrl);
     }
     render() {

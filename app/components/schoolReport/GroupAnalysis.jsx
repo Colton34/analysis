@@ -216,7 +216,6 @@ class GroupAnalysis extends React.Component {
 //算法数据结构：
         var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers);
         var disData = criticalStudentsDiscription(criticalLevelInfo); //缺少UI
-        // debugger;
 //自定义Module数据结构：
 
         return (
@@ -342,23 +341,10 @@ function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass,
         classRow.unshift(examInfo.gradeName+className+'班');
         table.push(classRow);
     });
-// debugger;
-
-// console.log('=============== criticalStudentsTable');
-// console.log(table);
-// console.log('=====================================');
-
-//     var criticalDis = criticalStudentsDiscription(criticalLevelInfo);  Done
-
-// console.log('=============== criticalStudentsDiscription');
-// console.log(criticalDis);
-// console.log('=====================================');
-
     return {tableData: table, criticalLevelInfo: criticalLevelInfo};
 }
 
 function makeCriticalSegments(levelBuffers, levels) {
-    //[<thirdScore-thirdBuffer>, <thirdScore+thirdBuffer>, ...]
     var result = [];
     _.each(levels, (levObj, levelKey) => {
         result.push(levObj.score-levelBuffers[levelKey-0]);

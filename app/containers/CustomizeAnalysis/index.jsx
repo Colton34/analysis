@@ -107,14 +107,22 @@ class CustomizeAnalysis extends React.Component {
             generatingAnalysis: true
         })
         var resultSet = Map.isMap(this.props.resultSet) ? this.props.resultSet.toJS() : this.props.resultSet;
+        // var newResultSet = {};
+        // _.each(resultSet, (value, subjectName) => {
+        //     var newSQM = this.deleteStudentFromSQM(resultSet[subjectName]);
+        //     newResultSet[subjectName] = newSQM;
+        // });
         for (var subjectName in resultSet) {
             var newSQM = this.deleteStudentFromSQM(resultSet[subjectName])
             this.props.updateSubjectSqm(subjectName, newSQM);
         }
-
-        var resultSetJS = this.props.resultSet.toJS();
+        _.each(resultSet, (value, subjectName) => {
+            var newSQM = this.deleteStudentFromSQM(resultSet[subjectName]);
+            value.newSQM = newSQM;
+        });
+        // var resultSetJS = this.props.resultSet.toJS();
         // var currentSubjectJS = this.props.currentSubject.toJS();
-        var postData = makeExamSchema(resultSetJS, this.props.analysisName);
+        var postData = makeExamSchema(resultSet, this.props.analysisName);
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         //创建成功后根据返回的examId去到其相应的dashboard--这部分API要添加新的，就不是之前的API了
 
@@ -338,7 +346,6 @@ function makeExamSchema(resultSet, analysisName) {
     var examStudentsInfo = _.sortBy(makeExamStudentsInfo(resultSet, subjectsIdArr), 'score');
     var examPapersInfo = makeExamPapersInfo(resultSet, subjectsIdArr);
     var examClassesInfo = makeExamClassesInfo(resultSet);
-
     return {
         "info": examInfo,
         "[studentsInfo]": examStudentsInfo,
@@ -350,7 +357,7 @@ function makeExamSchema(resultSet, analysisName) {
 
 function makeExamInfo(resultSet, analysisName) {
     /*
-    
+
         name:  ??
         gradeName: -- 暂时先不填写 -- TODO: 给examInfo添加gradeName
         startTime:  --post存入的时间
@@ -360,12 +367,12 @@ function makeExamInfo(resultSet, analysisName) {
         lostStudentsCount:
         subjects:
         fullMark:
-    
+
     */
     var subjects = _.keys(resultSet);
     //fullMark=所有科目中所有选中的小题的积分和
     var fullMark = _.sum(_.map(resultSet, (item, subjectName) => {
-        var sqmItem = item.SQM;
+        var sqmItem = item.newSQM;
         if (!sqmItem) return;
         return _.sum(_.map(sqmItem.x, (questionObj) => questionObj.score));
     }));
@@ -397,7 +404,9 @@ function makeExamInfo(resultSet, analysisName) {
 
 function makeExamStudentsInfo(resultSet, subjectsIdArr) {
     /*
-    
+
+Note: studentsInfo中的papers object数组中的paperid就是paper中id，但是rankcache中却是走的paper中的paper
+
     examStudentsInfo
     [
         {
@@ -412,19 +421,18 @@ function makeExamStudentsInfo(resultSet, subjectsIdArr) {
         ...
     ]
     */
-
     var studentsInfoMap = {};
     _.each(resultSet, (item, subjectName) => {
-        var sqmItem = item.SQM;
+        var sqmItem = item.newSQM;
         if (!sqmItem) return;
         var questions = sqmItem.x, students = sqmItem.y, matrix = sqmItem.m;
         var studentsPaperScore = _.map(matrix, (questionScoresArr) => _.sum(questionScoresArr));
         //一个科目： {_count: , class: , id: , kaohao: , name: , score: }
         _.each(sqmItem.y, (studentObj, index) => {
-            var obj = studentsInfoMap[studentObj.id];
+            var obj = studentsInfoMap[studentObj.kaohao];
             if (!obj) {
                 obj = _.assign(_.pick(studentObj, ['class', 'id', 'kaohao', 'name']), { "[papers]": [] });
-                studentsInfoMap[studentObj.id] = obj;
+                studentsInfoMap[studentObj.kaohao] = obj;
             }
             var ids = _.find(subjectsIdArr, (obj) => obj.subject == subjectName);
             obj["[papers]"].push({ paperid: ids.id, score: studentsPaperScore[index] });
@@ -440,7 +448,7 @@ function makeExamStudentsInfo(resultSet, subjectsIdArr) {
 function makeExamPapersInfo(resultSet, subjectsIdArr) {
     //TODO: 在这里给papersInfo中的每一个paper对象添加grade属性。Schema已经修改过了。
     var result = _.map(resultSet, (item, subjectName) => {
-        var sqmItem = item.SQM;
+        var sqmItem = item.newSQM;
         if (!sqmItem) return;
         var questions = sqmItem.x, students = sqmItem.y, matrix = sqmItem.m;
         var obj = _.find(subjectsIdArr, (sobj) => sobj.subject == subjectName);    //_.pick(item, ['id', 'paper', 'subject']);   //id是pid，paper是ObjectId
@@ -488,7 +496,7 @@ function makeExamClassesInfo(resultSet) {
             losstStudentsCount:
         }
     }
-    
+
     */
     var result = [];
     _.each(resultSet, (item, subjectName) => {

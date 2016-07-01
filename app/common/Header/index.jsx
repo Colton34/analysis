@@ -44,7 +44,7 @@ class HeaderComponent extends React.Component {
         var Cookies = require('cookies-js');
         var options = (_.includes(window.location.hostname, 'yunxiao')) ? { domain: '.yunxiao.com'} : {};
         Cookies.expire('authorization', options);
-        window.location = '/';
+        window.location = '/login';
     }
     componentDidMount() {
         $('body').click((event)=> {
@@ -69,7 +69,7 @@ class HeaderComponent extends React.Component {
                         </li>
                     </ul>
                     <a key='addAnalysisBtn' href='/add/analysis' style={localStyle.addAnalysisBtn}><i className='icon-add-3'></i>自定义分析</a>
-                    
+
                     {/* ------------------------------右侧头像、名字--------------------------------------*/ }
                     <a href='javascript:;' onClick={this.onClickAvatar.bind(this)} style={localStyle.userInfo}>
                         <div className={style['user-avatar']}> </div>
@@ -101,8 +101,8 @@ var localStyle = {
         ':hover': { textDecoration: 'none'},
         ':link': {textDecoration: 'none'}
     },
-    userInfo: { 
-        float: 'right', position: 'relative', height: '100%', lineHeight: '66px', 
+    userInfo: {
+        float: 'right', position: 'relative', height: '100%', lineHeight: '66px',
         cursor: 'pointer',textDecoration:'none',color: '#333',
         ':hover': {color: '#59bde5', textDecoration: 'none'},
         ':link': {textDecoration: 'none'}

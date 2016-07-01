@@ -144,7 +144,6 @@ class Dialog extends React.Component {
             //     tempLevels['0'].score = targetScore;
             //     tempLevels['0'].count = _.size(_.filter(this.props.examStudentsInfo, (s) => s.score >= targetScore));
             //     tempLevels['0'].percentage = _.round(_.multiply(_.divide(tempLevels['0'].count, this.props.examStudentsInfo.length), 100), 2);
-            //     debugger;
             // } else {
             //     _.each(_.range(value), (index) => {
             //         tempLevels[index+''] = this.levels[(index+theDiff)]
@@ -153,7 +152,6 @@ class Dialog extends React.Component {
 
             _.each(_.range(value), (index) => {
                 var targetScore = this.levels[(index+theDiff)].score;
-                // debugger;
                 var targetCount = (index == 0) ? _.size(_.filter(this.props.examStudentsInfo, (s) => s.score >= targetScore)) : _.size(_.filter(this.props.examStudentsInfo, (s) => s.score > targetScore));
                 var targetPercentage = _.round(_.multiply(_.divide(targetCount, this.props.examStudentsInfo.length), 100), 2);
                 tempLevels[index+''] = {score: targetScore, count: targetCount, percentage: targetPercentage};
@@ -277,6 +275,10 @@ class Dialog extends React.Component {
                 // }
 
                 // [300, 400, 500, 700]   [10, 20, 20, 20, 30, 40, 50]   7-1 = 6
+                if(value > examInfo.fullMark) {
+                    console.log('数值不合法--不能超过总分');
+                    return;
+                }
                 var targetIndex;//因为examStudentsInfo是有序的，所以可以用二分
                 if(num == (_.size(this.levels) - 1)) {
                     targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= value);
@@ -299,6 +301,10 @@ class Dialog extends React.Component {
                 //     this.isValid = false;
                 //     return;
                 // }
+                if(value > 100) {
+                    console.log('数值不合法--不能超过100%');
+                    return;
+                }
                 var flagCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
                 var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
 
@@ -433,7 +439,6 @@ class ScoreDistribution extends React.Component {
 
         //算法数据结构
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
-        // debugger;
         var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
         var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels);
 
@@ -760,7 +765,6 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
     //各档的累计人数等于=上一个高档次的累计人数+当前档次的人数（最高档的累计人数和人数是相等的）
     levItem.sumCount = _.sum(_.map(_.pickBy(countsGroupByLevel, (v, k) => k >= levelKey), (count) => count));
     levItem.sumPercentage = _.round(_.multiply(_.divide(levItem.sumCount, baseCount), 100), 2);
-    // debugger;
 
     return levItem;
 }

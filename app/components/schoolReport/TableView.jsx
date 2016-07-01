@@ -40,10 +40,10 @@ class TableView extends React.Component {
             showAll: !this.state.showAll,
             showData: !this.state.showAll ? this.props.tableData : this.props.tableData.slice(0,reserveRows)
         }, ()=> {
-            if (!this.state.showAll){
-                var top = $(document).scrollTop();
-                $(document).scrollTop(top - 400);    
-            }
+            // if (!this.state.showAll){
+            //     var top = $(document).scrollTop();
+            //     $(document).scrollTop(top - 400);    
+            // }
         })
     }
     render() {

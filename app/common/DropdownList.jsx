@@ -32,9 +32,10 @@ class DropdownList extends React.Component {
         super(props);
         this.multiChoiceNum = this.props.multiChoiceNum ? this.props.multiChoiceNum : this.props.classList.length;
         if (this.props.isMultiChoice) {
-            _.each(_.range(2), index => { //默认选择前两个
+            var theDropCount = (this.props.classList.length >= 2) ? 2 : 1;
+            _.each(_.range(theDropCount), index => { //默认选择前两个
                 this.props.classList[index].selected = true;
-            })    
+            })
         }
         this.state = {
             active: false,
@@ -53,7 +54,7 @@ class DropdownList extends React.Component {
     componentDidMount() {
         this.clickHandlerRef = this.handleBodyClick.bind(this);
         $('body').bind('click', this.clickHandlerRef);
-        
+
     }
     componentWillUnmount() {
         $('body').unbind('click', this.clickHandlerRef);
@@ -75,7 +76,7 @@ class DropdownList extends React.Component {
                 this.setState({
                     selectedItems: _.takeRight(selectedItems, this.multiChoiceNum)
                 })
-                
+
             }
         } else {
             this.setState({current: item, active: false, coveredItems: _.without(this.props.classList, item)});
@@ -90,7 +91,7 @@ class DropdownList extends React.Component {
                     {this.state.current.value}
                     <span className='dropdown' style={{position: 'absolute', right: 15}}>
                         <span className='caret'></span>
-                    </span> 
+                    </span>
                 </a >
                 {this.props.classList ? (
                     <ul style={this.state.active? style.list : style.hide}>
@@ -99,8 +100,8 @@ class DropdownList extends React.Component {
                                 var selectedStyle = item.selected ? {backgroundColor: '#00c076', color: "#fff",':hover': {backgroundColor: '#b66c'}}: {};
                                 return (
                                     <li key={index} style={{width: 130, height: 30, padding: 5, backgroundColor: '#fff'}}>
-                                        <a  key={'ddAtag-' + index} 
-                                            style={[style.dropDownBtn,{backgroundColor:'#f2f2f2',color: '#333'}, selectedStyle]} 
+                                        <a  key={'ddAtag-' + index}
+                                            style={[style.dropDownBtn,{backgroundColor:'#f2f2f2',color: '#333'}, selectedStyle]}
                                             href="javascript:void(0)" onClick={this.chooseItem.bind(this,item)}>
                                             {item.value}
                                         </a>

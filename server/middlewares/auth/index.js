@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-13 20:00:56
+* @Last Modified time: 2016-07-01 08:13:56
 */
 
 'use strict';
@@ -41,16 +41,13 @@ exports.authenticate = function(req, res, next) {
     var password = req.body.password;
 
     authUitls.getUserInfo(value).then(function(user) {
-        if(user && (!_.eq(user.pwd, password))) return when.reject(new UnauthorizedAccessError("401", {
-            message: 'Invalid value or password'
-        }));
+        if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 2, message: '密码不正确'}));
         if(!user) return authUitls.getUserInfo2(value, password);
 
         return when.resolve(user);
     }).then(function(user) {
-        if(!user) return when.reject(new UnauthorizedAccessError("401", {
-            message: 'Invalid value or password'
-        }));
+        if(!user) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '用户不存在'}));
+        if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '密码不正确'}));
         delete user.pwd;
 
         var token = jsonwebtoken.sign({ user: user }, config.secret);
@@ -65,11 +62,11 @@ exports.authenticate = function(req, res, next) {
 
 exports.verify = function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.authorization;
-    if(!token) return next(new BadRequestError('400', { message: 'no token be passed'}));
+    if(!token) return next(new errors.HttpStatusError(400, '没有令牌，拒绝访问，请登录~'));
 
     when.promise(function(resolve, reject) {
         jsonwebtoken.verify(token, config.secret, function (err, decode) {
-            if (err) return reject(new UnauthorizedAccessError("invalid_token"));
+            if (err) return reject(new errors.HttpStatusError(401, {errorCode: 3, message: '无效的令牌，拒绝访问，请登录~'}));
             //如果验证通过，则通过decode._id，然后去找user，并赋值给req.user
             resolve(decode.user);
         });

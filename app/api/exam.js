@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-27 20:59:15
+* @Last Modified time: 2016-07-01 09:51:40
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -178,7 +178,7 @@ export function fetchSchoolAnalysisData(params) {
                     id: pid
                 });
             } else {
-                restPapers.push(paper);
+                restPapers.push({id: pid, subject: paper.subject});
             }
         });
         headers = _.sortBy(headers, 'index');
@@ -186,7 +186,7 @@ export function fetchSchoolAnalysisData(params) {
             subject: '总分',
             id: 'totalScore'
         });
-        headers = _.concat(headers, _.map(restPapers, (paper) => paper.subject));
+        headers = _.concat(headers, restPapers);
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = _.map(levels, (value, key) => 5);
 
@@ -1334,19 +1334,13 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
         var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
 
         levObj.score = targetStudent.score;
-// debugger;
         var targetIndex;
         if(levelKey == '0') {
-            // console.log('0', levelKey);
             targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= levObj.score);
-            // debugger;
         } else {
-            // console.log('1 or 2', levelKey);
             targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > levObj.score);
-            // debugger;
         }
         var targetCount = examStudentsInfo.length - targetIndex;
-        // debugger;
         levObj.count = targetCount;
     });
     return levels;
