@@ -14,6 +14,9 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
         obj.y = num;
         obj.low = index === 0 ? 0 : result['x-axon'][index - 1];
         obj.high = result['x-axon'][index];
+        if (index === 0) {
+            obj.first = true;
+        }
         return obj;
     }) 
     
@@ -38,7 +41,10 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
         },
         tooltip: {
             formatter: function(){
-                return '分数区间：<b>[' + this.point.low + ',' + this.point.high + ')</b><br/>' + '人数:<b>' + this.point.y + '</b>'
+                return '分数区间：<b>' + 
+                        (this.point.first ? '[' : '(') + 
+                        this.point.low + ',' + this.point.high + ']</b><br/>' + 
+                        '人数:<b>' + this.point.y + '人</b>';
             }
         },
         legend: {
