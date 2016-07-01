@@ -208,7 +208,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                     <div style={{ margin: '0 auto', width: 500 }}>
                         <div style={{ display: 'inline-block' }}>
                             <div className={localStyle['first-ten']}></div>
-                            <div style={{ width: 155, height: 260, border: '1px solid #6dd0a8', margin: '0 auto' }}>
+                            <div style={{ width: 155, minHeight: 260, border: '1px solid #6dd0a8', margin: '0 auto' }}>
                                 {
                                     _.map(topStudents, (student, index) => {
                                         return (
@@ -223,7 +223,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                         </div>
                         <div style={{ display: 'inline-block', float: 'right' }}>
                             <div className={localStyle['last-ten']}></div>
-                            <div style={{ width: 155, height: 260, border: '1px solid #f9b4a2', margin: '0 auto' }}>
+                            <div style={{ width: 155, minHeight: 260, border: '1px solid #f9b4a2', margin: '0 auto' }}>
                                 {
                                     _.map(lowStudents, (student, index) => {
                                         return (
