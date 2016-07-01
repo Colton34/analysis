@@ -26,7 +26,12 @@ function submit() {
             console.log('textStatus == ', textStatus);
             console.log('errorThrown == ', errorThrown);
             $('#btn-login').removeClass('btn-disabled').addClass('account-submit');
-            alert('fail');
+            if (!$('.err-message-ctn').length) {
+                $('.login-yunxiao').append('<div class="err-message-ctn"><p class="err-message">登录出错</p></div>')
+            } else {
+                $('.err-message').text('登录出错');
+            }
+            //alert('fail');
         }
     });
 }
