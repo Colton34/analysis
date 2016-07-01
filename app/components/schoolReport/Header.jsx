@@ -25,6 +25,8 @@ class Header extends React.Component {
         // var baseURL = (window.client.hostname == 'localhost') ? 'http://' + window.client.hostname + ':' + window.http_port : 'http://' + window.client.hostname
         var path = this.props.location.pathname+this.props.location.search;
 
+console.log('path = ', path);
+
         params.request.post('/file/render/school/report', {url: path}).then(function(res) {
             var targetFileName = res.data;
             saveAs(window.request.defaults.baseURL+"/file/download/school/report?filename="+targetFileName);

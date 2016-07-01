@@ -16,7 +16,7 @@ import TableView from './TableView';
 var {Header, Title, Body, Footer} = Modal;
 
 let localStyle = {
-    dialogInput: {width: 150,height: 40, border: '1px solid #e7e7e7', borderRadius: 2},
+    dialogInput: {width: 150,height: 40, border: '1px solid #e7e7e7', borderRadius: 2, paddingLeft: 12},
     btn: {lineHeight: '32px', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',color: '#6a6a6a', margin: '0 6px'},
     tableShowAllBtn: { color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }
 }
@@ -135,7 +135,6 @@ class Dialog extends React.Component {
             //     tempLevels['0'].score = targetScore;
             //     tempLevels['0'].count = _.size(_.filter(this.props.examStudentsInfo, (s) => s.score >= targetScore));
             //     tempLevels['0'].percentage = _.round(_.multiply(_.divide(tempLevels['0'].count, this.props.examStudentsInfo.length), 100), 2);
-            //     debugger;
             // } else {
             //     _.each(_.range(value), (index) => {
             //         tempLevels[index+''] = this.levels[(index+theDiff)]
@@ -144,7 +143,6 @@ class Dialog extends React.Component {
 
             _.each(_.range(value), (index) => {
                 var targetScore = this.levels[(index+theDiff)].score;
-                // debugger;
                 var targetCount = (index == 0) ? _.size(_.filter(this.props.examStudentsInfo, (s) => s.score >= targetScore)) : _.size(_.filter(this.props.examStudentsInfo, (s) => s.score > targetScore));
                 var targetPercentage = _.round(_.multiply(_.divide(targetCount, this.props.examStudentsInfo.length), 100), 2);
                 tempLevels[index+''] = {score: targetScore, count: targetCount, percentage: targetPercentage};
@@ -337,7 +335,7 @@ class Dialog extends React.Component {
                                     _.map(_.range(this.state.levelNum), (index) => {
                                         return (
                                             <div key={index} style={{marginBottom: index === this.state.levelNum -1 ? 0 : 30, textAlign: 'center'}}>
-                                                <div style={{ display: 'inline-block' }}>{numberMap[(index + 1)]}档：
+                                                <div style={{ display: 'inline-block', marginRight: 30}}>{numberMap[(index + 1)]}档：
                                                     <input id={'score-' + index} ref={'score-' + index} defaultValue={this.levels[(this.levLastIndex - index) + ''].score} onBlur={_this.onInputBlur.bind(_this, 'score-' + index) } onChange={_this.onChange.bind(_this, 'score-' + index) } style={localStyle.dialogInput}/>
                                                 </div>
                                                 <div style={{ display: 'inline-block' }}>上线率：
@@ -406,7 +404,6 @@ class ScoreDistribution extends React.Component {
 
         //算法数据结构
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
-        // debugger;
         var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
         var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels);
 
@@ -733,7 +730,6 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
     //各档的累计人数等于=上一个高档次的累计人数+当前档次的人数（最高档的累计人数和人数是相等的）
     levItem.sumCount = _.sum(_.map(_.pickBy(countsGroupByLevel, (v, k) => k >= levelKey), (count) => count));
     levItem.sumPercentage = _.round(_.multiply(_.divide(levItem.sumCount, baseCount), 100), 2);
-    // debugger;
 
     return levItem;
 }

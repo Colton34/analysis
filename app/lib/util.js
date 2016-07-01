@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-27 15:02:16
+* @Last Modified time: 2016-07-01 09:54:02
 */
 
 'use strict';
@@ -92,12 +92,10 @@ export function downloadTable(headSeq, headSelect, headerMapper, renderRows) {
             validColumnNames.push(theName);
         }
     });
-    // debugger;
     //从每一行学生数据中拿到需要的数据
     var validStudentInfoMatrix = _.map(renderRows, (studentRowObj) => {
         return _.map(validColumnKeys, (key) => studentRowObj[key]);
     });
-    // debugger;
     // console.log(jsonToSsXml(validColumnNames, validStudentInfoMatrix));
 
 // var names = ['姓名', '城市', '国家', '生日', '人数'];
@@ -157,7 +155,6 @@ function jsonToSsXml(validColumnNames, validStudentInfoMatrix) {
 function download(content, filename, contentType) {
     if (!contentType) contentType = 'application/octet-stream';
     var a = document.getElementById('rankTable');
-    // debugger;
     var blob = new Blob([content], {
         'type': contentType
     });

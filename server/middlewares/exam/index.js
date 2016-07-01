@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-29 18:20:46
+* @Last Modified time: 2016-07-01 09:44:39
 */
 
 'use strict';
@@ -820,7 +820,6 @@ exports.createCustomAnalysis = function(req, res, next) {
 
     var postData = req.body.data;
     postData.owner = req.user.id;
-console.log('postData.owner = ', postData.owner);
 
     peterFX.create('@Exam', req.body.data, function(err, result) {
         if(err) return next(new errors.data.MongoDBError('创建自定义分析错误', err));

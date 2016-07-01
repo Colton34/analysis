@@ -34,7 +34,6 @@ class DropdownList extends React.Component {
         if (this.props.isMultiChoice) {
             var theDropCount = (this.props.classList.length >= 2) ? 2 : 1;
             _.each(_.range(theDropCount), index => { //默认选择前两个
-                // debugger;
                 this.props.classList[index].selected = true;
             })
         }

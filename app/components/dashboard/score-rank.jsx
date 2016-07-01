@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 import _ from 'lodash';
 import dashboardStyle from './dashboard.css';
-import {Link} from 'react-router';
+import {Link, browserHistory} from 'react-router';
 import {Table} from 'react-bootstrap';
 import {NUMBER_MAP} from '../../lib/constants';
 /*
@@ -49,7 +49,6 @@ const ScoreRank = ({data, examid, grade}) => {
 
 // if(grade) {
 //     console.log('-================  不可能');
-//     debugger;
 // }
 
 
@@ -94,11 +93,15 @@ class ScoreRank extends React.Component {
             hoverLink: false
         })
     }
+    onClickScoreRank(queryOptions) {
+        var targetUrl = '/rank/report?examid=' + queryOptions.examid + (queryOptions.grade ? '&grade=' + queryOptions.grade : '' );
+        browserHistory.push(targetUrl);
+    }
     render() {
         var {data, examid, grade} = this.props;
         var queryOptions = (grade) ? {examid: examid, grade: grade} : {examid: examid};
         return (
-            <div style={{ display: 'inline-block', minHeight: 340, padding: '0 10px 0 0'}}  className='col-md-6'>
+            <div style={{ display: 'inline-block', minHeight: 340, padding: '0 10px 0 0', cursor: 'pointer'}} onClick={this.onClickScoreRank.bind(this, queryOptions)} className='col-md-6'>
                 <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
                     <Link to={{ pathname: '/rank/report', query: queryOptions }}
                           onMouseEnter={this.onHeaderMouseEnter.bind(this)}

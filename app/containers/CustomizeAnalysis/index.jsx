@@ -120,12 +120,9 @@ class CustomizeAnalysis extends React.Component {
             var newSQM = this.deleteStudentFromSQM(resultSet[subjectName]);
             value.newSQM = newSQM;
         });
-
-debugger;
         // var resultSetJS = this.props.resultSet.toJS();
         // var currentSubjectJS = this.props.currentSubject.toJS();
         var postData = makeExamSchema(resultSet, this.props.analysisName);
-debugger;
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         //创建成功后根据返回的examId去到其相应的dashboard--这部分API要添加新的，就不是之前的API了
 
@@ -349,7 +346,6 @@ function makeExamSchema(resultSet, analysisName) {
     var examStudentsInfo = _.sortBy(makeExamStudentsInfo(resultSet, subjectsIdArr), 'score');
     var examPapersInfo = makeExamPapersInfo(resultSet, subjectsIdArr);
     var examClassesInfo = makeExamClassesInfo(resultSet);
-// debugger;
     return {
         "info": examInfo,
         "[studentsInfo]": examStudentsInfo,
@@ -425,7 +421,6 @@ Note: studentsInfo中的papers object数组中的paperid就是paper中id，但�
         ...
     ]
     */
-// debugger;
     var studentsInfoMap = {};
     _.each(resultSet, (item, subjectName) => {
         var sqmItem = item.newSQM;
@@ -435,18 +430,14 @@ Note: studentsInfo中的papers object数组中的paperid就是paper中id，但�
         //一个科目： {_count: , class: , id: , kaohao: , name: , score: }
         _.each(sqmItem.y, (studentObj, index) => {
             var obj = studentsInfoMap[studentObj.kaohao];
-            // debugger;
             if (!obj) {
                 obj = _.assign(_.pick(studentObj, ['class', 'id', 'kaohao', 'name']), { "[papers]": [] });
                 studentsInfoMap[studentObj.kaohao] = obj;
-                // debugger;
             }
             var ids = _.find(subjectsIdArr, (obj) => obj.subject == subjectName);
             obj["[papers]"].push({ paperid: ids.id, score: studentsPaperScore[index] });
-            // debugger;
         });
     });
-// debugger;
     //给所有的学生添加总分信息
     return _.map(studentsInfoMap, (studentObj, studentId) => {
         var totalScore = _.sum(_.map(studentObj["[papers]"], (paperObj) => paperObj.score));
