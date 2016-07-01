@@ -98,6 +98,7 @@ class MainPage extends React.Component {
                                         </tbody>
                                     </table>
                                     <button onClick={this.props.onGenerateAnalysis} href='javascript:void(0)' className={ownClassNames['fx-btn'] + ' ' + (this.props.isGenerating ? ownClassNames['fx-btn-disabled']:ownClassNames['fx-btn-primary'])}>生成报表</button>
+                                    <span style={{fontSize: 12, color:'#999', marginLeft: 20}}>报表生成后不可修改，若修改请重新创建自定义分析</span>
                                 </div>
                             )
                     }
