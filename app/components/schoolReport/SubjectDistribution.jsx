@@ -3,6 +3,7 @@ import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
 
 import styles from '../../common/common.css';
+import schoolReportStyles from './schoolReport.css';
 
 import Table from '../../common/Table.jsx';
 import DropdownList from '../../common/DropdownList';
@@ -99,9 +100,9 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
     //自定义Module数据结构
     var levelCommonInfo = _.join(_.map(_.range(_.size(levels)), (index) => numberMap[index + 1]));
     return (
-        <div style={{ position: 'relative' }}>
+        <div className={schoolReportStyles['section']}>
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-            <div style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 280 }}>
+            <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
                 学科分档上线学生人数的分布
             </div>
             <div style={{ width: 720, margin: '0 auto', marginTop: 50 }}>
@@ -126,7 +127,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
                                 <TableView tableData={tableData} TableComponent={Table} reserveRows={7}/>
 
                                 {/*--------------------------------  学科分档上线学生人数分布分析说明 -------------------------------------*/}
-                                <div style={{ backgroundColor: '#e7f9f0', padding: '5px 10px', marginTop: 15 }}>
+                                <div style={{ backgroundColor: '#e7f9f0',marginTop: 15 }} className={styles['tips']}>
                                     <p>{levelStr}档上线数据分析表明： </p>
 
                                     {
@@ -156,7 +157,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
                                 </p>
                                 <p>学科上线率离差：</p>
                                 <ReactHighcharts config={chartConfig}></ReactHighcharts>
-                                <div style={{ backgroundColor: '#e7f9f0', padding: '15px 0', marginTop: 15, fontSize: 12 }}>
+                                <div style={{ backgroundColor: '#e7f9f0', marginTop: 15, fontSize: 12 }} className={styles['tips']}>
                                     班级学科上线率离差： 指班级的学科上线率与全校各班级该学科的平均上线率之间的差值，反映了班级该学科对上线贡献的大小。
                                 </div>
                             </div>

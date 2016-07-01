@@ -9,6 +9,7 @@ import {makeSegments, makeFactor, makeSegmentsStudentsCount} from '../../api/exa
 import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
 import styles from '../../common/common.css';
+import schoolReportStyles from './schoolReport.css';
 import TableView from './TableView';
 import {Table as BootTable} from 'react-bootstrap';
 
@@ -162,9 +163,9 @@ class ClassPerformance extends React.Component {
         };
 
         return (
-            <div className={styles['school-report-layout']}>
+            <div className={schoolReportStyles['section']}>
                 <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-                <div style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 280 }}>
+                <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
                     班级的考试基本表现
                 </div>
 
@@ -174,13 +175,13 @@ class ClassPerformance extends React.Component {
                         各班级在这次考试中各自的表现均不相同，我们要对各班分析他们的突出表现及差异。观察各班的表现，要注意班级教学的实际，
                         同时也要联系各班级的历史客观因素，试分析评价要客观些。
                     </p>
-                    <p>
+                    <p className={schoolReportStyles['sub-section']}>
                         （1）从班级学生总分分布看，前面“各班
                         <span className={styles['school-report-dynamic']}>
                         {_.join(_.map(_.range(_.size(levels)), (index) => numberMap[index+1]), '、')}
                         档</span>上线学生人数分布表”，反映出各个班级总分较高学生的人数分布。
                     </p>
-                    <p>
+                    <p className={schoolReportStyles['sub-section']}>
                         （2）考虑到各个班级有各自的具体情况，可以基于各班的自身水平来考察高端及低端学生的分布，反映出学生总分的分布趋势。通过大数据归类分析我们发现，以各班自身水平衡量，高分学生人数较多的
                         班级有：
                         {/*--------------------------------  TODO：班级考试表现的Header -------------------------------------*/}
@@ -199,7 +200,7 @@ class ClassPerformance extends React.Component {
                     <ReactHighcharts config={config} style={{ margin: '0 auto', marginTop: 40 }}></ReactHighcharts>
 
                     {/*--------------------------------  班级考试基本表现平均分表格 -------------------------------------*/}
-                    <p>（3）从平均水平看，全校和班级的各学科平均得分率见下表所示：</p>
+                    <p className={schoolReportStyles['sub-section']}>（3）从平均水平看，全校和班级的各学科平均得分率见下表所示：</p>
                     <TableView tableHeaderData={meanTableHeaderData} tableData={meanTableBodyData} TableComponent={AverageTable} reserveRows={6}/>
 
                     {/* 如果样式一样的话，那么这个“显示更多班级”可以抽出来了，属于Table的一部分--逻辑是一样的 */}
@@ -211,7 +212,7 @@ class ClassPerformance extends React.Component {
                         <p>平均分：表达的是一个代表性水平的指标。但各班也有各班的具体情况，不仅要看平均分数的高低，还要看各班在自身水平基础上，可能有的学科表现更好，有的学科表现不足。即下面第（4）点分析的内容。</p>
                     </div>
                     {/*--------------------------------  班级考试基本表现贡献指数表格 -------------------------------------*/}
-                    <p>
+                    <p className={schoolReportStyles['sub-section']}>
                         (4) 各班的平均得分率看起来有高有低，也不能简单通过排队就评价教学质量的高低，需要结合各班具有自身的具体情况和原因基于客观分析（比如有尖子班、普通版之分）。
                         但相对于班级自身综合水平而言，各班各学科的平均得分率贡献指数（见下表）可以反映出各个班级教学对其自身综合水平影响的大小。（指数值为正，是促使提高；
                         为负， 是拖后腿。）
@@ -228,7 +229,7 @@ class ClassPerformance extends React.Component {
                     </div>
 
                 {/*--------------------------------  班级考试基本表现学生分组表格 -------------------------------------*/}
-                    <p>
+                    <p className={schoolReportStyles['sub-section']}>
                         （5）将学校分数从高到低，分为十组学生，每一组学生之间的水平相差不大，按这样方式，我们可以看见各班在这样的十组中所存在的人数如下：
                     </p>
                     <TableView tableData={groupTableData} reserveRows={7}/>

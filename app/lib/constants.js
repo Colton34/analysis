@@ -123,3 +123,4 @@ export const INIT_RANKREPORT_SUCCESS = 'INIT_RANKREPORT_SUCCESS';
 
 //====================== color ==============================
 export const A11 = '#de5d44';
+export const B03 = '#59bde5';

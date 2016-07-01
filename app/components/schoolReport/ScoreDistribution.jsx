@@ -1,5 +1,6 @@
 import React from 'react';
 import style from '../../common/common.css';
+import schoolReportStyles from './schoolReport.css';
 import ReactHighcharts from 'react-highcharts';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
@@ -498,10 +499,10 @@ class ScoreDistribution extends React.Component {
 
         };
         return (
-            <div style={{ position: 'relative', zIndex: 1}}>
+            <div style={{zIndex: 1}} className={schoolReportStyles['section']}>
                 <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
 
-                <div style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 280 }}>
+                <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
                     总分分档上线学生人数分布
                 </div>
 
@@ -548,7 +549,7 @@ class ScoreDistribution extends React.Component {
 
                     {/*--------------------------------  总分分档上线学生分析说明 -------------------------------------*/}
                     <div style={{ marginTop: 30 }}>
-                        <div style={{ display: 'inline-block', width: 330, backgroundColor: '#e9f7f0', paddingRight: 30,fontSize: 14 }}>
+                        <div className={style['tips']} style={{ display: 'inline-block', width: 330, backgroundColor: '#e9f7f0',fontSize: 14, marginTop: 0}}>
                             <p>表中显示了全校及各班各档上线人数。上线人数的多少一目了然。考虑到各班级学生总人数会存在有差异，要用上线率来比较：</p>
                             {
                                 (_.size(disData) > 0) ? (

@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from '../../common/common.css';
+import schoolReportStyles from './schoolReport.css';
 import ReactHighcharts from 'react-highcharts';
 
 import {makeSegments, makeSegmentsStudentsCount} from '../../api/exam';
@@ -63,16 +64,16 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
         }
     }
     return (
-        <div style={{ position: 'relative' }}>
+        <div className={schoolReportStyles['section']}>
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-            <div style={{ position: 'absolute', left: '50%', marginLeft: -120, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 200 }}>
+            <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -120, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 200 }}>
                 总分分布趋势
             </div>
             <div className={styles['school-report-content']} style={{fontSize: 14, lineHeight: '22px'}}>
                 <p style={{ marginTop: 40 }}>总学生总分趋势的分布图：是这次考试检测全校学生学生综合水平状况的一个基本表现特征。</p>
                 <p>总分分布曲线图如下：</p>
                 <ReactHighcharts config={config} style={{ margin: '0 auto', marginTop: 40 }}></ReactHighcharts>
-                <div style={{ width: 760, minHeight: 90, backgroundColor: '#e9f7f0', margin: '0 auto', marginTop: 20, padding: 15}}>
+                <div style={{ width: 760, minHeight: 90, backgroundColor: '#e9f7f0', margin: '0 auto', marginTop: 20}} className={styles['tips']}>
                     <p style={{ marginBottom: 20 }}>对于这次考试: </p>
                     <p>从总分分布曲线图来看，基本呈现“钟型分布”，即中档学生人数较多，两端（高分段，低分段）学生人数较少，这种分布属于正常状态，但作为学校水平性考试，还是希望高分段学生人数更多为好</p>
                 </div>

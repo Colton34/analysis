@@ -3,6 +3,7 @@ import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
 
 import styles from '../../../common/common.css';
+import schoolReportStyles from '../schoolReport.css';
 import localStyle from './studentPerformance.css';
 import Radium from 'radium';
 import TableView from '../TableView';
@@ -194,15 +195,15 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
     var tableHeaderData = _.map(headers, (headerObj) => headerObj.subject);
 
     return (
-        <div className={styles['school-report-layout']} style={{ paddingBottom: 100 }}>
+        <div className={schoolReportStyles['section']} style={{ paddingBottom: 100 }}>
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-            <div style={{ padding: '0 10px', position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 300 }}>
+            <div className={schoolReportStyles['section-title']} style={{ padding: '0 10px', position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 300 }}>
                 学校有必要知道的学生重点信息
             </div>
 
             {/*--------------------------------  有关学生重要信息的图表 -------------------------------------*/}
             <div className={styles['school-report-content']}>
-                <p>（1）这次考试，全校总分前后十名的学生是：</p>
+                <p className={schoolReportStyles['sub-section']}>（1）这次考试，全校总分前后十名的学生是：</p>
                 <div>
                     <div style={{ margin: '0 auto', width: 500 }}>
                         <div style={{ display: 'inline-block' }}>
@@ -240,7 +241,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
 
                 {/*--------------------------------  有关学生重要信息的表格 -------------------------------------*/}
                 <div style={{ marginTop: 60 }}>
-                    <p>（2）全校各个班级在各个学科优秀的学生人数，见下表：</p>
+                    <p className={schoolReportStyles['sub-section']}>（2）全校各个班级在各个学科优秀的学生人数，见下表：</p>
                     <StudentPerformanceTable
                         examInfo={examInfo}
                         examStudentsInfo={examStudentsInfo}
@@ -251,7 +252,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                         />
                 </div>
                 <div style={{ marginTop: 40 }}>
-                    <p>（3）全校各班级在各学科欠佳的学生数，如下表所示。希望相应班级任课教师多多帮助他们进步。</p>
+                    <p className={schoolReportStyles['sub-section']}>（3）全校各班级在各学科欠佳的学生数，如下表所示。希望相应班级任课教师多多帮助他们进步。</p>
                     <StudentPerformanceTable
                         examInfo={examInfo}
                         examStudentsInfo={examStudentsInfo}

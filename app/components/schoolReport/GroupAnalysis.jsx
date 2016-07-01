@@ -13,6 +13,7 @@ import {makeSegmentsStudentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap, A11} from '../../lib/constants';
 
 import styles from '../../common/common.css';
+import schoolReportStyles from './schoolReport.css';
 import TableView from './TableView';
 
 var {Header, Title, Body, Footer} = Modal;
@@ -219,9 +220,9 @@ class GroupAnalysis extends React.Component {
 //自定义Module数据结构：
 
         return (
-            <div className={styles['school-report-layout']}>
+            <div className={schoolReportStyles['section']}>
                 <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-                <div style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 280 }}>
+                <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
                     临界生群体分析
                 </div>
 

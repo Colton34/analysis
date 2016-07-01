@@ -9,6 +9,7 @@ import {makeSegmentsStudentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, A11} from '../../lib/constants';
 
 import styles from '../../common/common.css';
+import schoolReportStyles from './schoolReport.css';
 import TableView from './TableView';
 
 var {Header, Title, Body, Footer} = Modal;
@@ -274,9 +275,9 @@ class SubjectPerformance extends React.Component {
 //自定义Moudle数据结构：
         var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
         return (
-            <div className={styles['school-report-layout']}>
+            <div className={schoolReportStyles['section']}>
                 <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-                <div style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, color: '#9625fc', width: 280 }}>
+                <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
                     学科考试表现
                 </div>
                 <div className={styles['school-report-content']}>
@@ -300,11 +301,11 @@ class SubjectPerformance extends React.Component {
                     <p>有关学科分析还有如下几点：</p>
                     {/*--------------------------------  学科考试表现分析说明 -------------------------------------*/}
                     {/* TODO: 如果联系到学科的命题难度，其相对离差从大到小的顺序是<span style={{color: 'blue'}}>生物、物理、语文</span>。 缺少*/}
-                    <p>
+                    <p className={schoolReportStyles['sub-section']}>
                         （1）结合前面的分析内容，从各学科的成绩表现来看，每个学科的班级平均分得分率最高的与最低之间的离差，从大到小的顺序是，<span style={{color: 'blue'}}>{_.join(factorSubjects, '、')}</span>。离差较大的学科，反映出班级水平差距较大。离差较小的学科，反映出该学科教学效果比较整齐。（注：语文是母语，学生水平离差来的较小应该是常态）
                     </p>
 
-                    <p>（2）各个学科成绩分布的等级结构比例情况，如下表所示：</p>
+                    <p className={schoolReportStyles['sub-section']}>（2）各个学科成绩分布的等级结构比例情况，如下表所示：</p>
                     <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>
                         <i className='icon-cog-2'></i>
                         设置等级参数
@@ -312,7 +313,7 @@ class SubjectPerformance extends React.Component {
                     <TableView tableData={subjectLevelExamTableData} reserveRows={6}/>
 
                     {/*--------------------------------  TODO: 暂时空缺的和学科难易程度相关的数据 -------------------------------------*/}
-                    <p>（3）有关学科命题</p>
+                    <p className={schoolReportStyles['sub-section']}>（3）有关学科命题</p>
                     <p>
                         作为学科考试，必须考虑给水平不同的全体学生都能提供展示其学业水平的机会。有的学科在试题难度分布结构方面，可以进一步完善，防止出现过难或者过易的情况。
                     </p>
