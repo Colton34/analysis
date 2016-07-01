@@ -245,4 +245,9 @@
             color: #D40E0E;
             font-size: 12px;
         }
+
+        .btn-disabled {
+            background-color: #f2f2f2;
+            color: #bfbfbf;
+        }
     
