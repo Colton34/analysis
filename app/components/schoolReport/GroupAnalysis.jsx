@@ -10,7 +10,7 @@ import Table from '../../common/Table';
 
 import {updateLevelBuffersAction} from '../../reducers/schoolAnalysis/actions';
 import {makeSegmentsStudentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, A11} from '../../lib/constants';
 
 import styles from '../../common/common.css';
 import TableView from './TableView';
@@ -27,6 +27,10 @@ class Dialog extends React.Component {
         this.isValid = _.map(_.range(this.props.levelBuffers.length), (index) => true);
         this.isUpdate = false;
         this.levelBuffers = this.props.levelBuffers;
+        this.state = {
+            hasError: false,
+            errorMsg: ''
+        }
     }
 
     onChange(ref, event) {
@@ -41,6 +45,10 @@ class Dialog extends React.Component {
         if (!(value && _.isNumber(value) && value >= 0)) {
             console.log('输入不是有效的数字');
             this.isValid[levBufLastIndex-index] = false;
+            this.setState({
+                hasError: true,
+                errorMsg: numberMap[index + 1 + ''] + '档浮动分数输入不是有效数字'  
+            })
             return;
         };
 
@@ -59,25 +67,50 @@ class Dialog extends React.Component {
 
         if(!segmentsIsValid) {
             console.log('newSegments is invalid');
+            this.setState({
+                hasError: true,
+                errorMsg: '浮动分数过大'
+            })
             return;
         }
         this.isUpdate = true;
+
+        if(this.state.hasError) {
+            this.setState({
+                hasError: false,
+                errorMsg: ''
+            })
+        }
     }
 
     okClickHandler() {
         var formValid = _.every(this.isValid, (flag) => flag);
 
-        if(!formValid) {
+        if(!formValid || this.state.hasError) {
             console.log('表单没通过');
+            this.setState({
+                hasError: true,
+                errorMsg: '浮动分数填写有误'
+            })
             return;
         }
 
         if(!this.isUpdate) {
             console.log('表单没有更新');
+            this.setState({
+                hasError: true,
+                errorMsg: '未更新浮动分数'
+            })
             return;
         }
         this.isUpdate = false;
 
+        if(this.state.hasError) {
+            this.setState({
+                hasError: false,
+                errorMsg: ''
+            })
+        }
         //调用父类传递来的函数  this.props.updateLevelBuffers(this.levelBuffers)，从而更新父类
         this.props.updateLevelBuffers(this.levelBuffers);
         this.props.onHide();
@@ -90,6 +123,15 @@ class Dialog extends React.Component {
         // console.log('================== set float scores: ' + JSON.stringify(floatScores));
     }
 
+    onHide() {
+        this.setState({
+            hasError: false,
+            errorMsg: ''
+        })
+        this.isValid = _.map(_.range(this.props.levelBuffers.length), (index) => true);
+        this.isUpdate = false;
+        this.props.onHide();
+    }
     render() {
         // var {totalScoreLevel} = this.props;
         var _this = this;
@@ -99,7 +141,7 @@ class Dialog extends React.Component {
         this.isUpdate = false;
 
         return (
-            <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this) }>
+            <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this) }>
                 <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
                     设置临界生分数
                 </Header>
@@ -118,6 +160,7 @@ class Dialog extends React.Component {
                         }
                         </div>
                     </div>
+                    <div style={_.assign({},{color: A11, width: '100%', textAlign: 'center', marginTop: 20}, this.state.hasError ? {display: 'inline-block'} : {display: 'none'})}>{this.state.errorMsg}</div>
                 </Body>
                 <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0, padding: '0 0 30px 0' }}>
                     <a href="javascript:void(0)" style={_.assign({}, localStyle.btn, { backgroundColor: '#59bde5', color: '#fff' })} onClick={_this.okClickHandler.bind(_this) }>

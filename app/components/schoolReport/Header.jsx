@@ -10,16 +10,21 @@ import {saveAs} from '../../lib/util';
 class Header extends React.Component {
     constructor(props) {
       super(props);
-      this.isDownloading = false;
+      this.state = {
+          isDownloading: false
+      }
     }
 
     downloadFile() {
         var _this = this;
-        if(_this.isDownloading) {
+        if(_this.state.isDownloading) {
             console.log('文件正在下载中，请稍后再试，或者刷新当前页面重试');
             return;
         }
-        _this.isDownloading = true;
+        _this.setState({
+            isDownloading: true
+        })
+        //_this.isDownloading = true;
 
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         // var baseURL = (window.client.hostname == 'localhost') ? 'http://' + window.client.hostname + ':' + window.http_port : 'http://' + window.client.hostname
@@ -31,10 +36,16 @@ class Header extends React.Component {
             //TODO: 删除文件
             setTimeout(function() {
                 params.request.delete('/file/rm/school/report?filename='+targetFileName);
-                _this.isDownloading = false;
+                //_this.isDownloading = false;
+                _this.setState({
+                  isDownloading: false
+                })
             }, 4000);
         }).catch(function(err) {
-            _this.isDownloading = false;
+            //_this.isDownloading = false;
+            _this.setState({
+                isDownloading: false
+            })
             console.log('err = ', err);
         })
     }
@@ -58,10 +69,10 @@ class Header extends React.Component {
                     </div>
                     <a href='javascript: void(0)' className={styles.button}
                         onClick={this.downloadFile.bind(this)}
-                        style={{
+                        style={_.assign({},{
                             width: 120, height: 30, borderRadius: '20px', backgroundColor: '#698fba', color: '#fff', lineHeight: '30px',
                             position: 'absolute', right: '30px', top: '50%', marginTop: '-20px'
-                        }}>
+                        }, this.state.isDownloading ? {backgroundColor: '#f2f2f2', color: '#bfbfbf'} : {})}>
                         <i className='icon-tikuai-1'></i>
                         下载报告
                     </a>

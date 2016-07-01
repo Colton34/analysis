@@ -7,13 +7,14 @@ import { Modal, Table as BootTable} from 'react-bootstrap';
 import _ from 'lodash';
 
 import {showDialog, hideDialog} from '../../reducers/global-app/actions';//TODO: 设计思路？？？
-import {NUMBER_MAP as numberMap} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, A11} from '../../lib/constants';
 
 import {makeSegmentsStudentsCount} from '../../api/exam';
 
 import DropdownList from '../../common/DropdownList';
 import TableView from './TableView';
 var {Header, Title, Body, Footer} = Modal;
+
 
 let localStyle = {
     dialogInput: {width: 150,height: 40, border: '1px solid #e7e7e7', borderRadius: 2, paddingLeft: 12},
@@ -104,7 +105,11 @@ class Dialog extends React.Component {
         this.levels = props.levels;
         // this.isValid = true; //TODO: 修改成数组标记的形式？当修改分档个数的时候 isValid 的个数也要对应修改
         this.state = {
-            levelNum: _.size(props.levels)
+            levelNum: _.size(props.levels),
+            levelNumWrong: false,
+            levelNumMsg: '',
+            hasError: false,
+            errorMsg: ''
         };
     }
     onChange(ref, event) {
@@ -115,10 +120,14 @@ class Dialog extends React.Component {
 
         //分档只能是这几个数字
         if (!(_.includes([1, 2, 3, 4, 5], value))) {
-            console.log('分档值必须是包含1~5之间的数字');
+            //console.log('分档值必须是包含1~5之间的数字');
+            this.setState({
+                levelNumWrong: true,
+                levelNumMsg: '分档值是1至5的整数'
+            })
             return;
         }
-
+        
         var preLength = _.size(this.levels);
         var theDiff = Math.abs(preLength - value);
         if(theDiff === 0) return;
@@ -161,7 +170,7 @@ class Dialog extends React.Component {
             });
         }
         this.levels = tempLevels;
-        this.setState({ levelNum: value });
+        this.setState({ levelNum: value, levelNumWrong: false});
     }
 
     okClickHandler() {
@@ -196,7 +205,11 @@ class Dialog extends React.Component {
         //this.levels的个数和input的值是一样的；所有的input都不为空
         var levTotal = parseInt(this.refs.levelInput.value);
         if (!(levTotal && _.isNumber(levTotal) && levTotal > 0)) {
-            console.log('levTotal 分档个数必须是正数');
+            //console.log('levTotal 分档个数必须是正数');
+            this.setState({
+                levelNumWrong: true,
+                levelNumMsg: '分档数应是正数'
+            })
             return;
         }
 
@@ -214,10 +227,21 @@ class Dialog extends React.Component {
         });
 
         if(!isValid) {
-            console.log('表单验证不通过');
+            //console.log('表单验证不通过');
+            this.setState({
+                hasError: true,
+                errorMsg: '档位靠前分数必须比靠后的高'
+            })
             return;
         }
 
+        if (this.state.hasError) {
+            this.setState({
+                hasError: false,
+                errorMsg: ''
+            })
+        }
+        
         this.props.changeLevels(this.levels);
         this.props.onHide();
     }
@@ -304,7 +328,16 @@ class Dialog extends React.Component {
         // this.isValid = true; //TODO: 这里有bug，还是要确保所有的input都是true才对。不然，先来个错的，然后跳过这个错的，再来个对的，那么isValid就是true了。。。
         this.levels[(_.size(this.levels) - 1 - num)+''] = temp;
     }
-
+    onHide() {
+        this.setState({
+            levelNumWrong: false,
+            levelNumMsg: '',
+            hasError: false,
+            errorMsg: ''
+        })
+        this.levels = this.props.levels;
+        this.props.onHide();
+    }
     render() {
         var _this = this;
         var {examInfo, examStudentsInfo} = this.props;
@@ -313,7 +346,7 @@ class Dialog extends React.Component {
         this.levLastIndex = _.size(this.levels) - 1;
 //重绘要不要 来自 props
         return (
-            <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {})}>
+            <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this)}>
                 <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
                     分档参数设置
                 </Header>
@@ -323,6 +356,7 @@ class Dialog extends React.Component {
                         <span style={{ clear: 'both' }}>
                             <div style={{marginBottom: 30}}>
                                 整体分档为：<input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={localStyle.dialogInput} defaultValue={_this.state.levelNum} onChange={_this.onChange.bind(_this, 'levelInput') }/> {/*加个'levelInput'是几个意思？*/}
+                                <span style={_.assign({},{color: A11, marginLeft: 10}, this.state.levelNumWrong ? {display: 'inline-block'} : {display: 'none'})}>{this.state.levelNumMsg}</span>
                             </div>
                             <div>
                                 {
@@ -341,6 +375,7 @@ class Dialog extends React.Component {
                                     })
                                 }
                             </div>
+                            <div style={_.assign({},{color: A11, width: '100%', textAlign: 'center', marginTop: 20}, this.state.hasError ? {display: 'inline-block'} : {display: 'none'})}>{this.state.errorMsg}</div>
                         </span>
                     </div>
                 </Body>

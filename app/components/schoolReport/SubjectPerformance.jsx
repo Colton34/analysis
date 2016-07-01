@@ -6,7 +6,7 @@ import _ from 'lodash';
 import Table from '../../common/Table';
 
 import {makeSegmentsStudentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, A11} from '../../lib/constants';
 
 import styles from '../../common/common.css';
 import TableView from './TableView';
@@ -30,7 +30,9 @@ class Dialog extends React.Component {
         this.isValid = _.map(_.range(_.size(this.props.levelPcentages)), (index) => true);
         this.isUpdate = false;
         this.state = {
-            grades: this.props.levelPcentages
+            grades: this.props.levelPcentages,
+            hasError: false,
+            errorMsg: ''
         }
         // debugger;
     }
@@ -70,16 +72,29 @@ class Dialog extends React.Component {
         //this.props.updateLevelPercentages(newLevelPercentages);
 
         var formValid = _.every(this.isValid, (flag) => flag);
-        if(!formValid) {
+        if(!formValid || this.state.hasError) {
             console.log('表单验证不通过');
+            this.setState({
+                hasError: true,
+                errorMsg: '等级百分数输入有误'
+            })
             return;
         }
 
         if(!this.isUpdate) {
             console.log('表单没有更新');
+            this.setState({
+                hasError: true,
+                errorMsg: '等级设置未有改动'
+            })
             return;
         }
-
+        if (this.state.hasError) {
+            this.setState({
+                hasError: false,
+                errorMsg: ''
+            })
+        }
         this.isUpdate = false;
 
         this.props.updateGrades(this.state.grades);
@@ -92,6 +107,10 @@ class Dialog extends React.Component {
         if (!(value && _.isNumber(value) && value >= 0)) {
             console.log('所给百分比不是有效的数字');
             this.isValid[index] = false;
+            this.setState({
+                hasError: true,
+                errorMsg: letterMap[index + ''] + '等设置的百分比不是有效数字'
+            })
             return;
         };  //可以添加isValid = true，即如果isValid是false压根就进不来，也可以！但是这样就没有重置
         //的机会了。。。不可以~
@@ -102,15 +121,26 @@ class Dialog extends React.Component {
         if(!((value < 100) && (!higherLevPer || (value < higherLevPer)) && (!lowerLevPer || (value > lowerLevPer)))) {
             console.log('所给的百分比不符合规则');
             this.isValid[index] = false;
+            this.setState({
+                hasError: true,
+                errorMsg: letterMap[index + ''] + '等设置的百分比较前一等级高或比后一等级低'
+            })
             return;
         }
 
-        var formValid = _.every(this.isValid, (flag) => flag);
-        if(!formValid) {
-            console.log('表单验证不通过');
-            return;
-        }
-
+        // 检查当前input即可，点确定再检查其他的。
+        // var formValid = _.every(this.isValid, (flag) => flag);
+        // if(!formValid) {
+        //     console.log('表单验证不通过');
+        //     this.setState({
+        //         hasError: true,
+        //         errorMsg: '表单验证不通过'
+        //     })
+        //     return;
+        // }
+        
+        // isValid字段复位
+        this.isValid[index] = true;
         //如果value不变。。。那么也不更新
         if(this.state.grades[gradeLastIndex-index-1] == value) return;
 
@@ -118,16 +148,34 @@ class Dialog extends React.Component {
         var newGrades = this.state.grades;
         newGrades[gradeLastIndex-index-1] = value;
 
-        this.setState({
-            grades: newGrades
-        });
+        if (this.state.hasError) {
+            this.setState({
+                hasError: false,
+                errorMsg: '',
+                grades: newGrades
+            })
+        } else {
+            this.setState({
+                grades: newGrades
+            });
+        }
+        
     }
 
+    onHide() {
+        this.setState({
+            hasError: false,
+            errorMsg: ''
+        })
+        this.isUpdate = false;
+        this.isValid = _.map(_.range(_.size(this.props.levelPcentages)), (index) => true);
+        this.props.onHide();
+    }
     render() {
         var _this = this, gradeLastIndex = this.state.grades.length - 1;
 // debugger;
         return (
-            <Modal show={ this.props.show } ref="dialog"  onHide={this.props.onHide.bind(this, {}) }>
+            <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this) }>
                 <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
                     设置等级分数
                 </Header>
@@ -174,6 +222,7 @@ class Dialog extends React.Component {
                                 添加等级
                             </a>
                         </div>
+                        <div style={_.assign({},{color: A11, width: '100%', textAlign:'center', marginTop: 20}, this.state.hasError ? {display: 'inline-block'} : {display: 'none'})}>{this.state.errorMsg}</div>
                     </div>
                 </Body>
                 <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0, padding: '0 0 30px 0' }}>

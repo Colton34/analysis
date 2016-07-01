@@ -121,3 +121,5 @@ export const SET_CURSUBJECT_SQM = 'SET_CURSUBJECT_SQM';
 export const INIT_RANKREPORT = 'INIT_RANKREPORT';
 export const INIT_RANKREPORT_SUCCESS = 'INIT_RANKREPORT_SUCCESS';
 
+//====================== color ==============================
+export const A11 = '#de5d44';
