@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 14:14:33
+* @Last Modified time: 2016-07-01 08:44:01
 */
 
 'use strict';
@@ -146,22 +146,21 @@ function initWebServer(app) {
 
     // error handler for all the applications
     app.use(function (err, req, res, next) {
-
-        var errorType = typeof err,
-            code = err.status || 500,
-            msg = { message: "Internal Server Error" };
-
+        var code = err.status || 500;
         switch (err.name) {
-            case "UnauthorizedError":
-                code = err.status;
-                msg = undefined;
-                return res.redirect('/login');
-            case "BadRequestError":
-            case "UnauthorizedAccessError":
-                return res.redirect('/login');
-            case "NotFoundError":
-                code = err.status;
-                msg = err.inner;
+            case "HttpStatusError":
+                if(code == 401 && err.message && (err.message.errorCode == 1 || err.message.errorCode == 2)) {
+                    console.log('成功返回错误信息');
+                    return res.status(200).json(err.message);
+                }
+                if(code == 400) {
+                    console.log('重定向');
+                    return res.redirect('/login');
+                }
+                if(code == 401 && err.message && err.message.errorCode == 3) {
+                    console.log('重定向');
+                    return res.redirect('/login');
+                }
                 break;
             default:
                 break;
@@ -172,8 +171,7 @@ function initWebServer(app) {
             console.log('服务端Error', err);
         }
 
-        return res.status(code).json(msg);
-
+        return res.status(code).json(err);
     });
 
     debug("Creating HTTP server on port: %s", http_port);

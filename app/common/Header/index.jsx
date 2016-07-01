@@ -44,7 +44,7 @@ class HeaderComponent extends React.Component {
         var Cookies = require('cookies-js');
         var options = (_.includes(window.location.hostname, 'yunxiao')) ? { domain: '.yunxiao.com'} : {};
         Cookies.expire('authorization', options);
-        window.location = '/';
+        window.location = '/login';
     }
     componentDidMount() {
         $('body').click((event)=> {
@@ -98,8 +98,8 @@ var localStyle = {
         ':hover': { textDecoration: 'none'},
         ':link': {textDecoration: 'none'}
     },
-    userInfo: { 
-        float: 'right', position: 'relative', height: '100%', lineHeight: '66px', 
+    userInfo: {
+        float: 'right', position: 'relative', height: '100%', lineHeight: '66px',
         marginLeft: 10, cursor: 'pointer',textDecoration:'none',color: '#333',
         ':hover': {color: '#59bde5', textDecoration: 'none'},
         ':link': {textDecoration: 'none'}
