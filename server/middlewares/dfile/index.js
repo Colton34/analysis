@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-01 10:24:31
+* @Last Modified time: 2016-07-01 11:33:51
 */
 
 'use strict';
@@ -31,9 +31,6 @@ exports.renderSchoolReport = function(req, res, next) {
     // });
     var tmpobj = tmp.fileSync({ postfix: '.pdf', dir: tempFileDir });
     var renderBaseUrl = process.env.RENDERHOSTNAME || 'localhost:3000';
-
-
-console.log('the download url = ', 'http://'+renderBaseUrl+req.body.url);
 
     var childArgs = [
         path.join(__dirname, '../..', 'lib', 'phantom-script.js'),
