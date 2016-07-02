@@ -57,7 +57,6 @@ class CustomizeAnalysis extends React.Component {
     componentDidMount() {
         // var existsExamList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList
         if (this.props.examList.size === 0) {
-            console.log('============ should init home');
             var params = initParams(this.props.params, this.props.location, { 'request': window.request });
             this.props.initHome(params);
         }
@@ -65,7 +64,6 @@ class CustomizeAnalysis extends React.Component {
 
 
     changeCurrentSubjectName(name) {
-        console.log('======== subject name: ' + name);
         this.props.changeCurrentSubjectName(name);
     }
 
@@ -73,13 +71,11 @@ class CustomizeAnalysis extends React.Component {
         location.href = '/';
     }
     onPrevPage() {
-        console.log('in onPrevPage function');
         var {pageIndex} = this.props;
         if (pageIndex === 0) return;
         this.props.setPageIndex(PREV_PAGE);
     }
     onNextPage() {
-        console.log('in onNextPage funciton');
         var {pageIndex} = this.props;
         if (pageIndex === 3) {
             this.props.saveCurrentSubject();
