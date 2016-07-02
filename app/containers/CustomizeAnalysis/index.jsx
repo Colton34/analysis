@@ -346,6 +346,7 @@ function makeExamSchema(resultSet, analysisName) {
     var examStudentsInfo = _.sortBy(makeExamStudentsInfo(resultSet, subjectsIdArr), 'score');
     var examPapersInfo = makeExamPapersInfo(resultSet, subjectsIdArr);
     var examClassesInfo = makeExamClassesInfo(resultSet);
+    debugger;
     return {
         "info": examInfo,
         "[studentsInfo]": examStudentsInfo,
@@ -435,7 +436,7 @@ Note: studentsInfo中的papers object数组中的paperid就是paper中id，但�
                 studentsInfoMap[studentObj.kaohao] = obj;
             }
             var ids = _.find(subjectsIdArr, (obj) => obj.subject == subjectName);
-            obj["[papers]"].push({ paperid: ids.id, score: studentsPaperScore[index] });
+            obj["[papers]"].push({ paperid: ids.id, score: studentsPaperScore[index], class_name: studentObj.class });
         });
     });
     //给所有的学生添加总分信息

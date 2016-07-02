@@ -79,7 +79,7 @@ class StudentPerformanceTable extends React.Component {
             current: this.selectItems[0], //默认按照名词排列
             coveredItems: this.selectItems.slice(1),
             rankingNum: 30, //默认是 名词排列 的 前30名
-            percentageNum: 20,
+            percentageNum: 30,
             inputNum: 30
         }
     }
@@ -301,7 +301,6 @@ export default StudentPerformance;
  * @return {[type]}                     [description]
  */
 function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, headers, isGood, countFlag) {
-    // debugger;
     var result = {};
     _.each(examInfo.realClasses, (className) => {
         result[className] = {};
@@ -316,10 +315,8 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
         var subjectScoreStudentsByClass = (isGood) ? _.groupBy(_.takeRight(orderPapers, countFlag), 'class_name') : _.groupBy(_.take(orderPapers, countFlag), 'class_name');
         _.each(examInfo.realClasses, (className, index) => {
             result[className][pid] = subjectScoreStudentsByClass[className] ? subjectScoreStudentsByClass[className].length : 0;
-            // debugger;
         });
     });
-    // debugger;
 
     var table = [];
     _.each(result, (value, className) => {
@@ -327,7 +324,6 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
         //headers就是真正考的科目+总分
         _.each(headers, (headerObj, index) => {
             // console.log(value[headerObj.id]);
-            // debugger;
             value[headerObj.id] ? row.push(value[headerObj.id]) : row.push(0);
         });
         row.unshift(examInfo.gradeName + className + '班');

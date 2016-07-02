@@ -469,7 +469,7 @@ function makeGroupStudentsInfo(groupLength, students) {
     //将数组内的元素分成10组，计算每一组中各个班级学生人数
     var result = {}, flagCount = students.length, totalStudentCount = students.length;
     _.each(_.range(groupLength), function(index) {
-        var groupCount = (index == groupLength-1) ? (totalStudentCount - flagCount) : (_.ceil(_.divide(totalStudentCount, groupLength)));
+        var groupCount = (index == groupLength-1) ? flagCount : (_.ceil(_.divide(totalStudentCount, groupLength)));
         //当前组的学生数组：
         var currentGroupStudents = _.slice(students, (flagCount - groupCount), flagCount);
         //对当前组的学生按照班级进行group

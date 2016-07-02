@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-01 09:51:40
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-07-02 13:26:51
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -189,7 +189,6 @@ export function fetchSchoolAnalysisData(params) {
         headers = _.concat(headers, restPapers);
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = _.map(levels, (value, key) => 5);
-
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
