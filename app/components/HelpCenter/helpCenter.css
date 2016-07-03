@@ -63,3 +63,11 @@
     margin-bottom: 11px;
     border-bottom: 1px solid #eee;
 }
+
+.qicon {
+    display: inline-block;
+    margin-right: 10px;
+    width: 14px;
+    height: 13px;
+    background: url(../../images/qIcon.png) no-repeat;
+}
