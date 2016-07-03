@@ -28,11 +28,11 @@
 }
 .table-unit {
      border: 1px solid #d7d7d7;
-     text-align: center;
+     text-align: left;
      vertical-align: middle !important;
      min-height: 40px;
      line-height: 40px;        
-     padding: 0;
+     padding-left: 30px !important;
      font-size: 12px;
 }
 .common-font {
