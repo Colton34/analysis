@@ -7,7 +7,7 @@ import {Link} from 'react-router';
 import {List} from 'immutable';
 
 import {initHomeAction} from '../../reducers/home/actions';
-import {initParams} from '../../lib/util';
+import {initParams, saveAs} from '../../lib/util';
 import {FROM_FLAG as fromFlag, FROM_CUSTOM_TEXT} from '../../lib/constants';
 
 import styles from './Home.css';
@@ -42,12 +42,14 @@ const Questionnaire = () => {
 }
 
 let questionList = [
-    '多校联考，怎么查看数据？',
-    '什么场景下使用自定义分析？',
-    '如何删除某次考试分析内容？',
-    '群体分析和个体分析的区别是什么？',
-    '考试分析提供的报告为什么专业？'
+    '分析报告结果错误或不满意怎么办？',
+    '自定义分析时，导入考试数据、学生信息数据错误怎么办？',
+    '什么是题目合并、题目累加、将题目合并为一题',
+    '如何再次编辑已创建的自定义分析？',
+    '想删除考试分析报告，怎么操作？'
 ];
+
+
 const CommonQuestions = () => {
     return (
         <div>
@@ -72,7 +74,14 @@ const CommonQuestions = () => {
 
 @Radium
 class TeacherHelper extends React.Component {
-    
+
+    downloadHomeGuidePdf(event) {
+        event.preventDefault();
+        var path = '/file/download/homeguide';
+        saveAs(window.request.defaults.baseURL+path);
+    }
+
+
     render(){
         return (
             <div>
@@ -80,14 +89,16 @@ class TeacherHelper extends React.Component {
                 <a href='/faq?section=intro&sub=introVideo' className={styles['video-img']} ></a>
                 <a style={localStyle.downloadBtn}
                     target='_blank'
-                    href="http://kaoshi2.kss.ksyun.com/yunxiao/kaoshi2.0/pdf/%E5%A5%BD%E5%88%86%E6%95%B0%E9%98%85%E5%8D%B7%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf" >
+                    onClick={this.downloadHomeGuidePdf.bind(this)}
+                    href="#"
+                >
                     下载使用说明书
                     <span className='icon-download-1' style={localStyle.downloadIcon}></span>
                 </a>
             </div>
         )
     }
-    
+
 }
 
 const Sidebar = () => {
@@ -262,7 +273,7 @@ class ExamList extends React.Component {
                                 </li>
                                 {
                                     this.getPage().map((num, index, arr) => {
-                                        
+
                                         return (
                                             <li key={'pageIndex-' + index}
                                                 data-page={num}
@@ -329,7 +340,7 @@ class Home extends React.Component {
 var localStyle= {
     linkAnalysisBtn: {
         display: 'inline-block', width: 100, height: 34, lineHeight: '34px', textAlign: 'center', backgroundColor: '#fff', border:'1px solid #24aef8', color: '#24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5,
-        
+
     },
     linkAnalysisBtnHover: {
         display: 'inline-block', width: 100, height: 34, lineHeight: '34px', textAlign: 'center', border:'1px solid #24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5, backgroundColor:'#24aef8', color:'#fff'
@@ -338,7 +349,7 @@ var localStyle= {
         width: 22, height: 22, borderRadius: '50%', backgroundColor: '#e7e7e7', color: '#fff', display: 'inline-block', marginRight: 22, cursor: 'pointer', textAlign: 'center', lineHeight: '22px',
         ':hover': {color: '#fff', backgroundColor: '#bfbfbf'}
     },
-    downloadBtn: { 
+    downloadBtn: {
         display: 'block', marginTop: 10, height: 40, width: '100%', color: '#333', lineHeight: '40px', borderBottom: '1px solid #dcdcdc',
         ':hover': {color: '#59bde5', textDecoration: 'none'}
     },
