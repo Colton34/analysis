@@ -73,7 +73,15 @@ class SchoolReport extends React.Component {
                     studentsGroupByClass = {studentsGroupByClass}
                     levels = {levels}
                     changeLevels = {this.props.changeLevels} />
-
+                <SubjectDistribution
+                    examInfo = {examInfo}
+                    examStudentsInfo = {examStudentsInfo}
+                    examPapersInfo = {examPapersInfo}
+                    examClassesInfo = {examClassesInfo}
+                    studentsGroupByClass = {studentsGroupByClass}
+                    allStudentsPaperMap = {allStudentsPaperMap}
+                    levels = {levels}
+                    headers = {headers}/>
                 <ClassPerformance
                     examInfo = {examInfo}
                     examStudentsInfo = {examStudentsInfo}
