@@ -315,7 +315,7 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
         var orderPapers = _.sortBy(papers, 'score');
         var subjectScoreStudentsByClass = (isGood) ? _.groupBy(_.takeRight(orderPapers, countFlag), 'class_name') : _.groupBy(_.take(orderPapers, countFlag), 'class_name');
         _.each(examInfo.realClasses, (className, index) => {
-            result[className][pid] = subjectScoreStudentsByClass[className] ? subjectScoreStudentsByClass[className].length : '无数据';
+            result[className][pid] = subjectScoreStudentsByClass[className] ? subjectScoreStudentsByClass[className].length : 0;
         });
     });
 
