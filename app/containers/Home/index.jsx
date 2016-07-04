@@ -44,7 +44,7 @@ const Questionnaire = () => {
 let questionList = [
     '分析报告结果错误或不满意怎么办？',
     '自定义分析时，导入考试数据、学生信息数据错误怎么办？',
-    '什么是题目合并、题目累加、将题目合并为一题',
+    '什么是题目合并、题目累加、将题目合并为一题？',
     '如何再次编辑已创建的自定义分析？',
     '想删除考试分析报告，怎么操作？'
 ];
@@ -162,10 +162,10 @@ class ExamItem extends React.Component {
                 <div style={{ width: '100%'}}>
                     <div style={{ padding: '20px 0' }}>
                         <div style={{ display: 'inline-block', width: 54, height: 54, lineHeight: '54px', textAlign: 'center', backgroundColor: '#e1e5eb', borderRadius: '50%', float: 'left'}}>
-                            <i className={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? 'icon-star' : 'icon-clipboard'} style={{color: '#fff', fontSize: 20}}></i>
+                            <i className={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? 'icon-star' : 'icon-clipboard'} style={{color: '#fff', fontSize: 26}}></i>
                         </div>
                         <div style={{ display: 'inline-block', marginLeft: 20 }}>
-                            <div style={{ fontSize: 16, marginBottom: 12, color: '#3f3f3f' }}>{item.examName}</div>
+                            <div style={{ fontSize: 16, marginBottom: 8, color: '#3f3f3f' }}>{item.examName}</div>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>创建时间: {item.eventTime}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
@@ -248,7 +248,7 @@ class ExamList extends React.Component {
         var {examList} = this.props;
         var {pageIndex, pageSize} = this.state;
         return (
-            <div style={{ display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 30, backgroundColor: '#fff' }}>
+            <div style={{ display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 25, backgroundColor: '#fff' }}>
                 <div className={styles['banner-img']}></div>
                 {
                     examList.length ? _.map(examList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize), (obj) => {
@@ -346,7 +346,7 @@ var localStyle= {
         display: 'inline-block', width: 100, height: 34, lineHeight: '34px', textAlign: 'center', border:'1px solid #24aef8', float: 'right', textDecoration: 'none', borderRadius: '2px', marginTop: 5, backgroundColor:'#24aef8', color:'#fff'
     },
     pageDirection: {
-        width: 22, height: 22, borderRadius: '50%', backgroundColor: '#e7e7e7', color: '#fff', display: 'inline-block', marginRight: 22, cursor: 'pointer', textAlign: 'center', lineHeight: '22px',
+        width: 22, height: 22, borderRadius: '50%', backgroundColor: '#e7e7e7', color: '#fff', display: 'inline-block', marginRight: 22, cursor: 'pointer', textAlign: 'center', lineHeight: '22px', fontSize: 12,
         ':hover': {color: '#fff', backgroundColor: '#bfbfbf'}
     },
     downloadBtn: {

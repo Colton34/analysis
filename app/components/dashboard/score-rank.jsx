@@ -82,6 +82,7 @@ class ScoreRank extends React.Component {
         this.state = {
             hoverLink: false
         }
+        this.scoreMap = {};
     }
     onHeaderMouseEnter() {
         this.setState({
@@ -97,8 +98,31 @@ class ScoreRank extends React.Component {
         var targetUrl = '/rank/report?examid=' + queryOptions.examid + (queryOptions.grade ? '&grade=' + queryOptions.grade : '' );
         browserHistory.push(targetUrl);
     }
+    sortScore() {
+        var {data} = this.props;
+        if (!data.top.length) {
+            return;
+        }
+        var scoreMap = {};
+        var scoreRank = [];
+        _.forEach(data.top, (studentInfo, index) => {
+            if (scoreMap[studentInfo.score] === undefined) {
+                scoreMap[studentInfo.score] = {count: 1};
+            } else {
+                scoreMap[studentInfo.score].count += 1;
+            }
+        })
+        scoreRank = _.orderBy(_.keys(scoreMap).map(strScore => {return parseFloat(strScore)}), [], 'desc');
+        _.forEach(scoreRank, (score, index) => {
+            scoreMap[score].rank = index === 0 ? 1 : scoreMap[scoreRank[index - 1]].count + scoreMap[scoreRank[index - 1]].rank;
+        })
+        this.scoreMap = scoreMap;
+    }
+    
     render() {
         var {data, examid, grade} = this.props;
+        this.sortScore();
+            
         var queryOptions = (grade) ? {examid: examid, grade: grade} : {examid: examid};
         return (
             <div style={{ display: 'inline-block', minHeight: 340, padding: '0 10px 0 0', cursor: 'pointer'}} onClick={this.onClickScoreRank.bind(this, queryOptions)} className='col-md-6'>
@@ -114,10 +138,10 @@ class ScoreRank extends React.Component {
                         </span>
                     </Link>
 
-                    <Table id='topRankTable' responsive style={{ width: '100%', height: '100%', margin: '30px 0 30px 0' }}>
+                    <Table id='topRankTable' responsive style={{ width: '100%', height: '100%', margin: '20px 0 30px 0' }}>
                         <thead>
                             <tr>
-                                <th style={styles.tableCell}>名次</th>
+                                <th style={_.assign({}, styles.tableCell, {paddingLeft: 30})}>名次</th>
                                 <th style={styles.tableCell}>姓名</th>
                                 <th style={styles.tableCell}>班级</th>
                                 <th style={styles.tableCell}>分数</th>
@@ -132,7 +156,7 @@ class ScoreRank extends React.Component {
                                                 _.range(4).map(num => {
                                                     switch (num) {
                                                         case 0:
-                                                            return <td key={'rank-' + num} style={styles.tableCell}>第{NUMBER_MAP[index+1]}名</td>
+                                                            return <td key={'rank-' + num} style={_.assign({}, styles.tableCell, {paddingLeft: 30})}>第{NUMBER_MAP[this.scoreMap[studentInfo.score].rank]}名</td>
                                                         case 1:
                                                             return <td key={'name-' + num} style={styles.tableCell}>{studentInfo.name}</td>
                                                         case 2:
