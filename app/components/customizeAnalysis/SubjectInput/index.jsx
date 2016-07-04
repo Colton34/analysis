@@ -3,6 +3,7 @@ import ownClassNames from './inputSubject.css';
 import _ from 'lodash';
 import Header from '../Header'
 import Footer from '../Footer';
+import InfoDialog from '../../../common/InfoDialog';
 
 var subjects = [
     '语文',
@@ -56,7 +57,8 @@ class SubjectInput extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            checkedTagIndex: -1
+            checkedTagIndex: -1,
+            showInfoDialog: false
         }
     }
     onClickSubject(index) {
@@ -79,12 +81,19 @@ class SubjectInput extends React.Component {
         }
         if (subjectName !== this.props.currentSubject.name) {
             if (this.props.subjectList.indexOf(subjectName) !== -1) {
-                alert('学科名已存在');//todo: 使用dialog组件;
+                this.setState({
+                    showInfoDialog: true
+                })
                 return;
             }
             this.props.changeCurrentSubjectName(subjectName);
         };
         this.props.onNextPage();
+    }
+    onHideDialog() {
+        this.setState({
+            showInfoDialog: false
+        })
     }
     render() {
         return (
@@ -110,6 +119,7 @@ class SubjectInput extends React.Component {
                     </div>
                 </div>
                 <Footer pageIndex={this.props.pageIndex} onNextPage={this.onNextPage.bind(this) }/>
+                <InfoDialog show={this.state.showInfoDialog} onHide={this.onHideDialog.bind(this)} content='学科名已存在'/>
             </div>
         )
     }
