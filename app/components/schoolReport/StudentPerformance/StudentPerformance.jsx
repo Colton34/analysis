@@ -315,7 +315,7 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
         var orderPapers = _.sortBy(papers, 'score');
         var subjectScoreStudentsByClass = (isGood) ? _.groupBy(_.takeRight(orderPapers, countFlag), 'class_name') : _.groupBy(_.take(orderPapers, countFlag), 'class_name');
         _.each(examInfo.realClasses, (className, index) => {
-            result[className][pid] = subjectScoreStudentsByClass[className] ? subjectScoreStudentsByClass[className].length : 0;
+            result[className][pid] = subjectScoreStudentsByClass[className] ? subjectScoreStudentsByClass[className].length : '无数据';
         });
     });
 
@@ -325,7 +325,8 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
         //headers就是真正考的科目+总分
         _.each(headers, (headerObj, index) => {
             // console.log(value[headerObj.id]);
-            value[headerObj.id] ? row.push(value[headerObj.id]) : row.push(0);
+            // _.isNumber(value[headerObj.id]) ? row.push(value[headerObj.id]) : row.push('无数据');
+            row.push(value[headerObj.id]);
         });
         row.unshift(examInfo.gradeName + className + '班');
         table.push(row);
