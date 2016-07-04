@@ -234,10 +234,10 @@ class ExamSelect extends React.Component {
         // 获得当前题目的基本信息： 属于哪个paper， 它的题号是多少；
         // 根据paperId， 找到currenPapers中的paper，然后根据题号找到当前题号;
         // 修改题号的选中信息， 然后修改整体的state；
-
         var questionInfo = event.target.value;
         var paperId = questionInfo.split('-')[0];
-        var questionName = questionInfo.split('-')[1];
+        var index = _.indexOf(questionInfo, '-');
+        var questionName = questionInfo.slice(index + 1);
         var checked = event.target.checked;
         this.props.checkOneQuestion(paperId, questionName, checked);
     }
