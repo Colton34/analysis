@@ -81,6 +81,7 @@ class TeacherHelper extends React.Component {
                 <a style={localStyle.downloadBtn}
                     target='_blank'
                     href="http://kaoshi2.kss.ksyun.com/yunxiao/kaoshi2.0/pdf/%E5%A5%BD%E5%88%86%E6%95%B0%E9%98%85%E5%8D%B7%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf" >
+                    <i className='icon-link-1'></i>
                     下载使用说明书
                     <span className='icon-download-1' style={localStyle.downloadIcon}></span>
                 </a>
@@ -151,7 +152,7 @@ class ExamItem extends React.Component {
                 <div style={{ width: '100%'}}>
                     <div style={{ padding: '20px 0' }}>
                         <div style={{ display: 'inline-block', width: 54, height: 54, lineHeight: '54px', textAlign: 'center', backgroundColor: '#e1e5eb', borderRadius: '50%', float: 'left'}}>
-                            <i className={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? 'icon-star' : 'icon-clipboard'} style={{color: '#fff', fontSize: 26}}></i>
+                            <i className={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? 'icon-fromzdy' : 'icon-fromks'} style={{color: '#fff', fontSize: 26}}></i>
                         </div>
                         <div style={{ display: 'inline-block', marginLeft: 20 }}>
                             <div style={{ fontSize: 16, marginBottom: 8, color: '#3f3f3f' }}>{item.examName}</div>

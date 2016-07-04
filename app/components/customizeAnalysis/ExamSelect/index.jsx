@@ -468,7 +468,7 @@ class ExamSelect extends React.Component {
                                                         return (
                                                             <li key={'subject-' + index} className={ownClassNames['subject-li']}>
                                                                 <div className={ownClassNames['checkbox']}>
-                                                                    <input id={'checkbox-subject-' + index} type='checkbox' value={paper.id} data-subject={paper.subject} data-grade={exam.grade}
+                                                                    <input id={'checkbox-subject-' + index} type='checkbox' value={paper.id} data-subject={paper.subject} data-grade={exam.grade} style={{cursor: 'pointer'}}
                                                                         onChange={this.onSelectPaper.bind(this, exam) }checked={paperIds.indexOf(paper.id) !== -1 ? true : false}/>
                                                                     <label for={'checkbox-subject-' + index}/>
                                                                     <span>{paper.subject}</span>
