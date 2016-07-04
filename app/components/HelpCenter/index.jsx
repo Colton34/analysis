@@ -16,6 +16,10 @@ class HelpCenter extends React.Component {
         var parentId = $target.parents('#section-title').data('section');
         this.setState({
             active: {section: parentId, sub: id}
+        }, ()=> {
+            if ($target.data('type') === 'video') {
+                $('#example_video_1').load();
+            }
         })
     }
     onClickQuestionItem(e) {
@@ -57,6 +61,7 @@ class HelpCenter extends React.Component {
                                                         className={localClass['list-item']}
                                                         style={[{ color: '#fff', marginLeft: 0 }, localStyle.listItem].concat(id===activeSub ? [localStyle.listItemActive]: [])}>
                                                         <a id={id} key={'qlink-' + id + '-' + index} 
+                                                           data-type={sectionInfos[sectionId].sub[id].type}
                                                            href="javascript:;" className={localClass['list-btn']} 
                                                            style={_.assign({},localStyle.listLink, (id === activeSub ? localStyle.listLinkActive: {}))}
                                                            onClick={this.onClickSubTitle.bind(this, id)}
@@ -143,6 +148,15 @@ var sectionInfos = {
                 name: '了解云校分析2.0',
                 type: 'video',
                 url: 'http://portal.kssws.ks-cdn.com/yunxiaoshow.mp4'
+            },  'howToCheck' : {
+                name: '如何查看分析报告',
+                type: 'video',
+                url: 'http://kaoshi2.kss.ksyun.com/fenxi/4f3b2de646a1b2d843b12ed7fe3b5c2b.mp4'
+            },
+            'howToUse': {
+                name: '如何使用自定义分析',
+                type: 'video',
+                url: 'http://kaoshi2.kss.ksyun.com/fenxi/65f08ccc726690018ad43963922249ee.mp4'
             }
         }
     },
