@@ -63,7 +63,11 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
     var resultData = _.map(levels, (levObj, levelKey) => {
         var currentLevel = levels[(levLastIndex - levelKey) + ''];
 
+//Note:（坑）本来这里subjectsMean应该是全量的--即exam中有多少papers就会有多少paper的mean信息（这和前面通过班级找此班级下各科的paper mean的方式不同）--所以理论上
+//不会碰到从班级找paper时遇到因为“某班级没有考试某一科目那么就没有科目平均分的信息”的问题，但是因为走了"25算法"，此算法当遇到科目之间总分差距很大的时候，一样会导致求
+//不到某一科目的平均分。如果遇到这种情况则给出被过滤掉的科目的信息，让用户知道。
         var {subjectLevelInfo, subjectsMean} = makeSubjectLevelInfo(currentLevel.score, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examInfo.fullMark);
+
 
         //按行横向扫描的各行RowData
         var tableData = theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers);
@@ -384,7 +388,7 @@ function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examI
  * }
  */
 function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examFullMark) {
-    var subjectsMean = makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark);
+    var subjectsMean = makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark);//这里有可能拿不到全科。。。
     // var schoolTotalScoreMean = _.round(_.mean(_.map(_.filter(examStudentsInfo, (student) => student.score > levelScore), (student) => student.score)), 2); //总分的平均分 = （scope下所有学生中，分数大于此档线的所有学生成绩的平均分）== 不正确，此处总分的平均分即为设置的此档的分档线的分数
 
     subjectsMean.totalScore = { id: 'totalScore', mean: levelScore, name: '总分' };
