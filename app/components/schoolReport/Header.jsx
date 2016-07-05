@@ -64,11 +64,14 @@ class Header extends React.Component {
                 <div style={{ height: 110, backgroundColor: '#fcfcfc', position: 'relative', display:'table-cell', width: 1000, verticalAlign: 'middle', textAlign: 'center'}}>
                     <a href={targetUrl} style={[localStyle.goBackLink,{ float: 'left', margin: '20px 0 0 20px'}]}><i className='icon-left-open-3'></i>返回</a>
                     <div style={{ margin: "0 auto", fontSize: 20, width: 700}}>
-                        
+
                         <div style={{ textAlign: 'center' }}>{examInfo.name}</div>
                         <div style={{ textAlign: 'center' }}>学校总体分析诊断报告</div>
-                        
+
                     </div>
+{/*
+
+    暂时先注释掉“下载报告”的功能
                     <a href='javascript: void(0)' className={styles.button}
                         onClick={this.downloadFile.bind(this)}
                         style={_.assign({},{
@@ -78,6 +81,8 @@ class Header extends React.Component {
                         <i className='icon-tikuai-1'></i>
                         下载报告
                     </a>
+
+*/}
                 </div>
                 <div className={styles['school-report-content']}>
                     <p style={{ lineHeight: '22px', marginTop: 40, textIndent: 28, fontSize: 14}}>
