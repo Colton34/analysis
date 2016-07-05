@@ -58,9 +58,11 @@ export default function reducer(state, action) {
             if(!action.isCached && action.paperInfo.origin === PAPER_ORIGIN.system) nextState = nextState.setIn(['papersCache', action.res.id], action.res);
             return nextState;
         case SUBTRACT_PAPER_INFO:
+            var subjectName = state.getIn(['currentSubject', 'name']);
             var nextState = state.setIn(['currentSubject','src'], state.getIn(['currentSubject','src']).delete(action.pid));
             if (nextState.getIn(['currentSubject','src']).size === 0) {
                 nextState = nextState.setIn(['currentSubject', 'grade'], '');
+                nextState = nextState.set('resultSet', nextState.get('resultSet').delete(subjectName)); //如果是再编辑的装填，则resultSet里会有个副本，删除掉该副本
             }
             return nextState;
         case CHECK_ALL_QUESTION: 

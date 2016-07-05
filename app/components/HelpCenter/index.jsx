@@ -16,6 +16,10 @@ class HelpCenter extends React.Component {
         var parentId = $target.parents('#section-title').data('section');
         this.setState({
             active: {section: parentId, sub: id}
+        }, ()=> {
+            if ($target.data('type') === 'video') {
+                $('#example_video_1').load();
+            }
         })
     }
     onClickQuestionItem(e) {
@@ -56,8 +60,9 @@ class HelpCenter extends React.Component {
                                                     <dd key={'qtitle-' + id + '-'+index}
                                                         className={localClass['list-item']}
                                                         style={[{ color: '#fff', marginLeft: 0 }, localStyle.listItem].concat(id===activeSub ? [localStyle.listItemActive]: [])}>
-                                                        <a id={id} key={'qlink-' + id + '-' + index}
-                                                           href="javascript:;" className={localClass['list-btn']}
+                                                        <a id={id} key={'qlink-' + id + '-' + index} 
+                                                           data-type={sectionInfos[sectionId].sub[id].type}
+                                                           href="javascript:;" className={localClass['list-btn']} 
                                                            style={_.assign({},localStyle.listLink, (id === activeSub ? localStyle.listLinkActive: {}))}
                                                            onClick={this.onClickSubTitle.bind(this, id)}
                                                            >
@@ -143,6 +148,15 @@ var sectionInfos = {
                 name: '了解云校分析2.0',
                 type: 'video',
                 url: 'http://portal.kssws.ks-cdn.com/yunxiaoshow.mp4'
+            },  'howToCheck' : {
+                name: '如何查看分析报告',
+                type: 'video',
+                url: 'http://kaoshi2.kss.ksyun.com/fenxi/4f3b2de646a1b2d843b12ed7fe3b5c2b.mp4'
+            },
+            'howToUse': {
+                name: '如何使用自定义分析',
+                type: 'video',
+                url: 'http://kaoshi2.kss.ksyun.com/fenxi/65f08ccc726690018ad43963922249ee.mp4'
             }
         }
     },
@@ -165,7 +179,17 @@ var sectionInfos = {
                             '如果当前自定义分析已经生成分析报表，则没办法重新修改，可以在分析报告的面板处删除，重新创建新的正确的自定义分析即可。',
                             '如果当前自定义分析未生成分析报表，则通过编辑，修改当前分析的科目，重新导入正确的数据即可。'
                         ]
-                    },{
+                    },{ 
+                        title: '什么是题目合并、题目累加、将题目合并为一题',
+                        content: [
+                             '•题目合并',
+                             '需要把多学科汇总成一门学科进行分析，例如：某次高三月考考试时，期望把物理、化学、生物三科汇总成理综一门学科进行分析，可以使用题目合并。',
+                             '•题目累加',
+                             '需要把一学科考试拆分成不同学科进行汇总分析，例如：某次高三期中考试时，期望把理综拆分成物理、化学、生物三学科进行汇总分析，可以使用累加',
+                             '•题目合并为一道题',
+                             '需要同一学科的不同考试数据合并在一起进行分析，查看相关的分析数据等，例如：期望把期中，期末的语文合并在一起进行分析，查看相关的分析数据等，可以使用题目合并成一道题；'
+                         ]
+                    },{ 
                         title: '如何再次编辑已创建的自定义分析？',
                         content: [
                              '如果当前自定义分析已经生成分析报表，则没办法重新修改，可以在分析报告的面板处删除，重新创建新的正确的自定义分析即可。',
