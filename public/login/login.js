@@ -31,6 +31,7 @@ function submit() {
             } else {
                 $('.err-message').text('登录出错');
             }
+            isLoggingIn = false;
             //alert('fail');
         }
     });
