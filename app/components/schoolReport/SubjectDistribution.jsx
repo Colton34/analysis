@@ -63,17 +63,27 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
     var resultData = _.map(levels, (levObj, levelKey) => {
         var currentLevel = levels[(levLastIndex - levelKey) + ''];
 
+//Note:（坑）本来这里subjectsMean应该是全量的--即exam中有多少papers就会有多少paper的mean信息（这和前面通过班级找此班级下各科的paper mean的方式不同）--所以理论上
+//不会碰到从班级找paper时遇到因为“某班级没有考试某一科目那么就没有科目平均分的信息”的问题，但是因为走了"25算法"，此算法当遇到科目之间总分差距很大的时候，一样会导致求
+//不到某一科目的平均分。如果遇到这种情况则给出被过滤掉的科目的信息，让用户知道。
         var {subjectLevelInfo, subjectsMean} = makeSubjectLevelInfo(currentLevel.score, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examInfo.fullMark);
 
+//设计：通过headers和subjectMean得到orderdValidSubjectMean：即，通过headers是有序的，并且避免了因为特殊原因而没有求到某些科目平均分而导致不能接着计算的问题。
+//这些因为特殊原因出问题的科目记录下来给你给提示。
+
+        var {validOrderedSubjectMean, unvalids} = filterMakeOrderedSubjectMean(headers, subjectsMean);
+console.log('unvalids == ', unvalids);
+
         //按行横向扫描的各行RowData
-        var tableData = theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers);
+        // var tableData = theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers);
+        var tableData = theSubjectLevelTable(subjectLevelInfo, validOrderedSubjectMean, examInfo);
         /*
         disData: {
             <className> : {maxSubjects: [], minSubjects: []}
         }
 
          */
-        var disData = theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers);
+        var disData = theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo);
         /*
         chartData: {
             xAxons: [<className>],
@@ -250,16 +260,18 @@ class TextView extends React.Component {
  * @param  {[type]} headers         [description]
  * @return {[type]}                 [description]
  */
-function theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers) {
+function theSubjectLevelTable(subjectLevelInfo, validOrderedSubjectMean, examInfo) {
     //此档的内容
+    //这里面依然会有二连杀：即虽然上面已经避免了可能会因为paper mean的"25xx"算法而导致漏掉一些科目的平均分，但是当去求某一个班级的数据的时候依然要考虑此班级有可能
+    //没有考某一科目！！！
     var table = [];
-    var titleHeader = _.map(headers, (headerObj, index) => {
-        return headerObj.subject + ' (' + subjectsMean[headerObj.id].mean + ')';
+    var titleHeader = _.map(validOrderedSubjectMean, (headerObj, index) => {
+        return headerObj.subject + ' (' + headerObj.mean + ')';
     });
     titleHeader.unshift('班级');
 
     var totalSchoolObj = subjectLevelInfo.totalSchool;
-    var totalSchoolRow = _.map(headers, (headerObj) => {
+    var totalSchoolRow = _.map(validOrderedSubjectMean, (headerObj) => {
         return totalSchoolObj[headerObj.id];
     });
     totalSchoolRow.unshift('全校');
@@ -267,8 +279,9 @@ function theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers)
 
     _.each(subjectLevelInfo, (subjectLevelObj, theKey) => {
         if (theKey == 'totalSchool') return;
-        var classRow = _.map(headers, (headerObj) => {
-            return subjectLevelObj[headerObj.id];
+        var classRow = _.map(validOrderedSubjectMean, (headerObj) => {
+            var temp = (_.isUndefined(subjectLevelObj[headerObj.id])) ? '无数据' : subjectLevelObj[headerObj.id];
+            return temp;
         });
         classRow.unshift(examInfo.gradeName + theKey + '班');
         table.push(classRow);
@@ -280,17 +293,18 @@ function theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers)
 }
 
 
-function theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers) {
+function theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo) {
     var result = {};
 
-//注意：有的班级考的科目多，有的考的科目少。。。所以显示什么药具体到class里面。如果一个班级只考了一个科目那么result中就没有此班级
+//注意：有的班级考的科目多，有的考的科目少。。。所以显示什么要具体到class里面。如果一个班级只考了一个科目那么result中就没有此班级
     var subjectLevelArr, maxSubjects, minSubjects;
     _.each(subjectLevelInfo, (subjectLevelObj, theKey) => {
         subjectLevelArr = _.sortBy(_.filter(_.map(subjectLevelObj, (count, key) => {
             return { count: count, key: key };
         }), (obj) => obj.key != 'totalScore'), 'count');
 
-        var baseLineCount = subjectLevelArr.length - 1;
+//TODO: 这里不应该是“length-1”了，按照算法的描述就应该是length...其他地方使用这个变量是不是有其他原因--需要check
+        var baseLineCount = subjectLevelArr.length;
         var targetCount = (baseLineCount == 2 || baseLineCount == 3) ? 1 : ((baseLineCount >= 4 && baseLineCount < 7) ? 2 : ((baseLineCount >= 7) ? 3 : 0));
 
         if(targetCount == 0) return;
@@ -324,12 +338,12 @@ function theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo, headers) {
 由 pid 组成的 header
 
  */
-function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, headers) {
+function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, validOrderedSubjectMean) {
     //TODO:可能需要把计算出的最大和最小作为数据结构，因为分析说明其实就是这个图表的文字版说明
     //去掉总分的信息，因为最后的factors中是没有总分这一项的
-    var titleHeader = _.map(headers.slice(1), (obj) => obj.subject);
+    var titleHeader = _.map(validOrderedSubjectMean.slice(1), (obj) => obj.subject);
     //构造基本的原matrix
-    var originalMatrix = makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, headers);
+    var originalMatrix = makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, validOrderedSubjectMean);
     //factorsMatrix中每一行（即一重数组的长度应该和titleHeader相同，且位置意义对应）
     var factorsMatrix = makeFactor(originalMatrix);
     //扫描每一行，得到最大和最小的坐标，然后到titHeader中获取科目名称，返回{subject: , count: } 班级的顺序就是studentsGroupByClass的顺序
@@ -348,15 +362,19 @@ function theSubjectLevelChart(subjectLevelInfo, examInfo, examPapersInfo, examCl
 
 }
 
-function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, headers) {
+function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examInfo, validOrderedSubjectMean) {
     var matrix = []; //一维是“班级”--横着来
     //把全校的数据放到第一位
     var totalSchoolObj = subjectLevelInfo.totalSchool;
-    matrix.push(_.map(headers, (headerObj) => _.round(_.divide(totalSchoolObj[headerObj.id], examInfo.realStudentsCount), 2)));
+    //求得上线人数比
+    matrix.push(_.map(validOrderedSubjectMean, (headerObj) => _.round(_.divide(totalSchoolObj[headerObj.id], examInfo.realStudentsCount), 2)));
 
     _.each(subjectLevelInfo, (subjectsOrTotalScoreObj, theKey) => {
         if (theKey == 'totalSchool') return;
-        matrix.push(_.map(headers, (headerObj) => _.round(_.divide(subjectsOrTotalScoreObj[headerObj.id], examClassesInfo[theKey].realStudentsCount), 2)));
+        matrix.push(_.map(validOrderedSubjectMean, (headerObj) => {
+            var temp = (_.isUndefined(subjectsOrTotalScoreObj[headerObj.id])) ? '无数据' : _.round(_.divide(subjectsOrTotalScoreObj[headerObj.id], examClassesInfo[theKey].realStudentsCount), 2);
+            return temp;
+        }));
     });
     return matrix;
 }
@@ -384,7 +402,7 @@ function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examI
  * }
  */
 function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examFullMark) {
-    var subjectsMean = makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark);
+    var subjectsMean = makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark);//这里有可能拿不到全科。。。
     // var schoolTotalScoreMean = _.round(_.mean(_.map(_.filter(examStudentsInfo, (student) => student.score > levelScore), (student) => student.score)), 2); //总分的平均分 = （scope下所有学生中，分数大于此档线的所有学生成绩的平均分）== 不正确，此处总分的平均分即为设置的此档的分档线的分数
 
     subjectsMean.totalScore = { id: 'totalScore', mean: levelScore, name: '总分' };
@@ -392,7 +410,7 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
     var result = {};
     result.totalSchool = {};
 
-    result.totalSchool.totalScore = _.filter(examStudentsInfo, (student) => student.score > levelScore).length;
+    result.totalSchool.totalScore = _.filter(examStudentsInfo, (student) => student.score > levelScore).length;//TODO:这里使用">"没有问题么？
 
     _.each(subjectsMean, (subMean, pid) => {
         if (pid == 'totalScore') return;
@@ -404,7 +422,7 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
         var temp = {};
         // var classTotalScoreMean = _.round(_.mean(_.map(classStudents, (student) => student.score)), 2);
         temp.totalScore = _.filter(classStudents, (student) => student.score > levelScore).length;
-
+        //Note: 这里的算法没有问题：subjectsMean是全部有效的，而这里遍历的pid是跟着当前班级所考的科目走的
         _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
             temp[pid] = _.filter(papers, (paper) => paper.score > subjectsMean[pid].mean).length;
         });
@@ -413,6 +431,19 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
     });
 
     return { subjectLevelInfo: result, subjectsMean: subjectsMean }
+}
+
+function filterMakeOrderedSubjectMean(headers, subjectsMean) {
+    //按照headers的顺序，返回有序的[{subject: , id(): , mean: }]
+    var valids = [], unvalids = [];
+    _.each(headers, (headerObj) => {
+        if(subjectsMean[headerObj.id]) {
+            valids.push({id: headerObj.id, subject: headerObj.subject, mean: subjectsMean[headerObj.id].mean});
+        } else {
+            unvalids.push({id: headerObj.id, subject: headerObj.subject, mean: subjectsMean[headerObj.id].mean});
+        }
+    });
+    return {validOrderedSubjectMean: valids, unvalids: unvalids};
 }
 
 //计算每一档次各科的平均分

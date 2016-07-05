@@ -429,7 +429,8 @@ class ExamSelect extends React.Component {
                 console.log('Error: ', err);
             },
             uploadFail : function(resp){
-                console.log('Fail: ', resp);
+//会走这里：{message: '解析考试分数数据错误', name: 'Error'}
+                console.log('Fail: ', resp.message);
             }
         };
         return (

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-01 11:33:51
+* @Last Modified time: 2016-07-05 10:50:07
 */
 
 'use strict';
@@ -70,7 +70,14 @@ exports.downloadExamTmp = function(req, res, next) {
 
 exports.downloadExamGuide = function(req, res, next) {
     var fileDir = path.join(__dirname, '../../../public/files');
-    var filename = '自定义分析操作说明书.pdf';
+    var filename = '自定义分析操作手册.pdf';
+    var fileUrl = path.join(fileDir, filename);
+    res.download(fileUrl, filename);
+}
+
+exports.downloadHomeGuide = function(req, res, next) {
+    var fileDir = path.join(__dirname, '../../../public/files');
+    var filename = '好分数分析系统使用说明书.pdf';
     var fileUrl = path.join(fileDir, filename);
     res.download(fileUrl, filename);
 }
@@ -91,7 +98,7 @@ exports.importExamData = function(req, res, next) {
     if(result.code === 0){
         res.status(200).json(result.data);
     }else{
-        next(new errors.Error('解析考试分数数据错误 : ' + result.msg));
+        next(new errors.Error('解析考试分数数据错误'));
     }
 }
 

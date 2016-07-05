@@ -57,7 +57,7 @@ class HelpCenter extends React.Component {
                                         {
                                             _.keys(sectionInfos[sectionId].sub).map((id,index) =>{
                                                 return (
-                                                    <dd key={'qtitle-' + id + '-'+index} 
+                                                    <dd key={'qtitle-' + id + '-'+index}
                                                         className={localClass['list-item']}
                                                         style={[{ color: '#fff', marginLeft: 0 }, localStyle.listItem].concat(id===activeSub ? [localStyle.listItemActive]: [])}>
                                                         <a id={id} key={'qlink-' + id + '-' + index} 
@@ -70,7 +70,7 @@ class HelpCenter extends React.Component {
                                                         </a>
                                                     </dd>
                                                 )
-                                            })    
+                                            })
                                         }
                                     </dl>
                                 </div>
@@ -79,7 +79,7 @@ class HelpCenter extends React.Component {
                     }
                    </div>
                 <div className={localClass['content']}>
-                
+
                     <span className={localClass['content-title']}>{sectionInfos[activeSection]['sub'][activeSub].name}</span>
                     {
                         sectionInfos[activeSection]['sub'][activeSub].type ==='text' ?
@@ -103,16 +103,16 @@ class HelpCenter extends React.Component {
                                         )
                                     })
                                 }
-                            </ul> : 
+                            </ul> :
                             <div style={{ width: 800, height: 565, margin: 20 }}>
                                 <video style={{width: '100%', height: '100%'}}id="example_video_1" className="video-js vjs-default-skin vjs-big-play-centered vjs-paused example_video_1-dimensions vjs-controls-enabled vjs-workinghover vjs-user-active"
-                                    controls preload="auto" 
+                                    controls preload="auto"
                                     data-setup='{}'>
                                     <source src={sectionInfos[activeSection]['sub'][activeSub].url} type="video/mp4" />
                                 </video>
                             </div>
                     }
-                    
+
 
                 </div>
                 <div style={{ clear: 'both' }}></div>
@@ -128,16 +128,16 @@ var localStyle= {
     },
     listItemActive: {
        backgroundColor: '#6f737d'
-       
-    }, 
+
+    },
     listLink: {
         ':hover': {textDecoration: 'none', color: '#fff'}
     },
     listLinkActive: {
-        textDecoration: 'none', color: '#fff' 
-        
+        textDecoration: 'none', color: '#fff'
+
     }
-    
+
 }
 
 var sectionInfos = {
@@ -167,14 +167,14 @@ var sectionInfos = {
                 name: '自定义分析',
                 type: 'text',
                 list: [
-                    { 
-                        title: '分析报告结果错误或不满意怎么办？', 
+                    {
+                        title: '分析报告结果错误或不满意怎么办？',
                         content: [
                             '分析结果有错误有很多原因导致，最常见的原因有两个：1、来自阅卷时，考试题目设置的问题。2、创建自定义分析时，课目和题目选择以及学生数据导入有问题。一般出现这样的错误，建议直接重新创建新的正确的自定义分析即可。同时注意规范认真操作。',
-                            '分析结果不满意，可以通过创建自定义分析，任意组合、合并等考试题目，来生成实际满意的分析报告。同时注意规范认真操作。' 
+                            '分析结果不满意，可以通过创建自定义分析，任意组合、合并等考试题目，来生成实际满意的分析报告。同时注意规范认真操作。'
                         ]
-                    },{ 
-                        title: '自定义分析时，导入考试数据、学生信息数据错误怎么办？', 
+                    },{
+                        title: '自定义分析时，导入考试数据、学生信息数据错误怎么办？',
                         content: [
                             '如果当前自定义分析已经生成分析报表，则没办法重新修改，可以在分析报告的面板处删除，重新创建新的正确的自定义分析即可。',
                             '如果当前自定义分析未生成分析报表，则通过编辑，修改当前分析的科目，重新导入正确的数据即可。'
@@ -218,4 +218,12 @@ var sectionInfos = {
     }
 }
 
-export default HelpCenter;
+export default HelpCenter
+
+    '分析报告结果错误或不满意怎么办？',
+    '自定义分析时，导入考试数据、学生信息数据错误怎么办？',
+    '什么是题目合并、题目累加、将题目合并为一题',
+    '如何再次编辑已创建的自定义分析？',
+    '想删除考试分析报告，怎么操作？'
+    '自定义分析时，生成题号错误时怎么办？'
+    '帐号和密码忘记怎么？'

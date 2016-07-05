@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-01 09:51:40
+* @Last Modified time: 2016-07-04 13:09:11
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -189,7 +189,6 @@ export function fetchSchoolAnalysisData(params) {
         headers = _.concat(headers, restPapers);
         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = _.map(levels, (value, key) => 5);
-
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
@@ -1351,7 +1350,7 @@ export function makeFactor(originalMatrix) {
     //1.行相减
     _.each(originalMatrix, (classRow, rowIndex) => {
         if (rowIndex == 0) return;
-        var rowFactors = _.map(classRow, (perItem, columnIndex) => _.round(_.subtract(perItem, originalMatrix[0][columnIndex]), 2));
+        var rowFactors = _.map(classRow, (perItem, columnIndex) => (_.isNumber(perItem) ? _.round(_.subtract(perItem, originalMatrix[0][columnIndex]), 2) : perItem));
         tempMatrix.push(rowFactors);
     });
 
@@ -1361,7 +1360,8 @@ export function makeFactor(originalMatrix) {
         var tempRow = [];
         _.each(rowArr, (tempFactor, columnIndex) => {
             if (columnIndex == 0) return;
-            tempRow.push(_.round(_.subtract(tempFactor, rowArr[0]), 2));
+            var resultTempFactor = (_.isNumber(tempFactor)) ? _.round(_.subtract(tempFactor, rowArr[0]), 2) : tempFactor;
+            tempRow.push(resultTempFactor);
         });
         resultMatrix.push(tempRow);
     });

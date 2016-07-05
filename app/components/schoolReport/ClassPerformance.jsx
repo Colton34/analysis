@@ -120,8 +120,8 @@ class ClassPerformance extends React.Component {
 //                 data: [11.2, 9.6, 19.5, 85.5, 21.8, 12.5, 87.5, 78.5, 33.3, 8.3, 23.9, 5.6]
 //             }];
         var headerInfo = theClassExamHeader(studentsGroupByClass);
-        var {xAxons, yAxonses} = theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers, this.state.currentClasses);
-        var subjectMeanInfo = makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass, headers);
+        var {xAxons, yAxonses} = theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, this.state.currentClasses);
+        var subjectMeanInfo = makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass);
         var meanTableBodyData = theClassExamMeanTable(examInfo, subjectMeanInfo, headers);
         var factorsTableData = theClassExamMeanFactorsTable(examInfo, subjectMeanInfo, studentsGroupByClass, headers);
         var groupTableData = theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo);
@@ -284,7 +284,7 @@ function theClassExamHeader(studentsGroupByClass) {
 }
 
 //一个班级或两个班级的图表
-function theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, headers, currentClasses) {
+function theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, currentClasses) {
     var classKeys = _.keys(examClassesInfo);
 
     if(!currentClasses || currentClasses.length == 0) currentClasses = _.map(_.range(2), (index) => examClassesInfo[classKeys[index]]);//初始化的时候显示默认的2个班级
@@ -327,7 +327,8 @@ function theClassExamMeanTable(examInfo, subjectMeanInfo, headers) {
 
         var classRow = [];
         _.each(headers, (headerObj) => {
-            classRow = _.concat(classRow, [classMeanObj[headerObj.id].mean, classMeanObj[headerObj.id].meanRate])
+            var tempObj = (classMeanObj[headerObj.id]) ? [classMeanObj[headerObj.id].mean, classMeanObj[headerObj.id].meanRate] : ['无数据', '无数据'];
+            classRow = _.concat(classRow, tempObj);
         });
         classRow.unshift(examInfo.gradeName+theKey+'班');
         matrix.push(classRow);
@@ -367,7 +368,7 @@ function makeClassExamMeanOriginalMatirx(subjectMeanInfo, headers) {
 
     _.each(subjectMeanInfo, (subjectMenaObj, theKey) => {
         if(theKey == 'totalSchool') return;
-        matrix.push(_.map(headers, (headerObj) => subjectMenaObj[headerObj.id].meanRate));
+        matrix.push(_.map(headers, (headerObj) => (subjectMenaObj[headerObj.id]) ? subjectMenaObj[headerObj.id].meanRate : '无数据'));
     });
     return matrix;
 }
@@ -431,7 +432,7 @@ function theClassExamTotalScoreGroupTable(examInfo, examStudentsInfo, groupLengt
     return table;
 }
 
-function makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass, headers) {
+function makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass) {
     var result = {};
     result.totalSchool = makeOriginalSubjectInfoRow(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo);
     _.each(studentsGroupByClass, (students, className) => {
@@ -470,7 +471,7 @@ function makeGroupStudentsInfo(groupLength, students) {
     //将数组内的元素分成10组，计算每一组中各个班级学生人数
     var result = {}, flagCount = students.length, totalStudentCount = students.length;
     _.each(_.range(groupLength), function(index) {
-        var groupCount = (index == groupLength-1) ? (totalStudentCount - flagCount) : (_.ceil(_.divide(totalStudentCount, groupLength)));
+        var groupCount = (index == groupLength-1) ? flagCount : (_.ceil(_.divide(totalStudentCount, groupLength)));
         //当前组的学生数组：
         var currentGroupStudents = _.slice(students, (flagCount - groupCount), flagCount);
         //对当前组的学生按照班级进行group
