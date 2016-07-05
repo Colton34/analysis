@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-05 23:08:55
+* @Last Modified time: 2016-07-06 00:22:53
 */
 
 'use strict';
@@ -46,7 +46,7 @@ var production = {
     "secret": "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
     "alg": "HS256",
     "rankBaseUrl": 'http://fenxi-be.haofenshu.com',
-    "testRankBaseUrl": 'http://ct.yunxiao.com:8157',
+    "testRankBaseUrl": 'http://fenxi-be.haofenshu.com',
     "yjServer": "http://yj.yunxiao.com",
     "yj2Server": "http://yue.haofenshu.com",
     "casServer": "http://passport.yunxiao.com"
