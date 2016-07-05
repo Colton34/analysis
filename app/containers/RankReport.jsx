@@ -50,7 +50,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                         firstLineHead.map((headType, index) => {
                             if (_.indexOf(['kaohao', 'name', 'class'], headType) !== -1) {
                                 return (
-                                    <th key={headType} rowSpan='2' data-headtype={headType} className={commonStyle['table-unit']} style={{minHeight: 40, minWidth: 50, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
+                                    <th key={headType} rowSpan='2' data-headtype={headType} className={commonStyle['table-unit']} style={{minHeight: 40, minWidth: 80, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
                                         <span>{headerMapper[headType]}</span>
                                         <span style={localStyle.sortDirection}>
                                             <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' },  sortInfo.head !== headType ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333'} : { visibility: 'hidden' })}>
