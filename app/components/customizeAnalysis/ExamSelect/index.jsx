@@ -431,6 +431,10 @@ class ExamSelect extends React.Component {
             uploadFail : function(resp){
 //会走这里：{message: '解析考试分数数据错误', name: 'Error'}
                 console.log('Fail: ', resp.message);
+                _this.setState({
+                    showInfoDialog: true,
+                    infoDialogMsg: resp.message + '。请检查数据填写是否完整无误。'
+                })
             }
         };
         return (
