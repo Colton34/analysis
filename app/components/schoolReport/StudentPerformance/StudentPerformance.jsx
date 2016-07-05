@@ -26,7 +26,7 @@ const Table = ({tableHeaderData, isGood, inputNum, current, tableData}) => {
                     {
                         _.map(tableHeaderData, (th, index) => {
                             return (
-                                <th key={index} className={styles['table-unit']}>{th}</th>
+                                <th key={index} className={styles['table-unit']} style={{minWidth: 100}}>{th}</th>
                             )
                         })
                     }
@@ -35,7 +35,7 @@ const Table = ({tableHeaderData, isGood, inputNum, current, tableData}) => {
                     {
                         _.map(tableHeaderData, (th, index) => {
                             return (
-                                <th key={index} className={styles['table-unit']}>{(isGood ? '前' : '后') + inputNum + (current.key == 'ranking' ? '名' : '%') }</th>
+                                <th key={index} className={styles['table-unit']} style={{minWidth: 100}}>{(isGood ? '前' : '后') + inputNum + (current.key == 'ranking' ? '名' : '%') }</th>
                             )
                         })
                     }
@@ -47,7 +47,7 @@ const Table = ({tableHeaderData, isGood, inputNum, current, tableData}) => {
                                 {
                                     _.map(rowData, (data, index) => {
                                         return (
-                                            <td key={index} className={styles['table-unit']}>
+                                            <td key={index} className={styles['table-unit']} style={{minWidth: 100}}>
                                                 {data}
                                             </td>
                                         )

@@ -266,7 +266,7 @@ function theSubjectLevelTable(subjectLevelInfo, validOrderedSubjectMean, examInf
     //没有考某一科目！！！
     var table = [];
     var titleHeader = _.map(validOrderedSubjectMean, (headerObj, index) => {
-        return headerObj.subject + ' (' + headerObj.mean + ')';
+        return headerObj.subject + ' <br/>(' + headerObj.mean + ')';
     });
     titleHeader.unshift('班级');
 

@@ -23,7 +23,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                     {
                         _.map(tableHeaderData, (subject, index) => {
                             return (
-                                <th colSpan="2" key={index} className={styles['table-unit']}>{subject}</th>
+                                <th colSpan="2" key={index} className={styles['table-unit']} style={{minWidth: 100}}>{subject}</th>
                             )
                         })
                     }
@@ -33,8 +33,8 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                     _.map(_.range(tableHeaderData.length), (num) => {
                         return _.map(_.range(2), (index) => {
                             if (index === 0)
-                                return <th className={styles['table-unit']} key={index}>平均分</th>
-                            return <th className={styles['table-unit']} key={index}>平均得分率</th>
+                                return <th className={styles['table-unit']} key={index} style={{minWidth: 100}}>平均分</th>
+                            return <th className={styles['table-unit']} key={index} style={{minWidth: 100}}>平均得分率</th>
                         })
                     })
                 }
@@ -46,7 +46,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                                 {
                                     _.map(tdList, (td, tindex) => {
                                         return (
-                                            <td key={'td' + tindex}className={styles['table-unit']}>
+                                            <td key={'td' + tindex}className={styles['table-unit']} style={{minWidth: 100}}>
                                                 {td}
                                             </td>
                                         )
