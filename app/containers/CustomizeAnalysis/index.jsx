@@ -342,7 +342,6 @@ function makeExamSchema(resultSet, analysisName) {
     var examStudentsInfo = _.sortBy(makeExamStudentsInfo(resultSet, subjectsIdArr), 'score');
     var examPapersInfo = makeExamPapersInfo(resultSet, subjectsIdArr);
     var examClassesInfo = makeExamClassesInfo(resultSet);
-    debugger;
     return {
         "info": examInfo,
         "[studentsInfo]": examStudentsInfo,
