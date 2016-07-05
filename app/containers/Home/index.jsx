@@ -220,6 +220,7 @@ class ExamList extends React.Component {
     onClickPage(event) {
         var {pageIndex} = this.state;
         var page = $(event.target).data('page');
+
         switch(page) {
             case 'prev':
                 if (pageIndex === 0) return ;
@@ -276,7 +277,7 @@ class ExamList extends React.Component {
                                     this.getPage().map((num, index, arr) => {
 
                                         return (
-                                            <li key={'pageIndex-' + index}
+                                            <li key={'pageIndex-' + num}
                                                 data-page={num}
                                                 onClick={this.onClickPage.bind(this)}
                                                 style={_.assign({},{display: 'inline-block', cursor: 'pointer', fontSize: 16, color: '#999'}, num === this.state.pageIndex? {color: '#59bde5'}: {}, index === arr.length -1 ? {marginRight: 22} : {marginRight: 18})}>

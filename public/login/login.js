@@ -31,7 +31,7 @@ function submit() {
             } else {
                 $('.err-message').text('登录出错');
             }
-            //alert('fail');
+            isLoggingIn = false;
         }
     });
 }
@@ -44,8 +44,8 @@ $('#btn-login').click(function(event) {
         submit();
         isLoggingIn = true;
     }
-        
-    
+
+
 })
 
 //'<div class="err-message-ctn"><p class="err-message">密码错误</p></div>'

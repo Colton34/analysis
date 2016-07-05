@@ -62,7 +62,9 @@ export default function reducer(state, action) {
             var nextState = state.setIn(['currentSubject','src'], state.getIn(['currentSubject','src']).delete(action.pid));
             if (nextState.getIn(['currentSubject','src']).size === 0) {
                 nextState = nextState.setIn(['currentSubject', 'grade'], '');
-                nextState = nextState.set('resultSet', nextState.get('resultSet').delete(subjectName)); //如果是再编辑的装填，则resultSet里会有个副本，删除掉该副本
+                nextState = nextState.set('resultSet', nextState.get('resultSet').delete(subjectName)); //如果是再编辑的状态，则resultSet里会有个副本，删除掉该副本
+                nextState = nextState.setIn(['currentSubject', 'groupMap'], {});  //清空groupMap,否则影响新groupMap生成
+                nextState = nextState.setIn(['currentSubject', 'mergeType'], '');
             }
             return nextState;
         case CHECK_ALL_QUESTION: 

@@ -48,12 +48,11 @@ class Dialog extends React.Component {
             this.isValid[levBufLastIndex-index] = false;
             this.setState({
                 hasError: true,
-                errorMsg: numberMap[index + 1 + ''] + '档浮动分数输入不是有效数字'  
+                errorMsg: numberMap[index + 1 + ''] + '档浮动分数输入不是有效数字'
             })
             return;
         };
-
-
+        this.isValid[levBufLastIndex-index] = true;
         if(this.levelBuffers[levBufLastIndex-index] == value) {
             console.log('没有更新');
             return;
@@ -61,11 +60,9 @@ class Dialog extends React.Component {
 
         //levelBuffers的顺序是和levels对应的--显示的时候是倒序
         this.levelBuffers[levBufLastIndex-index] = value;
-
         //检测如果添加了此buffer，那么保证顺序是对的，由小到大。拿到当前生成的两个值，左边的要比它左边的大，右边的要比它右边的小（前提是如果左右边有值的话）：
         var newSegments = makeCriticalSegments(this.levelBuffers, this.props.levels);
         var segmentsIsValid = _.every(_.range(newSegments.length-1), (index) => (newSegments[index+1] > newSegments[index]));
-
         if(!segmentsIsValid) {
             console.log('newSegments is invalid');
             this.setState({
@@ -75,7 +72,6 @@ class Dialog extends React.Component {
             return;
         }
         this.isUpdate = true;
-
         if(this.state.hasError) {
             this.setState({
                 hasError: false,
@@ -95,7 +91,6 @@ class Dialog extends React.Component {
             })
             return;
         }
-
         if(!this.isUpdate) {
             console.log('表单没有更新');
             this.setState({
@@ -137,9 +132,9 @@ class Dialog extends React.Component {
         // var {totalScoreLevel} = this.props;
         var _this = this;
 
-        this.levelBuffers = this.props.levelBuffers;
-        this.isValid = _.map(_.range(this.levelBuffers.length), (index) => true);
-        this.isUpdate = false;
+        // this.levelBuffers = this.props.levelBuffers;
+        // this.isValid = _.map(_.range(this.levelBuffers.length), (index) => true);
+        // this.isUpdate = false;
 
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this) }>
@@ -229,7 +224,7 @@ class GroupAnalysis extends React.Component {
             {/*--------------------------------  临界生群体分析Header -------------------------------------*/}
                 <div className={styles['school-report-content']}>
                     <p>
-                        将临近总分各分数线上下的群体视为“临界生”，学校可以给他们多一点关注，找到他们的薄弱点、有针对性促进一下，他们就坑稳定、甚至提升总分档次。
+                        将临近总分各分数线上下的群体视为“临界生”，学校可以给他们多一点关注，找到他们的薄弱点、有针对性促进一下，他们就能稳定、甚至提升总分档次。
                         这个无论是对学生个人，还是对学校整体的教学成就，都有显著的积极作用。全校临界生群体规模，见下表：
                     </p>
                     <a href="javascript:void(0)" onClick={this.onShowDialog.bind(this) }className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>

@@ -235,7 +235,7 @@ class TextView extends React.Component {
                                     对于<span style={{ color: '#00955e' }}>{className}班，{_.join(disData[className].maxSubjects, '、') }</span>贡献较大，
                                     <span style={{ color: '#00955e' }}>{_.join(disData[className].minSubjects, '、') }</span>贡献较小；
                                 </p>
-                            ) : (<p>只有一个科目没有可比性</p>)
+                            ) : (<p>对于<span style={{ color: '#00955e' }}>{className}班，只有一个科目没有可比性</span></p>)
                     }
                     </div>)
                 })
