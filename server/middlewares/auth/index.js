@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-01 08:13:56
+* @Last Modified time: 2016-07-05 18:14:22
 */
 
 'use strict';
@@ -35,10 +35,13 @@ var authUitls = require('./util');
 exports.authenticate = function(req, res, next) {
     req.checkBody('value', '无效的value').notEmpty();
     req.checkBody('password', '无效的password').notEmpty();
-    if(req.validationErrors()) return next(req.validationErrors());
+    if(req.validationErrors()) return next(new errors.HttpStatusError(401, {errorCode: 1, message: '无效的用户名或密码'}));
 
     var value = req.body.value.toLowerCase();
     var password = req.body.password;
+
+console.log('value = ', value, '   password = ', password);
+
 
     authUitls.getUserInfo(value).then(function(user) {
         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 2, message: '密码不正确'}));
@@ -53,6 +56,10 @@ exports.authenticate = function(req, res, next) {
         var token = jsonwebtoken.sign({ user: user }, config.secret);
         user.token = token;
         req.user = user;
+
+console.log('登录成功');
+
+
         next();
     }).catch(function(err) {
         next(err);
