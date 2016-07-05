@@ -144,7 +144,7 @@ console.log('unvalids == ', unvalids);
                                         (disData['totalSchool']) ? (
                                             <p>对于全校，<span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].maxSubjects, '、') }学科</span>在本次考试中一档上线率贡献较大，
                                                 <span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].minSubjects, '、') }学科</span>对高层次的学生培养处于弱势，需要引起高度重视。</p>
-                                                ) : (<p>只要一个学科没有可比性</p>)
+                                                ) : (<p>只有一个学科没有可比性</p>)
                                     }
 
 
