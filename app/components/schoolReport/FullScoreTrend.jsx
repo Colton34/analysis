@@ -19,8 +19,8 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
             obj.first = true;
         }
         return obj;
-    }) 
-    
+    })
+
 //自定义Module数据结构
     var config = {
         title: {
@@ -42,9 +42,9 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
         },
         tooltip: {
             formatter: function(){
-                return '分数区间：<b>' + 
-                        (this.point.first ? '[' : '(') + 
-                        this.point.low + ',' + this.point.high + ']</b><br/>' + 
+                return '分数区间：<b>' +
+                        (this.point.first ? '[' : '(') +
+                        this.point.low + ',' + this.point.high + ']</b><br/>' +
                         '人数:<b>' + this.point.y + '人</b>';
             }
         },
@@ -75,7 +75,7 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
                 <ReactHighcharts config={config} style={{ margin: '0 auto', marginTop: 40 }}></ReactHighcharts>
                 <div style={{ width: 760, minHeight: 90, backgroundColor: '#e9f7f0', margin: '0 auto', marginTop: 20}} className={styles['tips']}>
                     <p style={{ marginBottom: 20 }}>对于这次考试: </p>
-                    <p>从总分分布曲线图来看，基本呈现“钟型分布”，即中档学生人数较多，两端（高分段，低分段）学生人数较少，这种分布属于正常状态，但作为学校水平性考试，还是希望高分段学生人数更多为好</p>
+                    <p>从总分分布曲线图可以看出，这次考试学生总分的分布情况，直观的反映了本次学生考试分数集中的区间，注意这些现象，有意识的调整教学。</p>
                 </div>
             </div>
         </div>

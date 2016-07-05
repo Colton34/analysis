@@ -144,7 +144,7 @@ console.log('unvalids == ', unvalids);
                                         (disData['totalSchool']) ? (
                                             <p>对于全校，<span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].maxSubjects, '、') }学科</span>在本次考试中一档上线率贡献较大，
                                                 <span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].minSubjects, '、') }学科</span>对高层次的学生培养处于弱势，需要引起高度重视。</p>
-                                                ) : (<p>只要一个学科没有可比性</p>)
+                                                ) : (<p>只有一个学科没有可比性</p>)
                                     }
 
 
@@ -235,7 +235,7 @@ class TextView extends React.Component {
                                     对于<span style={{ color: '#00955e' }}>{className}班，{_.join(disData[className].maxSubjects, '、') }</span>贡献较大，
                                     <span style={{ color: '#00955e' }}>{_.join(disData[className].minSubjects, '、') }</span>贡献较小；
                                 </p>
-                            ) : (<p>只有一个科目没有可比性</p>)
+                            ) : (<p>对于<span style={{ color: '#00955e' }}>{className}班，只有一个科目没有可比性</span></p>)
                     }
                     </div>)
                 })
