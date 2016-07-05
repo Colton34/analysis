@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Map} from 'immutable';
-
+import _ from 'lodash';
 //自定义组件
 import Header from '../common/Header';
 import Footer from '../common/Footer';
@@ -32,13 +32,26 @@ class App extends React.Component {
     static need = [
         initUser
     ];
+    getViewport() {
+        if (document.compatMode == "BackCompat") {
+            return {
+                width: document.body.clientWidth,
+                height: document.body.clientHeight
+            }
+        } else {
+            return {
+                width: document.documentElement.clientWidth,
+                height: document.documentElement.clientHeight
+            }
+        }
+    }
 
     render() {
         var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
-        
+        var viewPort = this.getViewport();
         var currentPath = this.props.location.pathname;
         return (
-            <div style={[{backgroundColor: '#EFF1F4'},(currentPath === '/' ? {}: {paddingBottom: 30})]} className={commonStyle['common-font']}>
+            <div style={_.assign({}, {backgroundColor: '#EFF1F4', minHeight: viewPort.height},(currentPath === '/' ? {}: {paddingBottom: 30}))} className={commonStyle['common-font']}>
                 <Header user={user} actions={this.props.actions}/>
                 <Dialog />
                     {this.props.children}
