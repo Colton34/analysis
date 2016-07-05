@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-15 14:16:52
+* @Last Modified time: 2016-07-05 14:41:17
 */
 
 'use strict';
@@ -13,7 +13,7 @@ var development = {
     "port": 3000,
     "secret": "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
     "alg": "HS256",
-    "rankBaseUrl": 'http://ct.yunxiao.com:8156',
+    "rankBaseUrl": 'http://ct.yunxiao.com:8157',
     "testRankBaseUrl": 'http://ct.yunxiao.com:8157',
     "yjServer": "http://yj.yunxiao.com",//   http://testyue.yunxiao.com
     "yj2Server": "http://ct.yunxiao.com:8110",
