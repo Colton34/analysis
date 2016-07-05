@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-02 15:34:10
+* @Last Modified time: 2016-07-05 10:50:07
 */
 
 'use strict';
@@ -98,7 +98,7 @@ exports.importExamData = function(req, res, next) {
     if(result.code === 0){
         res.status(200).json(result.data);
     }else{
-        next(new errors.Error('解析考试分数数据错误 : ' + result.msg));
+        next(new errors.Error('解析考试分数数据错误'));
     }
 }
 
