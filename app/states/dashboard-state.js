@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:09:30
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-25 20:11:10
+* @Last Modified time: 2016-07-06 05:32:05
 */
 
 'use strict';
@@ -17,8 +17,14 @@ var InitialState = Record({
 
     examInfoGuide: {},
     scoreRank: {},
-    levelScoreReport: {},
-    classScoreReport: {}
+    schoolReport: {}
 });
 
 export default InitialState;
+
+/*
+,
+    levelScoreReport: {},
+    classScoreReport: {}
+
+ */

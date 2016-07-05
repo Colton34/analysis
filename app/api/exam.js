@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-04 13:09:11
+* @Last Modified time: 2016-07-06 05:40:12
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -146,6 +146,7 @@ export function fetchDashboardData(params) {
     return params.request.get(url).then(function(res) {
         // console.log('=======================  dashboard res.data.keys = ', _.keys(res.data));
         //TODO: 需要赋值给reducer，然后直接展现就好；肯能还有一两个漏掉的~~~
+        debugger;
         return Promise.resolve(res.data);
     });
 }

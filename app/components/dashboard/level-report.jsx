@@ -109,6 +109,26 @@ class LevelReport extends React.Component {
 
     }
     render() {
+        return (
+            <div style={{ display: 'inline-block', height: 340, padding: '0 10px 0 0'}}  className='col-lg-4'>
+                {/*<div style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px', position: 'relative'}}>
+                    <div id='schoolReportHeader' onMouseEnter={this.onHeaderMouseEnter} onMouseLeave={this.onHeaderMouseLeave} style={{ height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' }}>
+                        <span style={{ color: '#333', fontSize: 16, marginRight: 10 }}>分档分析报告</span>
+                        <span style={{ float: 'right', color: '#bfbfbf' }}><i className='icon-right-open-2'></i></span>
+                    </div>
+                    <ReactHighcharts config={config} style={{ maxWidth: 330, maxHeight: 235, marginTop:20 }}></ReactHighcharts>
+                </div>
+                */}
+                <div className={dashboardStyle['level-report-img']}></div>
+            </div>
+        )
+    }
+}
+export default Radium(LevelReport);
+
+
+/*
+
         var renderData = _.map(this.props.data, function (levObj, levelKey) {
             var obj = {};
             obj.name = numberMap[levelKey-0+1] + '档';
@@ -154,19 +174,7 @@ class LevelReport extends React.Component {
             }
 
         }
-        return (
-            <div style={{ display: 'inline-block', height: 340, padding: '0 10px 0 0'}}  className='col-lg-4'>
-                {/*<div style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px', position: 'relative'}}>
-                    <div id='schoolReportHeader' onMouseEnter={this.onHeaderMouseEnter} onMouseLeave={this.onHeaderMouseLeave} style={{ height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' }}>
-                        <span style={{ color: '#333', fontSize: 16, marginRight: 10 }}>分档分析报告</span>
-                        <span style={{ float: 'right', color: '#bfbfbf' }}><i className='icon-right-open-2'></i></span>
-                    </div>
-                    <ReactHighcharts config={config} style={{ maxWidth: 330, maxHeight: 235, marginTop:20 }}></ReactHighcharts>
-                </div>
-                */}
-                <div className={dashboardStyle['level-report-img']}></div>
-            </div>
-        )
-    }
-}
-export default Radium(LevelReport);
+
+
+
+ */
