@@ -45,13 +45,16 @@ class App extends React.Component {
             }
         }
     }
-
+    componentDidMount() {
+        var viewPort = this.getViewport();
+        $('#appComp').css({'min-height': viewPort.height})
+    }
     render() {
         var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
-        var viewPort = this.getViewport();
+        
         var currentPath = this.props.location.pathname;
         return (
-            <div style={_.assign({}, {backgroundColor: '#EFF1F4', minHeight: viewPort.height},(currentPath === '/' ? {}: {paddingBottom: 30}))} className={commonStyle['common-font']}>
+            <div id='appComp' style={_.assign({}, {backgroundColor: '#EFF1F4'},(currentPath === '/' ? {}: {paddingBottom: 30}))} className={commonStyle['common-font']}>
                 <Header user={user} actions={this.props.actions}/>
                 <Dialog />
                     {this.props.children}
