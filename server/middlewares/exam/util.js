@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-27 16:58:24
+* @Last Modified time: 2016-07-05 22:16:46
 */
 
 'use strict';
@@ -203,6 +203,8 @@ exports.generateExamScoresInfo = function(exam) {
     //每个学校每个年级都是唯一的（只有一个初一，只有一个初二...），通过年级，获取所有此年级下的所有班级className，通过scores的className key过滤
     return fetchExamScoresById(exam.fetchId).then(function(scoresInfo) {
         //全校此考试(exam)某年级(grade)所有考生总分信息，升序排列
+
+
         var targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
 
         var orderedStudentScoreInfo = _.sortBy(_.concat(..._.values(targetClassesScore)), 'score'); //这个数据结构已经很接近
@@ -240,6 +242,7 @@ function fetchExamScoresById(examid) {
             if(err) return reject(new errors.URIError('查询rank server(scores)失败', err));
             //TODO: 这里当获取到数据错误的时候，服务不会给error status，都会走成功，但是返回的字段里有error属性，因此通过判断error属性来做健壮性判断！
             var data = JSON.parse(body);
+            if(data.error) return reject(new errors.Error('获取rank服务数据错误，examid='+examid));
             var keys = _.keys(data);
             resolve(data[keys[0]]);
         });
