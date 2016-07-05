@@ -46,7 +46,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
             <thead>
                 <tr style={{ backgroundColor: '#fafafa' }}>
                     {
-                        
+
                         firstLineHead.map((headType, index) => {
                             if (_.indexOf(['kaohao', 'name', 'class'], headType) !== -1) {
                                 return (
@@ -446,7 +446,7 @@ class RankReportTableView extends React.Component {
                     })
                 })
                 filteringData = _.values(_.pick(this.props.studentInfos, kaohaoList));
-            } 
+            }
             _.forEach(filteringData, (studentInfo) => {
                 for (var key in studentInfo) {
                     if(studentInfo[key].toString().indexOf(searchStr) !== -1) {
@@ -473,7 +473,7 @@ class RankReportTableView extends React.Component {
         var headType = $target.data('headtype');
         var newSortInfo = {};
         newSortInfo.head = headType;
-        
+
         if (sortInfo.head === headType) {
             if (sortInfo.order === 'asc') {
                 newSortInfo.order = 'desc';
@@ -744,9 +744,6 @@ class RankReport extends React.Component {
     componentDidMount() {
         if (this.props.haveInit) return;
 
-console.log('componentDidMount rank report');
-// debugger;
-
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         this.props.initRankReport(params);
 
@@ -806,11 +803,11 @@ console.log('componentDidMount rank report');
                 _.forEach(studentsArr, (studentObj, index) => {
                     // 记录班级中各个学生的成绩
                     if (classScoreMap[studentObj.score] === undefined) {
-                        classScoreMap[studentObj.score] = {count: 1};    
+                        classScoreMap[studentObj.score] = {count: 1};
                     } else {
                         classScoreMap[studentObj.score].count += 1;
                     }
-                    
+
                     if (scoreMap[studentObj.score] === undefined) {
                         scoreMap[studentObj.score] = {count: 1};
                     } else {

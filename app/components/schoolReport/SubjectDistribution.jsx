@@ -72,7 +72,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
 //这些因为特殊原因出问题的科目记录下来给你给提示。
 
         var {validOrderedSubjectMean, unvalids} = filterMakeOrderedSubjectMean(headers, subjectsMean);
-console.log('unvalids == ', unvalids);
+// console.log('unvalids == ', unvalids); -- 这里打印出（后面考虑给用户提示）被无辜抹掉的科目
 
         //按行横向扫描的各行RowData
         // var tableData = theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers);
