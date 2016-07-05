@@ -62,7 +62,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                         </span>
                                     </th>)
                             }
-                            return <th key={headType} colSpan={counter[headType]} className={commonStyle['table-unit']} style={{height: 40, minWidth: 310, borderBottomWidth: 1, textAlign: 'center'}}>{headerMapper[headType]}</th>
+                            return <th key={headType} colSpan={counter[headType]} className={commonStyle['table-unit']} style={{height: 40, minWidth: 350, borderBottomWidth: 1, textAlign: 'center'}}>{headerMapper[headType]}</th>
                         })
                     }
                 </tr>
