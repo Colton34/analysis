@@ -27,7 +27,7 @@
      line-height: 23px; 
      list-style-type: none;
 }
-.question-item :before {
+.question-dot:before {
     content: "• ";
     color: #999;
     font-size: 18px;
