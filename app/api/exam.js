@@ -146,7 +146,6 @@ export function fetchDashboardData(params) {
     return params.request.get(url).then(function(res) {
         // console.log('=======================  dashboard res.data.keys = ', _.keys(res.data));
         //TODO: 需要赋值给reducer，然后直接展现就好；肯能还有一两个漏掉的~~~
-        debugger;
         return Promise.resolve(res.data);
     });
 }

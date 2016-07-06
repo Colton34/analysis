@@ -113,6 +113,8 @@ class Dashboard extends React.Component {
     render() {
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
+        var schoolReport = (Map.isMap(this.props.dashboard.schoolReport)) ? this.props.dashboard.schoolReport.toJS() : this.props.dashboard.schoolReport;
+
         // var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
         // var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
         var examid = this.props.location.query ? this.props.location.query.examid : '';
@@ -143,7 +145,7 @@ class Dashboard extends React.Component {
                 {/* */}
                 <div className='row' style={{marginTop: 20}}>
                     <ScoreRank data={scoreRank} examid={examid} grade={grade}/>
-                    <SchoolReport examid={examid} grade={grade}/>
+                    <SchoolReport examid={examid} grade={grade} data={schoolReport}/>
                 </div>
                 {/* */}
                 <div className='row' style={{marginTop: 20}}>
