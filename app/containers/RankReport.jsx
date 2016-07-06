@@ -125,7 +125,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                 {
                                     headSeq.map((seqHead, dIndex) => {
                                         if (headSelect[seqHead] === true) {
-                                            return <td key={'tableData-' + index + dIndex} className={commonStyle['table-unit']} style={{height: 40}}>{rowData[seqHead] !== undefined ? rowData[seqHead] : '无数据'}</td>
+                                            return <td key={'tableData-' + index + dIndex} className={commonStyle['table-unit']} style={{height: 40}}>{rowData[seqHead] === Number.NEGATIVE_INFINITY || rowData[seqHead] === Number.POSITIVE_INFINITY ?  '--' : rowData[seqHead]}</td>
                                         }
                                     })
                                 }
@@ -859,6 +859,21 @@ class RankReport extends React.Component {
             })
         })
     }
+
+    handleUndefinedData() {
+        _.forEach(this.studentInfos, (studentInfo, kaohao) => {
+            _.forEach(this.headSeq, head => {
+                if (studentInfo[head] === undefined) {
+                    if (head.indexOf('score') !== -1) {
+                        studentInfo[head] = Number.NEGATIVE_INFINITY;
+                    } else if (head.indexOf('groupRank') !== -1 || head.indexOf('classRank') !== -1) {
+                        studentInfo[head] = Number.POSITIVE_INFINITY;
+                    }
+
+                }
+            })
+        })
+    }
     render() {
         var {examInfo, rankCache} = this.props;
         examInfo = Map.isMap(examInfo) ? examInfo.toJS() : examInfo;
@@ -872,6 +887,7 @@ class RankReport extends React.Component {
         }
         this.getHeadSeq(examInfo);
         this.generateStudentInfos(rankCache);
+        this.handleUndefinedData();
 // console.log('examInfo === ', examInfo);
 // console.log('rankCache === ', rankCache);
 // console.log('this.studentInfos === ', this.studentInfos);
