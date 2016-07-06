@@ -95,7 +95,7 @@ class SchoolReportCard extends React.Component {
                         </span>
                     </div>
                     {/*<div className={dashboardStyle['school-report-img']} style={{marginTop: 30}}></div>*/}
-                    <ReactHighcharts config={config} style={{ width: 535, height: 240, marginTop: 30, zIndex: 5}}></ReactHighcharts>
+                    <ReactHighcharts config={config} style={{ width: 535, height: 240, marginTop: 30}}></ReactHighcharts>
                 </div>
             </div>
         )
