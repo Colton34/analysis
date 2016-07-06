@@ -52,3 +52,11 @@
     height: 173px;
     display: block; 
 }
+
+.video-img-hover {
+   background-image: url(../../images/videoLinkHover.png);
+    background-size: contain;
+    width: 230px;
+    height: 173px;
+    display: block; 
+}

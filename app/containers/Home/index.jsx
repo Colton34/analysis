@@ -75,19 +75,37 @@ const CommonQuestions = () => {
 
 @Radium
 class TeacherHelper extends React.Component {
-
+    constructor() {
+        super();
+        this.state = {
+            videoLinkHover: false
+        }
+    }
     downloadHomeGuidePdf(event) {
         event.preventDefault();
         var path = '/file/download/homeguide';
         saveAs(window.request.defaults.baseURL+path);
     }
 
+    onHoverVideoLink() {
+        this.setState({
+            videoLinkHover: true
+        })
+    }
 
+    onLeaveVideoLink() {
+        this.setState({
+            videoLinkHover: false
+        })
+    }
     render(){
         return (
             <div>
                 <div className={styles.title}>老师助手</div>
-                <a href='/faq?section=intro&sub=introVideo' className={styles['video-img']} ></a>
+                <a  href='/faq?section=intro&sub=introVideo' 
+                    onMouseEnter={this.onHoverVideoLink.bind(this)}
+                    onMouseLeave={this.onLeaveVideoLink.bind(this)} 
+                    className={this.state.videoLinkHover ? styles['video-img-hover'] : styles['video-img']} ></a>
                 <a style={localStyle.downloadBtn}
                     target='_blank'
                     onClick={this.downloadHomeGuidePdf.bind(this)}
