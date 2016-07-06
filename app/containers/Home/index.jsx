@@ -63,7 +63,7 @@ const CommonQuestions = () => {
                         return (
                             <li key={index} style={{ fontSize: 12, display: 'table-row'}} className={styles['question-item']}>
                                 <span className={styles['question-dot']} style={{display: 'table-cell', width: 15}}></span>
-                                <Link to={{pathname: '/faq'}} style={{ textDecoration: 'none', color: '#333', display: 'table-cell', verticalAlign: 'top'}}>{q}</Link>
+                                <Link to={{pathname: '/faq', query: {section: 'questions', sub: 'zidingyi', index: index}}} style={{ textDecoration: 'none', color: '#333', display: 'table-cell', verticalAlign: 'top'}}>{q}</Link>
                             </li>
                         )
                     })
