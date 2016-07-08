@@ -74,17 +74,17 @@ const ScoreRank = ({data, examid, grade}) => {
 */
 
 /**
- * ({data, examid, grade})
+ * props:
+ *  queryOptions: 跳转时的url query
  */
-class ScoreRank extends React.Component {
+class CardHeader extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             hoverLink: false
         }
-        this.scoreMap = {};
     }
-    onHeaderMouseEnter() {
+     onHeaderMouseEnter() {
         this.setState({
             hoverLink: true
         })
@@ -94,6 +94,30 @@ class ScoreRank extends React.Component {
             hoverLink: false
         })
     }
+    render() {
+        return (
+            <Link to={{ pathname: '/rank/report', query: this.props.queryOptions}}
+                onMouseEnter={this.onHeaderMouseEnter.bind(this) }
+                onMouseLeave={this.onHeaderMouseLeave.bind(this) }
+                style={_.assign({}, styles.linkHeader, this.state.hoverLink ? { color: '#27aef8', textDecoration: 'none' } : { color: '#333' }) }>
+                <span style={{ fontSize: 16, marginRight: 10 }}>分数排行榜</span>
+                <span style={{ fontSize: 12 }}>最高分TOP6</span>
+                <span style={_.assign({}, { float: 'right' }, this.state.hoverLink ? { color: '#27aef8' } : { color: '#bfbfbf' }) }>
+                    <i className='icon-right-open-2'></i>
+                </span>
+            </Link>
+        )
+    }
+}
+/**
+ * ({data, examid, grade})
+ */
+class ScoreRank extends React.Component {
+    constructor(props) {
+        super(props);
+        this.scoreMap = {};
+    }
+   
     onClickScoreRank(queryOptions) {
         var targetUrl = '/rank/report?examid=' + queryOptions.examid + (queryOptions.grade ? '&grade=' + queryOptions.grade : '' );
         browserHistory.push(targetUrl);
@@ -127,17 +151,7 @@ class ScoreRank extends React.Component {
         return (
             <div style={{ display: 'inline-block', minHeight: 340, padding: '0 10px 0 0', cursor: 'pointer'}} onClick={this.onClickScoreRank.bind(this, queryOptions)} className='col-md-6'>
                 <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
-                    <Link to={{ pathname: '/rank/report', query: queryOptions }}
-                          onMouseEnter={this.onHeaderMouseEnter.bind(this)}
-                          onMouseLeave={this.onHeaderMouseLeave.bind(this)}
-                          style={_.assign({}, styles.linkHeader, this.state.hoverLink ? {color: '#27aef8', textDecoration: 'none'} : {color: '#333'})}>
-                        <span style={{ fontSize: 16, marginRight: 10 }}>分数排行榜</span>
-                        <span style={{ fontSize: 12 }}>最高分TOP6</span>
-                        <span style={_.assign({},{ float: 'right'}, this.state.hoverLink? {color: '#27aef8'} : {color: '#bfbfbf'})}>
-                            <i className='icon-right-open-2'></i>
-                        </span>
-                    </Link>
-
+                   <CardHeader queryOptions={queryOptions}/>
                     <Table id='topRankTable' responsive style={{ width: '100%', height: '100%', margin: '20px 0 30px 0' }}>
                         <thead>
                             <tr>
