@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-06 06:17:08
+* @Last Modified time: 2016-07-08 11:26:02
 */
 
 'use strict';
@@ -496,7 +496,8 @@ function schoolReport(exam, examScoreArr) {
  * @param  {Number} count [description]
  * @return {[type]}       [description]
  */
-export function makeSegments(end, start = 0, count = 12) {
+function makeSegments(end) {
+    var start = 0, count = 12;
     var step = _.ceil(_.divide(_.subtract(end, start), count));
     var result = _.range(start, end + 1, step);
     if (_.takeRight(result) < end) result.push(end);
@@ -509,7 +510,7 @@ export function makeSegments(end, start = 0, count = 12) {
  * @param  {[type]} segments [description]
  * @return 和segments形成的区间段一一对应的分布数数组
  */
-export function makeSegmentsStudentsCount(students, segments) {
+function makeSegmentsStudentsCount(students, segments) {
     var groupStudentsBySegments = _.groupBy(students, function(item) {
         return findScoreSegmentIndex(segments, item.score);
     });
