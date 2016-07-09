@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-03 19:03:53
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-04 09:05:24
+* @Last Modified time: 2016-07-09 10:32:57
 */
 
 'use strict';
@@ -23,6 +23,8 @@ var casServer = config.casServer;
 var apiUser = `${yjServer}/api/user/fenxi_login.do`;
 var apiUser2 = `${yj2Server}/anno/user/profile`;
 var apiCasValid = `${casServer}/passport/fx/login`;
+
+var tokenKey = new Buffer('462fd506cf7c463caa4bdfa94fad5ea3', 'base64');
 
 exports.getUserInfo = function(name) {
     var result;
@@ -45,7 +47,7 @@ exports.getUserInfo2 = function(name, pwd){
     var result, body, userId;
     var url = buildGetUrl(apiCasValid, {username : name, password : pwd});
 
-    getUserId(url).then(function(userId) {
+    return getUserId(url).then(function(userId) {
         if(!userId) return when.resolve(null);
         var token = jwt.sign({}, tokenKey, { algorithm: 'HS512', jwtid : userId, noTimestamp : false});
         return getUserProfile(token, userId);
