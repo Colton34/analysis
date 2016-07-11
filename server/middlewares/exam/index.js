@@ -2,129 +2,90 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-01 09:44:39
+* @Last Modified time: 2016-07-09 12:30:41
 */
 
 'use strict';
 
+var _ = require('lodash');
+var when = require('when');
+var moment = require('moment');
+require('moment/locale/zh-cn');
+var errors = require('common-errors');
+
+var examUitls = require('./util');
 var peterHFS = require('peter').getManager('hfs');
 var peterFX = require('peter').getManager('fx');
 
-var when = require('when');
-var _ = require('lodash');
-var errors = require('common-errors');
-var examUitls = require('./util');
-var moment = require('moment');
-require('moment/locale/zh-cn');
+/**
+ * 分数排行榜Module的API
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}
+ {
+      examInfo: {
+        name: ,
+        papers: [{pid: , paper: , subject: }]   , //注意要在这里添加 totalScore的信息
+        classes:
+    }
 
-// exports.rankReport = function(req, res, next) {
-//     // var grade = decodeURI(req.query.grade);
-//     // examUitls.filterExam(req.query.examid, grade).then(function(exam) {
-//     //     res.status(200).json(exam);
-//     // });
-
-//     //TODO: 使用这里的数据结构 或者 在rank-server API的scores中添加学生的信息，而不只是分数。但是这里只有总分
-//     //的信息，而没有各科的信息。所以还是需要和schoolAnalysis一样的数据结构。
-
-//     //设计：这里使用和SchoolAnalysis一样的数据结构，这样如果再有相同的需求，则可以考虑将此数据结构作为Common的。
-//     //而且在自定义分析的数据持久化Schema中也是存储的相同的数据结构。
-
-//     var exam = req.exam,
-//         examScoreMap = req.classScoreMap,
-//         examScoreArr = req.orderedScoresArr;
-//     try {
-//         req.examInfo = formatExamInfo(exam);
-//         req.examPapersInfo = generateExamPapersInfo(exam);
-//         req.examClassesInfo = genearteExamClassInfo(exam);
-//     } catch (e) {
-//         next(new errors.Error('schoolAnalysis 同步错误', e));
-//     }
-//     generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo).then(function(examStudentsInfo) {
-//         res.status(200).json({
-//             examInfo: req.examInfo,
-//             examPapersInfo: req.examPapersInfo,
-//             examClassesInfo: req.examClassesInfo,
-//             examStudentsInfo: examStudentsInfo
-//         });
-//     }).catch(function(err) {
-//         next(new errors.Error('schoolAnalysis Error', err));
-//     });
-// }
-
-
-/*
-examInfo: {
-    name: ,
-    papers: [{pid: , paper: , subject: }]   , //注意要在这里添加 totalScore的信息
-    classes:
-}
-
-rankCache: {
-    totalScore: {
-        <className>: [ //已经是有序的（升序）
-            {
-                kaohao: ,
-                name: ,
-                class: ,
-                //score:
-            }
-        ],
+    rankCache: {
+        totalScore: {
+            <className>: [ //已经是有序的（升序）
+                {
+                    kaohao: ,
+                    name: ,
+                    class: ,
+                    //score:
+                }
+            ],
+            ...
+        },
+        <pid>: {
+            <className>: [
+                {
+                    kaohao: ,
+                    name: ,
+                    class: ,
+                    score
+                }
+            ],
+            ...
+        },
         ...
-    },
-    <pid>: {
-        <className>: [
-            {
-                kaohao: ,
-                name: ,
-                class: ,
-                score
-            }
-        ],
-        ...
-    },
-    ...
+    }
 }
-
  */
-
 exports.rankReport = function(req, res, next) {
-    //验证过，有examid和grade
     var grade = decodeURI(req.query.grade);
-    //1.根据exam查找@Exam item，根据grade过滤出有效的paper
-    getValidPaper(req.query.examid, grade).then(function(result) {
-        //2.根据paper的[students]和matrix计算学生的各科成绩
-        // [ {id, kaohao, name, class, score, paper }  ]  -- 整个年级各个学生，各个科目的object
+    filterPapersByGrade(req.query.examid, grade).then(function(result) {
         var papers = result.papers, examName = result.examName;
-        var allStudentsPaperScoreInfo = _.concat(..._.map(papers, (paper) => { //学生不同的科目算作不同条目，因此是重复的学生信息
+        var perStudentPerPaperArr = _.concat(..._.map(papers, (paper) => {
             var scoreMatrix = paper.matrix;
             return _.map(paper['[students]'], (student, index) => {
                 var paperScore = _.sum(scoreMatrix[index]);
                 return _.assign(student, {score: paperScore, paper: paper._id, pid: paper.id });
             });
         }));
-        //先根据学生分组得到其总分
-        var scoreInfoGroupByStudent = _.groupBy(allStudentsPaperScoreInfo, 'id');
-        var allStudentsTotalScoreInfo = _.map(scoreInfoGroupByStudent, (studentPaperInfoArr, studentId) => {
-            //把总分信息添加上去
-            // var totalScore = _.sum(studentPaperInfoArr, (s) => s.paperScore);
-            var totalScore = _.sum(_.map(studentPaperInfoArr, (s) => s.score));
-            var studentBaseInfo = _.pick(studentPaperInfoArr[0], ['id', 'kaohao', 'name', 'class', 'school', 'xuehao']);
-            return _.assign(studentBaseInfo, {score: totalScore, paper: 'totalScore', id: 'totalScore'});
+        var paperStudentMap = _.groupBy(perStudentPerPaperArr, 'id');
+        var perStudentTotalScoreArr = _.map(paperStudentMap, (studentPapersArr, studentId) => {
+            var totalScore = _.sum(_.map(studentPapersArr, (s) => s.score));
+            var studentBaseInfo = _.pick(studentPapersArr[0], ['id', 'kaohao', 'name', 'class', 'school', 'xuehao']);
+            return _.assign({score: totalScore, paper: 'totalScore', id: 'totalScore'}, studentBaseInfo);
         });
 
-        var allStudentsScoreInfo = _.concat(allStudentsPaperScoreInfo, allStudentsTotalScoreInfo);
-        var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
+        var studentScoresArr = _.concat(perStudentPerPaperArr, perStudentTotalScoreArr);
+        var studentScoresPaperMap = _.groupBy(studentScoresArr, 'paper');
         var rankCache = {};
-        _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperId) => {
-            //这里面都是当前科目的分数
-            rankCache[paperId] = _.groupBy(studentsScoreInfoArr, 'class');
+        _.each(studentScoresPaperMap, (studentsScoreItemArr, paperId) => {
+            rankCache[paperId] = _.groupBy(studentsScoreItemArr, 'class');
         });
 
-        //组织examInfo的信息：
         var examPapers = _.map(papers, (paperObj) => {
             return {paper: paperObj._id, pid: paperObj.id, name: paperObj.subject};
         });
-        var examClasses = _.keys(_.groupBy(allStudentsTotalScoreInfo, 'class'));  //总分肯定是包含全部学生的，所以没必要使用allStudentsScoreInfo。
+        var examClasses = _.keys(_.groupBy(perStudentTotalScoreArr, 'class'));
         var examInfo = {
             name: examName,
             papers: examPapers,
@@ -218,17 +179,21 @@ exports.customRankReport = function(req, res, next) {
     })
 }
 
-function getValidPaper(examid, gradeName) {
+/**
+ * //根据examid获取到一个exam。并保证此exam种所有的papers来自同一个grade。
+ * @param  {[type]} examid    目标exam的id
+ * @param  {[type]} gradeName  过滤条件grade value
+ * @return {[type]}           {papers: <所查找的exam下的，并且同属于一个年级的，并且是paper对象>, examName: <exam name>}
+ */
+function filterPapersByGrade(examid, gradeName) {
     var targetExam;
     return when.promise(function(resolve, reject) {
         peterHFS.get('@Exam.'+examid, function(err, exam) {
-            if(err) return reject(new errors.data.MongoDBError('find exam error : ', err));
-            //过滤paper
+            if(err) return reject(new errors.data.MongoDBError('[filterPapersByGrade] Error ', err));
             targetExam = exam;
             resolve(_.filter(exam['[papers]'], (paper) => paper.grade == gradeName));
         });
     }).then(function(validPapers) {
-        //查找补全实体信息
         var paperIds = _.map(validPapers, (paperObj) => paperObj.paper);
         var paperPromises = _.map(paperIds, (pObjId) => {
             return when.promise(function(resolve, reject) {

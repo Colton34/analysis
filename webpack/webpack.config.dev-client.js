@@ -2,10 +2,7 @@ var path = require('path');
 var webpack = require('webpack');
 var assetsPath = path.join(__dirname, '..', 'public', 'assets');
 var hotMiddlewareScript = 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true';
-
-// 使用代码压缩加快编译速度
 var node_modules_path = path.resolve(__dirname, '..', 'node_modules');
-// var pathToReact = path.resolve(node_modules_path, 'react/dist/react.min.js');
 
 var commonLoaders = [
     {
