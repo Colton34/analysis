@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-01 09:44:39
+* @Last Modified time: 2016-07-08 11:26:02
 */
 
 'use strict';
@@ -454,14 +454,16 @@ exports.dashboard = function(req, res, next) {
     try {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
-        var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
-        var classScoreReportResult = classScoreReport(examScoreArr, examScoreMap);
+        var schoolReportResult = schoolReport(exam, examScoreArr);
+        // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
+        // var classScoreReportResult = classScoreReport(examScoreArr, examScoreMap);
 
         res.status(200).json({
             examInfoGuide: examInfoGuideResult,
             scoreRank: scoreRankResult,
-            levelScoreReport: levelScoreReportResult,
-            classScoreReport: classScoreReportResult
+            schoolReport: schoolReportResult
+            // levelScoreReport: levelScoreReportResult,
+            // classScoreReport: classScoreReportResult
         });
     } catch (e) {
         next(new errors.Error('format dashboard error : ', e));
@@ -473,6 +475,73 @@ exports.dashboard = function(req, res, next) {
     //     next(err);
     // });
     // var studentSelfReportResult = studentSelfReport(examScoreArr);
+}
+
+function schoolReport(exam, examScoreArr) {
+    var segments = makeSegments(exam.fullMark);
+
+    var xAxons = _.slice(segments, 1);
+    var yAxons = makeSegmentsStudentsCount(examScoreArr, segments);
+
+    return {
+        'x-axon': xAxons,
+        'y-axon': yAxons
+    }
+}
+
+/**
+ * 创建segments。这里count是区间段的个数，所以segments.length = count + 1(自动填充了最后的end值)
+ * @param  {[type]} end   [description]
+ * @param  {Number} start [description]
+ * @param  {Number} count [description]
+ * @return {[type]}       [description]
+ */
+function makeSegments(end) {
+    var start = 0, count = 12;
+    var step = _.ceil(_.divide(_.subtract(end, start), count));
+    var result = _.range(start, end + 1, step);
+    if (_.takeRight(result) < end) result.push(end);
+    return result;
+}
+
+/**
+ * 获取所给学生(students)在 由segments形成的总分（因为这里取得是student.score--可以扩展）区间段中 的分布（个数）
+ * @param  {[type]} students [description]
+ * @param  {[type]} segments [description]
+ * @return 和segments形成的区间段一一对应的分布数数组
+ */
+function makeSegmentsStudentsCount(students, segments) {
+    var groupStudentsBySegments = _.groupBy(students, function(item) {
+        return findScoreSegmentIndex(segments, item.score);
+    });
+
+    //(_.range(segments-1))来保证肯定生成与区间段数目（segments.length-1--即横轴或Table的一行）相同的个数，没有则填充0，这样才能对齐
+    //这里已经将 levelKey = -1 和 levelKey = segments.length-1 给过滤掉了
+    var result = _.map(_.range(segments.length - 1), function(index) {
+        return (groupStudentsBySegments[index]) ? groupStudentsBySegments[index].length : 0
+    });
+
+    return result;
+}
+
+
+/*
+Note: 注意这里有可能返回-1（比最小值还要小）和(segments.legnth-1)（比最大值还大）。[0~segment.length-2]是正确的值
+ */
+function findScoreSegmentIndex(segments, des) {
+    var low = 0,
+        high = segments.length - 1;
+    while (low <= high) {
+        var middle = _.ceil((low + high) / 2);
+        if (des == segments[middle]) {
+            return (des == segments[0]) ? middle : middle - 1;
+        } else if (des < segments[middle]) {
+            high = middle - 1;　　
+        } else {
+            low = middle + 1;
+        }
+    }
+    return high; //取high是受segments的内容影响的
 }
 
 exports.customDashboard = function(req, res, next) {
@@ -487,19 +556,36 @@ exports.customDashboard = function(req, res, next) {
         try {
             var customExamInfoGuideResult = customExamInfoGuide(exam.info);
             var customScoreRankResult = customScoreRank(exam);
-            var customLevelScoreReportResult = customLevelScoreReport(exam);
-            var customClassScoreReportResult = customClassScoreReport(exam);
+            var customSchoolReportResult = customExamSchoolReport(exam);
+            // var customLevelScoreReportResult = customLevelScoreReport(exam);
+            // var customClassScoreReportResult = customClassScoreReport(exam);
 
             res.status(200).json({
                 examInfoGuide: customExamInfoGuideResult,
                 scoreRank: customScoreRankResult,
-                levelScoreReport: customLevelScoreReportResult,
-                classScoreReport: customClassScoreReportResult
+                schoolReport: customSchoolReportResult
+                // levelScoreReport: customLevelScoreReportResult,
+                // classScoreReport: customClassScoreReportResult
             })
         } catch(e) {
             next(new errors.Error('format custom dashboard error: ', e));
         }
     })
+}
+
+function customExamSchoolReport(exam) {
+    var examInfo = exam.info;
+    var examStudentsInfo = exam['[studentsInfo]'];
+
+    var segments = makeSegments(examInfo.fullMark);
+
+    var xAxons = _.slice(segments, 1);
+    var yAxons = makeSegmentsStudentsCount(examStudentsInfo, segments);
+
+    return {
+        'x-axon': xAxons,
+        'y-axon': yAxons
+    };
 }
 
 function customExamInfoGuide(examInfo) {

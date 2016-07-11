@@ -7,8 +7,8 @@ import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
 import dashboardStyle from './dashboard.css';
 
-const ClassReport = ({data}) => {
-    
+const ClassReport = () => {
+
     // 暂时注释掉以下config的计算，用静态图片代替highchart整个卡片。
     // var classNames = _.map(data['top5ClassesMean'], (obj) => obj.name+'班');
     // var gradeMeans = _.range(classNames.length).map(num => {

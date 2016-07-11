@@ -113,13 +113,15 @@ class Dashboard extends React.Component {
     render() {
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
-        var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
-        var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
+        var schoolReport = (Map.isMap(this.props.dashboard.schoolReport)) ? this.props.dashboard.schoolReport.toJS() : this.props.dashboard.schoolReport;
+
+        // var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
+        // var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) return;
         var grade = this.props.location.query.grade || '';
-        if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) ||
-            (!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0) || this.state.loading)
+        if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) || this.state.loading)
+            //(!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0)
             return (
                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
                     <Spinkit/>
@@ -131,25 +133,25 @@ class Dashboard extends React.Component {
                     <Link to={{pathname: '/'}} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{color: '#59bde5'}}></i></Link>
                     <span style={{ fontSize: 14,color: '#333', marginLeft: 20}}><a style={{color: '#b4b4b4'}} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> {examInfoGuide.name}</span>
                     {
-                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ? 
+                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ?
                         <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>
                             <i className='icon-delete'></i>删除
                         </a> : ''
                     }
                 </div>
                 <ExamGuideComponent data={examInfoGuide} />
-                
-            
+
+
                 {/* */}
                 <div className='row' style={{marginTop: 20}}>
                     <ScoreRank data={scoreRank} examid={examid} grade={grade}/>
-                    <SchoolReport examid={examid} grade={grade}/>
+                    <SchoolReport examid={examid} grade={grade} data={schoolReport}/>
                 </div>
                 {/* */}
                 <div className='row' style={{marginTop: 20}}>
-                    <LevelReport data={levelScoreReport}/>
-                    <SubjectReport/>
-                    <ClassReport data={classScoreReport}/>
+                    <LevelReport />
+                    <SubjectReport />
+                    <ClassReport />
                 </div>
                 {/**
                     <div style={[styles.box, styles.common.radius]}>
@@ -203,7 +205,7 @@ class Dashboard extends React.Component {
                     </div>
                 </div>
                  */}
-                
+
                 <Dialog show={this.state.showConfirmDialog} onHide={this.onHideDialog.bind(this)} onConfirm={this.onDeleteAnalysis.bind(this)}/>
             </div>
         );
