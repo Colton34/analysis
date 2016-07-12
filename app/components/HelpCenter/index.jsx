@@ -8,7 +8,7 @@ class HelpCenter extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            active: {section: 'questions', sub: 'zidingyi'}
+            active: {section: 'questions', sub: 'zidingyi', index: -1}
         }
     }
     onClickSubTitle(id, event) {
@@ -23,6 +23,7 @@ class HelpCenter extends React.Component {
         })
     }
     onClickQuestionItem(e) {
+        
         var $target = $(e.target);
         if($target.hasClass('active')) {
             $target.removeClass('active').siblings('div').hide()
@@ -34,7 +35,9 @@ class HelpCenter extends React.Component {
         var queries = this.props.location.query;
         if(queries.section && queries.sub) {
             this.setState({
-                active: {section: queries.section, sub: queries.sub}
+                active: {section: queries.section, sub: queries.sub, index: queries.index ? queries.index : -1}
+            }, ()=> {
+                console.log('state:' + JSON.stringify(this.state))
             })
         }
     }
@@ -88,11 +91,11 @@ class HelpCenter extends React.Component {
                                     sectionInfos[activeSection]['sub'][activeSub].list.map((item, index) => {
                                         return (
                                             <li key={'content-' + index}style={{ padding: '19px 0', borderBottom: '1px solid #f2f2f2' }}>
-                                                <p onClick={this.onClickQuestionItem}style={{ position: 'relative', cursor: 'pointer', margin: 0}}>
+                                                <p onClick={this.onClickQuestionItem} style={{ position: 'relative', cursor: 'pointer', margin: 0}} className={this.state.active.index == index ? 'active': ''}>
                                                     <i className={localClass['qicon']} ></i>
                                                     {item.title}
                                                 </p>
-                                                <div style={{ marginTop: 15, display: 'none' }}>
+                                                <div style={_.assign({},{ marginTop: 15}, this.state.active.index == index ? {display: 'block'} : {display: 'none'})}>
                                                 {
                                                     item.content.map((paragraph,index) => {
                                                         return <p key={item.title + '-p' + index} style={{color: '#979797'}}>{paragraph}</p>

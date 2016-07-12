@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-12 20:47:52
+* @Last Modified time: 2016-07-12 21:15:27
 */
 
 'use strict';
@@ -55,7 +55,7 @@ exports.home = function(req, res, next) {
  * @param  {Function} next [description]
  * @return {[type]}        [description]
  */
-exports.dashboard = function(req, res, next) {
+ exports.dashboard = function(req, res, next) {
     var exam = req.exam,
         examScoreMap = req.classScoreMap,
         examScoreArr = req.orderedScoresArr;
@@ -63,14 +63,16 @@ exports.dashboard = function(req, res, next) {
     try {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
-        var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
-        var classScoreReportResult = classScoreReport(examScoreArr, examScoreMap);
+        var schoolReportResult = schoolReport(exam, examScoreArr);
+        // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
+        // var classScoreReportResult = classScoreReport(examScoreArr, examScoreMap);
 
         res.status(200).json({
             examInfoGuide: examInfoGuideResult,
             scoreRank: scoreRankResult,
-            levelScoreReport: levelScoreReportResult,
-            classScoreReport: classScoreReportResult
+            schoolReport: schoolReportResult
+            // levelScoreReport: levelScoreReportResult,
+            // classScoreReport: classScoreReportResult
         });
     } catch (e) {
         next(new errors.Error('format dashboard error : ', e));
@@ -95,14 +97,16 @@ exports.customDashboard = function(req, res, next) {
         try {
             var customExamInfoGuideResult = customExamInfoGuide(exam.info);
             var customScoreRankResult = customScoreRank(exam);
-            var customLevelScoreReportResult = customLevelScoreReport(exam);
-            var customClassScoreReportResult = customClassScoreReport(exam);
+            var customSchoolReportResult = customExamSchoolReport(exam);
+            // var customLevelScoreReportResult = customLevelScoreReport(exam);
+            // var customClassScoreReportResult = customClassScoreReport(exam);
 
             res.status(200).json({
                 examInfoGuide: customExamInfoGuideResult,
                 scoreRank: customScoreRankResult,
-                levelScoreReport: customLevelScoreReportResult,
-                classScoreReport: customClassScoreReportResult
+                schoolReport: customSchoolReportResult
+                // levelScoreReport: customLevelScoreReportResult,
+                // classScoreReport: customClassScoreReportResult
             })
         } catch(e) {
             next(new errors.Error('format custom dashboard error: ', e));
@@ -572,38 +576,111 @@ function scoreRank(examScoreArr) {
 }
 
 /**
+ * 阅卷Dashboard校级报告模块
+ * @param  {[type]} exam         [description]
+ * @param  {[type]} examScoreArr [description]
+ * @return {[type]}              [description]
+ * 和校级报告详情的总分趋势的接口相同
+ */
+function schoolReport(exam, examScoreArr) {
+    var segments = makeSegments(exam.fullMark);
+    var xAxons = _.slice(segments, 1);
+    var yAxons = makeSegmentsStudentsCount(examScoreArr, segments);
+
+    return {
+        'x-axon': xAxons,
+        'y-axon': yAxons
+    }
+}
+
+/**
+ * 创建segments。这里count是区间段的个数，所以segments.length = count + 1(自动填充了最后的end值)
+ * @param  {[type]} end   [description]
+ * @param  {Number} start [description]
+ * @param  {Number} count [description]
+ * @return {[type]}       [description]
+ */
+function makeSegments(end) {
+    var start = 0, count = 12;
+    var step = _.ceil(_.divide(_.subtract(end, start), count));
+    var result = _.range(start, end + 1, step);
+    if (_.takeRight(result) < end) result.push(end);
+    return result;
+}
+
+/**
+ * 获取所给学生(students)在 由segments形成的总分（因为这里取得是student.score--可以扩展）区间段中 的分布（个数）
+ * @param  {[type]} students [description]
+ * @param  {[type]} segments [description]
+ * @return 和segments形成的区间段一一对应的分布数数组
+ */
+function makeSegmentsStudentsCount(students, segments) {
+    var groupStudentsBySegments = _.groupBy(students, function(item) {
+        return findScoreSegmentIndex(segments, item.score);
+    });
+
+    //(_.range(segments-1))来保证肯定生成与区间段数目（segments.length-1--即横轴或Table的一行）相同的个数，没有则填充0，这样才能对齐
+    //这里已经将 levelKey = -1 和 levelKey = segments.length-1 给过滤掉了
+    var result = _.map(_.range(segments.length - 1), function(index) {
+        return (groupStudentsBySegments[index]) ? groupStudentsBySegments[index].length : 0
+    });
+
+    return result;
+}
+
+
+/*
+Note: 注意这里有可能返回-1（比最小值还要小）和(segments.legnth-1)（比最大值还大）。[0~segment.length-2]是正确的值
+ */
+function findScoreSegmentIndex(segments, des) {
+    var low = 0,
+        high = segments.length - 1;
+    while (low <= high) {
+        var middle = _.ceil((low + high) / 2);
+        if (des == segments[middle]) {
+            return (des == segments[0]) ? middle : middle - 1;
+        } else if (des < segments[middle]) {
+            high = middle - 1;　　
+        } else {
+            low = middle + 1;
+        }
+    }
+    return high; //取high是受segments的内容影响的
+}
+
+/**
  * 一般阅卷Dashboard的分档模块。按照默认的分档标准进行分档划分。Note: 注意这里是按照百分比的常量进行计算的--这样不受总分的影响。
  * @param  {[type]} exam         [description]
  * @param  {[type]} examScoreArr [description]
  * @return {[type]}              [description]
  */
-function levelScoreReport(exam, examScoreArr) {
-    var levels = {
-        0: {
-            score: 0,
-            count: 0,
-            percentage: 15
-        },
-        1: {
-            score: 0,
-            count: 0,
-            percentage: 25
-        },
-        2: {
-            score: 0,
-            count: 0,
-            percentage: 60
-        }
-    };
+// function levelScoreReport(exam, examScoreArr) {
+//     var levels = {
+//         0: {
+//             score: 0,
+//             count: 0,
+//             percentage: 15
+//         },
+//         1: {
+//             score: 0,
+//             count: 0,
+//             percentage: 25
+//         },
+//         2: {
+//             score: 0,
+//             count: 0,
+//             percentage: 60
+//         }
+//     };
 
-    var totalStudentCount = exam.realStudentsCount;
-    _.each(levels, (levObj, levelKey) => {
-        levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
-        var targetStudent = _.takeRight(examScoreArr, levObj.count)[0];
-        levObj.score = targetStudent ? targetStudent.score : 0;
-    });
-    return levels;
-}
+//     var totalStudentCount = exam.realStudentsCount;
+//     _.each(levels, (levObj, levelKey) => {
+//         levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
+//         var targetStudent = _.takeRight(examScoreArr, levObj.count)[0];
+//         levObj.score = targetStudent ? targetStudent.score : 0;
+//     });
+//     return levels;
+// }
 
 /**
  * 一般阅卷Dashboard的班级报告API。
@@ -611,23 +688,23 @@ function levelScoreReport(exam, examScoreArr) {
  * @param  {[type]} examScoreMap [description]
  * @return {[type]}              [description]
  */
-function classScoreReport(examScoreArr, examScoreMap) {
-    var scoreMean = _.round(_.mean(_.map(examScoreArr, (scoreObj) => scoreObj.score)), 2);
-    var classesMean = _.map(examScoreMap, (classesScore, className) => {
-        return {
-            name: className,
-            mean: _.round(_.mean(_.map(classesScore, (scoreObj) => scoreObj.score)), 2)
-        }
-    });
-    var orderedClassesMean = _.sortBy(classesMean, 'mean');
-    return {
-        gradeMean: scoreMean,
-        top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
-    };
-}
+// function classScoreReport(examScoreArr, examScoreMap) {
+//     var scoreMean = _.round(_.mean(_.map(examScoreArr, (scoreObj) => scoreObj.score)), 2);
+//     var classesMean = _.map(examScoreMap, (classesScore, className) => {
+//         return {
+//             name: className,
+//             mean: _.round(_.mean(_.map(classesScore, (scoreObj) => scoreObj.score)), 2)
+//         }
+//     });
+//     var orderedClassesMean = _.sortBy(classesMean, 'mean');
+//     return {
+//         gradeMean: scoreMean,
+//         top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
+//     };
+// }
 
 /**
- * 自定义的格式化examInfo
+ * 自定义分析Dashboard总体概览模块
  * @param  {[type]} examInfo [description]
  * @return {[type]}          [description]
  */
@@ -643,7 +720,7 @@ function customExamInfoGuide(examInfo) {
 }
 
 /**
- * 自定义分析Dashboard排行榜的API
+ * 自定义分析Dashboard排行榜模块
  * @param  {[type]} exam [description]
  * @return {[type]}      [description]
  */
@@ -653,6 +730,26 @@ function customScoreRank(exam) {
         top: _.reverse(_.takeRight(examStudentsInfo, 6)),
         low: _.reverse(_.take(examStudentsInfo, 6))
     }
+}
+
+/**
+ * 自定义分析Dashboard校级报告模块
+ * @param  {[type]} exam [description]
+ * @return {[type]}      [description]
+ */
+function customExamSchoolReport(exam) {
+    var examInfo = exam.info;
+    var examStudentsInfo = exam['[studentsInfo]'];
+
+    var segments = makeSegments(examInfo.fullMark);
+
+    var xAxons = _.slice(segments, 1);
+    var yAxons = makeSegmentsStudentsCount(examStudentsInfo, segments);
+
+    return {
+        'x-axon': xAxons,
+        'y-axon': yAxons
+    };
 }
 
 /**

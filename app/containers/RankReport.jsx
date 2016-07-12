@@ -14,6 +14,7 @@ import Spinkit from '../common/Spinkit';
 
 import {tableExport} from '../lib/tableExporter';
 import Radium from 'radium';
+import {B03} from '../lib/constants'; 
 
 var headerMapper = {
     kaohao: '考号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '排名', classRank: '班级排名', score: '分数'
@@ -125,7 +126,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                 {
                                     headSeq.map((seqHead, dIndex) => {
                                         if (headSelect[seqHead] === true) {
-                                            return <td key={'tableData-' + index + dIndex} className={commonStyle['table-unit']} style={{height: 40}}>{rowData[seqHead] !== undefined ? rowData[seqHead] : '无数据'}</td>
+                                            return <td key={'tableData-' + index + dIndex} className={commonStyle['table-unit']} style={{height: 40}}>{rowData[seqHead] === Number.NEGATIVE_INFINITY || rowData[seqHead] === Number.POSITIVE_INFINITY ?  '--' : rowData[seqHead]}</td>
                                         }
                                     })
                                 }
@@ -503,11 +504,9 @@ class RankReportTableView extends React.Component {
         var dataBegin = pageIndex * pageSize + 1;
         var dataEnd = (pageIndex + 1) * pageSize < showData.length ? (pageIndex + 1) * pageSize : showData.length;
 
-// debugger;
 
 
         var theRowDatas = this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
-        // debugger;
         return (
             <div style={{ margin: '30px 30px 30px 35px' }}>
                 <div style={{border: '1px solid #eeeeee', padding: '5px 30px 0 30px'}}>
@@ -730,6 +729,31 @@ class Pagination extends React.Component {
         )
     }
 }
+/**
+ * props:
+ * examInfo,
+ * targetUrl
+ */
+@Radium
+class PageHeader extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    onClickExamName(url) {
+        location.href = url; 
+    }
+    render() {
+        var {examInfo, targetUrl} = this.props;
+        return (
+            <div style={{ paddingLeft: 30, backgroundColor: '#fafafa', height: 50, lineHeight: '50px' }}>
+                <a href={targetUrl} style={{ fontSize: 12, textDecoration: 'none', color: '#59bde5', float: 'left' }}><i className='icon-fanhui2' style={{color: '#59bde5', fontSize: 16}}></i></a>
+                <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span onClick={this.onClickExamName.bind(this, targetUrl)} style={localStyle.examName}>{examInfo.name + ' > '}</span>分数排行榜</span>
+            </div>
+        )
+        
+    }
+}
+
 class RankReport extends React.Component {
     static need = [
         initRankReportAction
@@ -859,6 +883,21 @@ class RankReport extends React.Component {
             })
         })
     }
+
+    handleUndefinedData() {
+        _.forEach(this.studentInfos, (studentInfo, kaohao) => {
+            _.forEach(this.headSeq, head => {
+                if (studentInfo[head] === undefined) {
+                    if (head.indexOf('score') !== -1) {
+                        studentInfo[head] = Number.NEGATIVE_INFINITY;
+                    } else if (head.indexOf('groupRank') !== -1 || head.indexOf('classRank') !== -1) {
+                        studentInfo[head] = Number.POSITIVE_INFINITY;
+                    }
+
+                }
+            })
+        })
+    }
     render() {
         var {examInfo, rankCache} = this.props;
         examInfo = Map.isMap(examInfo) ? examInfo.toJS() : examInfo;
@@ -872,6 +911,7 @@ class RankReport extends React.Component {
         }
         this.getHeadSeq(examInfo);
         this.generateStudentInfos(rankCache);
+        this.handleUndefinedData();
 // console.log('examInfo === ', examInfo);
 // console.log('rankCache === ', rankCache);
 // console.log('this.studentInfos === ', this.studentInfos);
@@ -883,10 +923,7 @@ class RankReport extends React.Component {
 
         return (
             <div style={{ width: 1200, minHeight: 830, backgroundColor: '#fff', margin: '0 auto', marginTop: 30 }}>
-                <div style={{ paddingLeft: 30, backgroundColor: '#fafafa', height: 50, lineHeight: '50px' }}>
-                    <a href={targetUrl} style={{ fontSize: 12, textDecoration: 'none', color: '#59bde5', float: 'left' }}><i className='icon-fanhui2' style={{color: '#59bde5', fontSize: 16}}></i></a>
-                    <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span style={{color: '#b4b4b4'}}>{examInfo.name + ' > '}</span>分数排行榜</span>
-                </div>
+                <PageHeader examInfo={examInfo} targetUrl={targetUrl}/>
                 <RankReportTableView
                     examInfo={examInfo}
                     rankCache={rankCache}
@@ -929,7 +966,11 @@ var localStyle = {
         ':hover': {backgroundColor: '#f2f2f2'}
     },
     pageShortcut: {display: 'inline-block', width: 30, heigth: 30, border:'1px solid #eee', color: '#bfbfbf', marginRight:6, lineHeight:'30px', textAlign: 'center', cursor: 'pointer'},
-    sortDirection: { width: 10, height: 20, position: 'absolute', top: '50%', right: '10%', marginTop: -14}
+    sortDirection: { width: 10, height: 20, position: 'absolute', top: '50%', right: '10%', marginTop: -14},
+    examName: {
+        color: '#b4b4b4', cursor: 'pointer',
+        ':hover': {color: B03}
+    }
 }
 //根据当前选中的班级，科目，搜索，隐藏列，显示多少条记录，currentPage的时候要重新渲染table
 

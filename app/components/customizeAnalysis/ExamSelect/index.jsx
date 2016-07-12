@@ -489,7 +489,7 @@ class ExamSelect extends React.Component {
                             }
                         </div>
                     </div>
-                    <div className={'col-md-7'}>
+                    <div className={'col-md-7'} style={{paddingRight: 0}}>
                         <div style={{ marginBottom: 20, position: 'relative'}}>
                             {
                                 this.props.isLiankao ?
@@ -524,15 +524,16 @@ class ExamSelect extends React.Component {
                                                 {currentPapers[paperId].origin === PAPER_ORIGIN.upload ? <span style={localStyle.paperDelBtn} key={paperId} data-paperid={paperId} onClick={this.onDelUploadPaper.bind(this)}>删除</span>:''}
                                             </div>
                                             <div id={'qlist-' + paperId} style={{ overflow: 'auto' }}>
-                                                <ul>
+                                                <ul style={{paddingLeft: 0}}>
                                                     {
                                                         currentPapers[paperId].oriSQM.x.map((questionInfo, index) => {
                                                             return (
                                                                 <li key={'question-list-item-' + index} className={ownClassNames['question-list-item']}>
-                                                                    <input  type="checkbox" id={'qlist-item-' + paperId + '-' + questionInfo.name} ref={'qlist-item-' + paperId + '-' + questionInfo.name} value={paperId + '-' +
-                                                                        questionInfo.name} onChange={this.onCheckQuestion.bind(this, 'qlist-item-' + paperId + '-' + questionInfo.name) } checked={questionInfo.selected || questionInfo.selected === undefined ? true : false}/>
-                                                                    <label for={'qlist-item-' + paperId + ' ' + questionInfo.name } />
-                                                                    <span>{questionInfo.name}</span>
+                                                                    
+                                                                        <input  style={{verticalAlign: 'middle', marginTop: -10, marginRight: 2}} type="checkbox" id={'qlist-item-' + paperId + '-' + questionInfo.name} ref={'qlist-item-' + paperId + '-' + questionInfo.name} value={paperId + '-' + questionInfo.name} onChange={this.onCheckQuestion.bind(this, 'qlist-item-' + paperId + '-' + questionInfo.name) } checked={questionInfo.selected || questionInfo.selected === undefined ? true : false}/>
+                                                                        <label for={'qlist-item-' + paperId + ' ' + questionInfo.name } />
+                                                                        <span title={questionInfo.name} style={{display: 'inline-block', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', width: 63}}>{questionInfo.name}</span>
+                                                                    
                                                                 </li>
                                                             )
                                                         })

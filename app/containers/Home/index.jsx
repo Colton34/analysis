@@ -61,8 +61,9 @@ const CommonQuestions = () => {
                 {
                     questionList.map((q, index) => {
                         return (
-                            <li key={index} style={{ fontSize: 12 }} className={styles['question-item']}>
-                                <Link to={{pathname: '/faq'}} style={{ textDecoration: 'none', color: '#333' }}>{q}</Link>
+                            <li key={index} style={{ fontSize: 12, display: 'table-row'}} className={styles['question-item']}>
+                                <span className={styles['question-dot']} style={{display: 'table-cell', width: 15}}></span>
+                                <Link to={{pathname: '/faq', query: {section: 'questions', sub: 'zidingyi', index: index}}} style={{ textDecoration: 'none', color: '#333', display: 'table-cell', verticalAlign: 'top'}}>{q}</Link>
                             </li>
                         )
                     })
@@ -74,19 +75,37 @@ const CommonQuestions = () => {
 
 @Radium
 class TeacherHelper extends React.Component {
-
+    constructor() {
+        super();
+        this.state = {
+            videoLinkHover: false
+        }
+    }
     downloadHomeGuidePdf(event) {
         event.preventDefault();
         var path = '/file/download/homeguide';
         saveAs(window.request.defaults.baseURL+path);
     }
 
+    onHoverVideoLink() {
+        this.setState({
+            videoLinkHover: true
+        })
+    }
 
+    onLeaveVideoLink() {
+        this.setState({
+            videoLinkHover: false
+        })
+    }
     render(){
         return (
             <div>
                 <div className={styles.title}>老师助手</div>
-                <a href='/faq?section=intro&sub=introVideo' className={styles['video-img']} ></a>
+                <a  href='/faq?section=intro&sub=introVideo' 
+                    onMouseEnter={this.onHoverVideoLink.bind(this)}
+                    onMouseLeave={this.onLeaveVideoLink.bind(this)} 
+                    className={this.state.videoLinkHover ? styles['video-img-hover'] : styles['video-img']} ></a>
                 <a style={localStyle.downloadBtn}
                     target='_blank'
                     onClick={this.downloadHomeGuidePdf.bind(this)}
