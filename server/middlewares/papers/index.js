@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-30 19:57:47
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-09 11:52:33
+* @Last Modified time: 2016-07-12 19:44:20
 */
 
 'use strict';
@@ -12,7 +12,6 @@ var errors = require('common-errors');
 var peterHFS = require('peter').getManager('hfs');
 var peterFX = require('peter').getManager('fx');
 
-
 exports.fetchPaper = function (req, res, next) {
     req.checkParams('paperId', '无效的paperId').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
@@ -21,7 +20,6 @@ exports.fetchPaper = function (req, res, next) {
         if(err) return next(new errors.data.MongoDBError(': '+req.params.paperId+' Error', err));
         res.status(200).json({
             id: paper._id,
-            pid: paper.id,  //这个值也用不到了，可以删除--因为是插入，所以pid是生成的，但是这里又没有@Paper，所以这里是mock的id
             // answers: paper.answers, //TODO: 设计关于answers的存储
             x: paper['[questions]'],
             y: paper['[students]'],
