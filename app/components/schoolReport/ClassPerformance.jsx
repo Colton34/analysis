@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Table from '../../common/Table';
 import DropdownList from '../../common/DropdownList';
 
-import {makeSegments, makeFactor, makeSegmentsStudentsCount} from '../../api/exam';
+import {makeSegments, makeFactor, makeSegmentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap} from '../../lib/constants';
 
 import styles from '../../common/common.css';
@@ -297,7 +297,7 @@ function theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, currentC
 //只有班级没有全校！！！
     var yAxonses = _.map(currentClasses, (classItem) => {
         var students = examStudentsGroupByClass[classItem.key];
-        var yAxons = makeSegmentsStudentsCount(students, segments);
+        var yAxons = makeSegmentsCount(students, segments);
         return {
             name: classItem.value,
             data: yAxons

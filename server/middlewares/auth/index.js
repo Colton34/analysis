@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-09 11:18:35
+* @Last Modified time: 2016-07-13 16:10:22
 */
 
 'use strict';
@@ -21,7 +21,26 @@ var authUitls = require('./util');
 var config = require('../../config/env');
 var peterHFS = require('peter').getManager('hfs');
 
-//登录服务来自阅卷，并且分两个源查找验证
+/**
+ * 登录的验证。验证的逻辑调用的是阅卷通用的登录接口--包含两部分：先尝试查找1.5，没有找到再
+ * 尝试查找2.0。
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}
+req.user 接口：
+{
+    areaId: xxx,
+    id: xxx,
+    name: xxx,
+    permissionType: xxx,
+    realName: xxx,
+    roleName: xxx,
+    schoolId: xxx,
+    schoolName: xxx,
+    token: xxx
+}
+ */
 exports.authenticate = function(req, res, next) {
     req.checkBody('value', '无效的value').notEmpty();
     req.checkBody('password', '无效的password').notEmpty();
@@ -50,7 +69,13 @@ exports.authenticate = function(req, res, next) {
     })
 }
 
-//对所有受保护的资源进行auth验证
+/**
+ * 对所有受保护的API进行校验。验证通过将有效的token写入response从而被client持有。
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.verify = function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.authorization;
     if(!token) return next(new errors.HttpStatusError(400, '没有令牌，拒绝访问，请登录~'));

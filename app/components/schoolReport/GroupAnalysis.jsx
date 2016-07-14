@@ -9,7 +9,7 @@ import {List} from 'immutable';
 import Table from '../../common/Table';
 
 import {updateLevelBuffersAction} from '../../reducers/schoolAnalysis/actions';
-import {makeSegmentsStudentsCount} from '../../api/exam';
+import {makeSegmentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap, A11} from '../../lib/constants';
 
 import styles from '../../common/common.css';
@@ -316,7 +316,7 @@ function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass,
 
     var segments = makeCriticalSegments(levelBuffers, levels);
 
-    var totalSchoolCounts = makeSegmentsStudentsCount(examStudentsInfo, segments);
+    var totalSchoolCounts = makeSegmentsCount(examStudentsInfo, segments);
 
     var totalSchool = _.filter(totalSchoolCounts, (count, index) => (index % 2 == 0));
 
@@ -325,7 +325,7 @@ function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass,
     table.push(totalSchool);
 
     _.each(studentsGroupByClass, (students, className) => {
-        var classCounts = makeSegmentsStudentsCount(students, segments);
+        var classCounts = makeSegmentsCount(students, segments);
         var classRow = _.filter(classCounts, (count, index) => (index % 2 == 0));//从低到高
         classRow = _.reverse(classRow); //从高到底
 

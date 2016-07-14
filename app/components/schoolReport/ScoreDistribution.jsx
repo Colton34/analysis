@@ -10,7 +10,7 @@ import _ from 'lodash';
 import {showDialog, hideDialog} from '../../reducers/global-app/actions';//TODO: 设计思路？？？
 import {NUMBER_MAP as numberMap, A11} from '../../lib/constants';
 
-import {makeSegmentsStudentsCount} from '../../api/exam';
+import {makeSegmentsCount} from '../../api/exam';
 
 import DropdownList from '../../common/DropdownList';
 import TableView from './TableView';
@@ -128,7 +128,7 @@ class Dialog extends React.Component {
             })
             return;
         }
-        
+
         var preLength = _.size(this.levels);
         var theDiff = Math.abs(preLength - value);
         if(theDiff === 0) return;
@@ -240,7 +240,7 @@ class Dialog extends React.Component {
                 errorMsg: ''
             })
         }
-        
+
         this.props.changeLevels(this.levels);
         this.props.onHide();
     }
@@ -736,10 +736,10 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
     //{<levelKey>: <students>} 其中levelKey是String类型的，并且值小代表的是低分段（但是levels中）
     //从makeSegmentsStudentsCount得到的 countsMap中的 levelKey的个数一定是 segments.length-1 个，所以省去了后面判断没有某一个levelKey对应的数据则要补充。
 
-//makeSegmentsStudentsCount 获取的是：1.和segments顺序对应的key的count，也就是说低的levelKey对应的是低分段的count  2.包含[0, segments.length-2]共
+//makeSegmentsCount 获取的是：1.和segments顺序对应的key的count，也就是说低的levelKey对应的是低分段的count  2.包含[0, segments.length-2]共
 //segments.length-1个有效值
 
-    var countsGroupByLevel = makeSegmentsStudentsCount(examStudentsInfo, levelSegments);
+    var countsGroupByLevel = makeSegmentsCount(examStudentsInfo, levelSegments);
     //开始创建标准的resultInfo数据结构：
     result.totalSchool = {};
 
@@ -748,7 +748,7 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
     });
 
     _.each(studentsGroupByClass, (studentsFromClass, className) => {
-        var classCountsGroupByLevel = makeSegmentsStudentsCount(studentsFromClass, levelSegments);
+        var classCountsGroupByLevel = makeSegmentsCount(studentsFromClass, levelSegments);
         var temp = {};
         _.each(classCountsGroupByLevel, (count, levelKey) => {
             temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[className].realStudentsCount);

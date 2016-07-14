@@ -2,29 +2,34 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-05 10:50:07
+* @Last Modified time: 2016-07-13 11:44:18
 */
 
 'use strict';
 
-var errors = require('common-errors');
-var childProcess = require('child_process');
-var phantom = require('phantomjs-prebuilt');
-var path = require('path');
 var fs = require('fs');
 var tmp = require('tmp');
-
 var XLSX = require('xlsx');
+var path = require('path');
+var errors = require('common-errors');
 var excel = require("node-excel-export");
-// var config = require('../../config/env');
+var phantom = require('phantomjs-prebuilt');
+var childProcess = require('child_process');
 
 var tempFileDir = path.join(__dirname, '../../..', 'tempFiles');
 
+/**
+ * 使用phantomjs渲染需要下载的页面，并生成快照临时文件等待下载
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.renderSchoolReport = function(req, res, next) {
     req.checkBody('url', '无效的url').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
 
-    //先检测tempFileDir是否存在如果不存在则自动创建--节省时间，默认手动创建此文件夹
+    //Note: 先检测tempFileDir是否存在如果不存在则自动创建--节省时间，默认手动创建此文件夹
     // fs.access(tempFileDir, fs.F_OK, function(err) {
     //     if(err) fs.mkdirSync(tempFileDir);
 
@@ -45,11 +50,25 @@ exports.renderSchoolReport = function(req, res, next) {
     });
 }
 
+/**
+ * 通过Post请求（而不是link形式）来下载生成的报告
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.downloadSchoolReport = function(req, res, next) {
     var stat = fs.statSync(req.query.filename);
     res.status(200).download(req.query.filename, '校级报告.pdf');
 }
 
+/**
+ * 为了避免无用报告文件堆积，临时文件被下载后即被删除
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.rmSchoolReport = function(req, res, next) {
     //下载成功后删除此临时文件
     req.checkQuery('filename', '无效的filename').notEmpty();
@@ -61,6 +80,13 @@ exports.rmSchoolReport = function(req, res, next) {
     });
 }
 
+/**
+ * 自定义分析中选择科目位置的“下载校考导入模板”
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.downloadExamTmp = function(req, res, next) {
     var fileDir = path.join(__dirname, '../../../public/files');
     var filename = (req.query && req.query.liankao) ? '联考小分模板.xlsx' : '校内考试小分模板.xlsx';
@@ -68,6 +94,13 @@ exports.downloadExamTmp = function(req, res, next) {
     res.download(fileUrl, filename);
 }
 
+/**
+ * 自定义分析开始页面中“查看示例”
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.downloadExamGuide = function(req, res, next) {
     var fileDir = path.join(__dirname, '../../../public/files');
     var filename = '自定义分析操作手册.pdf';
@@ -75,6 +108,13 @@ exports.downloadExamGuide = function(req, res, next) {
     res.download(fileUrl, filename);
 }
 
+/**
+ * 首页"下载使用说明书"
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.downloadHomeGuide = function(req, res, next) {
     var fileDir = path.join(__dirname, '../../../public/files');
     var filename = '好分数分析系统使用说明书.pdf';
@@ -84,12 +124,20 @@ exports.downloadHomeGuide = function(req, res, next) {
 
 
 /*
-注意：原来这里是区分联考的，这里暂时没有联考的逻辑--因为没有在auth后的user信息中看到。
+TODO:补充联考
+Warning：原来这里是区分联考的，这里暂时没有联考的逻辑--因为没有在auth后的user信息中看到。
  if(req.session.user.isLiankao === result.data.isLiankao){
      res.json(httpResult.succ(result.data));
  }else{
      res.json(httpResult.err_logic(`模板上传错误, 请上传${req.session.user.isLiankao ? '联考' : '校内'}模板`));
  }
+ */
+/**
+ * 自定义分析中选择考试科目位置“导入线下考试数据”
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
  */
 exports.importExamData = function(req, res, next) {
     var file = req.file;
@@ -102,6 +150,13 @@ exports.importExamData = function(req, res, next) {
     }
 }
 
+/**
+ * 自定义分析中确认学生位置“上传考生数据”
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.importExamStudent = function(req, res, next) {
     var file = req.file;
     var result = xlsxParser(file, parseStudentList);
@@ -113,6 +168,13 @@ exports.importExamStudent = function(req, res, next) {
     }
 }
 
+/**
+ * 自定义分析中确认考生位置“导出考生数据”
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.exportExamStudent = function(req, res, next) {
     if(!req.body || !req.body['students']) return next(new errors.Error('没有有效的需要导出的学生数据'));
 
@@ -165,6 +227,13 @@ exports.exportExamStudent = function(req, res, next) {
     }
 }
 
+/**
+ * 排行榜详情，下载“排行榜”报告
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
 exports.exportRankReport = function(req, res, next) {
     //接收到客户端的数据，然后输出excel file
     req.checkBody('keys', '无效的keys').notEmpty();

@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import Table from '../../common/Table';
 
-import {makeSegmentsStudentsCount} from '../../api/exam';
+import {makeSegmentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, A11} from '../../lib/constants';
 
 import styles from '../../common/common.css';
@@ -136,7 +136,7 @@ class Dialog extends React.Component {
         //     })
         //     return;
         // }
-        
+
         // isValid字段复位
         this.isValid[index] = true;
         //如果value不变。。。那么也不更新
@@ -157,7 +157,7 @@ class Dialog extends React.Component {
                 grades: newGrades
             });
         }
-        
+
     }
 
     onHide() {
@@ -379,7 +379,7 @@ function theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, 
         var segments = makeSubjectLevelSegments(paperObj.fullMark, levelPcentages);
         //这应该是当前科目的区分段的count--而不是总分（且一定不包含总分）
         //获取此科目下所有学生的成绩
-        var result = makeSegmentsStudentsCount(allStudentsPaperMap[paperObj.id], segments); //注意：低分档次的人数在前
+        var result = makeSegmentsCount(allStudentsPaperMap[paperObj.id], segments); //注意：低分档次的人数在前
 
         result = _.map(_.reverse(result), (count) => {
             var percentage = _.round(_.multiply(_.divide(count, paperObj.realStudentsCount), 100), 2);

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:25:26
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-09 11:38:04
+* @Last Modified time: 2016-07-13 10:32:55
 */
 
 'use strict';
@@ -20,6 +20,7 @@ var upload = multer({
     }
 });
 
+//Note: 下载校级报告包括：1，渲染并生成报告（临时文件） 2. 下载生成的临时文件  3. 删除临时文件
 router.post('/render/school/report', dfile.renderSchoolReport);
 router.get('/download/school/report', dfile.downloadSchoolReport);
 router.delete('/rm/school/report', dfile.rmSchoolReport);

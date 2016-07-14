@@ -18,8 +18,6 @@ function submit() {
                 isLoggingIn = false;
             } else {
                 window.location = '/';
-                //$('.err-message-ctn').remove();
-                //$('#btn-login').removeClass('btn-disabled').addClass('account-submit');
             }
         },
         error: function (request, textStatus, errorThrown) {
