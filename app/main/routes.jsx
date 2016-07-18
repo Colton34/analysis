@@ -19,7 +19,7 @@ import RankReport from '../containers/RankReport';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Home} />
+            <IndexRoute component={Test} />
             <Route path='dashboard' component={Dashboard} />
             <Route path='school/report' component={SchoolReport} />
             <Route path='add/analysis' component={CustomizeAnalysis}/>
@@ -30,13 +30,7 @@ export default (store) => {
 };
 
 /*
-            <IndexRoute component={Home} />
-            <Route path='dashboard' component={Dashboard} />
-            <Route path='school/report' component={SchoolReport} />
-            <Route path='add/analysis' component={CustomizeAnalysis}/>
-            <Route path='faq' component={HelpCenter}/>
-
-        /:examId/
+示例:
 
         <Route path="/" component={App}>
             <IndexRoute component={Home}/>
