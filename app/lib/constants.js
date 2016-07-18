@@ -122,5 +122,10 @@ export const INIT_RANKREPORT = 'INIT_RANKREPORT';
 export const INIT_RANKREPORT_SUCCESS = 'INIT_RANKREPORT_SUCCESS';
 
 //====================== color ==============================
+export const BACKGROUND_COLOR = '#EFF1F4';
 export const A11 = '#de5d44';
 export const B03 = '#59bde5';
+export const C04 = '#eeeeee';
+export const C07 = '#BFBFBF';
+export const C12 = '#333333';
+export const C14 = '#fdfdfd';
