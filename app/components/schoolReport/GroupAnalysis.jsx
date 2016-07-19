@@ -10,7 +10,7 @@ import Table from '../../common/Table';
 
 import {updateLevelBuffersAction} from '../../reducers/schoolAnalysis/actions';
 import {makeSegmentsStudentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap, A11} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
@@ -216,67 +216,23 @@ class GroupAnalysis extends React.Component {
 
         return (
             <div className={schoolReportStyles['section']}>
-                <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-                <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
-                    临界生群体分析
-                </div>
-
-            {/*--------------------------------  临界生群体分析Header -------------------------------------*/}
-                <div className={styles['school-report-content']}>
-                    <p>
-                        将临近总分各分数线上下的群体视为“临界生”，学校可以给他们多一点关注，找到他们的薄弱点、有针对性促进一下，他们就能稳定、甚至提升总分档次。
-                        这个无论是对学生个人，还是对学校整体的教学成就，都有显著的积极作用。全校临界生群体规模，见下表：
-                    </p>
-                    <a href="javascript:void(0)" onClick={this.onShowDialog.bind(this) }className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>
+                <div style={{ marginBottom: 30 }}>
+                    <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
+                    <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>临界生群体分析</span>
+                    <span style={{ fontSize: 12, color: C07 }}>临界生群体分析，通过设置临界分数线来计算全校及各班的总分在不同分档分数线左右徘徊的人数分布</span>
+                    <a href="javascript:void(0)" onClick={this.onShowDialog.bind(this) }className={styles.button} style={{ width: 120, height: 30, backgroundColor: A12, color: '#fff', float: 'right', borderRadius: 2, lineHeight: '30px' }}>
                         <i className='icon-cog-2'></i>
                         设置临界分数
                     </a>
-
-                    {/*--------------------------------  临界生群体分析表格 -------------------------------------*/}
-                    <TableView tableData={tableData} reserveRows={7}/>
-
-                    {/*     _.keys(studentsGroupByClass).length > 5 ? (<a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
-                        点击查看更多班级数据 V
-                    </a>) : ''   */}
-
-                {/*--------------------------------  TODO: 临界生群体分析说明 -------------------------------------*/}
-
-{/*
-
-                                            {_.map(_.range(_.size(levels)), (lindex) => {
-                                                return (
-                                                    <span key={lindex} style={{ color: '#00955e' }}>{_.join(disData[index].top, '、')}</span>{numberMap[index]}档临界生人数较{pindex == 0 ? '多' : '少'}{(pindex == 0 && lindex == (_.size(levels)-1)) ? '可以更多的关注这几个班级的同学。' : (lindex == (_.size(levels)-1) ? '。' : '，')}
-                                                )
-                                            })}
-
-*/}
-
-                    <div className={styles.tips}>
-                        <p>数据分析表明：</p>
-                        {
-                            (_.size(disData.top) == 0 || _.size(disData.low) == 0) ? (<p>只有一个班级，没有可比性</p>) : (
-                                    _.map(_.range(2), (pindex) => {
-                                            return (
-                                                <p key={pindex}>
-                                                    {
-                                                        _.map(_.range(_.size(levels)), (lindex) => {
-                                                            return (
-                                                                <span key={lindex} >
-                                                                    <span style={(pindex == 0) ? {color: '#c96925'} : { color: '#00955e' } }>{_.join(disData[(pindex ==0) ? 'top' : 'low'][lindex], '、')}</span>{numberMap[lindex+1]}档临界生人数较{(pindex == 0) ? '多' : '少'}
-                                                                    {(pindex == 0 && lindex == (_.size(levels)-1)) ? '可以更多的关注这几个班的同学' : (lindex == (_.size(levels)-1) ? '。' : '，')}
-                                                                </span>
-                                                            )
-                                                        })
-                                                    }
-                                                </p>
-                                            )
-                                        }
-                                    )
-                                )
-                        }
-                    </div>
                 </div>
-                <Dialog levels={levels} levelBuffers={levelBuffers} updateLevelBuffers={this.props.updateLevelBuffers} show={this.state.showDialog} onHide={this.onHideDialog.bind(this)}/>
+                <TableView tableData={tableData} reserveRows={7}/>
+                {/*****************临界生较多班级*************/}
+                <p style={{ marginBottom: 20, marginTop: 40 }}>
+                    <span className={schoolReportStyles['sub-title']}>临界生较多班级</span>
+                    <span className={schoolReportStyles['title-desc']}>临界生较多班级，存在更大提高班级该档上线率的空间，学校和班级应该基于更多关注，对整体教学成就有显著的积极作用。</span>
+                </p>
+                {/* todo： 图待补充 */}
+                <Dialog levels={levels} levelBuffers={levelBuffers} updateLevelBuffers={this.props.updateLevelBuffers} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }/>
             </div>
         )
     }
