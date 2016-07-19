@@ -6,8 +6,7 @@ import _ from 'lodash';
 import Table from '../../common/Table';
 
 import {makeSegmentsStudentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, A11} from '../../lib/constants';
-
+import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
 import TableView from './TableView';
@@ -276,51 +275,28 @@ class SubjectPerformance extends React.Component {
         var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
         return (
             <div className={schoolReportStyles['section']}>
-                <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-                <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
-                    学科考试表现
+                <div style={{ marginBottom: 30 }}>
+                    <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
+                    <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科考试表现</span>
+                    <span style={{ fontSize: 12, color: C07 }}>学科考试表现，通过对不同学科之间基本指标数据的分析，发现学校各学科的教学信息</span>
                 </div>
-                <div className={styles['school-report-content']}>
-                    <p>对于任何考试都需要了解，学科考试后所表现出的基本情况。一般都要有些基本指标来表达，如下面学科考试基本指标一览表所示：</p>
+                <TableView tableData={subjectExamTableData} reserveRows={6}/>
 
-                {/*--------------------------------  学科考试表现基本指标表格 -------------------------------------*/}
-
-                    <TableView tableData={subjectExamTableData} reserveRows={6}/>
-                    <p className={styles.tips}>
-                        学科基本指标的数据虽一目了然，但其中也包含了许多考试信息，值得学校的关注，具体分析和理解各个指标：
-                        <br />
-                        <br />
-                        最高分：反映出学科的最高分，各学科就有差异了；<br />
-                        最低分：反映出学科的最低分，可以看出最低水平；<br />
-                        平均分：表达各科的代表性水平，也反映了学生得分的集中趋势；<br />
-                        标准差：反映了学生分数的分布离散程度，值越大表示个体之间的分数分布的离散程度越大，反之，值越小表示个体之间的分数分布的离散程度越小；<br />
-                        差异系数：标准差与平均分之比，表示不同样本的相对离散程度，值越大表示相对相对离散程度越大，反之，值越小表示相对离散程度越小；<br />
-                        难度：表达学科考试难易程度，难度系数值越大，表明考试越容易，难度系数值越小，考试越难；上表中的难度值明确表达了这次考试最难得学科和考试最容易的学科具体是哪个学科。
-                    </p>
-                    <br />
-                    <p>有关学科分析还有如下几点：</p>
-                    {/*--------------------------------  学科考试表现分析说明 -------------------------------------*/}
-                    {/* TODO: 如果联系到学科的命题难度，其相对离差从大到小的顺序是<span style={{color: 'blue'}}>生物、物理、语文</span>。 缺少*/}
-                    <p className={schoolReportStyles['sub-section']}>
-                        （1）结合前面的分析内容，从各学科的成绩表现来看，每个学科的班级平均分得分率最高的与最低之间的离差，从大到小的顺序是，<span style={{color: 'blue'}}>{_.join(factorSubjects, '、')}</span>。离差较大的学科，反映出班级水平差距较大。离差较小的学科，反映出该学科教学效果比较整齐。（注：语文是母语，学生水平离差来的较小应该是常态）
-                    </p>
-
-                    <p className={schoolReportStyles['sub-section']}>（2）各个学科成绩分布的等级结构比例情况，如下表所示：</p>
-                    <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>
+                <p style={{marginBottom: 20}}>
+                    <span className={schoolReportStyles['sub-title']}>学科离差表现</span>
+                    <span className={schoolReportStyles['title-desc']}>离差较大的学科，反映出各班级该学科教学效果差距较大；离差较小的学科，反映出各班级该学科教学效果比较整齐</span>
+                </p>
+                {/* todo： 待补充离差表现图 */}
+                <p style={{marginBottom: 20}}>
+                    <span className={schoolReportStyles['sub-title']}>各学科成绩分布的等级结构比例</span>
+                    <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 120, height: 30, float: 'right', backgroundColor: A12, color: '#fff', lineHeight: '30px', borderRadius: 2}}>
                         <i className='icon-cog-2'></i>
                         设置等级参数
                     </a>
-                    <TableView tableData={subjectLevelExamTableData} reserveRows={6}/>
-
-                    {/*--------------------------------  TODO: 暂时空缺的和学科难易程度相关的数据 -------------------------------------*/}
-                    <p className={schoolReportStyles['sub-section']}>（3）有关学科命题</p>
-                    <p>
-                        作为学科考试，必须考虑给水平不同的全体学生都能提供展示其学业水平的机会。有的学科在试题难度分布结构方面，可以进一步完善，防止出现过难或者过易的情况。
-                    </p>
-                    <p>注：各个学科更精细的分析报告，请查阅各个学科详细分析模块。</p>
-                </div>
-               <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} levelPcentages={this.state.levelPcentages} updateGrades={this.updateLevelPercentages.bind(this)} />
-            </div>
+                </p>
+                <TableView tableData={subjectLevelExamTableData} reserveRows={6}/>
+                <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} levelPcentages={this.state.levelPcentages} updateGrades={this.updateLevelPercentages.bind(this)} />
+            </div> 
         )
     }
 

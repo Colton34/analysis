@@ -2,7 +2,10 @@
     display: inline-block;
     text-align: center;
     text-decoration: none;
-   
+}
+
+.button:hover{
+    text-decoration: none;
 }
 
 .tips {

@@ -6,8 +6,7 @@ import Table from '../../common/Table';
 import DropdownList from '../../common/DropdownList';
 
 import {makeSegments, makeFactor, makeSegmentsStudentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap} from '../../lib/constants';
-
+import {NUMBER_MAP as numberMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
 import TableView from './TableView';
@@ -65,7 +64,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
  * props:
  * totalScoreLevel: 分档信息
  */
-class ClassPerformance extends React.Component {
+    class ClassPerformance extends React.Component {
 
     constructor(props) {
         super(props);
@@ -164,83 +163,50 @@ class ClassPerformance extends React.Component {
 
         return (
             <div className={schoolReportStyles['section']}>
-                <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-                <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
-                    班级的考试基本表现
+                <div style={{ marginBottom: 30 }}>
+                    <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
+                    <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>班级的考试基本表现</span>
+                    <span style={{ fontSize: 12, color: C07 }}>通过各班在数据上的突出表现及其差异，来分析不同班级之间的考试表现情况，但要注意结合各班级的实际教学情况及历史原因，做客观分析判断。</span>
                 </div>
-
-                {/*--------------------------------  班级考试基本表现Header -------------------------------------*/}
-                <div className={styles['school-report-content']}>
-                    <p>
-                        各班级在这次考试中各自的表现均不相同，我们要对各班分析他们的突出表现及差异。观察各班的表现，要注意班级教学的实际，
-                        同时也要联系各班级的历史客观因素，试分析评价要客观些。
-                    </p>
-                    <p className={schoolReportStyles['sub-section']}>
-                        （1）从班级学生总分分布看，前面“各班
-                        <span className={styles['school-report-dynamic']}>
-                        {_.join(_.map(_.range(_.size(levels)), (index) => numberMap[index+1]), '、')}
-                        档</span>上线学生人数分布表”，反映出各个班级总分较高学生的人数分布。
-                    </p>
-                    <p className={schoolReportStyles['sub-section']}>
-                        （2）考虑到各个班级有各自的具体情况，可以基于各班的自身水平来考察高端及低端学生的分布，反映出学生总分的分布趋势。通过大数据归类分析我们发现，以各班自身水平衡量，高分学生人数较多的
-                        班级有：
-                        {/*--------------------------------  TODO：班级考试表现的Header -------------------------------------*/}
-                        <span className={styles['school-report-dynamic']}>{_.join(headerInfo.greater, '、')}</span>，
-                        高分学生人数比低分学生人数较少的班级有
-                        <span className={styles['school-report-dynamic']}>{_.join(headerInfo.lesser, '、')}</span>。
-                        <br/>
-                        （注意： 这是一各班自身水平为基础而得出的结论，不是单用学生总分在全校中的排队为依据的，可能会有特别好的班级也会出现相对于班级自身水平的高分学生人数少于低分学生人数的
-                          ，说明该班级还没有充分挖掘出学生的潜力。）
-                    </p>
-                    {/*--------------------------------  班级考试表现的趋势图表 -------------------------------------*/}
-                    <p>班级学生总分分布趋势图：</p>
-                    <span style={{position: 'absolute', right: 0}}>
-                        <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true}/>
+                {/* 线图 + 高分多寡班级 */}
+                <div style={{display: 'inline-block', width: 875, height: 380, position: 'relative'}}>
+                    <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
+                    <span style={{position: 'absolute', top: 0, right: 0}}>
+                        <span style={{display: 'table-cell', paddingRight: 10}}>对比对象</span>
+                        <span style={{display: 'table-cell'}}><DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true}/></span>
                     </span>
-                    <ReactHighcharts config={config} style={{ margin: '0 auto', marginTop: 40 }}></ReactHighcharts>
-
-                    {/*--------------------------------  班级考试基本表现平均分表格 -------------------------------------*/}
-                    <p className={schoolReportStyles['sub-section']}>（3）从平均水平看，全校和班级的各学科平均得分率见下表所示：</p>
-                    <TableView tableHeaderData={meanTableHeaderData} tableData={meanTableBodyData} TableComponent={AverageTable} reserveRows={6}/>
-
-                    {/* 如果样式一样的话，那么这个“显示更多班级”可以抽出来了，属于Table的一部分--逻辑是一样的 */}
-                    {/*  _.keys(studentsGroupByClass).length > 5 ? (<a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
-                        点击查看更多班级数据 V
-                    </a>) : ''   */}
-                    <div className={styles.tips}>
-                        <p>数据图表说明部分：表中各个班级的平均分与平均得分率的高低，一目了然。</p>
-                        <p>平均分：表达的是一个代表性水平的指标。但各班也有各班的具体情况，不仅要看平均分数的高低，还要看各班在自身水平基础上，可能有的学科表现更好，有的学科表现不足。即下面第（4）点分析的内容。</p>
-                    </div>
-                    {/*--------------------------------  班级考试基本表现贡献指数表格 -------------------------------------*/}
-                    <p className={schoolReportStyles['sub-section']}>
-                        (4) 各班的平均得分率看起来有高有低，也不能简单通过排队就评价教学质量的高低，需要结合各班具有自身的具体情况和原因基于客观分析（比如有尖子班、普通版之分）。
-                        但相对于班级自身综合水平而言，各班各学科的平均得分率贡献指数（见下表）可以反映出各个班级教学对其自身综合水平影响的大小。（指数值为正，是促使提高；
-                        为负， 是拖后腿。）
-                    </p>
-                    <TableView tableData={factorsTableData} reserveRows={6}/>
-
-                    {/* _.keys(studentsGroupByClass).length > 5 ? (<a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
-                        点击查看更多班级数据 V
-                    </a>) : ''  */}
-
-                    <div className={styles.tips}>
-                        <p>班级的学科平均得分率水平贡献指数：</p>
-                        <p>指班级的学科得分率与全校各班级该学科的平均得分率之间的差值，反应班级该学科水平对整体贡献的大小。</p>
-                    </div>
-
-                {/*--------------------------------  班级考试基本表现学生分组表格 -------------------------------------*/}
-                    <p className={schoolReportStyles['sub-section']}>
-                        （5）将学校分数从高到低，分为十组学生，每一组学生之间的水平相差不大，按这样方式，我们可以看见各班在这样的十组中所存在的人数如下：
-                    </p>
-                    <TableView tableData={groupTableData} reserveRows={7}/>
-                    {/*  _.keys(studentsGroupByClass).length > 5 ? (                <a href="javascript: void(0)" style={{ color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }}>
-                        点击查看更多班级数据 V
-                    </a>) : ''    */}
-                    <div className={styles.tips}>
-                        <p>说明：</p>
-                        <p>从以上数据表格中，按总人数平均分为十组，可以看见不同组（及不同分数段中）在不同班级的人数分布情况。</p>
-                    </div>
                 </div>
+                <div style={{display: 'inline-block', width: 215, float: 'right'}}>
+                    <div style={{ display: 'table-row'}}>
+                        <div style={{ width: 215, height: 110, border: '1px solid ' + C07, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center' }}>
+                            <p style={{ fontSize: 12, marginBottom: 10 }}>高分学生较多的班级</p>
+                            <p style={{ fontSize: 30, color: B08 }}>{_.join(headerInfo.greater, '、') }</p>
+                        </div>
+                    </div>
+                    <div style={{height: 20}}></div>
+                    <div style={{width: 215, height: 110, border: '1px solid ' + C07, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center'}}>
+                        <p style={{fontSize: 12, marginBottom: 10}}>高分学生较少的班级</p>
+                        <p style={{fontSize: 30, color: B04}}>{_.join(headerInfo.lesser, '、')}</p>
+                    </div>
+                    <p style={{fontSize: 12, color: C07, marginTop: 20}}>
+                        <span style={{color: B08}}>*</span>
+                        高分年级结论以各班自身水平为基础推导得出，可能会有特别好的班级也出现相对与班级自身水平的高分学生人数少于低分学生人数的，说明该班级还没有充分挖掘出学生的潜力
+                    </p>
+                </div>
+
+                {/* 平均得分率表格 */}
+                <p style={{marginBottom: 20}}>
+                    <span className={schoolReportStyles['sub-title']}>学科平均分/平均得分率</span>
+                    <span className={schoolReportStyles['title-desc']}>平均得分率=班级平均分÷学科的总分，数值越高，班级的此学科越优秀</span>
+                </p>
+                <TableView tableHeaderData={meanTableHeaderData} tableData={meanTableBodyData} TableComponent={AverageTable} reserveRows={6}/>
+
+                {/* 得分率贡献指数 */}
+                <p style={{marginBottom: 20, marginTop: 40}}>
+                    <span className={schoolReportStyles['sub-title']}>班级学科得分率贡献指数</span>
+                    <span className={schoolReportStyles['title-desc']}>得分率贡献指数 = 班级学科得分率 - 全校学科平均得分率。指数值为正，是促进作用；为负，是拖后腿。</span>
+                </p>
+                <TableView tableData={factorsTableData} reserveRows={6}/>
             </div>
         )
     }
