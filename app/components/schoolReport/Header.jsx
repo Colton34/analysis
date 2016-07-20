@@ -5,8 +5,120 @@ import {Link} from 'react-router'
 import {initParams} from '../../lib/util';
 import Radium from 'radium';
 import {saveAs} from '../../lib/util';
-import {B03, C07, C12} from '../../lib/constants'; 
+import {COLORS_MAP as colorsMap, B03, C07, C12} from '../../lib/constants'; 
 
+var modules = [
+    {
+        name: '总分分布趋势',
+        id: 'fullScoreTrend'
+    }, {
+        name: '总分分档上线学生人数分布',
+        id: 'scoreDistribution'
+    }, {
+        name: '学科分档上线学生人数分布',
+        id: 'subjectDistribution'
+    }, {
+        name: '班级考试基本表现',
+        id: 'classPerformance'
+    }, {
+        name: '学科考试表现',
+        id: 'subjectPerformance'
+    }, {
+        name: '临界生群体分析',
+        id: 'groupAnalysis'
+    }, {
+        name: '分数排行榜',
+        id: 'studentPerformance'
+    }];
+
+class NavBar extends React.Component {
+    constructor(props) {
+        super(props);
+        //this.position = 'normal';
+        this.state= {
+            activeId: 'fullScoreTrend',
+            position: 'normal'
+        }
+    }
+    componentDidMount() {
+        var navBarTop = document.getElementById('navBar').offsetTop;
+        var scrollTopList = [];
+        _.forEach(modules, (module, index) => {
+            scrollTopList.push(document.getElementById(module.id).offsetTop)
+        })
+        var $body = $('body');
+        // $('#app').scroll(()=> {
+        //     debugger
+        //     if ($navBar.scrollTop() <= $body.scrollTop()) {
+        //         console.log('need to transfrom!');
+        //     }
+        // })
+        var _this = this;
+        window.addEventListener('scroll', function () {
+            var bodyTop = $body.scrollTop();
+            //判断何时吸顶
+
+            if (navBarTop <= bodyTop) {
+                if(_this.state.position !== 'fixed') {
+                    $('#header').css({ 'position': 'static' });
+                    _this.setState({
+                        position: 'fixed'
+                    })
+                }
+            } else{
+                $('#header').css({'position': 'relative'});
+                _this.position = 'normal';
+                _this.setState({
+                    position: 'normal'
+                })    
+            }
+
+            for (var i in scrollTopList) {
+                if (scrollTopList[i] <= bodyTop + 100 && scrollTopList[i] >= bodyTop - 100) {
+                    _this.setState({
+                        activeId: modules[i].id
+                    })
+                    return;
+                }
+            }
+            
+
+        })
+
+    }
+    onClickModule(event) {
+        var $target = $(event.target);
+        var id = $target.data('id');
+        if (!id) {
+            id = $target.parent('#nav-item').data('id');
+        }
+        $('body').scrollTop($('#' + id).offset().top - 100) // -100适当补回导航栏遮挡的部分
+        this.setState({
+            activeId: id
+        })
+        
+    }
+    render() {
+        
+        return (
+            <div id='navBar' style={_.assign({}, {zIndex: 100, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C05, backgroundColor: colorsMap.C02},
+                                    this.state.position === 'normal' ? {position:'absolute', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: 1200, left: '50%', marginLeft: -600})}>
+            {
+                modules.map((module, index) => {
+                    return (
+                        <div id='nav-item' style={{display: 'table-cell', minWidth: 1200/modules.length, height: 50, textAlign: 'center', verticalAlign: 'middle', fontSize: 12, cursor: 'pointer'}} 
+                             data-id={module.id} onClick={this.onClickModule.bind(this)}>
+                            <span style={this.state.activeId === module.id ? {paddingBottom: 16, borderBottom: '2px solid ' + colorsMap.A12} : {}}>{module.name} </span>
+                            <span style={_.assign({}, {display: 'inline-block', height: 12, float: 'right', marginTop: 2}, index === modules.length -1 ? {}: {borderRight: '1px solid ' + colorsMap.C05})}></span>
+                        </div>
+                    )
+                })
+            }
+            </div>
+        )
+    }
+  }
+  
 @Radium
 class Header extends React.Component {
     constructor(props) {
@@ -61,7 +173,7 @@ class Header extends React.Component {
         var targetUrl = grade ? '/dashboard?examid=' + examid + '&grade=' + encodeURI(grade) : '/dashboard?examid=' + examid;
 
         return (
-            <div style={{padding: '30px 0 30px 30px ', marginBottom: 20, borderRadius: 2, backgroundColor: '#fff'}}>
+            <div id='header' style={{zIndex: 100, padding: '30px 0 30px 30px ', marginBottom: 20, borderRadius: 2, backgroundColor: '#fff', position: 'relative', minHeight: 230}}>
                 <p style={{fontSize: 18, color: C12, marginBottom: 15}}>校级分析报告-{examInfo.name}</p>
                 <p style={{fontSize: 12, color: C07, marginBottom: 28}}>
                     <span style={{marginRight: 15}}>时间: {startTime}</span>
@@ -78,10 +190,12 @@ class Header extends React.Component {
                         }
                     </span>
                 </p>
-                <p style={{color: B03}}>
+                <div className={styles['button']} style={{width: 180, height: 40, lineHeight: '40px', borderRadius:2, backgroundColor: colorsMap.A12, color: '#fff', cursor: 'pointer'}}>
                     <i className='icon-download-1'></i> 
                     下载校级分析报告
-                </p>
+                </div>
+                {/************************* 导航条 ******************************/}
+                <NavBar/>
             </div>
         )
     }

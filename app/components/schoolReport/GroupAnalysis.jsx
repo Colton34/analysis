@@ -215,7 +215,7 @@ class GroupAnalysis extends React.Component {
 //自定义Module数据结构：
 
         return (
-            <div className={schoolReportStyles['section']}>
+            <div id='groupAnalysis' className={schoolReportStyles['section']}>
                 <div style={{ marginBottom: 30 }}>
                     <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                     <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>临界生群体分析</span>

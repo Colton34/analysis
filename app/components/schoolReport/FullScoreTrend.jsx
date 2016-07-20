@@ -64,7 +64,7 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
         }
     }
     return (
-        <div style={{padding: '30px 0 30px 30px', borderRadius: 2, backgroundColor: '#fff', position: 'relative', marginBottom: 20}}>
+        <div id='fullScoreTrend' style={{padding: '30px 0 30px 30px', borderRadius: 2, backgroundColor: '#fff', position: 'relative', marginBottom: 20}}>
             {/**
                 <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
             <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -120, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 200 }}>

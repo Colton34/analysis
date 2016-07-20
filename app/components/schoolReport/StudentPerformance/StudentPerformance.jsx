@@ -183,7 +183,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
     var rankColors = [B08, B07, B06];
     var students = [topStudents, lowStudents];
     return (
-        <div className={schoolReportStyles['section']} style={{ paddingBottom: 30 }}>
+        <div id='studentPerformance' className={schoolReportStyles['section']} style={{ paddingBottom: 30 }}>
             <div style={{ marginBottom: 30 }}>
                 <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                 <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>分数排行榜</span>

@@ -82,7 +82,7 @@ class SchoolReport extends React.Component {
                  </div>
              )
         return (
-            <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: BACKGROUND_COLOR }}>
+            <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: BACKGROUND_COLOR, zIndex: 0}}>
                 <NavHeader examInfo={examInfo} />
                 <Header examInfo = {examInfo} params={this.props.params} location={this.props.location} />
                 <FullScoreTrend examInfo = {examInfo} examStudentsInfo = {examStudentsInfo} />
