@@ -12,9 +12,8 @@ import {DropdownButton, Button, Table as BootTable, MenuItem} from 'react-bootst
 import commonStyle from '../common/common.css';
 import Spinkit from '../common/Spinkit';
 
-import {tableExport} from '../lib/tableExporter';
 import Radium from 'radium';
-import {B03} from '../lib/constants'; 
+import {B03} from '../lib/constants';
 
 var headerMapper = {
     kaohao: '考号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '排名', classRank: '班级排名', score: '分数'
@@ -740,7 +739,7 @@ class PageHeader extends React.Component {
         super(props);
     }
     onClickExamName(url) {
-        location.href = url; 
+        location.href = url;
     }
     render() {
         var {examInfo, targetUrl} = this.props;
@@ -750,7 +749,7 @@ class PageHeader extends React.Component {
                 <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span onClick={this.onClickExamName.bind(this, targetUrl)} style={localStyle.examName}>{examInfo.name + ' > '}</span>分数排行榜</span>
             </div>
         )
-        
+
     }
 }
 

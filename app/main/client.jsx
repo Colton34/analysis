@@ -24,8 +24,9 @@ const history = syncHistoryWithStore(browserHistory, store);
 const routes = createRoutes(store);
 
 render(
-  <Provider store={store}>
-    <Router history={history}>
-        {routes}
-    </Router>
-  </Provider>, document.getElementById('app'));
+    <Provider store={store}>
+        <Router history={history}>
+            {routes}
+        </Router>
+    </Provider>, document.getElementById('app')
+);

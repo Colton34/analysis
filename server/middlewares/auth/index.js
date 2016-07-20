@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-13 16:10:22
+* @Last Modified time: 2016-07-20 10:16:00
 */
 
 'use strict';
@@ -62,6 +62,8 @@ exports.authenticate = function(req, res, next) {
         var token = jsonwebtoken.sign({ user: user }, config.secret);
         user.token = token;
         req.user = user;
+
+console.log(req.user);
 
         next();
     }).catch(function(err) {
