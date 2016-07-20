@@ -8,12 +8,18 @@ import localStyle from './studentPerformance.css';
 import Radium from 'radium';
 import TableView from '../TableView';
 import {Table as BootTable} from 'react-bootstrap';
+import {COLORS_MAP as colorsMap, A11, A12, B03, B04, B06, B07, B08, C09, C12, C05, C07} from '../../../lib/constants';
+
 var localCss = {
     btn: {
         display: 'inline-block', width: 115, height: 25, color: '#333', lineHeight: '25px', textDecoration: 'none', textAlign: 'center', border: '1px solid #e9e8e6',
         ':hover': { textDecoration: 'none' },
         ':link': { textDecoration: 'none' }
-    },
+    }, 
+    tableCell: {
+        fontSize: 12, textAlign: 'left', verticalAlign: 'middle', minWidth: 50, minHeight: 30
+    }
+
 
 }
 
@@ -104,6 +110,7 @@ class StudentPerformanceTable extends React.Component {
 
     chooseItem(content) {
         //TODO: setState(newState)中newState不一定需要把所有的stae属性都添加上去吧，没有就是不修改吧？
+        if (this.state.current.key === content.key) return;
         var newState = { current: content, active: false, coveredItems: _.without(this.selectItems, content) };
         newState.inputNum = (content.key == 'ranking') ? this.state.rankingNum : this.state.percentageNum;
         this.setState(newState);
@@ -152,31 +159,25 @@ class StudentPerformanceTable extends React.Component {
         var _this = this;
 
         return (
-            <div>
-                <div style={{ position: 'absolute', right: 180 }}>
-                    <a key={'ddbtn-head'} style={[localCss.btn, {position: 'relative'}]} href="javascript:void(0)" onClick={this.toggleList.bind(this) }>
-                        {this.state.current.value}
-                        <span className='dropdown' style={{ position: 'absolute', right: 10, color:'#bfbfbf' }}>
-                            <span className='caret'></span>
-                        </span>
-                    </a>
-                    <ul id='dropDownList' className={this.state.active ? localStyle.list : localStyle.hide}>
-                        {
-                            _.map(_this.state.coveredItems, (item, index) => {
-                                return (
-                                    <li key={index}>
-                                        <a key={'ddbtn-' + index} style={[localCss.btn, { backgroundColor: '#f2f2f2', color: '#333' }]} href="javascript:void(0)" onClick={this.chooseItem.bind(this, item) }>
-                                            {item.value}
-                                        </a>
-                                    </li>
-                                )
-                            })
-                        }
-                    </ul>
+            <div style={{position: 'relative'}}>
+                {/*---------------------------------    switch按钮  ---------------------------------------------- */}
+                <div style={{position: 'absolute', top: -55, left: '50%', marginLeft: -80, width: 160, height: 30, borderRadius: 2, border: '1px solid ' + colorsMap.A12 }}>
+                {
+                    this.selectItems.map((item, index) => {
+                        return (
+                            <div style={_.assign({}, {display: 'inline-block', width: '50%', height: '100%', textAlign: 'center', lineHeight: '30px', cursor: 'pointer'}, this.state.current.key === item.key ? {backgroundColor: colorsMap.A12, color: '#fff'} : {backgroundColor: '#fff', color: colorsMap.A12})}
+                                 onClick={this.chooseItem.bind(this, item)}>
+                                {item.value}
+                            </div>
+                        )
+                    })
+                }
                 </div>
                 {/* 名次/比例输入框  */}
-                <div style={{ float: 'right', marginRight: -90, marginBottom: 10 }}>
-                    年级{(isGood) ? '前' : '后'}<input defaultValue={_this.state.inputNum} onBlur={_this.onInputChange.bind(_this) } style={{ display: 'inline-block', width: 45, height: 22, lineHeight: '22px' }}/> {_this.state.current.key === 'ranking' ? '名' : '%'}
+                <div style={{position: 'absolute', right: 0, top: -55 }}>
+                    <span style={{marginRight: 8}}>年级{(isGood) ? '前' : '后'}</span>
+                    <input defaultValue={_this.state.inputNum} onBlur={_this.onInputChange.bind(_this) } style={{ display: 'inline-block', width: 52, height: 30, lineHeight: '30px' }}/> 
+                    {_this.state.current.key === 'ranking' ? '名' : '%'}
                 </div>
                 <TableView TableComponent={Table} tableHeaderData={tableHeaderData} isGood={isGood} inputNum={this.state.inputNum} current={this.state.current} tableData={tableBodyData}/>
 
@@ -193,9 +194,103 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
     var topStudents = _.reverse(_.takeRight(examStudentsInfo, 10));
     var lowStudents = _.reverse(_.take(examStudentsInfo, 10));
     var tableHeaderData = _.map(headers, (headerObj) => headerObj.subject);
-
+    var rankColors = [B08, B07, B06];
+    var students = [topStudents, lowStudents];
     return (
         <div className={schoolReportStyles['section']} style={{ paddingBottom: 100 }}>
+            <div style={{ marginBottom: 30 }}>
+                <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
+                <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>分数排行榜</span>
+                <span style={{ fontSize: 12, color: C07 }}>分数排行榜，可得出相对优秀及相对落后的学生在各个班级中的分布数量</span>
+            </div>
+            {/******************************   前后十名列表 *******************************************/}
+            <div id='rank-table'>
+            {
+                _.range(2).map(posNum => {
+                    {/* 分别渲染前、后十名列表 */}
+                    return (
+                        <div key={'table-' + posNum} style={_.assign({}, { width: 555, minHeight: 338, display: 'inline-block', border: '1px solid ' + C05, paddingTop: 30 }, posNum === 0 ? { marginRight: 30 } : {}) }>
+                            <div style={{ padding: '0 30px 20px 0', marginLeft: 30, borderBottom: '1px solid ' + C05 }}>{'本次考试' + (posNum === 0 ? '前' : '后') + '十名的学生'}</div>
+                            {
+                                _.range(2).map(num => {
+                                    {/* 分别渲染列表内的左右边表格 */ }
+                                    return (
+                                        <table key={'table-' + posNum + '-' + num} style={_.assign({}, { width: 240, minHeight: 220, margin: '30px 0 0 30px', float: 'left' }, num === 0 ? { borderRight: '1px solid ' + C05 } : {}) }>
+                                            <thead>
+                                                <tr>
+                                                    <th style={localCss.tableCell}>名次</th>
+                                                    <th style={localCss.tableCell}>姓名</th>
+                                                    <th style={localCss.tableCell}>班级</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {
+                                                    students[posNum].slice(num * 5, (num + 1) * 5).map((student, index) => {
+                                                        return (
+                                                            <tr key={posNum + '-student-tr-' + num + index}>
+                                                                {
+                                                                    _.range(3).map(tdNum => {
+                                                                        var rank = num * 5 + index;
+                                                                        switch (tdNum) {
+                                                                            case 0:
+                                                                                return (
+                                                                                    <td key={posNum + '-student-' + rank + '-' + tdNum} style={localCss.tableCell}>
+                                                                                        <div style={_.assign({}, { width: 22, height: 22, borderRadius: '50%', textAlign: 'center', lineHeight: '22px' }, (rank > 2 || posNum === 1)? { backgroundColor: colorsMap.C03, color: colorsMap.C09 } : { backgroundColor: rankColors[rank], color: '#fff' }) }>
+                                                                                            {rank + 1}
+                                                                                        </div>
+                                                                                    </td>)
+                                                                            case 1:
+                                                                                return (
+                                                                                    <td key={posNum + '-student-' + rank + '-' + tdNum} style={localCss.tableCell}>{student.name}</td>
+                                                                                )
+                                                                            case 2:
+                                                                                return (
+                                                                                    <td key={posNum + '-student-' + rank + '-' + tdNum} style={localCss.tableCell}>{student.class + '班'}</td>
+                                                                                )
+                                                                        }
+                                                                    })
+                                                                }
+                                                            </tr>
+                                                        )
+                                                    })
+                                                }
+                                            </tbody>
+                                        </table>
+                                    )
+                                })
+                            }
+                        </div>
+                    )
+                    })
+            }
+            </div>
+             {/*--------------------------------  优秀学生人数表格 -------------------------------------*/}
+            <p style={{ marginBottom: 30, marginTop: 50 }}>
+                <span className={schoolReportStyles['sub-title']}>优秀学生人数</span>
+            </p>
+            <StudentPerformanceTable
+                examInfo={examInfo}
+                examStudentsInfo={examStudentsInfo}
+                allStudentsPaperMap={allStudentsPaperMap}
+                headers={headers}
+                isGood={true}
+                tableHeaderData={tableHeaderData}
+                />
+             {/*--------------------------------  待提高学生人数表格 -------------------------------------*/}
+            <p style={{ marginBottom: 30, marginTop: 50 }}>
+                <span className={schoolReportStyles['sub-title']}>待提高学生人数</span>
+            </p>
+            <StudentPerformanceTable
+                examInfo={examInfo}
+                examStudentsInfo={examStudentsInfo}
+                allStudentsPaperMap={allStudentsPaperMap}
+                headers={headers}
+                isGood={false}
+                tableHeaderData={tableHeaderData}
+                />
+
+
+
             <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
             <div className={schoolReportStyles['section-title']} style={{ padding: '0 10px', position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 300 }}>
                 学校有必要知道的学生重点信息

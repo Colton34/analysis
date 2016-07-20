@@ -122,14 +122,34 @@ export const INIT_RANKREPORT = 'INIT_RANKREPORT';
 export const INIT_RANKREPORT_SUCCESS = 'INIT_RANKREPORT_SUCCESS';
 
 //====================== color ==============================
+export const COLORS_MAP = {
+    A11 : '#de5d44',
+    A12 : '#40b1de',
+    B03 : '#59bde5',
+    B04 : '#69c170',
+    B06 : '#f7be38',
+    B07 : '#f6953d',
+    B08 : '#ee6b52',
+    C03 : '#f2f2f2',
+    C04 : '#eeeeee',
+    C05 : '#e7e7e7',
+    C07 : '#BFBFBF',
+    C09 : '#999999',
+    C12 : '#333333',
+    C14 : '#fdfdfd'    
+}
 export const BACKGROUND_COLOR = '#EFF1F4';
 export const A11 = '#de5d44';
 export const A12 = '#40b1de';
 export const B03 = '#59bde5';
 export const B04 = '#69c170';
+export const B06 = '#f7be38';
+export const B07 = '#f6953d';
 export const B08 = '#ee6b52';
+export const C03 = '#f2f2f2';
 export const C04 = '#eeeeee';
 export const C05 = '#e7e7e7';
 export const C07 = '#BFBFBF';
+export const C09 = '#999999';
 export const C12 = '#333333';
 export const C14 = '#fdfdfd';
