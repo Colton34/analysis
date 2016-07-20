@@ -274,7 +274,7 @@ class SubjectPerformance extends React.Component {
 //自定义Moudle数据结构：
         var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
         return (
-            <div className={schoolReportStyles['section']}>
+            <div id='subjectPerformance' className={schoolReportStyles['section']}>
                 <div style={{ marginBottom: 30 }}>
                     <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                     <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科考试表现</span>
