@@ -2,7 +2,7 @@ import React from 'react';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
 import ReactHighcharts from 'react-highcharts';
-import { B03, C04, C07, C12, C14 } from '../../lib/constants'; 
+import { B03, C04, C07, C12, C14 } from '../../lib/constants';
 import {makeSegments, makeSegmentsStudentsCount} from '../../api/exam';
 
 const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
@@ -23,16 +23,29 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
 
 //自定义Module数据结构
     var config = {
+        colors:['#00adfb'],
         title: {
-            text: '',
-            x: -20 //center
+            text: '(人数)',
+            floating:true,
+            x:-370,
+            y:5,
+            style:{
+              "color": "#333333",
+               "fontSize": "14px"
+            }
+
         },
         xAxis: {
+          tickWidth:'0px',//不显示刻度
             categories: result['x-axon']
         },
         yAxis: {
+
+          gridLineDashStyle:'Dash',
             title: {
-                text: '人数'
+                text: '',
+
+
             },
             plotLines: [{
                 value: 0,
@@ -41,11 +54,14 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
             }]
         },
         tooltip: {
+        backgroundColor:'#000',
+        borderColor:'#000',
+        style:{
+          color:'#fff'
+        },
             formatter: function(){
-                return '分数区间：<b>' +
-                        (this.point.first ? '[' : '(') +
-                        this.point.low + ',' + this.point.high + ']</b><br/>' +
-                        '人数:<b>' + this.point.y + '人</b>';
+                 return this.point.low + '-' + this.point.high +
+                '区间人数<br />' + this.point.y + '人,占';
             }
         },
         legend: {

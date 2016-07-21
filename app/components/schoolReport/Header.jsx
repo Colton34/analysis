@@ -47,7 +47,6 @@ class NavBar extends React.Component {
             scrollTopList.push(document.getElementById(module.id).offsetTop)
         })
         var $body = $('body');
-        
         var _this = this;
         window.addEventListener('scroll', function () {
             var bodyTop = $body.scrollTop();
@@ -60,8 +59,6 @@ class NavBar extends React.Component {
                     })
                 }
             } else{
-                //$('#header').css({'position': 'relative'});
-                _this.position = 'normal';
                 _this.setState({
                     position: 'normal'
                 })    
@@ -80,11 +77,14 @@ class NavBar extends React.Component {
         })
 
     }
+<<<<<<< HEAD
     componentWillUnmount() {
         window.removeEventListener('scroll', ()=> {
             console.log('remove scroll listener');
         })
     }
+=======
+>>>>>>> 24df2186b29cd44bc65fdb27e6a628cdf54b516b
     onClickModule(event) {
         var $target = $(event.target);
         var id = $target.data('id');
@@ -98,6 +98,7 @@ class NavBar extends React.Component {
         
     }
     render() {
+<<<<<<< HEAD
         var moduleLen = modules.length;
         return (
             <div id='navBar' style={_.assign({}, {zIndex: 100, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C05, backgroundColor: colorsMap.C02},
@@ -106,6 +107,16 @@ class NavBar extends React.Component {
                 modules.map((module, index) => {
                     return (
                         <div key={'navItem-' + index} id='nav-item' style={{display: 'table-cell', minWidth: 1200/moduleLen, height: 50, textAlign: 'center', verticalAlign: 'middle', fontSize: 12, cursor: 'pointer'}} 
+=======
+        
+        return (
+            <div id='navBar' style={_.assign({}, {zIndex: 100, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C05, backgroundColor: colorsMap.C02},
+                                    this.state.position === 'normal' ? {position:'absolute', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: 1200, left: '50%', marginLeft: -600})}>
+            {
+                modules.map((module, index) => {
+                    return (
+                        <div id='nav-item' style={{display: 'table-cell', minWidth: 1200/modules.length, height: 50, textAlign: 'center', verticalAlign: 'middle', fontSize: 12, cursor: 'pointer'}} 
+>>>>>>> 24df2186b29cd44bc65fdb27e6a628cdf54b516b
                              data-id={module.id} onClick={this.onClickModule.bind(this)}>
                             <span style={this.state.activeId === module.id ? {paddingBottom: 16, borderBottom: '2px solid ' + colorsMap.A12} : {}}>{module.name} </span>
                             <span style={_.assign({}, {display: 'inline-block', height: 12, float: 'right', marginTop: 2}, index === modules.length -1 ? {}: {borderRight: '1px solid ' + colorsMap.C05})}></span>
