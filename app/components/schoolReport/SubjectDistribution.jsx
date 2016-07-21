@@ -131,7 +131,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
             x:-480,
             y:5,
             style:{
-              "color": "#333333",
+              "color": "#767676",
                "fontSize": "14px"
             }
         },
@@ -146,6 +146,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
 
         },
         yAxis: {
+          lineWidth:1,
           gridLineColor:'#f2f2f2',
           gridLineDashStyle:'Dash',
             title: '',

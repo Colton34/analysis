@@ -135,7 +135,7 @@ class Dialog extends React.Component {
         //     })
         //     return;
         // }
-        
+
         // isValid字段复位
         this.isValid[index] = true;
         //如果value不变。。。那么也不更新
@@ -156,7 +156,7 @@ class Dialog extends React.Component {
                 grades: newGrades
             });
         }
-        
+
     }
 
     onHide() {
@@ -262,7 +262,6 @@ class SubjectPerformance extends React.Component {
             levelPcentages: newLevelPercentages
         })
     }
-
     render() {
 //Props数据结构：
         var {examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers} = this.props;
@@ -272,6 +271,52 @@ class SubjectPerformance extends React.Component {
         var subjectLevelExamTableData = theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, this.state.levelPcentages);
         var disData = theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap);
 //自定义Moudle数据结构：
+
+var config={
+chart: {
+    type: 'column'
+},
+title: {
+    text: '',
+    enabled:false
+},
+subtitle: {
+    text: '(离差)',
+    floating:true,
+    x:-512,
+    y:5,
+    style:{
+      "color": "#767676",
+       "fontSize": "14px"
+    }
+
+},
+colors:['#1daef8','#16d2c7'],
+xAxis: {
+  tickWidth:'0px',//不显示刻度
+    
+},
+yAxis: {
+  lineWidth:1,
+gridLineDashStyle:'Dash',
+title: {
+                text: ''
+            },
+},
+credits:{
+  enabled:false
+},
+tooltip:{
+enabled:false
+},
+legend:{
+  enabled:false
+},
+series: [{
+
+    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+}]
+};
         var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
         return (
             <div id='subjectPerformance' className={schoolReportStyles['section']}>
@@ -283,10 +328,13 @@ class SubjectPerformance extends React.Component {
                 <TableView tableData={subjectExamTableData} reserveRows={6}/>
 
                 <p style={{marginBottom: 20}}>
-                    <span className={schoolReportStyles['sub-title']}>学科离差表现</span>
+                    <span className={schoolReportStyles['sub-title']}>学科离差分布</span>
                     <span className={schoolReportStyles['title-desc']}>离差较大的学科，反映出各班级该学科教学效果差距较大；离差较小的学科，反映出各班级该学科教学效果比较整齐</span>
                 </p>
                 {/* todo： 待补充离差表现图 */}
+                <div style={{display: 'inline-block', width: '100%', height: 380, position: 'relative'}}>
+                  <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
+                </div>
                 <p style={{marginBottom: 20}}>
                     <span className={schoolReportStyles['sub-title']}>各学科成绩分布的等级结构比例</span>
                     <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 120, height: 30, float: 'right', backgroundColor: A12, color: '#fff', lineHeight: '30px', borderRadius: 2}}>
@@ -296,7 +344,7 @@ class SubjectPerformance extends React.Component {
                 </p>
                 <TableView tableData={subjectLevelExamTableData} reserveRows={6}/>
                 <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} levelPcentages={this.state.levelPcentages} updateGrades={this.updateLevelPercentages.bind(this)} />
-            </div> 
+            </div>
         )
     }
 

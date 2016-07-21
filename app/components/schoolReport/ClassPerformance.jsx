@@ -141,7 +141,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
              x:-388,
              y:43,
              style:{
-               "color": "#333333",
+               "color": "#767676",
                 "fontSize": "14px"
              }
 
@@ -151,6 +151,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                 tickWidth:'0px',//不显示刻度
             },
             yAxis: {
+              lineWidth:1,
               gridLineDashStyle:'Dash',
                 title: {
                     text: ''

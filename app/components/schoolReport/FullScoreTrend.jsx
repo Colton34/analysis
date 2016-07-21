@@ -30,7 +30,7 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
             x:-370,
             y:5,
             style:{
-              "color": "#333333",
+              "color": "#767676",
                "fontSize": "14px"
             }
 
@@ -40,12 +40,10 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
             categories: result['x-axon']
         },
         yAxis: {
-
+          lineWidth:1,
           gridLineDashStyle:'Dash',
             title: {
                 text: '',
-
-
             },
             plotLines: [{
                 value: 0,
