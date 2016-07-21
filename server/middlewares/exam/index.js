@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-08 11:26:02
+* @Last Modified time: 2016-07-21 11:57:36
 */
 
 'use strict';
@@ -284,11 +284,55 @@ exports.home = function(req, res, next) {
             return when.reject(new errors.Error('格式化exams错误'));
         }
     }).then(function(formatedExams) {
+        // formatedExams = filterExamsByAuth(formatedExams);
         res.status(200).send(formatedExams);
     }).catch(function(err) {
         next(err);
     })
 }
+
+/*
+
+
+                var obj = {};
+                obj.examName = (justOneGrade) ? value.exam.name : value.exam.name + "(年级：" + gradeKey + ")";
+                obj.grade = gradeKey;
+                obj.id = key;
+                obj.time = moment(value.exam['event_time']).valueOf();
+                obj.eventTime = moment(value.exam['event_time']).format('ll');
+                obj.subjectCount = papers.length;
+                obj.papers = _.map(papers, (obj) => {
+                    return {
+                        id: obj.paper,
+                        subject: obj.subject
+                    }
+                });
+                obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
+                obj.from = value.exam.from; //TODO: 这里数据库里只是存储的是数字，但是显示需要的是文字，所以需要有一个map转换
+
+                result[timeKey].push(obj);
+
+
+ */
+
+
+
+
+
+function filterExamsByAuth(formatedExams) {
+    //Note: 如果过滤后最终此时间戳key下没有exam了则也不显示此time key
+    //Note: 从当前用户中获取此用户权限，从而过滤
+}
+
+    //获取方便判断的user auth
+    //算法：
+        //从大到小判断
+        //是否是“校领导”（教育局？）
+    //yes: 结束
+        //no: 是否是"某些"年级主任（能看此年级下所有的科目）-- 删掉所有{grade: xxx, ...}的object  (学科组长，班主任，任课老师这三个都需要填写grade)，是否还剩余有object
+    //yes: 接着判断剩余的对象代表的是不是“某些学科组长”的权限 -- 删掉所有{grade: xxx, subject: yyy, ...}的object  no: 计算权限  是否还剩余object
+    //yes: 班主任/任课老师
+
 
 function getCustomExams(owner) {
     return when.promise(function(resolve, reject) {
