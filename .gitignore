@@ -15,3 +15,4 @@ note*
 tempFiles/
 start-dev.sh
 start.sh
+.DS_Store
