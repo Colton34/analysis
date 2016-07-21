@@ -25,7 +25,7 @@ var localCss = {
 
 const Table = ({tableHeaderData, isGood, current, tableData}) => {
     return (
-        <BootTable bordered hover responsive>
+        <BootTable bordered hover responsive style={{marginBottom: 0}}>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa' }}>
                     <th className={styles['table-unit']}>班级</th>

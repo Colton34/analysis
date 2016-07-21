@@ -26,6 +26,70 @@ var localStyle= {
     }
 }
 
+class InfoBlock extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showScroll: false,
+            needScroll: _.size(this.props.disData) > 4 ? true : false
+        }
+    }
+
+    onMouseEnter(e){
+        if (!this.state.needScroll) return;
+        this.setState({
+            showScroll: true
+        })
+    }
+    onMouseLeave(e){
+        if (!this.state.needScroll) return;
+        this.setState({
+            showScroll: false
+        })
+    }
+
+    render() {
+        var {disData, studentsGroupByClass} = this.props;
+        var disDataSize = _.size(disData);
+        return (
+            <div style={_.assign({}, { width: '100%', height: 150, marginTop: 30 }, disDataSize > 4 && this.state.showScroll ? { overflowX: 'scroll' } : {overflowX: 'hidden'})}
+                 onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
+                <div style={_.assign({}, { width: disDataSize * 235 }) }>
+                    {/**先渲染全校数据 */}
+                    <div style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20 }}>
+                        <p style={{ marginBottom: 10, fontSize: 12 }}>全校上线贡献率</p>
+                        {
+                            disData['totalSchool'] ? (
+                                <div>
+                                    <p style={{ fontSize: 12, marginBottom: 0 }}>贡献率高：<span style={{ color: B08 }}>{_.join(disData['totalSchool'].maxSubjects, '、') }</span></p>
+                                    <p style={{ fontSize: 12 }}>贡献率低：<span style={{ color: B04 }}>{_.join(disData['totalSchool'].minSubjects, '、') }</span></p>
+                                </div>
+                            ) : <p>只有一个科目没有可比性</p>
+                        }
+                    </div>
+                    {
+                        _.map(studentsGroupByClass, (students, className) => {
+                            return (
+                                <div style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
+                                    <p style={{ marginBottom: 10, fontSize: 12 }}>{className + '班'}上线贡献率</p>
+                                    {
+                                        disData[className] ? (
+                                            <div>
+                                                <p style={{ fontSize: 12, marginBottom: 0 }}>贡献率高：<span style={{ color: B08 }}>{_.join(disData[className].maxSubjects, '、') }</span></p>
+                                                <p style={{ fontSize: 12 }}>贡献率低：<span style={{ color: B04 }}>{_.join(disData[className].minSubjects, '、') }</span></p>
+                                            </div>
+                                        ) : <p>只有一个科目没有可比性</p>
+                                    }
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            </div>
+        )
+    }
+}
+
 /**
  * props:
  * levels: 包含分档信息的object;
@@ -68,40 +132,8 @@ class LevelInfo extends React.Component {
                 {/* 主要内容显示区 */}
                 <div id='info-block'>
                    <TableView tableData={tableData} TableComponent={Table} reserveRows={7}/>
-                   {/** 各班上线率方块*/}
-                   <div style={_.assign({}, { width: '100%', height: 150, marginTop: 30 }, disDataSize > 4 ? { overflowX: 'scroll' } : {}) }>
-                       <div style={_.assign({}, { width: disDataSize * 235}) }>
-                           {/**先渲染全校数据 */}
-                           <div style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20}}>
-                               <p style={{ marginBottom: 15, fontSize: 12}}>全校上线贡献率</p>
-                               {
-                                   disData['totalSchool'] ? (
-                                       <div>
-                                           <p style={{fontSize: 12}}>贡献率高：<span style={{ color: B08 }}>{_.join(disData['totalSchool'].maxSubjects, '、') }</span></p>
-                                           <p style={{fontSize: 12}}>贡献率低：<span style={{ color: B04 }}>{_.join(disData['totalSchool'].minSubjects, '、') }</span></p>
-                                       </div>
-                                   ) : <p>只有一个科目没有可比性</p>
-                               }
-                           </div>
-                           {
-                               _.map(studentsGroupByClass, (students, className) => {
-                                   return (
-                                       <div style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
-                                           <p style={{ marginBottom: 15, fontSize: 12 }}>{className + '班'}上线贡献率</p>
-                                           {
-                                               disData[className] ? (
-                                                   <div>
-                                                       <p style={{fontSize: 12}}>贡献率高：<span style={{ color: B08 }}>{_.join(disData[className].maxSubjects, '、') }</span></p>
-                                                       <p style={{fontSize: 12}}>贡献率低：<span style={{ color: B04 }}>{_.join(disData[className].minSubjects, '、') }</span></p>
-                                                   </div>
-                                               ) : <p>只有一个科目没有可比性</p>
-                                           }
-                                       </div>
-                                   )
-                               })
-                           }
-                       </div>
-                   </div>
+                   {/** 各科贡献率方块*/}
+                   <InfoBlock studentsGroupByClass={studentsGroupByClass} disData={disData}/>
                     {/* 离差图 */}
                     <p style={{margin: '50px 0 30px 0'}}>
                         <span style={{fontSize: 16}}>学科上线率离差</span>

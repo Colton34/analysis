@@ -47,27 +47,18 @@ class NavBar extends React.Component {
             scrollTopList.push(document.getElementById(module.id).offsetTop)
         })
         var $body = $('body');
-        // $('#app').scroll(()=> {
-        //     debugger
-        //     if ($navBar.scrollTop() <= $body.scrollTop()) {
-        //         console.log('need to transfrom!');
-        //     }
-        // })
         var _this = this;
         window.addEventListener('scroll', function () {
             var bodyTop = $body.scrollTop();
             //判断何时吸顶
-
             if (navBarTop <= bodyTop) {
                 if(_this.state.position !== 'fixed') {
-                    $('#header').css({ 'position': 'static' });
+                    //$('#header').css({ 'position': 'static' });
                     _this.setState({
                         position: 'fixed'
                     })
                 }
             } else{
-                $('#header').css({'position': 'relative'});
-                _this.position = 'normal';
                 _this.setState({
                     position: 'normal'
                 })    
@@ -86,6 +77,11 @@ class NavBar extends React.Component {
         })
 
     }
+    componentWillUnmount() {
+        window.removeEventListener('scroll', ()=> {
+            console.log('remove scroll listener');
+        })
+    }
     onClickModule(event) {
         var $target = $(event.target);
         var id = $target.data('id');
@@ -99,14 +95,14 @@ class NavBar extends React.Component {
         
     }
     render() {
-        
+        var moduleLen = modules.length;
         return (
             <div id='navBar' style={_.assign({}, {zIndex: 100, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C05, backgroundColor: colorsMap.C02},
-                                    this.state.position === 'normal' ? {position:'absolute', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: 1200, left: '50%', marginLeft: -600})}>
+                                    this.state.position === 'normal' ? {position:'absolute', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: 1200, left: '50%', marginLeft: -600, borderBottom: '1px solid ' + colorsMap.C05})}>
             {
                 modules.map((module, index) => {
                     return (
-                        <div id='nav-item' style={{display: 'table-cell', minWidth: 1200/modules.length, height: 50, textAlign: 'center', verticalAlign: 'middle', fontSize: 12, cursor: 'pointer'}} 
+                        <div key={'navItem-' + index} id='nav-item' style={{display: 'table-cell', minWidth: 1200/moduleLen, height: 50, textAlign: 'center', verticalAlign: 'middle', fontSize: 12, cursor: 'pointer'}} 
                              data-id={module.id} onClick={this.onClickModule.bind(this)}>
                             <span style={this.state.activeId === module.id ? {paddingBottom: 16, borderBottom: '2px solid ' + colorsMap.A12} : {}}>{module.name} </span>
                             <span style={_.assign({}, {display: 'inline-block', height: 12, float: 'right', marginTop: 2}, index === modules.length -1 ? {}: {borderRight: '1px solid ' + colorsMap.C05})}></span>
