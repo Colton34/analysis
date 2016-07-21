@@ -461,6 +461,7 @@ class ScoreDistribution extends React.Component {
             currentClass: item
         })
     }
+    
     render() {
     //Props数据结构：
         var {examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, changeLevels} = this.props;
@@ -473,7 +474,6 @@ class ScoreDistribution extends React.Component {
         //自定义Module数据结构
         var _this = this;
         var levTotal = _.size(levels);
-        var disTotal = _.size(disData);
 //饼图的数据和select放在一起。是受当前组件的状态值而改变的。通过totalScroeLevelInfo来获取
 // 通过 levelTotalScoreInfo[theKey] 即可获得此scope下所有学生的分档情况
 
@@ -565,48 +565,12 @@ class ScoreDistribution extends React.Component {
                         <span style={{ fontSize: 12, color: C07 }}>总分分档上线学生人数分布，可得到全校及各班在学业综合水平上的分层表现</span>
                     </div>
                     <TableView tableData={tableData} levels={levels} TableComponent={Table} reserveRows={6}/>
-
+                    {/* 上线率高低模块 */}
                     <div style={{margin: '50px 0 20px 0'}}>
                         <span style={{color: C12, marginRight: 20}}>按上线率比较</span>
                         <span style={{ fontSize: 12, color: C07 }}>上线率 = 班级某档上线人数 ÷ 全校某档上线人数，因各班级人数不同，通过比较累积上线率，能更准确的反映各班级上线情况</span>
                     </div>
-
-                    <div style={_.assign({},{display: 'inline-block'})}>
-                        <div id='high' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0', marginBottom: 20}, disTotal > 3 ? {overflowX: 'scroll'} : {})}>
-                            <div style={_.assign({}, {width: 215 * disTotal + 95})}>
-                            {
-                                (_.size(disData) > 0) ? (
-                                    _.map(_.range(levTotal), (index) => {
-                                        var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
-                                        return (
-                                            <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
-                                                <p style={{ fontSize: 12 }}>{levelStr}档线上线率高的班级</p>
-                                                <p style={{ color: B08, marginBottom: 0 }}>{_.join(_.map(levObj.high, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
-                                            </div>
-                                        )
-                                    })
-                                ) : (<p>只有一个班级，没有可比性</p>)
-                            }
-                            </div>
-                        </div>
-                        <div id='low' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0', marginBottom: 20}, disTotal > 3 ? {overflowX: 'scroll'} : {})}>
-                            <div style={_.assign({}, {width: 215 * disTotal + 95})}>
-                            {
-                                (_.size(disData) > 0) ? (
-                                    _.map(_.range(levTotal), (index) => {
-                                        var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
-                                        return (
-                                            <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
-                                                <p style={{ fontSize: 12 }}>{levelStr}档线上线率低的班级</p>
-                                                <p style={{ color: B04, marginBottom: 0 }}>{_.join(_.map(levObj.low, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
-                                            </div>
-                                        )
-                                    })
-                                ) : (<p>只有一个班级，没有可比性</p>)
-                            }
-                            </div>
-                        </div>
-                    </div>
+                    <OnlineInfo levTotal={levTotal} disData={disData} examInfo={examInfo}/>
                     <div style={{ display: 'inline-block', width: 380, height:240,
                        position: 'relative', float: 'right' }}>
                         {/*--------------------------------  总分分档上线学生饼图 -------------------------------------*/}
@@ -625,6 +589,85 @@ class ScoreDistribution extends React.Component {
 
 export default ScoreDistribution;
 
+/**
+ * 上线率高低模块组件
+ * props:
+ * levTotal, disData
+ */
+class OnlineInfo extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            showScroll: ''
+        }
+    }
+    onMouseEnter(e){
+        var $target = $(e.target); 
+        var id = $target.attr('id');
+        if (!id) {
+            id = $target.parents('.online-block').attr('id');
+        }
+        console.log('enter: ' + id);
+        this.setState({
+            showScroll: id
+        })
+    }
+    onMouseLeave(e){
+        var $target = $(e.target); 
+        var id = $target.attr('id');
+        if (!id) {
+            id = $target.parents('.online-block').attr('id');
+        }
+        console.log('leave: ' + id);
+        this.setState({
+            showScroll: ''
+        })
+    }
+    render() {
+        var {levTotal, disData, examInfo} = this.props;
+        var disTotal = _.size(disData);
+        return (
+            <div style={_.assign({}, { display: 'inline-block' }) }>
+                <div id='high' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'high' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
+                    onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
+                    <div style={_.assign({}, { width: 215 * disTotal + 95 }) }>
+                        {
+                            (_.size(disData) > 0) ? (
+                                _.map(_.range(levTotal), (index) => {
+                                    var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
+                                    return (
+                                        <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
+                                            <p style={{ fontSize: 12 }}>{levelStr}档线上线率高的班级</p>
+                                            <p style={{ color: B08, marginBottom: 0 }}>{_.join(_.map(levObj.high, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
+                                        </div>
+                                    )
+                                })
+                            ) : (<p>只有一个班级，没有可比性</p>)
+                        }
+                    </div>
+                </div>
+                <div id='low' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'low' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
+                    onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
+                    <div style={_.assign({}, { width: 215 * disTotal + 95 }) }>
+                        {
+                            (_.size(disData) > 0) ? (
+                                _.map(_.range(levTotal), (index) => {
+                                    var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
+                                    return (
+                                        <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
+                                            <p style={{ fontSize: 12 }}>{levelStr}档线上线率低的班级</p>
+                                            <p style={{ color: B04, marginBottom: 0 }}>{_.join(_.map(levObj.low, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
+                                        </div>
+                                    )
+                                })
+                            ) : (<p>只有一个班级，没有可比性</p>)
+                        }
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
 
 //算法：按照分档标准创建对应的segments。segments最小值是最低档线，最大值是满分（即，一档线区间是(一档线score, fullMark]）
 /**
