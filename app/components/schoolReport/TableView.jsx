@@ -1,9 +1,13 @@
 import React from 'react';
 import Table from '../../common/Table.jsx';
+import {COLORS_MAP as colorsMap} from '../../lib/constants';
 
 
 let localStyle = {
-    tableShowAllBtn: { color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }
+    tableShowAllBtn: { 
+        color: colorsMap.C12, textDecoration: 'none', width: '100%', height: 40, display: 'inline-block', textAlign: 'center', backgroundColor: '#fff', lineHeight: '40px',
+        border: '1px solid ' + colorsMap.C05, borderTop: 0
+    }
 }
 /**
  * props:
@@ -50,14 +54,14 @@ class TableView extends React.Component {
         var TableComponent = this.props.TableComponent ? this.props.TableComponent : Table;
         return (
             <div>
-                <div style={{ width: '100%', overflowX: 'scroll' }}>
+                <div style={{ width: '100%'}}>
                     <TableComponent  {...this.props} tableData={this.state.showData} />
                 </div>
                 {
                     this.state.showAllEnable ?
                         (this.state.showAll ?
-                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击收缩表格数据 <i className='icon-up-open-2'></i></a> :
-                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击查看更多数据 <i className='icon-down-open-2'></i> </a>
+                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击收缩表格数据 <i style={{color: colorsMap.A12}} className='icon-up-open-2'></i></a> :
+                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击查看更多数据 <i style={{color: colorsMap.A12}} className='icon-down-open-2'></i> </a>
                         ) : ''
                 }
             </div>
