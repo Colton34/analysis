@@ -30,16 +30,19 @@ class InfoBlock extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            showScroll: false
+            showScroll: false,
+            needScroll: _.size(this.props.disData) > 4 ? true : false
         }
     }
 
     onMouseEnter(e){
+        if (!this.state.needScroll) return;
         this.setState({
             showScroll: true
         })
     }
     onMouseLeave(e){
+        if (!this.state.needScroll) return;
         this.setState({
             showScroll: false
         })
