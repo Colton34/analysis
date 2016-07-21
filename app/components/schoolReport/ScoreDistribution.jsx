@@ -155,7 +155,7 @@ class Dialog extends React.Component {
             })
             return;
         }
-        
+
         var preLength = _.size(this.levels);
         var theDiff = Math.abs(preLength - value);
         if(theDiff === 0) return;
@@ -267,7 +267,7 @@ class Dialog extends React.Component {
                 errorMsg: ''
             })
         }
-        
+
         this.props.changeLevels(this.levels);
         this.props.onHide();
     }
@@ -482,7 +482,7 @@ class ScoreDistribution extends React.Component {
         var levelInfo = totalScoreLevelInfo[this.state.currentClass.key];
         var pieChartData = _.map(levelInfo, (levelObj, levelKey)=> {
             var obj = {};
-            obj.name = numberMap[(parseInt(levelKey)+1)] + '档';
+            obj.name = numberMap[(parseInt(levelKey)+1)] + '档上线率';
             obj.y = levelInfo[(levTotal-1-levelKey)+''].count;  //当前scope下当前档次的人数
             return obj;
         });
@@ -496,24 +496,54 @@ class ScoreDistribution extends React.Component {
                 plotShadow: false,
                 type: 'pie'
             },
+            colors:[
+             '#00adfb',
+             '#16d2c7',
+             '#4bc254',
+             '#e7e7e7'
+           ],
             title: {
-                text: ''
+              verticalAlign: 'middle',
+              text: '各档上线率',
+              align:'center',
+              x:-60,
+              y:3,
+              style:{
+                'color':'#333333',
+                'font-size':'14px'
+              }
             },
             tooltip: {
                 pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
             },
             plotOptions: {
                 pie: {
+                  size:'180',
+                  innerSize:'130',//内径大小
                     allowPointSelect: true,
                     cursor: 'pointer',
                     dataLabels: {
-                        enabled: true,
+                        enabled: false,
                         format: '<b>{point.name}</b>: {point.percentage:.1f} %',
                         style: {
                             color: (ReactHighcharts.theme && ReactHighcharts.theme.contrastTextColor) || 'black'
                         }
-                    }
+                    },
+                    showInLegend: true,
+
                 }
+            },
+            legend:{
+              layout: 'vertical',
+              align: 'right',
+              verticalAlign: 'bottom',
+              borderWidth: '0px',
+              enabled: true,
+              itemStyle:{
+                'font-size':'14px',
+                'color':'#333333'
+              },
+              itemMarginBottom:15
             },
             series: [{
                 name: '档位',
@@ -531,7 +561,7 @@ class ScoreDistribution extends React.Component {
                 <div className={schoolReportStyles['section']}>
                     <div style={{ marginBottom: 30 }}>
                         <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
-                        <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>总分分档上线学生人数分布</span> 
+                        <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>总分分档上线学生人数分布</span>
                         <span style={{ fontSize: 12, color: C07 }}>总分分档上线学生人数分布，可得到全校及各班在学业综合水平上的分层表现</span>
                     </div>
                     <TableView tableData={tableData} levels={levels} TableComponent={Table} reserveRows={6}/>
@@ -573,7 +603,8 @@ class ScoreDistribution extends React.Component {
                             }
                         </div>
                     </div>
-                    <div style={{ display: 'inline-block', width: 380, height: 240, position: 'relative', float: 'right' }}>
+                    <div style={{ display: 'inline-block', width: 380, height:240,
+                       position: 'relative', float: 'right' }}>
                         {/*--------------------------------  总分分档上线学生饼图 -------------------------------------*/}
                         <ReactHighcharts config={config} style={{ display: 'inline-block', width: 380, height: 240 }}></ReactHighcharts>
                         {/*--------------------------------  饼图的select -------------------------------------*/}

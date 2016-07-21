@@ -129,16 +129,31 @@ const AverageTable = ({tableHeaderData, tableData}) => {
         var meanTableHeaderData = _.map(headers, (headerObj) => headerObj.subject);
 
         var config = {
-            title: {
-                text: '',
-                x: -20 //center
-            },
+          colors:[
+           '#00adfb',
+           '#4bc254',
+           '#16d2c7',
+           '#e7e7e7'
+         ],
+         title: {
+             text: '(人数)',
+             floating:true,
+             x:-388,
+             y:43,
+             style:{
+               "color": "#333333",
+                "fontSize": "14px"
+             }
+
+         },
             xAxis: {
-                categories: xAxons
+                categories: xAxons,
+                tickWidth:'0px',//不显示刻度
             },
             yAxis: {
+              gridLineDashStyle:'Dash',
                 title: {
-                    text: '人数'
+                    text: ''
                 },
                 plotLines: [{
                     value: 0,
@@ -147,12 +162,13 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                 }]
             },
             tooltip: {
-                valueSuffix: '人数'
+                valueSuffix: '人数',
+                enabled:false
             },
             legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'top',
                 borderWidth: 0
             },
             series: yAxonses,

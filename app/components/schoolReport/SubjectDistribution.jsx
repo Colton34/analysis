@@ -112,7 +112,7 @@ class LevelInfo extends React.Component {
             </div>
         )
     }
-    
+
 
 
 }
@@ -126,15 +126,28 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
             type: 'column'
         },
         title: {
-            text: ''
+            text: '(上线率离差)',
+            floating:true,
+            x:-480,
+            y:5,
+            style:{
+              "color": "#333333",
+               "fontSize": "14px"
+            }
         },
         legend: {
             enabled: false
         },
         xAxis: {
+          gridLineColor:'#f2f2f2',
+            tickWidth:'0px',//不显示刻度
+            gridLineWidth:1,
+            gridLineDashStyle:'Dash',
 
         },
         yAxis: {
+          gridLineColor:'#f2f2f2',
+          gridLineDashStyle:'Dash',
             title: '',
             reversedStacks: false
         },
@@ -144,7 +157,8 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
             }
         },
         tooltip: {
-            pointFormat: '<b>{point.name}:{point.y:.1f}</b>'
+            pointFormat: '<b>{point.name}:{point.y:.1f}</b>',
+            enabled: false
         },
         credits: {
             enabled: false
@@ -185,10 +199,10 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
 
         var chartConfig = _.cloneDeep(config);
         chartConfig['xAxis']['categories'] = chartData['xAxons'];
-        var series = [{ data: [], color: '#74c13b', stack: 0 }, { data: [], color: '#f2cd45', stack: 0 }];
+        var series = [{ data: [], color: '#00adfb', stack: 0 }, { data: [], color: '#e7e7e7', stack: 0 }];
         _.each(chartData['yAxons'], (yInfoArr, index) => {
-            series[0].data.push({ name: yInfoArr[0].subject, y: yInfoArr[0].count, dataLabels: { enabled: true, format:'{point.name}', y: -10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 绿色柱
-            series[1].data.push({ name: yInfoArr[1].subject, y: yInfoArr[1].count, dataLabels: { enabled: true, format:'{point.name}', y:  10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 黄色柱
+            series[0].data.push({ name: yInfoArr[0].subject, y: yInfoArr[0].count, dataLabels: { enabled: true, format:'{null}', y: -10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 绿色柱
+            series[1].data.push({ name: yInfoArr[1].subject, y: yInfoArr[1].count, dataLabels: { enabled: true, format:'{null}', y:  10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 黄色柱
         });
         chartConfig['series'] = series;
 
@@ -204,7 +218,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
         <div className={schoolReportStyles['section']}>
             <div style={{ marginBottom: 30 }}>
                 <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
-                <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科分档上线学生人数的分布</span> 
+                <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科分档上线学生人数的分布</span>
                 <span style={{ fontSize: 12, color: C07 }}>运用大数据算法将总分的分档分数精确地分解到各学科中，得出各学科的个档分数线及其分档上线人数分布，可反映出全校各班在各学科的上线情况</span>
             </div>
             <LevelInfo levels={levels} resultData={resultData} studentsGroupByClass={studentsGroupByClass}/>
