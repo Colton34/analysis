@@ -34,6 +34,9 @@ class Dialog extends React.Component {
             hasError: false,
             errorMsg: ''
         }
+        var examFullMark = 0;
+        _.forEach(this.props.examPapersInfo, paperInfo=>{examFullMark += paperInfo.fullMark})
+        this.examFullMark = examFullMark;
     }
     okClickHandler() {
         this.props.onHide();
@@ -172,12 +175,13 @@ class Dialog extends React.Component {
         var _this = this, gradeLastIndex = this.state.grades.length - 1;
 
         return (
-            <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this) }>
+            <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this)}>
                 <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
-                    设置等级分数
+                    设置等级参数
                 </Header>
                 <Body style={{padding: 30}}>
                     <div style={{ minHeight: 230 }}>
+                        <div>考试总分为：{this.examFullMark}分</div>
                         <div style={{ borderBottom: '1px solid #f2f2f2', textAlign: 'center'}}>
                             {
                                 _.map(_.range(gradeLastIndex), (index) => {
@@ -187,7 +191,7 @@ class Dialog extends React.Component {
 
                                     if (index === gradeLastIndex-1 && index !== 0) {
                                         return (
-                                            <div style={{ margin: '30px 0 30px 30px', textAlign: 'left'}} onMouseEnter={this.handleMouseEnter}  onMouseLeave={this.handleMouseLeave}  key={index}>
+                                            <div style={{ margin: '30px 0 30px 30px', textAlign: 'left'}} onMouseEnter={this.handleMouseEnter}  onMouseLeave={this.handleMouseLeave}  key={_.now() + index}>
                                                 <span style={{ marginRight: 20 }}>{charStr}等：</span>
 
                                                 <span style={{ marginRight: 20 }}>表示小于满分×{ this.state.grades[gradeLastIndex-index] }%的分数的学生为{charStr}等</span>
@@ -196,7 +200,7 @@ class Dialog extends React.Component {
                                         )
                                     } else if (index === 0) {
                                         return (
-                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={index}>
+                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={_.now() + index}>
                                                 <span style={{ marginRight: 20 }}>{charStr}等：<input ref={'grade-' + index} defaultValue={this.state.grades[gradeLastIndex-index-1]} onBlur={_this.onInputBlur.bind(_this, index)} />%</span>
                                                 <span style={{ marginRight: 20 }}>表示满分×{ this.state.grades[gradeLastIndex-index-1] }%的分数以上的学生为{charStr}等</span>
                                                 <a onClick={_this.onDeleteGrade.bind(_this, index)}  href='javascript:void(0)'style={{textDecoration:'none'}}id='deleteIcon' className='hide'>x</a>
@@ -204,7 +208,7 @@ class Dialog extends React.Component {
                                         )
                                     } else {
                                         return (
-                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={index}>
+                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={_.now() + index}>
                                                 <span style={{ marginRight: 20 }}>{charStr}等：<input ref={'grade-' + index} defaultValue={this.state.grades[gradeLastIndex-index-1]} onBlur={_this.onInputBlur.bind(_this, index)}/>%</span>
                                                 <span style={{ marginRight: 20 }}>表示满分×{ this.state.grades[gradeLastIndex-index-1] }%到{letterMap[index-1]}等分数的学生为{charStr}等</span>
                                                 <a onClick={_this.onDeleteGrade.bind(_this, index)}  href='javascript:void(0)' style={{textDecoration:'none'}} id='deleteIcon' className='hide'>x</a>
@@ -295,7 +299,7 @@ class SubjectPerformance extends React.Component {
                     </a>
                 </p>
                 <TableView tableData={subjectLevelExamTableData} reserveRows={6}/>
-                <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} levelPcentages={this.state.levelPcentages} updateGrades={this.updateLevelPercentages.bind(this)} />
+                <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} levelPcentages={this.state.levelPcentages} updateGrades={this.updateLevelPercentages.bind(this)} examPapersInfo={examPapersInfo} />
             </div> 
         )
     }
