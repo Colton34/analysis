@@ -135,21 +135,31 @@ class Dialog extends React.Component {
         // this.levelBuffers = this.props.levelBuffers;
         // this.isValid = _.map(_.range(this.levelBuffers.length), (index) => true);
         // this.isUpdate = false;
-
+        var {levels} = this.props;
+        var levelNum = _.size(levels);
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this) }>
                 <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
-                    设置临界生分数
+                    设置临界分数
                 </Header>
                 <Body style={{padding: 30}}>
-                    <div style={{ minHeight: 150, display: 'table', margin:'0 auto'}}>
-                        <div style={{display: 'table-cell', verticalAlign: 'middle'}}>
+                    <div style={{ minHeight: 150}}>
+                        <div style={{marginBottom: 20}}>
+                            考试成绩分为{levelNum}档，
+                        {  
+                            _.join(_.range(levelNum).map(num => {
+                                var index = levelNum - num -1;
+                                return numberMap[num + 1] + '档' + levels[index].score + '分'
+                            }), ',')
+                        }
+                        </div>
+                        <div>
                         {
                             _.map(this.levelBuffers, (buffer, index) => {
                                 return (
-                                    <div key={index} style={{textAlign: 'center', marginBottom: index === this.levelBuffers.length - 1 ? 0 : 30}}>
+                                    <div key={index} style={{marginBottom: index === this.levelBuffers.length - 1 ? 0 : 30}}>
                                         {numberMap[index+1]}档线上下浮分数：
-                                        <input ref={'buffer-' + index} onBlur={_this.onInputBlur.bind(_this, index) } defaultValue={this.levelBuffers[this.levelBuffers.length-1-index]} style={{ width: 140, heigth: 28, display: 'inline-block', textAlign: 'center' }}/>分
+                                        <input ref={'buffer-' + index} onBlur={_this.onInputBlur.bind(_this, index) } defaultValue={this.levelBuffers[this.levelBuffers.length-1-index]} style={{ width: 280, heigth: 34, display: 'inline-block', textAlign: 'left', paddingLeft: 20, margin: '0 20px'}}/>分
                                     </div>
                                 )
                             })
@@ -213,7 +223,6 @@ class GroupAnalysis extends React.Component {
         var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers);
         var disData = criticalStudentsDiscription(criticalLevelInfo); //缺少UI
 //自定义Module数据结构：
-
         return (
             <div id='groupAnalysis' className={schoolReportStyles['section']}>
                 <div style={{ marginBottom: 30 }}>
