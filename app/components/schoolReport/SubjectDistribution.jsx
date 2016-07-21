@@ -215,7 +215,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
     //自定义Module数据结构
     var levelCommonInfo = _.join(_.map(_.range(_.size(levels)), (index) => numberMap[index + 1]));
     return (
-        <div className={schoolReportStyles['section']}>
+        <div id='subjectDistribution' className={schoolReportStyles['section']}>
             <div style={{ marginBottom: 30 }}>
                 <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                 <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科分档上线学生人数的分布</span>

@@ -23,25 +23,16 @@ var localCss = {
 
 }
 
-const Table = ({tableHeaderData, isGood, inputNum, current, tableData}) => {
+const Table = ({tableHeaderData, isGood, current, tableData}) => {
     return (
         <BootTable bordered hover responsive>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa' }}>
-                    <th rowSpan="2" className={styles['table-unit']}>班级</th>
+                    <th className={styles['table-unit']}>班级</th>
                     {
                         _.map(tableHeaderData, (th, index) => {
                             return (
                                 <th key={index} className={styles['table-unit']} style={{minWidth: 100}}>{th}</th>
-                            )
-                        })
-                    }
-                </tr>
-                <tr style={{ backgroundColor: '#fafafa' }}>
-                    {
-                        _.map(tableHeaderData, (th, index) => {
-                            return (
-                                <th key={index} className={styles['table-unit']} style={{minWidth: 100}}>{(isGood ? '前' : '后') + inputNum + (current.key == 'ranking' ? '名' : '%') }</th>
                             )
                         })
                     }
@@ -81,43 +72,32 @@ class StudentPerformanceTable extends React.Component {
         super(props);
         this.selectItems = [{ key: 'ranking', value: '名次统计' }, { key: 'percentage', value: '比例统计' }];
         this.isValid = true;
+        this.default = 30;
         this.state = {
-            active: false,
             current: this.selectItems[0], //默认按照名词排列
-            coveredItems: this.selectItems.slice(1),
             rankingNum: 30, //默认是 名词排列 的 前30名
             percentageNum: 30,
             inputNum: 30
         }
     }
-    handleBodyClick(event) {
-        if($(event.target).parents('#dropdownList').length === 0) {
-            this.setState({
-                active: false
-            })
-         }
-    }
-    componentDidMount() {
-        this.clickHandlerRef = this.handleBodyClick.bind(this);
-        $('body').bind('click', this.clickHandlerRef)
-    }
-    componentWillUnmount() {
-        $('body').unbind('click', this.clickHandlerRef);
-    }
-    toggleList() {
-        this.setState({ active: !this.state.active })
-    }
-
+    
     chooseItem(content) {
         //TODO: setState(newState)中newState不一定需要把所有的stae属性都添加上去吧，没有就是不修改吧？
         if (this.state.current.key === content.key) return;
-        var newState = { current: content, active: false, coveredItems: _.without(this.selectItems, content) };
-        newState.inputNum = (content.key == 'ranking') ? this.state.rankingNum : this.state.percentageNum;
-        this.setState(newState);
+        var newState = {current: content };
+        newState.inputNum = this.default;//(content.key == 'ranking') ? this.state.rankingNum : this.state.percentageNum;
+        if (content.key === 'ranking') {
+            newState.rankingNum = this.default;
+        } else {
+            newState.percentageNum = this.default;
+        }
+        this.setState(newState, ()=> {
+            console.log('after set state: ' + this.state.inputNum);
+        });
     }
 
-    onInputChange(event) {
-        var value = parseInt(event.target.value);
+    onConfirmChange() {
+        var value = parseInt(this.state.inputNum);
         if (!(value && _.isNumber(value) && value > 0)) {
             console.log('输入不是有效数字');
             this.isValid = false;
@@ -147,7 +127,11 @@ class StudentPerformanceTable extends React.Component {
         this.isValid = true;
         this.setState(newConfig);
     }
-
+    onChangeInput(event) {
+        this.setState({
+            inputNum: event.target.value
+        })
+    }
     render() {
         //Props数据结构：
         var {examInfo, examStudentsInfo, allStudentsPaperMap, headers, isGood, tableHeaderData} = this.props;
@@ -176,11 +160,13 @@ class StudentPerformanceTable extends React.Component {
                 {/* 名次/比例输入框  */}
                 <div style={{position: 'absolute', right: 0, top: -55 }}>
                     <span style={{marginRight: 8}}>年级{(isGood) ? '前' : '后'}</span>
-                    <input defaultValue={_this.state.inputNum} onBlur={_this.onInputChange.bind(_this) } style={{ display: 'inline-block', width: 52, height: 30, lineHeight: '30px' }}/> 
-                    {_this.state.current.key === 'ranking' ? '名' : '%'}
+                    <input ref='numInput' value={this.state.inputNum} onChange={this.onChangeInput.bind(this)} style={{ display: 'inline-block', width: 52, height: 30, lineHeight: '30px', textAlign:'center', marginRight: 5 }}/> 
+                    <span style={{marginRight: 10}}>{_this.state.current.key === 'ranking' ? '名' : '%'}</span>
+                    <span onClick={this.onConfirmChange.bind(this)} style={{display: 'inline-block', width: 42, height: 30, lineHeight: '30px', borderRadius: 2, backgroundColor: colorsMap.A12, color: '#fff', cursor: 'pointer', textAlign: 'center'}}>
+                        确定
+                    </span>
                 </div>
-                <TableView TableComponent={Table} tableHeaderData={tableHeaderData} isGood={isGood} inputNum={this.state.inputNum} current={this.state.current} tableData={tableBodyData}/>
-
+                <TableView TableComponent={Table} tableHeaderData={tableHeaderData} isGood={isGood} current={this.state.current} tableData={tableBodyData}/>
             </div>
         )
     }
@@ -197,7 +183,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
     var rankColors = [B08, B07, B06];
     var students = [topStudents, lowStudents];
     return (
-        <div className={schoolReportStyles['section']} style={{ paddingBottom: 100 }}>
+        <div id='studentPerformance' className={schoolReportStyles['section']} style={{ paddingBottom: 30 }}>
             <div style={{ marginBottom: 30 }}>
                 <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                 <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>分数排行榜</span>
@@ -288,82 +274,6 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                 isGood={false}
                 tableHeaderData={tableHeaderData}
                 />
-
-
-
-            <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-            <div className={schoolReportStyles['section-title']} style={{ padding: '0 10px', position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 300 }}>
-                学校有必要知道的学生重点信息
-            </div>
-
-            {/*--------------------------------  有关学生重要信息的图表 -------------------------------------*/}
-            <div className={styles['school-report-content']}>
-                <p className={schoolReportStyles['sub-section']}>（1）这次考试，全校总分前后十名的学生是：</p>
-                <div>
-                    <div style={{ margin: '0 auto', width: 500 }}>
-                        <div style={{ display: 'inline-block' }}>
-                            <div className={localStyle['first-ten']}></div>
-                            <div style={{ width: 155, minHeight: 260, border: '1px solid #6dd0a8', margin: '0 auto' }}>
-                                {
-                                    _.map(topStudents, (student, index) => {
-                                        return (
-                                            <div key={index} className={localStyle['student-box']}>
-                                                <div style={{ fontSize: 14, color: '#3bba80' }}>{student.name}</div>
-                                                <div style={{ fontSize: 12 }}>({student.class + '班'}) </div>
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </div>
-                        </div>
-                        <div style={{ display: 'inline-block', float: 'right' }}>
-                            <div className={localStyle['last-ten']}></div>
-                            <div style={{ width: 155, minHeight: 260, border: '1px solid #f9b4a2', margin: '0 auto' }}>
-                                {
-                                    _.map(lowStudents, (student, index) => {
-                                        return (
-                                            <div key={index} className={localStyle['student-box']}>
-                                                <div style={{ fontSize: 14, color: '#f68a72' }}>{student.name}</div>
-                                                <div style={{ fontSize: 12 }}>({student.class + '班'}) </div>
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/*--------------------------------  有关学生重要信息的表格 -------------------------------------*/}
-                <div style={{ marginTop: 60 }}>
-                    <p className={schoolReportStyles['sub-section']}>（2）全校各个班级在各个学科优秀的学生人数，见下表：</p>
-                    <StudentPerformanceTable
-                        examInfo={examInfo}
-                        examStudentsInfo={examStudentsInfo}
-                        allStudentsPaperMap={allStudentsPaperMap}
-                        headers={headers}
-                        isGood={true}
-                        tableHeaderData={tableHeaderData}
-                        />
-                </div>
-                <div style={{ marginTop: 40 }}>
-                    <p className={schoolReportStyles['sub-section']}>（3）全校各班级在各学科欠佳的学生数，如下表所示。希望相应班级任课教师多多帮助他们进步。</p>
-                    <StudentPerformanceTable
-                        examInfo={examInfo}
-                        examStudentsInfo={examStudentsInfo}
-                        allStudentsPaperMap={allStudentsPaperMap}
-                        headers={headers}
-                        isGood={false}
-                        tableHeaderData={tableHeaderData}
-                        />
-                </div>
-                <div style={{ marginTop: 30 }}>
-                    <p>
-                        注：每个学生都有精准的个人学业诊断分析报告，学生或家长可免费通过“好分数网”查阅个人考试的基本情况。网址：
-                        <a href="http://hfs.yunxiao.com">hfs.yunxiao.com</a>, 账户名为学生本人学号，初始密码为学生家长的电话号码。
-                    </p>
-                </div>
-            </div>
         </div>
     )
 }

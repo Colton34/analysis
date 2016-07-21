@@ -556,7 +556,7 @@ class ScoreDistribution extends React.Component {
 
         };
         return (
-            <div style={{borderRadius: 2, backgroundColor: BACKGROUND_COLOR, position: 'relative', borderBottom: 20}}>
+            <div id='scoreDistribution' style={{borderRadius: 2, backgroundColor: BACKGROUND_COLOR, position: 'relative', borderBottom: 20}}>
                 <BasicInfo examInfo={examInfo} levels={levels} examStudentsInfo={examStudentsInfo} onShowDialog={this.onShowDialog.bind(this)}/>
                 <div className={schoolReportStyles['section']}>
                     <div style={{ marginBottom: 30 }}>
