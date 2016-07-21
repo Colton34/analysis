@@ -63,14 +63,14 @@ const Table = ({tableData, levels}) => {
         }
     }
     return (
-        <BootTable  bordered  hover responsive style={_.assign({},  widthProp)}>
+        <BootTable bordered  hover responsive style={_.assign({}, {marginBottom: 0}, widthProp)}>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa' }}>
                     <th rowSpan="2" className={style['table-unit']}>班级</th>
                     {
                         _.map(_.range(levTotal), (index) =>{
                             return (
-                                <th key={index} colSpan="3" className={style['table-unit']} style={{minWidth: 180}}>
+                                <th key={index} colSpan="3" className={style['table-unit']} style={{minWidth: 200, textAlign: 'center', paddingLeft: 0}}>
                                      {numberMap[(index + 1)]}档
                                 </th>
                             )
@@ -473,7 +473,7 @@ class ScoreDistribution extends React.Component {
         //自定义Module数据结构
         var _this = this;
         var levTotal = _.size(levels);
-
+        var disTotal = _.size(disData);
 //饼图的数据和select放在一起。是受当前组件的状态值而改变的。通过totalScroeLevelInfo来获取
 // 通过 levelTotalScoreInfo[theKey] 即可获得此scope下所有学生的分档情况
 
@@ -541,8 +541,9 @@ class ScoreDistribution extends React.Component {
                         <span style={{ fontSize: 12, color: C07 }}>上线率 = 班级某档上线人数 ÷ 全校某档上线人数，因各班级人数不同，通过比较累积上线率，能更准确的反映各班级上线情况</span>
                     </div>
 
-                    <div style={{ display: 'inline-block' }}>
-                        <div id='high' style={_.assign({}, { width: 740, height: 110, border: '1px solid ' + C05, padding: '30px 0', marginBottom: 20 }, _.size(disData) > 3 ? { overflowX: 'scroll' } : {}) }>
+                    <div style={_.assign({},{display: 'inline-block'})}>
+                        <div id='high' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0', marginBottom: 20}, disTotal > 3 ? {overflowX: 'scroll'} : {})}>
+                            <div style={_.assign({}, {width: 215 * disTotal + 95})}>
                             {
                                 (_.size(disData) > 0) ? (
                                     _.map(_.range(levTotal), (index) => {
@@ -556,8 +557,10 @@ class ScoreDistribution extends React.Component {
                                     })
                                 ) : (<p>只有一个班级，没有可比性</p>)
                             }
+                            </div>
                         </div>
-                        <div id='low' style={{ width: 740, height: 110, border: '1px solid ' + C05, padding: '30px 0' }}>
+                        <div id='low' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0', marginBottom: 20}, disTotal > 3 ? {overflowX: 'scroll'} : {})}>
+                            <div style={_.assign({}, {width: 215 * disTotal + 95})}>
                             {
                                 (_.size(disData) > 0) ? (
                                     _.map(_.range(levTotal), (index) => {
@@ -571,6 +574,7 @@ class ScoreDistribution extends React.Component {
                                     })
                                 ) : (<p>只有一个班级，没有可比性</p>)
                             }
+                            </div>
                         </div>
                     </div>
                     <div style={{ display: 'inline-block', width: 380, height: 240, position: 'relative', float: 'right' }}>
