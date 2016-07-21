@@ -11,7 +11,7 @@ const Table = ({tableData}) => {
     var tableHeaderData = tableData[0];
     var tableBodyData = _.slice(tableData, 1);
     return (
-        <BootTable bordered  hover responsive >
+        <BootTable bordered  hover responsive style={{marginBottom: 0}}>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa' }}>
                     {

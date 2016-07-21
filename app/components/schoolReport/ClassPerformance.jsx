@@ -15,7 +15,7 @@ import {Table as BootTable} from 'react-bootstrap';
 const AverageTable = ({tableHeaderData, tableData}) => {
 
     return (
-        <BootTable  bordered hover responsive>
+        <BootTable  bordered hover responsive style={{marginBottom: 0}}>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa' }}>
                     <th className={styles['table-unit']} rowSpan="2">班级</th>
