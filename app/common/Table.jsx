@@ -34,11 +34,11 @@ class Tip extends React.Component {
                     backgroundColor: colorsMap.C07})}
                     onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
                     <i className='icon-help-1'></i>
-                    <div className='tip-block' style={_.assign({},{color: colorsMap.C12, position: 'absolute', top: 26, right: '50%', marginRight: -130}, this.state.showTip ? {display: 'block'} : {display: 'none'})}>
+                    <p className='tip-block' style={_.assign({},{color: colorsMap.C12, position: 'absolute', top: 26, right: '50%', marginRight: -130}, this.state.showTip ? {display: 'block'} : {display: 'none'})}>
                     {
                         this.props.content
                     }
-                    </div>
+                    </p>
                     
                 </div>
             </div>
