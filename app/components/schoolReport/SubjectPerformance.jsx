@@ -176,7 +176,10 @@ class Dialog extends React.Component {
 
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this)}>
-                <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
+                <Header closeButton={false} style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
+                    <button className={styles['dialog-close']} onClick={this.onHide.bind(this)}>
+                        <i className='icon-cancel-3'></i>
+                    </button>
                     设置等级参数
                 </Header>
                 <Body style={{padding: 30}}>

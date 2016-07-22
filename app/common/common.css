@@ -41,3 +41,20 @@
 .common-font {
     font-family: Helvetica, Arial, "Microsoft YaHei", "微软雅黑", STXihei, "华文细黑", Simhei, "黑体", SimSun, "宋体", sans-serif;
 }
+
+/*******************   对话框   ******************/
+.dialog-close {
+    position: absolute;
+    width: 30px;
+    height: 30px; 
+    line-height: 30px;
+    text-align: center;
+    border-radius: 50%;
+    opacity: 0.8;
+    background-color: #000;
+    color: #fff;
+    padding: 0;
+    border: 0;
+    top: -16px;
+    right: -15px;
+}
