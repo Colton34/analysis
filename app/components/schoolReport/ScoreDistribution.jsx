@@ -539,7 +539,7 @@ class ScoreDistribution extends React.Component {
               layout: 'vertical',
               align: 'right',
               verticalAlign: 'bottom',
-              borderWidth: '0px',
+              borderWidth: 0,  //写'0px'会报错；
               enabled: true,
               itemStyle:{
                 'font-size':'14px',
