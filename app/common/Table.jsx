@@ -45,8 +45,13 @@ class Tip extends React.Component {
         )
     }
 }
-
-const Table = ({tableData, tipConfig}) => {
+/**
+ * props:
+ * tableData: 渲染表格的数据
+ * tipConfig: 有些表头需要添加一个问号，鼠标悬停时弹出提示。结构是{表头名:{content: '提示内容'}}
+ * colorCallback: 颜色回调函数，有时候需要根据数值调整显示的颜色
+ */
+const Table = ({tableData, tipConfig, colorCallback}) => {
     var tableHeaderData = tableData[0];
     var tableBodyData = _.slice(tableData, 1);
     var tipNames = tipConfig ? _.keys(tipConfig) : [];
@@ -79,7 +84,7 @@ const Table = ({tableData, tipConfig}) => {
                                 {
                                     _.map(tdList, (td,index) => {
                                         return (
-                                            <td key={'td' + index} className={styles['table-unit']} style={{minWidth: 100}}>
+                                            <td key={'td' + index} className={styles['table-unit']} style={_.assign({}, {minWidth: 100}, colorCallback ? {color: colorCallback(td)} : {})}>
                                                 {td}
                                             </td>
                                         )

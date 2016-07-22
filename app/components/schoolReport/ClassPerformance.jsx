@@ -6,7 +6,7 @@ import Table from '../../common/Table';
 import DropdownList from '../../common/DropdownList';
 
 import {makeSegments, makeFactor, makeSegmentsStudentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
 import TableView from './TableView';
@@ -105,7 +105,15 @@ const AverageTable = ({tableHeaderData, tableData}) => {
         // lineChartRenderData = [].concat([lineChartRenderData[1], obj]);
         // this.forceUpdate();
     }
-
+    // 根据数值返回要显示的颜色,传给TableView组件
+    colorCallback(value) {
+        if (!_.isNumber(value) || isNaN(value)) 
+            return colorsMap.C11;
+        if (value < 0) {
+            return colorsMap.B08;
+        } 
+        return colorsMap.C11;
+    }
     render() {
 //Props数据结构：
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, levels, headers} = this.props;
@@ -222,7 +230,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                     <span className={schoolReportStyles['sub-title']}>班级学科得分率贡献指数</span>
                     <span className={schoolReportStyles['title-desc']}>得分率贡献指数 = 班级学科得分率 - 全校学科平均得分率。指数值为正，是促进作用；为负，是拖后腿。</span>
                 </p>
-                <TableView tableData={factorsTableData} reserveRows={6}/>
+                <TableView tableData={factorsTableData} reserveRows={6} colorCallback={this.colorCallback}/>
             </div>
         )
     }
