@@ -70,7 +70,7 @@ class InfoBlock extends React.Component {
                     {
                         _.map(studentsGroupByClass, (students, className) => {
                             return (
-                                <div style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
+                                <div key={'infoBlock-' + className} style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
                                     <p style={{ marginBottom: 10, fontSize: 12 }}>{className + '班'}上线贡献率</p>
                                     {
                                         disData[className] ? (
@@ -123,7 +123,7 @@ class LevelInfo extends React.Component {
                     {
                         _.range(_.size(levels)).map((num) => {
                             return(
-                                <li onClick={this.switchTab.bind(this)} className={'fl ' + (num === this.state.activeTab ? 'active' : '')} data-num={num}>{numberMap[num + 1]}档线上线学生人数分布</li>
+                                <li key={'levelInfo-li-' + num}onClick={this.switchTab.bind(this)} className={'fl ' + (num === this.state.activeTab ? 'active' : '')} data-num={num}>{numberMap[num + 1]}档线上线学生人数分布</li>
                             )
                         })
                     }
