@@ -101,20 +101,7 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
              </div>
              <div style={{}}>
                 <ReactHighcharts config={config} style={{ width: 870, height: 330, display: 'inline-block'}}></ReactHighcharts>
-                <ul style={{width: 240, height: 360, padding: '30px 0 40px 20px', marginBottom: 0, backgroundColor: C14, border: '1px solid ' + C04, position: 'absolute', right: 0, bottom: 0, overflowY: 'scroll', listStyleType: 'none'}}>
-                {
-                    result['y-axon'].map((data, index) => {
-                        return (
-                            <li key={'fullScoreTrend-li-' + index} style={{borderBottom: '1px dashed ' + C04, height: 40, lineHeight: '40px', display: 'table-row'}}>
-                                <span className={schoolReportStyles['list-dot']} style={{width: 20, height: 40, lineHeight: '40px', textAlign: 'center', display: 'table-cell'}}></span>
-                                <span style={{marginRight: 20, display: 'table-cell', width: 110, textAlign: 'left'}}>{(index === 0 ? '[' + data.low : '(' + data.low) + ',' + data.high + ']分区间'}</span>
-                                <span style={{marginRight: 20, display: 'table-cell', width: 50, textAlign: 'left'}}>{data.y}</span>
-                                <span style={{display: 'table-cell', textAlign: 'left'}}>人</span>
-                            </li>
-                        )
-                    })
-                }
-                </ul>
+                <FullScoreInfo yData={result['y-axon']}/>
                 <div style={{clear: 'both'}}></div>
              </div>
         </div>
@@ -124,6 +111,46 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
 
 export default FullScoreTrend;
 
+/**
+ * props:
+ * yData: highChart图数据的y轴数据
+ */
+class FullScoreInfo extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            showScroll : false,
+            needScroll: this.props.yData.length > 8 ? true : false  //列表超过8个就会需要滚动条
+        }
+    }
+    onMouseEnter() {
+        if (!this.state.needScroll) return;
+        this.setState({showScroll: true})
+    }
+    onMouseLeave() {
+        if (!this.state.needScroll) return ;
+        this.setState({showScroll: false});
+    }
+    render() {
+        var {yData} = this.props;
+        return (
+            <ul style={_.assign({ width: 240, height: 360, padding: '30px 0 40px 20px', marginBottom: 0, backgroundColor: C14, border: '1px solid ' + C04, position: 'absolute', right: 0, bottom: 0,listStyleType: 'none', fontSize: 12 }, this.state.showScroll ? { overflowY: 'scroll'}: {overflowY: 'hidden'})} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
+                {
+                    yData.map((data, index) => {
+                        return (
+                            <li key={'fullScoreTrend-li-' + index} style={{height: 40, lineHeight: '40px', display: 'table-row' }}>
+                                <span className={schoolReportStyles['list-dot']} style={{ width: 20, height: 40, lineHeight: '40px', textAlign: 'center', display: 'table-cell', verticalAlign: 'middle'}}></span>
+                                <span style={{ marginRight: 20, display: 'table-cell', width: 110, textAlign: 'left', borderBottom: '1px dashed ' + C04}}>{(index === 0 ? '[' + data.low : '(' + data.low) + ',' + data.high + ']分区间'}</span>
+                                <span style={{ marginRight: 20, display: 'table-cell', width: 50, textAlign: 'left',  borderBottom: '1px dashed ' + C04}}>{data.y}</span>
+                                <span style={{ display: 'table-cell', textAlign: 'left', borderBottom: '1px dashed ' + C04, }}>人</span>
+                            </li>
+                        )
+                    })
+                }
+            </ul>
+        )
+    }
+ }
 function theTotalScoreTrenderChart(examInfo, examStudentsInfo) {
     var segments = makeSegments(examInfo.fullMark);
 
