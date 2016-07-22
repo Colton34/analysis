@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-22 11:53:08
+* @Last Modified time: 2016-07-22 11:58:27
 */
 
 'use strict';
@@ -363,16 +363,53 @@ exports.home = function(req, res, next) {
             return when.reject(new errors.Error('格式化exams错误'));
         }
     }).then(function(formatedExams) {
-        // formatedExams = filterExamsByAuth(formatedExams);
+        formatedExams = filterExamsByAuth(formatedExams);
         res.status(200).send(formatedExams);
     }).catch(function(err) {
         next(err);
     })
 }
 
+
 /*
 
+数据结构：
+//Note: 如果gradeKey对应的是Boolean true，那么就是此年级主任。如果不是schoolManager那么就不带有此key--为了方便遍历
+{
+    isSchoolManager: false/true,
+    gradeAuth: {
+        gradeKey: true,
+        gradeKey: {
+            subjectManagers: ,
+            groupManagers: ,
+            subjectTeachers: ,
+            doubleSubjectTeachers
+        },
+        ...
+    }
+}
 
+
+ */
+
+function filterExamsByAuth(formatedExams) {
+    //Note: 如果过滤后最终此时间戳key下没有exam了则也不显示此time key
+    //Note: 从当前用户中获取此用户权限，从而过滤
+    var auth = req.user.auth;
+    if(auth.isSchoolManager) return formatedExams;
+    //只要是此年级的，那么都能看到这场考试，但是具体的考试的数据要跟着此用户的权限走
+    var authGrades = _.keys(auth.gradeAuth);
+    //过滤formatedExams
+    var result = {};
+    _.each(formatedExams, (exams, timeKey) => {
+        var vaildExams = _.filter(exams, (examItem) => {
+            return _.includes(authGrades, examItem.grade);
+        });
+        if(vaildExams.length > 0) result[timeKey] = vaildExams;
+    });
+    return result;
+}
+/*
                 var obj = {};
                 obj.examName = (justOneGrade) ? value.exam.name : value.exam.name + "(年级：" + gradeKey + ")";
                 obj.grade = gradeKey;
@@ -390,20 +427,7 @@ exports.home = function(req, res, next) {
                 obj.from = value.exam.from; //TODO: 这里数据库里只是存储的是数字，但是显示需要的是文字，所以需要有一个map转换
 
                 result[timeKey].push(obj);
-
-
  */
-
-
-
-
-
-function filterExamsByAuth(formatedExams) {
-    //Note: 如果过滤后最终此时间戳key下没有exam了则也不显示此time key
-    //Note: 从当前用户中获取此用户权限，从而过滤
-    // var result = {};
-    // _.each(formatedExams)
-}
 
     //获取方便判断的user auth
     //算法：
