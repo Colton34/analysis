@@ -149,7 +149,7 @@ class Dialog extends React.Component {
                     <div style={{ minHeight: 150}}>
                         <div style={{marginBottom: 20}}>
                             考试成绩分为{levelNum}档，
-                        {  
+                        {
                             _.join(_.range(levelNum).map(num => {
                                 var index = levelNum - num -1;
                                 return numberMap[num + 1] + '档' + levels[index].score + '分'
@@ -226,6 +226,63 @@ class GroupAnalysis extends React.Component {
         var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers);
         var disData = criticalStudentsDiscription(criticalLevelInfo); //缺少UI
 //自定义Module数据结构：
+var config={
+chart: {
+    type: 'column'
+},
+title: {
+    text: '',
+},
+subtitle: {
+    text: '(人数)',
+    floating:true,
+    x:-500,
+    y:43,
+    style:{
+      "color": "#767676",
+       "fontSize": "12px"
+    }
+
+},
+colors:['#1daef8','#16d2c7'],
+xAxis: {
+  tickWidth:'0px',//不显示刻度
+    categories: [
+        '语文',
+        '数学',
+        '英语',
+        '政治',
+        '地理',
+        '生物',
+        '历史 ',
+        '物理',
+        '化学',
+        '生物'
+    ]
+},
+yAxis: {
+  lineWidth:1,
+gridLineDashStyle:'Dash',
+title: {
+                text: ''
+            },
+},
+credits:{
+  enabled:false
+},
+tooltip:{
+enabled:false
+},
+legend:{
+enabled:true,
+align:'center',
+verticalAlign:'top'
+},
+series: [{
+
+    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+}]
+};
         return (
             <div id='groupAnalysis' className={schoolReportStyles['section']}>
                 <div style={{ marginBottom: 30 }}>
@@ -241,9 +298,12 @@ class GroupAnalysis extends React.Component {
                 {/*****************临界生较多班级*************/}
                 <p style={{ marginBottom: 20, marginTop: 40 }}>
                     <span className={schoolReportStyles['sub-title']}>临界生较多班级</span>
-                    <span className={schoolReportStyles['title-desc']}>临界生较多班级，存在更大提高班级该档上线率的空间，学校和班级应该基于更多关注，对整体教学成就有显著的积极作用。</span>
+                  <span className={schoolReportStyles['title-desc']}>临界生较多班级，存在更大提高班级该档上线率的空间，学校和班级应该基于更多关注，对整体教学成就有显著的积极作用。</span>
                 </p>
                 {/* todo： 图待补充 */}
+                <div style={{width:1110,height:280,display:'inline-block',paddingTop:30,marginRight:30}}>
+                  <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
+                </div>
                 <Dialog levels={levels} levelBuffers={levelBuffers} updateLevelBuffers={this.props.updateLevelBuffers} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }/>
             </div>
         )

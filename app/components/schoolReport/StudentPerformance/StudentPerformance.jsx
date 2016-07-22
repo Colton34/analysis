@@ -15,7 +15,7 @@ var localCss = {
         display: 'inline-block', width: 115, height: 25, color: '#333', lineHeight: '25px', textDecoration: 'none', textAlign: 'center', border: '1px solid #e9e8e6',
         ':hover': { textDecoration: 'none' },
         ':link': { textDecoration: 'none' }
-    }, 
+    },
     tableCell: {
         fontSize: 12, textAlign: 'left', verticalAlign: 'middle', minWidth: 50, minHeight: 30
     }
@@ -80,7 +80,7 @@ class StudentPerformanceTable extends React.Component {
             inputNum: 30
         }
     }
-    
+
     chooseItem(content) {
         //TODO: setState(newState)中newState不一定需要把所有的stae属性都添加上去吧，没有就是不修改吧？
         if (this.state.current.key === content.key) return;
@@ -160,7 +160,7 @@ class StudentPerformanceTable extends React.Component {
                 {/* 名次/比例输入框  */}
                 <div style={{position: 'absolute', right: 0, top: -55 }}>
                     <span style={{marginRight: 8}}>年级{(isGood) ? '前' : '后'}</span>
-                    <input ref='numInput' value={this.state.inputNum} onChange={this.onChangeInput.bind(this)} style={{ display: 'inline-block', width: 52, height: 30, lineHeight: '30px', textAlign:'center', marginRight: 5 }}/> 
+                    <input ref='numInput' value={this.state.inputNum} onChange={this.onChangeInput.bind(this)} style={{ display: 'inline-block', width: 52, height: 30, lineHeight: '30px', textAlign:'center', marginRight: 5 }}/>
                     <span style={{marginRight: 10}}>{_this.state.current.key === 'ranking' ? '名' : '%'}</span>
                     <span onClick={this.onConfirmChange.bind(this)} style={{display: 'inline-block', width: 42, height: 30, lineHeight: '30px', borderRadius: 2, backgroundColor: colorsMap.A12, color: '#fff', cursor: 'pointer', textAlign: 'center'}}>
                         确定

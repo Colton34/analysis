@@ -511,7 +511,7 @@ class ScoreDistribution extends React.Component {
               x:-60,
               y:3,
               style:{
-                'color':'#333333',
+                'color':'#767676',
                 'font-size':'14px'
               }
             },

@@ -30,7 +30,7 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
             x:-370,
             y:5,
             style:{
-              "color": "#333333",
+              "color": "#767676",
                "fontSize": "14px"
             }
 
@@ -40,12 +40,10 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
             categories: result['x-axon']
         },
         yAxis: {
-
+          lineWidth:1,
           gridLineDashStyle:'Dash',
             title: {
                 text: '',
-
-
             },
             plotLines: [{
                 value: 0,
@@ -61,7 +59,8 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
         },
             formatter: function(){
                  return this.point.low + '-' + this.point.high +
-                '区间人数<br />' + this.point.y + '人,占';
+                '区间人数<br />' + this.point.y +
+                '人,占'+Math.round(((this.point.y/examInfo.realStudentsCount)*100))+'%';
             }
         },
         legend: {
