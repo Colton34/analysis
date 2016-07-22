@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-21 19:09:08
+* @Last Modified time: 2016-07-22 14:47:50
 */
 
 'use strict';
@@ -185,7 +185,7 @@ var lostStudentsInfo = [];
 
  //Auth Note: 只需要过滤班级，科目还是不变--因为计算的是总分
 //从auth中获取正确的班级，从而拿到正确的学生
-exports.generateExamScoresInfo = function(exam) {
+exports.generateExamScoresInfo = function(exam, auth) {
     //Mock Data
     //需要再添加个grade字段--用来过滤grade...这样就不用再去school中找了
     // var arr = {
@@ -207,7 +207,7 @@ exports.generateExamScoresInfo = function(exam) {
     return fetchExamScoresById(exam.fetchId).then(function(scoresInfo) {
         //全校此考试(exam)某年级(grade)所有考生总分信息，升序排列
 
-        var authClasses = getAuthClasses(req.user.auth, exam.grade.name);
+        var authClasses = getAuthClasses(auth, exam.grade.name);
         //实现只获取到用户auth权限内的班级数据--但是dashboard是这个情况，可是具体里面所有的报告还是需要过滤科目。
         var targetClassesScore = {};
         if(_.isBoolean(authClasses) && authClasses) {
