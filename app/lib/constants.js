@@ -135,6 +135,7 @@ export const COLORS_MAP = {
     C04 : '#eeeeee',
     C05 : '#e7e7e7',
     C07 : '#BFBFBF',
+    C08:  '#B1B1B1',
     C09 : '#999999',
     C10 : '#6a6a6a',
     C11:  '#4d4d4d',

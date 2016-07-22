@@ -30,18 +30,16 @@ class Tip extends React.Component {
     render() {
         return (
             <div style={{display: 'inline-block'}}>
-                <div style={_.assign({}, { display: 'inline-block', width: 16, height: 16, lineHeight: '16px', borderRadius: '50%', textAlign: 'center', color: '#fff', position: 'relative' }, this.state.showTip ? { backgroundColor: colorsMap.C10 } : {
-                    backgroundColor: colorsMap.C11})}
+                <div style={_.assign({}, { display: 'inline-block', width: 16, height: 16, lineHeight: '16px', borderRadius: '50%', textAlign: 'center', color: '#fff', position: 'relative' }, this.state.showTip ? { backgroundColor: colorsMap.C08 } : {
+                    backgroundColor: colorsMap.C07})}
                     onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
                     <i className='icon-help-1'></i>
-                    {/*
-                    <i className={'icon-up-open-2'} style={_.assign({},{color: colorsMap.C05, position: 'absolute', top: 16, right: 1})}></i>
-                    <div style={_.assign({},{width: 320, padding: 20, border: '1px solid ' + colorsMap.C05, color: colorsMap.C12, position: 'absolute', top: 26, right: '50%', marginRight: -160, backgroundColor: '#fff'})}>
+                    <div className='tip-block' style={_.assign({},{color: colorsMap.C12, position: 'absolute', top: 26, right: '50%', marginRight: -130}, this.state.showTip ? {display: 'block'} : {display: 'none'})}>
                     {
                         this.props.content
                     }
                     </div>
-                    */}
+                    
                 </div>
             </div>
         )
