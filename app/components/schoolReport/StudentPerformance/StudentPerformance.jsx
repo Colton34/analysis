@@ -149,7 +149,7 @@ class StudentPerformanceTable extends React.Component {
                 {
                     this.selectItems.map((item, index) => {
                         return (
-                            <div style={_.assign({}, {display: 'inline-block', width: '50%', height: '100%', textAlign: 'center', lineHeight: '30px', cursor: 'pointer'}, this.state.current.key === item.key ? {backgroundColor: colorsMap.A12, color: '#fff'} : {backgroundColor: '#fff', color: colorsMap.A12})}
+                            <div key={'statisticType-' + index} style={_.assign({}, {display: 'inline-block', width: '50%', height: '100%', textAlign: 'center', lineHeight: '30px', cursor: 'pointer'}, this.state.current.key === item.key ? {backgroundColor: colorsMap.A12, color: '#fff'} : {backgroundColor: '#fff', color: colorsMap.A12})}
                                  onClick={this.chooseItem.bind(this, item)}>
                                 {item.value}
                             </div>

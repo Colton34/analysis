@@ -600,6 +600,11 @@ class OnlineInfo extends React.Component {
             needScroll: _.size(this.props.disData) > 3 ? true : false
         }
     }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps && _.size(nextProps.disData) > 3) {
+            this.setState({needScroll: true})
+        }
+    }
     onMouseEnter(e){
         if (!this.state.needScroll) return;
         var $target = $(e.target); 
