@@ -14,7 +14,7 @@ let localStyle = {
  * tableData: 需要在table里渲染的全部数据,
  * TableComponent: 要使用的table组件；
  * reserveRows: 截取数据时保留的行数;(默认保留5行)
- * 
+ * tipConfig: 表格表头可能存在的注释内容
  */
 class TableView extends React.Component {
     //static reserveRows = this.props.reserveRows || this.props.reserveRows <= 0 ? this.props.reserveRows : 5;

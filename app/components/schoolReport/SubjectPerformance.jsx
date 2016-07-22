@@ -277,14 +277,16 @@ class SubjectPerformance extends React.Component {
         var disData = theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap);
 //自定义Moudle数据结构：
         var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
-        return (
+        // 表格表头的鼠标悬停提示
+        var tipConfig = {'标准差': {content: '待添加', direction: 'bottom'}, '差异系数': {content: '待添加', direction: 'bottom'}};
+        return (    
             <div id='subjectPerformance' className={schoolReportStyles['section']}>
                 <div style={{ marginBottom: 30 }}>
                     <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                     <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科考试表现</span>
                     <span style={{ fontSize: 12, color: C07 }}>学科考试表现，通过对不同学科之间基本指标数据的分析，发现学校各学科的教学信息</span>
                 </div>
-                <TableView tableData={subjectExamTableData} reserveRows={6}/>
+                <TableView tableData={subjectExamTableData} reserveRows={6} tipConfig={tipConfig}/>
 
                 <p style={{marginBottom: 20}}>
                     <span className={schoolReportStyles['sub-title']}>学科离差表现</span>
