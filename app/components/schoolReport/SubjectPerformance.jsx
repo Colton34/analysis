@@ -274,6 +274,11 @@ class SubjectPerformance extends React.Component {
         var subjectExamTableData = theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers);
         var subjectLevelExamTableData = theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, this.state.levelPcentages);
         var disData = theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap);
+        var subjects=[];
+        for(let i=0;i<disData.length;i++){
+          subjects.push(disData[i].subject);
+        }
+
 //自定义Moudle数据结构：
 
 var config={
@@ -298,7 +303,7 @@ subtitle: {
 colors:['#1daef8','#16d2c7'],
 xAxis: {
   tickWidth:'0px',//不显示刻度
-
+  categories:subjects
 },
 yAxis: {
   lineWidth:1,
@@ -317,8 +322,7 @@ legend:{
   enabled:false
 },
 series: [{
-
-    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+    data: [49.9, 71.5]
 }]
 };
         var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);

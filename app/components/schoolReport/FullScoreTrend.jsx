@@ -59,7 +59,8 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
         },
             formatter: function(){
                  return this.point.low + '-' + this.point.high +
-                '区间人数<br />' + this.point.y + '人,占';
+                '区间人数<br />' + this.point.y +
+                '人,占'+Math.round(((this.point.y/examInfo.realStudentsCount)*100))+'%';
             }
         },
         legend: {
