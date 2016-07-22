@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-21 11:57:36
+* @Last Modified time: 2016-07-22 11:53:08
 */
 
 'use strict';
@@ -87,14 +87,25 @@ rankCache: {
 
  */
 
+
+
+
 exports.rankReport = function(req, res, next) {
     //验证过，有examid和grade
     var grade = decodeURI(req.query.grade);
+
+
+//拿到auth的classes和subjects
+
+
+
+
     //1.根据exam查找@Exam item，根据grade过滤出有效的paper
     getValidPaper(req.query.examid, grade).then(function(result) {
         //2.根据paper的[students]和matrix计算学生的各科成绩
         // [ {id, kaohao, name, class, score, paper }  ]  -- 整个年级各个学生，各个科目的object
         var papers = result.papers, examName = result.examName;
+
         var allStudentsPaperScoreInfo = _.concat(..._.map(papers, (paper) => { //学生不同的科目算作不同条目，因此是重复的学生信息
             var scoreMatrix = paper.matrix;
             return _.map(paper['[students]'], (student, index) => {
@@ -102,8 +113,10 @@ exports.rankReport = function(req, res, next) {
                 return _.assign(student, {score: paperScore, paper: paper._id, pid: paper.id });
             });
         }));
+
         //先根据学生分组得到其总分
         var scoreInfoGroupByStudent = _.groupBy(allStudentsPaperScoreInfo, 'id');
+
         var allStudentsTotalScoreInfo = _.map(scoreInfoGroupByStudent, (studentPaperInfoArr, studentId) => {
             //把总分信息添加上去
             // var totalScore = _.sum(studentPaperInfoArr, (s) => s.paperScore);
@@ -113,32 +126,98 @@ exports.rankReport = function(req, res, next) {
         });
 
         var allStudentsScoreInfo = _.concat(allStudentsPaperScoreInfo, allStudentsTotalScoreInfo);
+
+
         var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
+
+//auth里面所有信息都是互补的，除了“subjectManagers”和"groupManagers"会有重复的交集
+
         var rankCache = {};
         _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperId) => {
             //这里面都是当前科目的分数
             rankCache[paperId] = _.groupBy(studentsScoreInfoArr, 'class');
         });
 
-        //组织examInfo的信息：
-        var examPapers = _.map(papers, (paperObj) => {
-            return {paper: paperObj._id, pid: paperObj.id, name: paperObj.subject};
+//清理rankCache，得到authRankCache
+        //如果是校级领导或者年级主任则不需要清理，否则：
+        var authRankCache = {}, allPaperIds = _.keys(rankCache);
+        if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
+            //计算新的authRankCache
+            var gradeAuthObj = auth.gradeAuth[grade];
+            _.each(gradeAuthObj.subjectManagers, (obj) => {
+                //是此学科的组长，那么全部的班级数据都要
+                //Note：坑！因为是填写的subjectName，所以需要能匹配上，否则就不行
+                var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
+                if(targetAuthPaper) {
+                    authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
+                }
+            });
+            _.each(gradeAuthObj.groupManagers, (obj) => {
+                _.each(allPaperIds, (paperId) => {
+                    // 方法一：如果有此对象，说明是从上面添加的--那么就意味着全部班级都在里面了
+                    // if(!authRankCache[paperId])
+                    //方法二：更通用：
+                    var authExistClasses = (authRankCache[paperId]) ? _.keys(authRankCache[paperId]) : [];
+                    //如果当前authExistClasses还没有添加此班级的数据，并且此班级是有效的（即在原来的数据中能找到），则添加对应的班级数据到authRankCache中
+                    if(!_.includes(authExistClasses, obj.group) && (_.includes(_.keys(rankCache[paperId]), obj.group))) {
+                        if(!authRankCache[paperId]) authRankCache[paperId] = {};
+                        authRankCache[paperId][obj.group] = rankCache[paperId][obj.group];
+                    }
+                });
+            });
+            //因为auth中已经做了冗余的排查，所以如果这里有subjectTeachers那么就一定是前面所没有包含的
+            _.each(gradeAuthObj.subjectTeachers, (obj) => {
+                var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
+                if(targetAuthPaper) {
+                    // authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
+                    if(!authRankCache[targetAuthPaper.id]) authRankCache[targetAuthPaper.id] = {};
+                    authRankCache[targetAuthPaper.id][obj.group] = rankCache[targetAuthPaper.id][obj.group];
+                }
+            });
+        } else {
+            authRankCache = rankCache;
+        }
+
+        //根据authRankCache组织examInfo的信息：
+        var authPaperIds = _.keys(authRankCache);
+        var examPapers = _.map(authPaperIds, (paperId) => {
+            var targetPaper = _.find(papers, (paperObj) => paperObj.id == paperId);
+            return {paper: targetPaper._id, pid: targetPaper.id, name: targetPaper.subject};
         });
-        var examClasses = _.keys(_.groupBy(allStudentsTotalScoreInfo, 'class'));  //总分肯定是包含全部学生的，所以没必要使用allStudentsScoreInfo。
+
+//这里是否能用"..."呢？？？
+        var examClasses = _.union(..._.map(authRankCache, (obj, pid) => {
+            return _.keys(obj);
+        }));
+
+        //组织examInfo的信息：
+        // var examPapers = _.map(papers, (paperObj) => {
+        //     return {paper: paperObj._id, pid: paperObj.id, name: paperObj.subject};
+        // });
+        // var examClasses = _.keys(_.groupBy(allStudentsTotalScoreInfo, 'class'));  //总分肯定是包含全部学生的，所以没必要使用allStudentsScoreInfo。
         var examInfo = {
             name: examName,
-            papers: examPapers,
-            classes: examClasses
+            papers: examPapers, //并集
+            classes: examClasses //并集
         };
 
         res.status(200).json({
             examInfo: examInfo,
-            rankCache: rankCache
+            rankCache: authRankCache
         })
     }).catch(function(err) {
         next(err);
     })
 }
+
+// function getAuthSubjects(auth, gradeKey) {
+
+// }
+
+// function getAuthClassesSubjects(auth, gradeKey) {
+
+// }
+
 
 exports.customRankReport = function(req, res, next) {
     req.checkQuery('examid', '无效的examids').notEmpty();
@@ -322,6 +401,8 @@ exports.home = function(req, res, next) {
 function filterExamsByAuth(formatedExams) {
     //Note: 如果过滤后最终此时间戳key下没有exam了则也不显示此time key
     //Note: 从当前用户中获取此用户权限，从而过滤
+    // var result = {};
+    // _.each(formatedExams)
 }
 
     //获取方便判断的user auth

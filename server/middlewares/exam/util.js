@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-05 22:16:46
+* @Last Modified time: 2016-07-21 19:09:08
 */
 
 'use strict';
@@ -182,6 +182,9 @@ var lostStudentsInfo = [];
 // console.log('=====================  lost students ==============================');
 // console.log('lostStudentsInfo.length = ', lostStudentsInfo.length);
  */
+
+ //Auth Note: 只需要过滤班级，科目还是不变--因为计算的是总分
+//从auth中获取正确的班级，从而拿到正确的学生
 exports.generateExamScoresInfo = function(exam) {
     //Mock Data
     //需要再添加个grade字段--用来过滤grade...这样就不用再去school中找了
@@ -204,8 +207,20 @@ exports.generateExamScoresInfo = function(exam) {
     return fetchExamScoresById(exam.fetchId).then(function(scoresInfo) {
         //全校此考试(exam)某年级(grade)所有考生总分信息，升序排列
 
-
-        var targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
+        var authClasses = getAuthClasses(req.user.auth, exam.grade.name);
+        //实现只获取到用户auth权限内的班级数据--但是dashboard是这个情况，可是具体里面所有的报告还是需要过滤科目。
+        var targetClassesScore = {};
+        if(_.isBoolean(authClasses) && authClasses) {
+            targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
+        } else if(_.isArray(authClasses) && authClasses.length > 0) {
+            console.log('当前用户所管辖的班级：', authClasses);
+            //我拿到给的班级--但是会确认是不是有效班级名称--什么才是有效呢？就是能在grade['[classes]']中找到
+            //确保这些班级是有效的班级：
+            var allValidClasses = _.map(exam.grade['[classes]'], (classItem) => classItem.name);
+            authClasses = _.filter(authClasses, (className) => _.includes(allValidClasses, className));
+            console.log('当前用户最终有效的authClasse = ', authClasses);
+            targetClassesScore = _.pick(scoresInfo, authClasses);
+        }
 
         var orderedStudentScoreInfo = _.sortBy(_.concat(..._.values(targetClassesScore)), 'score'); //这个数据结构已经很接近
         //examStudentsInfo的结构了，后面schoolAnalysis等页面还需要，所以会考虑缓存~~~
@@ -234,6 +249,39 @@ exports.generateExamScoresInfo = function(exam) {
         });
     });
 };
+
+//从auth中获取正确的班级列表，此时肯定是一个年级
+/*
+数据结构：
+//Note: 如果gradeKey对应的是Boolean true，那么就是此年级主任。如果不是schoolManager那么就不带有此key--为了方便遍历
+{
+    isSchoolManager: false/true,
+    gradeAuth: {
+        gradeKey: true,
+        gradeKey: {
+            subjectManagers: ,
+            groupManagers: ,
+            subjectTeachers: ,
+            doubleSubjectTeachers
+        },
+        ...
+    }
+}
+
+ */
+function getAuthClasses(auth, gradeKey) {
+//1.schoolManager
+//2.gradeKey: true
+//3.subjectManagers
+//以上都是此年级的全部班级
+//否则，从groupManagers和subjectTeachers中取出所管辖的班级
+    if(auth.schoolManagers) return true;
+    if(_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]) return true;
+    if(_.isObject(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey].subjectManagers.length > 0) return true;
+    var groupManagersClasses = _.map(auth.gradeKey[gradeKey].groupManagers, (obj) => obj.group);
+    var subjectTeacherClasses = _.map(auth.gradeKey[gradeKey].subjectTeachers, (obj) => obj.group);
+    return _.union(groupManagersClasses, subjectTeacherClasses);
+}
 
 function fetchExamScoresById(examid) {
     var url = config.testRankBaseUrl + '/scores' + '?' + 'examid=' + examid;
