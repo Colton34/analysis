@@ -40,6 +40,33 @@ class NavBar extends React.Component {
             position: 'normal'
         }
     }
+    scrollHandler(navBarTop, scrollTopList) {
+        
+        var bodyTop = $('body').scrollTop();
+        //判断何时吸顶
+        if (navBarTop <= bodyTop) {
+            if (this.state.position !== 'fixed') {
+                //$('#header').css({ 'position': 'static' });
+                this.setState({
+                    position: 'fixed'
+                })
+            }
+        } else {
+            this.setState({
+                position: 'normal'
+            })
+        }
+
+        for (var i in scrollTopList) {
+            if (scrollTopList[i] <= bodyTop + 100 && scrollTopList[i] >= bodyTop - 100) {
+                this.setState({
+                    activeId: modules[i].id
+                })
+                return;
+            }
+        }
+
+    }
     componentDidMount() {
         var navBarTop = document.getElementById('navBar').offsetTop;
         var scrollTopList = [];
@@ -47,40 +74,12 @@ class NavBar extends React.Component {
             scrollTopList.push(document.getElementById(module.id).offsetTop)
         })
         var $body = $('body');
-        var _this = this;
-        window.addEventListener('scroll', function () {
-            var bodyTop = $body.scrollTop();
-            //判断何时吸顶
-            if (navBarTop <= bodyTop) {
-                if(_this.state.position !== 'fixed') {
-                    //$('#header').css({ 'position': 'static' });
-                    _this.setState({
-                        position: 'fixed'
-                    })
-                }
-            } else{
-                _this.setState({
-                    position: 'normal'
-                })    
-            }
-
-            for (var i in scrollTopList) {
-                if (scrollTopList[i] <= bodyTop + 100 && scrollTopList[i] >= bodyTop - 100) {
-                    _this.setState({
-                        activeId: modules[i].id
-                    })
-                    return;
-                }
-            }
-            
-
-        })
+        this.scrollHandlerRef = this.scrollHandler.bind(this, navBarTop, scrollTopList);
+        window.addEventListener('scroll', this.scrollHandlerRef);
 
     }
     componentWillUnmount() {
-        window.removeEventListener('scroll', ()=> {
-            console.log('remove scroll listener');
-        })
+        window.removeEventListener('scroll', this.scrollHandlerRef);
     }
     onClickModule(event) {
         var $target = $(event.target);
