@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-21 12:08:51
+* @Last Modified time: 2016-07-23 16:17:37
 */
 
 'use strict';
@@ -127,7 +127,7 @@ console.log('登录成功');
 
  */
 function getUserAuthInfo(auth) {
-console.log('============ 1');
+// console.log('============ 1');
 
     var isSchoolManager = ifSchoolManager(auth);
     // if(isSchoolManager) return [{grade: null, subject: null, group: null}];
@@ -143,7 +143,7 @@ function ifSchoolManager(auth) {
 }
 
 function filterGradeAuth(auth) {
-console.log('============ 2');
+// console.log('============ 2');
     //找到所有标识“年级主任”的object，删掉所有和此object中grade相同的object（即，留下这些年级主任的object，以及和年级主任不相同的grade的object）
     var gradeManagers = _.filter(auth, (obj) => {
         return (!_.isNull(obj.grade) && _.isNull(obj.subject) && _.isNull(obj.group));
@@ -159,7 +159,7 @@ console.log('============ 2');
     //1.对otherGradeAuthObjects进行groupBygrade
     var resetAuthObjectGradeMap = _.groupBy(otherGradeAuthObjects, 'grade');
 
-console.log('============ 3');
+// console.log('============ 3');
 
     //2.对每一个grade key所对应的array进行处理
     var filtratedResetAuthObjectGradeMap = {};
@@ -179,7 +179,7 @@ console.log('============ 3');
 }
 
 function filterResetAuthObjects(authObjectsArr, gradeKey) {
-console.log('============ 4');
+// console.log('============ 4');
     var subjectManagers = _.filter(authObjectsArr, (obj) => {
         return _.isNull(obj.group);
     });
@@ -196,7 +196,7 @@ console.log('============ 4');
     var groupManagerKeys = _.map(groupManagers, (obj) => {
         return obj.group;
     });
-console.log('============ 5');
+// console.log('============ 5');
     //如果即有subjectManagers又有groupManagers那么就一定会有交集
     var doubleSubjectTeachers = [];
     if(subjectManagerKeys.length > 0 && groupManagerKeys.length > 0) {

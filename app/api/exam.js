@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-06 05:40:12
+* @Last Modified time: 2016-07-23 15:57:53
 */
 
 //说明：paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
@@ -134,7 +134,10 @@ export function fetchPaper(params) {
 export function fetchHomeData(params) {
     var url = examPath + '/home';
 
+
     return params.request.get(url).then(function(res) {
+        console.log('res.data========');
+        console.log(res.data);
         return Promise.resolve(res.data);
     })
 }
@@ -1473,6 +1476,8 @@ export function fetchRankReportdData(params) {
     var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/rank/report?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
+        console.log(res.data);
+        debugger;
         return Promise.resolve(res.data);
     });
 }

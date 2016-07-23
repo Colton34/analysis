@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-22 15:35:32
+* @Last Modified time: 2016-07-23 16:18:18
 */
 
 'use strict';
@@ -91,6 +91,10 @@ rankCache: {
 
 
 exports.rankReport = function(req, res, next) {
+
+
+// console.log('111111');
+
     //验证过，有examid和grade
     var grade = decodeURI(req.query.grade);
     var auth = req.user.auth;
@@ -110,7 +114,7 @@ exports.rankReport = function(req, res, next) {
                 return _.assign(student, {score: paperScore, paper: paper._id, pid: paper.id });
             });
         }));
-
+// console.log('2222222');
         //先根据学生分组得到其总分
         var scoreInfoGroupByStudent = _.groupBy(allStudentsPaperScoreInfo, 'id');
 
@@ -134,7 +138,7 @@ exports.rankReport = function(req, res, next) {
             //这里面都是当前科目的分数
             rankCache[paperId] = _.groupBy(studentsScoreInfoArr, 'class');
         });
-
+// console.log('3333333');
 //清理rankCache，得到authRankCache
         //如果是校级领导或者年级主任则不需要清理，否则：
         var authRankCache = {}, allPaperIds = _.keys(rankCache);
@@ -149,6 +153,9 @@ exports.rankReport = function(req, res, next) {
                     authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
                 }
             });
+
+// console.log('4444444');
+
             _.each(gradeAuthObj.groupManagers, (obj) => {
                 _.each(allPaperIds, (paperId) => {
                     // 方法一：如果有此对象，说明是从上面添加的--那么就意味着全部班级都在里面了
@@ -162,13 +169,24 @@ exports.rankReport = function(req, res, next) {
                     }
                 });
             });
+// console.log('555555');
             //因为auth中已经做了冗余的排查，所以如果这里有subjectTeachers那么就一定是前面所没有包含的
             _.each(gradeAuthObj.subjectTeachers, (obj) => {
                 var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
                 if(targetAuthPaper) {
                     // authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
-                    if(!authRankCache[targetAuthPaper.id]) authRankCache[targetAuthPaper.id] = {};
-                    authRankCache[targetAuthPaper.id][obj.group] = rankCache[targetAuthPaper.id][obj.group];
+                    if(!authRankCache[targetAuthPaper._id]) authRankCache[targetAuthPaper._id] = {};
+
+// console.log('-------------------');
+// console.log('paper key = ', targetAuthPaper.id);
+// console.log('all rankCache paper ids == ', _.keys(rankCache));
+
+// console.log(rankCache[targetAuthPaper.id]);
+// console.log(rankCache[targetAuthPaper.id][obj.group]);
+// console.log('lalalaalallalallalall');
+
+
+                    authRankCache[targetAuthPaper._id][obj.group] = rankCache[targetAuthPaper._id][obj.group];
                 }
             });
         } else {
@@ -180,7 +198,7 @@ exports.rankReport = function(req, res, next) {
             authRankCache.totalScore = rankCache.totalScore;
         }
 
-
+// console.log('666666');
 
         //根据authRankCache组织examInfo的信息：
         var authPaperIds = _.keys(authRankCache);
@@ -199,12 +217,34 @@ exports.rankReport = function(req, res, next) {
             examPapers.push({paper: targetPaper._id, pid: targetPaper.id, name: targetPaper.subject});
         });
 
-//这里是否能用"..."呢？？？
-        var examClasses = _.union(..._.map(authRankCache, (obj, pid) => {
-            return _.keys(obj);
-        }));
+// console.log('examPapers ==== ', examPapers);
 
-console.log('examClasses ===== ', examClasses);
+
+//这里是否能用"..."呢？？？
+        // var examClasses = _.union(..._.map(authRankCache, (obj, pid) => {
+        //     console.log(_.keys(obj));
+        //     return _.keys(obj);
+        // }));
+        var tempAuthObjs = [], examClasses = [];
+        // var tempAuthObjs = _.map(authRankCache, (obj, pid) => {
+        //     // console.log(_.keys(obj));
+        //     return _.keys(obj);
+        // });
+        _.each(authRankCache, (obj, pid) => {
+            if(pid != 'totalScore') {
+                tempAuthObjs.push(_.keys(obj));
+            }
+        })
+
+// console.log('tempAuthObjs ==== ', tempAuthObjs);
+
+        _.each(tempAuthObjs, (authArr) => {
+            console.log(authArr);
+            examClasses = _.concat(examClasses, authArr);
+        })
+// console.log('uniq 前： ', examClasses);
+        examClasses = _.uniq(examClasses);
+// console.log('uniq 后 ===== ', examClasses);
 
 
         //组织examInfo的信息：
@@ -251,7 +291,7 @@ exports.customRankReport = function(req, res, next) {
             if(!examStudentsInfo || examStudentsInfo.length == 0 || !examPapersInfo || examPapersInfo.length == 0) {
                 return next(new errors.Error('no valid custom exam be found'));
             }
-            console.log('examStudentsInfo.length = ', examStudentsInfo.length);
+            // console.log('examStudentsInfo.length = ', examStudentsInfo.length);
             var flag = 0, tempResult;
             var allStudentsScoreInfo = _.concat(..._.map(examStudentsInfo, (student) => {
                 var obj = _.pick(student, ['id', 'kaohao', 'name', 'class']);
@@ -365,8 +405,6 @@ exports.home = function(req, res, next) {
     // oldHome(req, res, next);
     //0.通过verify已经有了req.user
     //1.获取此用户所从属的学校信息
-console.log('1');
-
     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
         //2.获取此学校所产生的所有的考试信息--因为不牵涉到分数，所以这里直接读DB即可，不需要rank-server的exam api
         return examUitls.getExamsBySchool(school);
@@ -375,16 +413,28 @@ console.log('1');
         return getCustomExams(req.user.id);
     }).then(function(customExams) {
         try {
+
+// console.log('===================  1');
+
             var allExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
+
+// console.log('===================  2, allExams.length === ', allExams.length);
+
             var formatedExams = formatExams(allExams);
+// console.log('===================  3');
+// console.log(JSON.stringify(formatedExams));
+// console.log('============== end 3');
+
+
+
             return when.resolve(formatedExams);
         } catch(e) {
             return when.reject(new errors.Error('格式化exams错误'));
         }
     }).then(function(formatedExams) {
         formatedExams = filterExamsByAuth(formatedExams, req.user.auth);
-
-console.log(formatedExams);
+// console.log('===================  4');
+// console.log(formatedExams);
 
         res.status(200).json(formatedExams);
     }).catch(function(err) {
@@ -417,6 +467,11 @@ function filterExamsByAuth(formatedExams, auth) {
     //Note: 如果过滤后最终此时间戳key下没有exam了则也不显示此time key
     //Note: 从当前用户中获取此用户权限，从而过滤
     if(auth.isSchoolManager) return formatedExams;
+
+
+console.log('auth === ', auth);
+
+
     //只要是此年级的，那么都能看到这场考试，但是具体的考试的数据要跟着此用户的权限走
     var authGrades = _.keys(auth.gradeAuth);
 
@@ -602,8 +657,13 @@ exports.initExam = function(req, res, next) {
     var grade = decodeURI(req.query.grade);
     examUitls.generateExamInfo(req.user.schoolId, req.query.examid, grade).then(function(exam) {
         req.exam = exam;
+
+// console.log('==========================  1');
+
         return examUitls.generateExamScoresInfo(req.exam, req.user.auth);
     }).then(function(result) {
+// console.log('==========================  2');
+
         req = _.assign(req, result);
         next();
     }).catch(function(err) {

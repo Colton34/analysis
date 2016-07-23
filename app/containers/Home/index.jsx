@@ -102,9 +102,9 @@ class TeacherHelper extends React.Component {
         return (
             <div>
                 <div className={styles.title}>老师助手</div>
-                <a  href='/faq?section=intro&sub=introVideo' 
+                <a  href='/faq?section=intro&sub=introVideo'
                     onMouseEnter={this.onHoverVideoLink.bind(this)}
-                    onMouseLeave={this.onLeaveVideoLink.bind(this)} 
+                    onMouseLeave={this.onLeaveVideoLink.bind(this)}
                     className={this.state.videoLinkHover ? styles['video-img-hover'] : styles['video-img']} ></a>
                 <a style={localStyle.downloadBtn}
                     target='_blank'
@@ -350,6 +350,10 @@ class Home extends React.Component {
                 </div>
             );
 
+
+console.log('examList ======');
+console.log(examList);
+console.log('=========');
 
         return (
             <div >

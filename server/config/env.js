@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-21 15:21:49
+* @Last Modified time: 2016-07-23 16:25:34
 */
 
 'use strict';
@@ -23,10 +23,14 @@
 // };
 
 
+// 000000000000000000100479
+
+
+
 var development = {
     "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://read:%3A_3IJon%3Cbb08@server4-ks.yunxiao.com:8300/analy4',  //mongodb://localhost:27017/hfs-test
     'fxdb': 'mongodb://hfsfenxi:%5D%237UXrz%5Bjq98@server4-ks.yunxiao.com:8300/hfsfenxi',
-    "port": 8666,
+    "port": 4000,
     "client_host": 'localhost',
     'render_host': 'testrender.yunxiao.com',
     "secret": "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-22 14:47:50
+* @Last Modified time: 2016-07-23 16:31:41
 */
 
 'use strict';
@@ -117,6 +117,18 @@ exports.generateExamInfo = function(schoolid, examid, gradeName) {
         return getSchoolById(schoolid);
     }).then(function(school) {
         var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
+
+if(!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) {
+    console.log('school.grades');
+
+    console.log(school['[grades]']);
+
+
+console.log('========== targetGrade:');
+console.log(targetGrade);
+}
+
+
         if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.Error('没有找到对应的年级或者从属此年级的班级'));
 
         data.exam.grade = targetGrade;
@@ -205,23 +217,28 @@ exports.generateExamScoresInfo = function(exam, auth) {
 
     //每个学校每个年级都是唯一的（只有一个初一，只有一个初二...），通过年级，获取所有此年级下的所有班级className，通过scores的className key过滤
     return fetchExamScoresById(exam.fetchId).then(function(scoresInfo) {
-        //全校此考试(exam)某年级(grade)所有考生总分信息，升序排列
 
+
+// console.log('==========================  lalalal');
+
+        //全校此考试(exam)某年级(grade)所有考生总分信息，升序排列
         var authClasses = getAuthClasses(auth, exam.grade.name);
+
+// console.log('============  bbbb');
+
         //实现只获取到用户auth权限内的班级数据--但是dashboard是这个情况，可是具体里面所有的报告还是需要过滤科目。
         var targetClassesScore = {};
         if(_.isBoolean(authClasses) && authClasses) {
             targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
         } else if(_.isArray(authClasses) && authClasses.length > 0) {
-            console.log('当前用户所管辖的班级：', authClasses);
+            // console.log('当前用户所管辖的班级：', authClasses);
             //我拿到给的班级--但是会确认是不是有效班级名称--什么才是有效呢？就是能在grade['[classes]']中找到
             //确保这些班级是有效的班级：
             var allValidClasses = _.map(exam.grade['[classes]'], (classItem) => classItem.name);
             authClasses = _.filter(authClasses, (className) => _.includes(allValidClasses, className));
-            console.log('当前用户最终有效的authClasse = ', authClasses);
+            // console.log('当前用户最终有效的authClasse = ', authClasses);
             targetClassesScore = _.pick(scoresInfo, authClasses);
         }
-
         var orderedStudentScoreInfo = _.sortBy(_.concat(..._.values(targetClassesScore)), 'score'); //这个数据结构已经很接近
         //examStudentsInfo的结构了，后面schoolAnalysis等页面还需要，所以会考虑缓存~~~
         //给exam补充实考和缺考人数信息：全校此年级此场考试的缺考人数=全校此年级的学生人数-全校此年级参加此场考试的人数
@@ -229,7 +246,7 @@ exports.generateExamScoresInfo = function(exam, auth) {
         //在exam.grade的每个班级对象中补充realCount和lostCount，如果整个班级缺考，则添加到exam.lostClasses中
         exam.realClasses = _.keys(targetClassesScore);
         exam.lostClasses = [], exam.realStudentsCount = 0, exam.lostStudentsCount = 0;
-
+// console.log('sldfjsldfjsdfjsj');
         //TODO:在这里还可以添加此班级在此场exam（而不是某一个paper）的realStudentsCount和lostStudentsCount
         _.each(exam.grade['[classes]'], (classItem, index) => {
             if (targetClassesScore[classItem.name]) {
@@ -241,8 +258,8 @@ exports.generateExamScoresInfo = function(exam, auth) {
                 exam.lostClasses.push(classItem.name);
             }
         });
-
         exam.realClasses = _.keys(targetClassesScore);
+
         return when.resolve({
             classScoreMap: targetClassesScore,
             orderedScoresArr: orderedStudentScoreInfo
@@ -275,11 +292,15 @@ function getAuthClasses(auth, gradeKey) {
 //3.subjectManagers
 //以上都是此年级的全部班级
 //否则，从groupManagers和subjectTeachers中取出所管辖的班级
-    if(auth.schoolManagers) return true;
+
+// console.log(auth);
+
+
+    if(auth.isSchoolManager) return true;
     if(_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]) return true;
     if(_.isObject(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey].subjectManagers.length > 0) return true;
-    var groupManagersClasses = _.map(auth.gradeKey[gradeKey].groupManagers, (obj) => obj.group);
-    var subjectTeacherClasses = _.map(auth.gradeKey[gradeKey].subjectTeachers, (obj) => obj.group);
+    var groupManagersClasses = _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => obj.group);
+    var subjectTeacherClasses = _.map(auth.gradeAuth[gradeKey].subjectTeachers, (obj) => obj.group);
     return _.union(groupManagersClasses, subjectTeacherClasses);
 }
 
