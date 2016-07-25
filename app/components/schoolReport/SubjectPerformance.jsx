@@ -176,7 +176,10 @@ class Dialog extends React.Component {
 
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this)}>
-                <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
+                <Header closeButton={false} style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
+                    <button className={styles['dialog-close']} onClick={this.onHide.bind(this)}>
+                        <i className='icon-cancel-3'></i>
+                    </button>
                     设置等级参数
                 </Header>
                 <Body style={{padding: 30}}>
@@ -327,7 +330,7 @@ series: [{
 };
         var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
         // 表格表头的鼠标悬停提示
-        var tipConfig = {'标准差': {content: '待添加', direction: 'bottom'}, '差异系数': {content: '待添加', direction: 'bottom'}};
+        var tipConfig = {'标准差': {content: '反映了学生分数的分布离散程度，值越大表示个体之间的分数分布的离散程度越大，反之，值越小表示个体之间的分数分布的离散程度越小；', direction: 'bottom'}, '差异系数': {content: '标准差与平均分之比，表示不同样本的相对离散程度。值越大表示相对离散程度越大，反之，值越小表示相对离散程度越小；', direction: 'bottom'}};
         return (    
             <div id='subjectPerformance' className={schoolReportStyles['section']}>
                 <div style={{ marginBottom: 30 }}>
@@ -337,7 +340,7 @@ series: [{
                 </div>
                 <TableView tableData={subjectExamTableData} reserveRows={6} tipConfig={tipConfig}/>
 
-                <p style={{marginBottom: 20}}>
+                <p style={{margin: '40px 0 20px 0'}}>
                     <span className={schoolReportStyles['sub-title']}>学科离差分布</span>
                     <span className={schoolReportStyles['title-desc']}>离差较大的学科，反映出各班级该学科教学效果差距较大；离差较小的学科，反映出各班级该学科教学效果比较整齐</span>
                 </p>
