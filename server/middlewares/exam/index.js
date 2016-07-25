@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-25 11:21:46
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-07-25 11:48:30
 */
 
 'use strict';
@@ -1051,13 +1051,44 @@ function formatExamInfo(exam) {
 function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo) {
     //在examScoreArr的每个对象中添加papers属性信息: 一个数组，里面就是{id: <pid>, score: <分数>}
     //req.exam['[papers]'] item.paper
-    return generateStudentsPaperInfo(exam, examClassesInfo).then(function(studentsPaperInfo) {
+    return generateStudentsPaperInfo(exam).then(function(studentsPaperInfo) {
         //遍历examScoreArr是为了保证有序
         _.each(examScoreArr, (scoreObj) => {
-            scoreObj.papers = studentsPaperInfo[scoreObj.id]; //注意，这里id是短id...
+            scoreObj.papers = studentsPaperInfo[scoreObj.id];
         });
         return when.resolve(examScoreArr);
     });
+}
+
+function generateStudentsPaperInfo(exam) {
+    //1.通过exam['[papers]']获取到各个paper的具体实例
+    //2.收集各个科目每个学生的成绩，打散组成perStudentPerPaper数组--这里好像没必要构成
+    //totalScore。
+    //3.构成 studentsPaperInfo
+    return getPaperInstanceByExam(exam).then(function(papers) {
+        var perStudentPerPaperArr = _.concat(..._.map(papers, (paper) => {
+            return _.map(paper['[students]'], (student, index) => {
+                // studentId: xxx, class_name: xxx, paperid: xxx, score: xxx
+                //注意：student.id是个什么样的id？后面studentsPaperInfo的key是
+                //student的短id
+                return {id: student.id, class_name: student.class, paperid: paper.id, score: student.score};
+            });
+        }));
+        var studentsPaperInfo = _.groupBy(perStudentPerPaperArr, 'id');
+        return when.resolve(studentsPaperInfo);
+    });
+}
+
+function getPaperInstanceByExam(exam) {
+    var papersPromise = _.map(exam['[papers]'], (paperObj) => {
+        return when.promise(function(resolve, reject) {
+            peterHFS.get(paperObj.paper, function(err, paper) {
+                if(err) return reject(new errors.Data.MongDBError('find paper: ' + paperId + '  Error', err));
+                resolve(paper);
+            });
+        });
+    });
+    return when.all(papersPromise);
 }
 
 //如果某些班级没有参加某场paper，那么此班级里的所有学生的papers属性就会缺少对应的pid对象
@@ -1074,35 +1105,35 @@ studentsPaperInfo:
 }
 
  */
-function generateStudentsPaperInfo(exam, examClassesInfo) {
-    //拿到所有exam['[papers]']的paper实例
-    var studentsPaperInfo = {};
-    var targetPaperIds = _.map(exam['[papers]'], (paperItem) => paperItem.id);
-    //对每一个paper实例建立<studentId>:<paperScore>的Map。或者也可以通过查询Student实例来得到每个学生的papers信息，但是那样的话查询的压力就大了许多，但是
-    //studnet.id上有索引。。。这个时间对比就不好评估了，先使用查询看看性能如何。。。
-    //方法一：直接使用@Student表中已经计算好的各科的成绩，但需要过滤属于此场考试的papers才是有效的papers。使用$in操作符，或者getMany，不知道那个性能好一些
-    //
+// function generateStudentsPaperInfo(exam, examClassesInfo) {
+//     //拿到所有exam['[papers]']的paper实例
+//     var studentsPaperInfo = {};
+//     var targetPaperIds = _.map(exam['[papers]'], (paperItem) => paperItem.id);
+//     //对每一个paper实例建立<studentId>:<paperScore>的Map。或者也可以通过查询Student实例来得到每个学生的papers信息，但是那样的话查询的压力就大了许多，但是
+//     //studnet.id上有索引。。。这个时间对比就不好评估了，先使用查询看看性能如何。。。
+//     //方法一：直接使用@Student表中已经计算好的各科的成绩，但需要过滤属于此场考试的papers才是有效的papers。使用$in操作符，或者getMany，不知道那个性能好一些
+//     //
 
-    var studentIds = _.map(_.concat(..._.map(exam.realClasses, (className) => examClassesInfo[className].students)), (sid) => '@Student.' + sid); //当前年级的所有参考班级的所有学生（可能会包含缺考学生，但是这样的学生其papers的length就是0了，所以也没有问题）
-    return when.promise(function(resolve, reject) {
-        peterHFS.getMany(studentIds, {project: ['_id', '[papers]']}, function(err, students) {
-            if(err) return reject(new errors.data.MongoDBError('query students error : ', err));
-            //过滤student['papers']，建立Map
-            try {
-                _.each(students, (studentItem) => {
-                    var targetPapers = _.filter(studentItem['[papers]'], (paperItem) => _.includes(targetPaperIds, paperItem.paperid));
-                    targetPapers = _.map(targetPapers, (paperItem) => _.pick(paperItem, ['paperid', 'score', 'class_name']));
-                    var studentId = studentItem._id.toString();
-                    studentId = studentId.slice(_.findIndex(studentId, (c) => c !== '0'));
-                    studentsPaperInfo[studentId] = targetPapers;
-                });
-                resolve(studentsPaperInfo);
-            } catch (e) {
-                reject(new errors.Error('generateStudentsPaperInfo error : ', e));
-            }
-        });
-    });
-}
+//     var studentIds = _.map(_.concat(..._.map(exam.realClasses, (className) => examClassesInfo[className].students)), (sid) => '@Student.' + sid); //当前年级的所有参考班级的所有学生（可能会包含缺考学生，但是这样的学生其papers的length就是0了，所以也没有问题）
+//     return when.promise(function(resolve, reject) {
+//         peterHFS.getMany(studentIds, {project: ['_id', '[papers]']}, function(err, students) {
+//             if(err) return reject(new errors.data.MongoDBError('query students error : ', err));
+//             //过滤student['papers']，建立Map
+//             try {
+//                 _.each(students, (studentItem) => {
+//                     var targetPapers = _.filter(studentItem['[papers]'], (paperItem) => _.includes(targetPaperIds, paperItem.paperid));
+//                     targetPapers = _.map(targetPapers, (paperItem) => _.pick(paperItem, ['paperid', 'score', 'class_name']));
+//                     var studentId = studentItem._id.toString();
+//                     studentId = studentId.slice(_.findIndex(studentId, (c) => c !== '0'));
+//                     studentsPaperInfo[studentId] = targetPapers;
+//                 });
+//                 resolve(studentsPaperInfo);
+//             } catch (e) {
+//                 reject(new errors.Error('generateStudentsPaperInfo error : ', e));
+//             }
+//         });
+//     });
+// }
 
 function generateExamPapersInfo(exam) {
     var examPapersInfo = {};

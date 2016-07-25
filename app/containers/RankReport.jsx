@@ -225,7 +225,6 @@ class RankReportTableView extends React.Component {
             headSeq: this.props.headSeq,                        // 默认显示全部表头
             sortInfo: {}                                        //{head: , order: }
         }
-        console.log(_.keys(this.props.studentInfos));
         // debugger;
     }
     getTableHead() {
@@ -889,7 +888,6 @@ class RankReport extends React.Component {
     }
 
     handleUndefinedData() {
-        console.log(this.headSeq);
         // debugger;
         _.forEach(this.studentInfos, (studentInfo, kaohao) => {
             // debugger;
@@ -922,9 +920,6 @@ class RankReport extends React.Component {
         this.getHeadSeq(examInfo);
         this.generateStudentInfos(rankCache);
         this.handleUndefinedData();
-console.log('examInfo === ', examInfo);
-console.log('rankCache === ', rankCache);
-console.log('this.studentInfos === ', this.studentInfos);
 // debugger;
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
