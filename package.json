@@ -15,7 +15,7 @@
     "build:prod": "cross-env NODE_ENV=production NODE_PATH=./server/middlewares webpack --colors --display-error-details --config ./webpack/webpack.config.prod.js",
     "build:node": "cross-env NODE_ENV=production npm run babel -- ./server -d ./compiled",
     "build": "npm run clean && npm run build:prod && npm run build:node",
-    "test": "cross-env NODE_ENV=test NODE_PATH=./server/middlewares karma start",
+    "test": "cross-env NODE_ENV=test NODE_PATH=./server/middlewares node compiled/index.js",
     "test:watch": "cross-env NODE_ENV=test NODE_PATH=./server/middlewares npm test -- --watch --no-single-run",
     "postinstall": "npm run build"
   },
