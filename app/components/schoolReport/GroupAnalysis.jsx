@@ -139,7 +139,10 @@ class Dialog extends React.Component {
         var levelNum = _.size(levels);
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this) }>
-                <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
+                <Header closeButton={false} style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
+                     <button className={styles['dialog-close']} onClick={this.onHide.bind(this)}>
+                        <i className='icon-cancel-3'></i>
+                    </button>
                     设置临界分数
                 </Header>
                 <Body style={{padding: 30}}>
@@ -218,10 +221,31 @@ class GroupAnalysis extends React.Component {
 
         levelBuffers = (List.isList(levelBuffers)) ? levelBuffers.toJS() : levelBuffers;
         if((!levelBuffers || _.size(levelBuffers) == 0)) return (<div></div>)
-
 //算法数据结构：
         var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers);
+
         var disData = criticalStudentsDiscription(criticalLevelInfo); //缺少UI
+
+        var levels=[];
+        for(let i in criticalLevelInfo){
+          levels[i]=(criticalLevelInfo[i].sort(function(a,b){return a.count<b.count;})).slice(0,3);
+        }//每档前三
+        var xdata=['一档','二档','三档','四档','五档'];//x轴要显示的数据列表
+        var finData=xdata.slice(0,levels.length);
+        var colorList=['#00abfe','#00d3c8','#45c44e','#00abfe','#45c44e'];//颜色列表
+        var serisData=[];var datas=[];
+        for(let i=0;i<3;i++){
+          serisData[i]=[];
+            for(let j=0;j<levels.length;j++){
+              serisData[i][j]={
+                  name:examInfo.gradeName+levels[j][i].class+'班',
+                  y:levels[j][i].count,
+                  color:colorList[j]
+
+            };
+          }
+
+        }
 //自定义Module数据结构：
 var config={
 chart: {
@@ -241,21 +265,10 @@ subtitle: {
     }
 
 },
-colors:['#1daef8','#16d2c7'],
+
 xAxis: {
   tickWidth:'0px',//不显示刻度
-    categories: [
-        '语文',
-        '数学',
-        '英语',
-        '政治',
-        '地理',
-        '生物',
-        '历史 ',
-        '物理',
-        '化学',
-        '生物'
-    ]
+    categories: finData
 },
 yAxis: {
   lineWidth:1,
@@ -268,17 +281,51 @@ credits:{
   enabled:false
 },
 tooltip:{
-enabled:false
+enabled:false,
+backgroundColor:'#000',
+borderColor:'#000',
+style:{
+  color:'#fff'
+},
+formatter: function(){
+     return this.point.name;
+}
 },
 legend:{
-enabled:true,
+enabled:false,
 align:'center',
 verticalAlign:'top'
 },
-series: [{
+plotOptions: {
+            column: {
+              cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    color: '#000',
+                    style: {
+                        fontWeight: 'bold'
+                    },
+                    formatter: function() {
+                        return this.point.name ;
+                    }
+                }
+            }
+        },
+  series: [{
+    name:'一档',
 
-    data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
-}]
+    data:serisData[0],
+  },
+  {
+    name:'二档',
+    data:serisData[1],
+  },
+  {
+    name:'三档',
+    data:serisData[2]
+  }
+]
+
 };
         return (
             <div id='groupAnalysis' className={schoolReportStyles['section']}>
