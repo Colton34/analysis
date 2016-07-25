@@ -26,21 +26,23 @@ import StudentPerformance from '../components/schoolReport/StudentPerformance/St
 
 import {initSchoolAnalysisAction, changeLevelAction} from '../reducers/schoolAnalysis/actions';
 import {initParams} from '../lib/util';
-import {SUBJECTS_WEIGHT as subjectWeight, BACKGROUND_COLOR} from '../lib/constants';
+import {SUBJECTS_WEIGHT as subjectWeight, COLORS_MAP as colorsMap, BACKGROUND_COLOR} from '../lib/constants';
 import Spinkit from '../common/Spinkit';
 
 class NavHeader extends React.Component {
     constructor(props) {
         super(props);
     }
-
+    
     render() {
+        var {examId, grade} = this.props;
+        var queries = grade ? {examid: examId, grade: grade} : {examid: examId}
         return (
-            <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px -15px', fontSize: 16, color: '#333' }}>
-                <Link to={{ pathname: '/' }} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
+            <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: colorsMap.C12 }}>
+                <Link to={{ pathname: '/dashboard',  query: queries}} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
                 <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}>
                     <a style={{ color: '#b4b4b4' }} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> 
-                    {this.props.examInfo.name}
+                    <Link to={{ pathname: '/dashboard',  query: queries}} style={{color: colorsMap.C12}}>{this.props.examInfo.name}</Link>
                     <span><i className='icon-right-open-2'></i>校级分析报告</span>
                 </span>
             </div>
@@ -72,6 +74,10 @@ class SchoolReport extends React.Component {
         headers = (List.isList(headers)) ? headers.toJS() : headers;
         levels = (Map.isMap(levels)) ? levels.toJS() : levels;
 
+        var examid = this.props.location.query ? this.props.location.query.examid : '';
+        var grade = this.props.location.query ? this.props.location.query.grade : '';
+        if (!examid) return;
+
         if((!examInfo || _.size(examInfo) == 0) || (!examStudentsInfo || examStudentsInfo.length == 0) ||
             (!examPapersInfo || _.size(examPapersInfo) == 0) || (!examClassesInfo || _.size(examClassesInfo) == 0) ||
             (!studentsGroupByClass || _.size(studentsGroupByClass) == 0) || (!allStudentsPaperMap || _.size(allStudentsPaperMap) == 0) ||
@@ -83,7 +89,7 @@ class SchoolReport extends React.Component {
              )
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: BACKGROUND_COLOR, zIndex: 0}}>
-                <NavHeader examInfo={examInfo} />
+                <NavHeader examInfo={examInfo} examId={examid} grade={grade}/>
                 <Header examInfo = {examInfo} params={this.props.params} location={this.props.location} />
                 <FullScoreTrend examInfo = {examInfo} examStudentsInfo = {examStudentsInfo} />
                 <ScoreDistribution
