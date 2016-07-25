@@ -349,12 +349,6 @@ class Home extends React.Component {
                     <Spinkit/>
                 </div>
             );
-
-
-console.log('examList ======');
-console.log(examList);
-console.log('=========');
-
         return (
             <div >
                 <Content examList={examList}/>

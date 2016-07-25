@@ -95,7 +95,7 @@ class Dashboard extends React.Component {
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         params.request.put(customBaseUrl, {examId: examid}).then(function(res) {
             location.href = '/';
-            console.log('res.data - ', res.data);
+            // console.log('res.data - ', res.data);
         }).then(function(err) {
             console.log('');
         })

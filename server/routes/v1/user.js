@@ -1,8 +1,8 @@
 /*
 * @Author: liucong
 * @Date:   2016-03-31 12:09:30
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 19:22:16
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-07-25 11:23:36
 */
 
 'use strict';
@@ -23,7 +23,6 @@ var auth = require('../../middlewares/auth');
 // });
 
 router.get('/me', auth.verify, function(req, res, next) {
-    // console.log('req.user = ', req.user);
     res.status(200).json(req.user);
 })
 

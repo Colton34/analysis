@@ -174,10 +174,14 @@ class CustomizeAnalysis extends React.Component {
         var examList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList;
         var currentSubject = Map.isMap(this.props.currentSubject) ? this.props.currentSubject.toJS() : this.props.currentSubject;
         var resultSet = Map.isMap(this.props.resultSet) ? this.props.resultSet.toJS() : this.props.resultSet;
+        var user = Map.isMap(this.props.user) ? this.props.user.toJS() : this.props.user;
         var customExamList = [];
         _.each(examList, (obj, index) => {
             customExamList = _.concat(customExamList, obj.values);
         });
+
+// debugger;
+
         return (
             <div style={{ width: 1000, minHeight: 600, margin: '20px auto', background: '#fff', paddingBottom: 30 }}>
                 <PageHeader
@@ -218,6 +222,7 @@ class CustomizeAnalysis extends React.Component {
                         onNextPage={this.onNextPage.bind(this) }
                         currentSubject={currentSubject}
                         resultSet={resultSet}
+                        user={user}
                         />
 
                 }
@@ -233,16 +238,17 @@ class CustomizeAnalysis extends React.Component {
 
 
                 }
+                {/* 这里为什么有两个currentSubject？？？  currentSubject={this.props.currentSubject}  */}
                 {
                     status === 'create' && pageIndex === 3 &&
                     <StudentConfirm
-                        currentSubject={this.props.currentSubject}
                         pageIndex={pageIndex}
                         onPrevPage={this.onPrevPage.bind(this) }
                         onNextPage={this.onNextPage.bind(this) }
                         onChangeGroupMap={this.props.setGroupMap}
                         currentSubject={currentSubject}
-                        setCurSubjectSqm={this.props.setCurSubjectSqm}/>
+                        setCurSubjectSqm={this.props.setCurSubjectSqm}
+                        user={user}/>
                 }
                 <InfoDialog content={this.state.dialogMsg} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) } />
             </div>
@@ -270,7 +276,8 @@ function mapStateToProps(state) {
         pageIndex: state.customAnalysis.pageIndex,
         resultSet: state.customAnalysis.resultSet,
         analysisName: state.customAnalysis.analysisName,
-        status: state.customAnalysis.status
+        status: state.customAnalysis.status,
+        user: state.app.user
     }
 }
 

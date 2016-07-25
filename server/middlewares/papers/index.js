@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-30 19:57:47
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-01 09:44:24
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-07-25 11:23:32
 */
 
 'use strict';
@@ -30,7 +30,6 @@ exports.fetchPaper = function (req, res, next) {
 }
 
 exports.fetchCustomPaper = function(req, res, next) {
-    console.log('fetchCustomPaper =================');
     req.checkParams('paperId', '无效的paperId').notEmpty();
     req.checkParams('examId', '无效的examId').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());

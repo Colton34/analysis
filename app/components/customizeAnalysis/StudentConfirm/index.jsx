@@ -12,6 +12,37 @@ var examInfos = {
     questionInfos: [{ "name": "第1题", "score": 3 }, { "name": "第2题", "score": 3 }, { "name": "第3题", "score": 3 }, { "name": "第4题", "score": 3 }, { "name": "第5题", "score": 3 }],
     studentInfos: [{ "name": "潘琳洁", "kaohao": "130615", "class": "6", "id": 3155561, "score": 118 }, { "name": "陈子彦", "kaohao": "132210", "class": "22", "id": 3156491, "score": 114 }, { "name": "徐伶依", "kaohao": "132252", "class": "22", "id": 3156520, "score": 113 }, { "name": "肖雨儿", "kaohao": "130813", "class": "8", "id": 3155678, "score": 113 }, { "name": "陈远", "kaohao": "132238", "class": "22", "id": 3156513, "score": 113 }, { "name": "祝睿", "kaohao": "130642", "class": "6", "id": 3155577, "score": 112 }, { "name": "徐凯鸿", "kaohao": "130643", "class": "6", "id": 3155578, "score": 112 }, { "name": "黄梦琦", "kaohao": "130644", "class": "6", "id": 3155579, "score": 112 }, { "name": "严博瀚", "kaohao": "132268", "class": "22", "id": 3156532, "score": 112 }]
 }
+
+
+/*
+数据结构：
+//Note: 如果gradeKey对应的是Boolean true，那么就是此年级主任。如果不是schoolManager那么就不带有此key--为了方便遍历
+{
+    isSchoolManager: false/true,
+    gradeAuth: {
+        gradeKey: true,
+        gradeKey: {
+            subjectManagers: ,
+            groupManagers: ,
+            subjectTeachers: ,
+            doubleSubjectTeachers
+        },
+        ...
+    }
+}
+
+ */
+function getAuchClasses(auth, gradeKey) {
+    //获取此页面需要的auth classes
+    //如果是校级领导，年级主任，任意一门学科的学科组长，那么都将看到所有学生--因为这里涉及的自定义分析到选择学生页面没有学科的筛选了，就没办法和学科再联系一起了
+    if(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]) || ((_.isObject(auth.gradeAuth[gradeKey])) && auth.gradeAuth[gradeKey].subjectManagers.length > 0)) return true;
+    var authGroupManagerClasses = _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => obj.group);
+    var authSubjectTeacherClasses = _.map(auth.gradeAuth[gradeKey].subjectTeachers, (obj) => obj.group);
+    var allAuthClasses = _.union(authGroupManagerClasses, authSubjectTeacherClasses);
+    return allAuthClasses;
+}
+
+
 //合并之后只有一个SQM， 其中的studentInfos即是这场考试整合
 /**
  * props:
@@ -24,24 +55,32 @@ class StudentConfirm extends React.Component {
     constructor(props) {
         super(props);
         var {groupMap} = this.props.currentSubject;
+        // debugger;
         this.state = {
             groupMap: _.isEmpty(groupMap) ? this.getGroupMap(this.props.currentSubject) : groupMap,
             showDialog: false
         }
+        // debugger;
     }
     componentWillReceiveProps(nextProps) {
         this.setState({
             groupMap: this.getGroupMap(nextProps.currentSubject)
         })
     }
+
+//收集学生的时候只能收集自己管辖范围内的学生
+//此时一定是确定了某一年级！！！从currenetSubject中获取年级--因为所有科目的年级肯定是一样的
     getGroupMap(currentSubject) {
         //var {examInfos} = this.props.currentSubject;
         //fixme: 获取examinfos的方法
+        var authClasses = getAuchClasses(this.props.user.auth, currentSubject.grade);
+        // debugger;
         var studentInfos = currentSubject.SQM.y;
         var groupMap = {};
         var isLiankao = studentInfos[0].school ? true : false;
         _.forEach(studentInfos, (student) => {
             var className = isLiankao ? student.school : student.class;
+            if(!((_.isBoolean(authClasses) && authClasses) || _.includes(authClasses, className))) return;
             if (!groupMap[className]) {
                 groupMap[className] = {
                     name: className,

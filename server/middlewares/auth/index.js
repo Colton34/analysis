@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-23 16:17:37
+* @Last Modified time: 2016-07-25 11:17:46
 */
 
 'use strict';
@@ -54,9 +54,6 @@ exports.authenticate = function(req, res, next) {
     }).then(function(auth) {
         //TODO: 将拿到的原始auth进行转换，存储转换后的auth
         var authInfo = getUserAuthInfo(auth);
-
-console.log('authInfo === ', JSON.stringify(authInfo));
-
         req.user.auth = authInfo;
         var token = jsonwebtoken.sign({ user: req.user }, config.secret);
         req.user.token = token;
@@ -127,10 +124,8 @@ console.log('登录成功');
 
  */
 function getUserAuthInfo(auth) {
-// console.log('============ 1');
 
     var isSchoolManager = ifSchoolManager(auth);
-    // if(isSchoolManager) return [{grade: null, subject: null, group: null}];
     if(isSchoolManager) return { isSchoolManager: true }
     var gradeAuth = filterGradeAuth(auth);
     return { gradeAuth: gradeAuth };
@@ -143,7 +138,6 @@ function ifSchoolManager(auth) {
 }
 
 function filterGradeAuth(auth) {
-// console.log('============ 2');
     //找到所有标识“年级主任”的object，删掉所有和此object中grade相同的object（即，留下这些年级主任的object，以及和年级主任不相同的grade的object）
     var gradeManagers = _.filter(auth, (obj) => {
         return (!_.isNull(obj.grade) && _.isNull(obj.subject) && _.isNull(obj.group));
@@ -158,9 +152,6 @@ function filterGradeAuth(auth) {
     });
     //1.对otherGradeAuthObjects进行groupBygrade
     var resetAuthObjectGradeMap = _.groupBy(otherGradeAuthObjects, 'grade');
-
-// console.log('============ 3');
-
     //2.对每一个grade key所对应的array进行处理
     var filtratedResetAuthObjectGradeMap = {};
     _.each(resetAuthObjectGradeMap, (authObjectsArr, gradeKey) => {
@@ -171,15 +162,9 @@ function filterGradeAuth(auth) {
         gradeManagerAuthObjectGradeMap[gradeKey] = true;
     });
     return _.assign(gradeManagerAuthObjectGradeMap, filtratedResetAuthObjectGradeMap);
-
-    // var resetAuthObjects = (..._.concat(_.map(resetAuthObjectGradeMap, (authObjectsArr, gradeKey) => {
-    //     return filterResetAuthObjects(authObjectsArr, gradeKey);
-    // })));
-    // return _.concat(gradeManagers, resetAuthObjects);
 }
 
 function filterResetAuthObjects(authObjectsArr, gradeKey) {
-// console.log('============ 4');
     var subjectManagers = _.filter(authObjectsArr, (obj) => {
         return _.isNull(obj.group);
     });
@@ -196,7 +181,6 @@ function filterResetAuthObjects(authObjectsArr, gradeKey) {
     var groupManagerKeys = _.map(groupManagers, (obj) => {
         return obj.group;
     });
-// console.log('============ 5');
     //如果即有subjectManagers又有groupManagers那么就一定会有交集
     var doubleSubjectTeachers = [];
     if(subjectManagerKeys.length > 0 && groupManagerKeys.length > 0) {
@@ -219,9 +203,7 @@ function filterResetAuthObjects(authObjectsArr, gradeKey) {
         subjectTeachers: subjectTeachers,
         doubleSubjectTeachers: doubleSubjectTeachers
     }
-    // return _.concat(subjectManagers, groupManagers, subjectTeachers);
 }
-
 
 exports.verify = function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.authorization;
@@ -236,16 +218,11 @@ exports.verify = function (req, res, next) {
     }).then(function(user) {
         user.token = token;
         req.user = user;
-next();
-        // return getUserAuthorization(req.user.id, req.user.name);
+        next();
     }).catch(function(err) {
         next(err);
     });
 };
-// .then(function(auth) {
-//         req.user.auth = auth;
-//         next();
-//     })
 
 //Note: 返回的是个数组！！！数组里是代表权限的objet--{grade: xxx, group: xxx, subject: xxx}
 function getUserAuthorization(userId, userName) {

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-23 16:31:41
+* @Last Modified time: 2016-07-25 11:23:18
 */
 
 'use strict';
@@ -118,15 +118,15 @@ exports.generateExamInfo = function(schoolid, examid, gradeName) {
     }).then(function(school) {
         var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
 
-if(!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) {
-    console.log('school.grades');
+//TODO:关于2.0学校没有grade的测试
+// if(!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) {
+//     console.log('school.grades');
 
-    console.log(school['[grades]']);
+//     console.log(school['[grades]']);
 
-
-console.log('========== targetGrade:');
-console.log(targetGrade);
-}
+//     console.log('========== targetGrade:');
+//     console.log(targetGrade);
+// }
 
 
         if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.Error('没有找到对应的年级或者从属此年级的班级'));
@@ -164,36 +164,7 @@ function fetchExamById(examid) {
 /*
 问题：这里通过examid去获取scores怎么区分是哪个年级的学生的总分呢？哦，通过班级过滤。。。
  */
-/*
-Test Code:
-var lostStudentsInfo = [];
 
-// if(index == 0) {
-// var originalIds = classItem['[students]'];
-// var realIds = _.map(targetClassesScore[classItem.name], (sss) => sss.id+'');
-// var diffIds = _.difference(originalIds, realIds);
-
-// // console.log(targetClassesScore[classItem.name]);
-
-// console.log('originalIds ========');
-// console.log(originalIds);
-// console.log('realIds ============');
-// console.log(realIds);
-// console.log('diffIds ===========  ');
-// console.log(diffIds);
-// }
-
-                // var originalIds = classItem['[students]'];
-                // var realIds = _.map(targetClassesScore[classItem.name], (sss) => sss.id+'');
-                // var diffIds = _.difference(originalIds, realIds);
-                // lostStudentsInfo = _.concat(lostStudentsInfo, diffIds);
-
-
-// console.log('=====================  lost students ==============================');
-// console.log(lostStudentsInfo);
-// console.log('=====================  lost students ==============================');
-// console.log('lostStudentsInfo.length = ', lostStudentsInfo.length);
- */
 
  //Auth Note: 只需要过滤班级，科目还是不变--因为计算的是总分
 //从auth中获取正确的班级，从而拿到正确的学生
@@ -218,25 +189,17 @@ exports.generateExamScoresInfo = function(exam, auth) {
     //每个学校每个年级都是唯一的（只有一个初一，只有一个初二...），通过年级，获取所有此年级下的所有班级className，通过scores的className key过滤
     return fetchExamScoresById(exam.fetchId).then(function(scoresInfo) {
 
-
-// console.log('==========================  lalalal');
-
         //全校此考试(exam)某年级(grade)所有考生总分信息，升序排列
         var authClasses = getAuthClasses(auth, exam.grade.name);
-
-// console.log('============  bbbb');
-
         //实现只获取到用户auth权限内的班级数据--但是dashboard是这个情况，可是具体里面所有的报告还是需要过滤科目。
         var targetClassesScore = {};
         if(_.isBoolean(authClasses) && authClasses) {
             targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
         } else if(_.isArray(authClasses) && authClasses.length > 0) {
-            // console.log('当前用户所管辖的班级：', authClasses);
             //我拿到给的班级--但是会确认是不是有效班级名称--什么才是有效呢？就是能在grade['[classes]']中找到
             //确保这些班级是有效的班级：
             var allValidClasses = _.map(exam.grade['[classes]'], (classItem) => classItem.name);
             authClasses = _.filter(authClasses, (className) => _.includes(allValidClasses, className));
-            // console.log('当前用户最终有效的authClasse = ', authClasses);
             targetClassesScore = _.pick(scoresInfo, authClasses);
         }
         var orderedStudentScoreInfo = _.sortBy(_.concat(..._.values(targetClassesScore)), 'score'); //这个数据结构已经很接近
@@ -246,7 +209,6 @@ exports.generateExamScoresInfo = function(exam, auth) {
         //在exam.grade的每个班级对象中补充realCount和lostCount，如果整个班级缺考，则添加到exam.lostClasses中
         exam.realClasses = _.keys(targetClassesScore);
         exam.lostClasses = [], exam.realStudentsCount = 0, exam.lostStudentsCount = 0;
-// console.log('sldfjsldfjsdfjsj');
         //TODO:在这里还可以添加此班级在此场exam（而不是某一个paper）的realStudentsCount和lostStudentsCount
         _.each(exam.grade['[classes]'], (classItem, index) => {
             if (targetClassesScore[classItem.name]) {
@@ -292,10 +254,6 @@ function getAuthClasses(auth, gradeKey) {
 //3.subjectManagers
 //以上都是此年级的全部班级
 //否则，从groupManagers和subjectTeachers中取出所管辖的班级
-
-// console.log(auth);
-
-
     if(auth.isSchoolManager) return true;
     if(_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]) return true;
     if(_.isObject(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey].subjectManagers.length > 0) return true;

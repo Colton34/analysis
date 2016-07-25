@@ -78,6 +78,53 @@ var MERGE_TYPE = {
 
 }
 
+function filterExamsByAuth(formatedExams, auth) {
+    if(auth.isSchoolManager) return formatedExams;
+    //只要是此年级的，那么都能看到这场考试，但是具体的考试的数据要跟着此用户的权限走
+    var authGrades = _.keys(auth.gradeAuth);
+    //过滤formatedExams
+    var result = [];
+    _.each(formatedExams, (obj) => {
+        var vaildExams = _.filter(obj.values, (examItem) => {
+            return _.includes(authGrades, examItem.grade);
+        });
+        if(vaildExams.length > 0) result.push({timeKey: obj.timeKey, values: vaildExams});
+    });
+    return result;
+}
+
+function filterAuthExamList(originalExamList, auth) {
+    //针对时间戳中的每一个exam实体都进行auth匹配，这里匹配到科目
+    //当前能获取到自定义分析的就相当于自己是此自定义分析考试的校领导，所以没有问题。而能创建自定义分析最开始也是有一个年级属性的--但是有个问题，在没有上权限之前一个初二的老师可以创建初三的自定义考试，但是有了权限之后他就看不到了
+    if(auth.isSchoolManager) return originalExamList;
+    var authGrades = _.keys(auth.gradeAuth);
+    var result = [];
+    _.each(originalExamList, (obj) => {
+        var vaildExams = _.filter(obj.values, (examItem) => {
+            return _.includes(authGrades, examItem.grade);
+        });
+        if(vaildExams.length == 0) return;
+        //有对应的年级exam实例--则，针对validExams获取科目。你是2班的语文老师，但是2班没有考试语文，3班考试了
+        _.each(vaildExams, (examItem) => {
+            var examPapers = examItem.papers;
+            //如果是此年级的年级组长--那么可以看到所有科目；或者如果是此年级某n(n>0)班级的班主任，那么也可以看到所有科目，则都不需要对此exam再进行科目过滤
+            if((_.isBoolean(auth.gradeAuth[examItem.grade]) && auth.gradeAuth[examItem.grade]) || ((_.isObject(auth.gradeAuth[examItem.grade])) && auth.gradeAuth[examItem.grade].groupManagers.length > 0)) return;
+            //否则：
+            // var allValidPaperSubjects = _.map(exam.papers, (paperObj) => paperObj.subject);
+            var authSubjectManagerSubjects = _.map(auth.gradeAuth[examItem.grade].subjectManagers, (obj) => obj.subject);
+            var authSubjectTeacherSubjects = _.map(auth.gradeAuth[examItem.grade].subjectTeachers, (obj) => obj.subject);
+            var allAuthSubjects = _.union(authSubjectManagerSubjects, authSubjectTeacherSubjects);
+            var authValidSubjectObjs = _.filter(examPapers, (paperObj) => {
+                return _.includes(allAuthSubjects, paperObj.subject);
+            });
+            examItem.papers = authValidSubjectObjs;
+        });
+        result.push({timeKey: obj.timeKey, values: vaildExams });
+    });
+    return result;
+}
+
+
 /**
  * props:
  * isLiankao: 是否联考
@@ -91,14 +138,14 @@ class ExamSelect extends React.Component {
     constructor(props) {
         super(props);
         //var {currentSubject} = this.props;
-
+        var authExamList = filterAuthExamList(this.props.examList, this.props.user.auth);
         this.state = {
             //currentPapers: currentSubject.src ? currentSubject.src : {},
             showDialog: false,
             showInfoDialog: false,
             startDate: moment().month(moment().month() - 12),  //默认显示一年内的考试
             endDate: moment(),
-            examList: this.props.examList,
+            examList: authExamList,
             infoDialogMsg: ''
         }
     }
@@ -529,11 +576,11 @@ class ExamSelect extends React.Component {
                                                         currentPapers[paperId].oriSQM.x.map((questionInfo, index) => {
                                                             return (
                                                                 <li key={'question-list-item-' + index} className={ownClassNames['question-list-item']}>
-                                                                    
+
                                                                         <input  style={{verticalAlign: 'middle', marginTop: -10, marginRight: 2}} type="checkbox" id={'qlist-item-' + paperId + '-' + questionInfo.name} ref={'qlist-item-' + paperId + '-' + questionInfo.name} value={paperId + '-' + questionInfo.name} onChange={this.onCheckQuestion.bind(this, 'qlist-item-' + paperId + '-' + questionInfo.name) } checked={questionInfo.selected || questionInfo.selected === undefined ? true : false}/>
                                                                         <label for={'qlist-item-' + paperId + ' ' + questionInfo.name } />
                                                                         <span title={questionInfo.name} style={{display: 'inline-block', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', width: 63}}>{questionInfo.name}</span>
-                                                                    
+
                                                                 </li>
                                                             )
                                                         })

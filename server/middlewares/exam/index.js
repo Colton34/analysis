@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-23 16:18:18
+* @Last Modified time: 2016-07-25 11:21:46
 */
 
 'use strict';
@@ -91,10 +91,6 @@ rankCache: {
 
 
 exports.rankReport = function(req, res, next) {
-
-
-// console.log('111111');
-
     //验证过，有examid和grade
     var grade = decodeURI(req.query.grade);
     var auth = req.user.auth;
@@ -114,7 +110,6 @@ exports.rankReport = function(req, res, next) {
                 return _.assign(student, {score: paperScore, paper: paper._id, pid: paper.id });
             });
         }));
-// console.log('2222222');
         //先根据学生分组得到其总分
         var scoreInfoGroupByStudent = _.groupBy(allStudentsPaperScoreInfo, 'id');
 
@@ -128,17 +123,15 @@ exports.rankReport = function(req, res, next) {
 
         var allStudentsScoreInfo = _.concat(allStudentsPaperScoreInfo, allStudentsTotalScoreInfo);
 
-
         var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
 
-//auth里面所有信息都是互补的，除了“subjectManagers”和"groupManagers"会有重复的交集
+        //auth里面所有信息都是互补的，除了“subjectManagers”和"groupManagers"会有重复的交集
 
         var rankCache = {};
         _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperId) => {
             //这里面都是当前科目的分数
             rankCache[paperId] = _.groupBy(studentsScoreInfoArr, 'class');
         });
-// console.log('3333333');
 //清理rankCache，得到authRankCache
         //如果是校级领导或者年级主任则不需要清理，否则：
         var authRankCache = {}, allPaperIds = _.keys(rankCache);
@@ -153,9 +146,6 @@ exports.rankReport = function(req, res, next) {
                     authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
                 }
             });
-
-// console.log('4444444');
-
             _.each(gradeAuthObj.groupManagers, (obj) => {
                 _.each(allPaperIds, (paperId) => {
                     // 方法一：如果有此对象，说明是从上面添加的--那么就意味着全部班级都在里面了
@@ -169,23 +159,12 @@ exports.rankReport = function(req, res, next) {
                     }
                 });
             });
-// console.log('555555');
             //因为auth中已经做了冗余的排查，所以如果这里有subjectTeachers那么就一定是前面所没有包含的
             _.each(gradeAuthObj.subjectTeachers, (obj) => {
                 var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
                 if(targetAuthPaper) {
                     // authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
                     if(!authRankCache[targetAuthPaper._id]) authRankCache[targetAuthPaper._id] = {};
-
-// console.log('-------------------');
-// console.log('paper key = ', targetAuthPaper.id);
-// console.log('all rankCache paper ids == ', _.keys(rankCache));
-
-// console.log(rankCache[targetAuthPaper.id]);
-// console.log(rankCache[targetAuthPaper.id][obj.group]);
-// console.log('lalalaalallalallalall');
-
-
                     authRankCache[targetAuthPaper._id][obj.group] = rankCache[targetAuthPaper._id][obj.group];
                 }
             });
@@ -197,61 +176,24 @@ exports.rankReport = function(req, res, next) {
             //如果没有totalScore，则添加进来：
             authRankCache.totalScore = rankCache.totalScore;
         }
-
-// console.log('666666');
-
         //根据authRankCache组织examInfo的信息：
         var authPaperIds = _.keys(authRankCache);
         var examPapers = [];
         _.each(authPaperIds, (paperId) => {
-
-// console.log('allPaperIds = ', allPaperIds);
-// console.log('targetPaperId = ', paperId);
-// var tempAllPaperObjIds = _.map(papers, (tempP) => tempP._id.toString());
-// var tempAllPaperIds = _.map(papers, (tempP) => tempP.id);
-// console.log('tempAllPaperObjIds = ', tempAllPaperObjIds);
-// console.log('tempAllPaperIds = ', tempAllPaperIds);
-
             if(paperId == 'totalScore') return;
             var targetPaper = _.find(papers, (paperObj) => paperObj._id.toString() == paperId+"");
             examPapers.push({paper: targetPaper._id, pid: targetPaper.id, name: targetPaper.subject});
         });
-
-// console.log('examPapers ==== ', examPapers);
-
-
-//这里是否能用"..."呢？？？
-        // var examClasses = _.union(..._.map(authRankCache, (obj, pid) => {
-        //     console.log(_.keys(obj));
-        //     return _.keys(obj);
-        // }));
         var tempAuthObjs = [], examClasses = [];
-        // var tempAuthObjs = _.map(authRankCache, (obj, pid) => {
-        //     // console.log(_.keys(obj));
-        //     return _.keys(obj);
-        // });
         _.each(authRankCache, (obj, pid) => {
             if(pid != 'totalScore') {
                 tempAuthObjs.push(_.keys(obj));
             }
         })
-
-// console.log('tempAuthObjs ==== ', tempAuthObjs);
-
         _.each(tempAuthObjs, (authArr) => {
-            console.log(authArr);
             examClasses = _.concat(examClasses, authArr);
         })
-// console.log('uniq 前： ', examClasses);
         examClasses = _.uniq(examClasses);
-// console.log('uniq 后 ===== ', examClasses);
-
-
-        //组织examInfo的信息：
-        // var examPapers = _.map(papers, (paperObj) => {
-        //     return {paper: paperObj._id, pid: paperObj.id, name: paperObj.subject};
-        // });
-        // var examClasses = _.keys(_.groupBy(allStudentsTotalScoreInfo, 'class'));  //总分肯定是包含全部学生的，所以没必要使用allStudentsScoreInfo。
         var examInfo = {
             name: examName,
             papers: examPapers, //并集
@@ -266,14 +208,6 @@ exports.rankReport = function(req, res, next) {
         next(err);
     })
 }
-
-// function getAuthSubjects(auth, gradeKey) {
-
-// }
-
-// function getAuthClassesSubjects(auth, gradeKey) {
-
-// }
 
 
 exports.customRankReport = function(req, res, next) {
@@ -291,48 +225,24 @@ exports.customRankReport = function(req, res, next) {
             if(!examStudentsInfo || examStudentsInfo.length == 0 || !examPapersInfo || examPapersInfo.length == 0) {
                 return next(new errors.Error('no valid custom exam be found'));
             }
-            // console.log('examStudentsInfo.length = ', examStudentsInfo.length);
             var flag = 0, tempResult;
             var allStudentsScoreInfo = _.concat(..._.map(examStudentsInfo, (student) => {
                 var obj = _.pick(student, ['id', 'kaohao', 'name', 'class']);
                 var totalObj = _.assign({score: student.score, paper: 'totalScore', pid: 'totalScore'}, obj);
-// if(flag == 0) {
-//     console.log('obj === ', obj);
-//     console.log('totalObj === ', totalObj);
-// }
 
                 var paperObjs = _.map(student['[papers]'], (pObj) => {
                     return _.assign({score: pObj.score, paper: examPapersInfo[pObj.paperid].paper, pid: pObj.paperid}, obj);
                 });
-
-// if(flag == 0) {
-//     console.log('totalObj == ', totalObj);
-//     console.log('paperObjs == ', paperObjs);
-// }
-
-
                 tempResult = _.concat([totalObj], paperObjs);
-
-
-// if(flag == 0) {
-//     console.log('tempResult == ', tempResult);
-// }
-
                 flag += tempResult.length;
                 return tempResult;
             }));
-
-// console.log('flag = ', flag);
-// console.log('allStudentsScoreInfo.length = ', allStudentsScoreInfo.length);
 
             var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
             var rankCache = {};
             _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperObjectId) => {
                 rankCache[paperObjectId] = _.groupBy(studentsScoreInfoArr, 'class');
             });
-
-// console.log('kyes = ', _.keys(rankCache));
-// console.log(rankCache[_.keys(rankCache)[0]]);
 
             var examPapers = _.map(examPapersInfo, (value, pid) => {
                 return {
@@ -413,29 +323,14 @@ exports.home = function(req, res, next) {
         return getCustomExams(req.user.id);
     }).then(function(customExams) {
         try {
-
-// console.log('===================  1');
-
             var allExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
-
-// console.log('===================  2, allExams.length === ', allExams.length);
-
             var formatedExams = formatExams(allExams);
-// console.log('===================  3');
-// console.log(JSON.stringify(formatedExams));
-// console.log('============== end 3');
-
-
-
             return when.resolve(formatedExams);
         } catch(e) {
             return when.reject(new errors.Error('格式化exams错误'));
         }
     }).then(function(formatedExams) {
         formatedExams = filterExamsByAuth(formatedExams, req.user.auth);
-// console.log('===================  4');
-// console.log(formatedExams);
-
         res.status(200).json(formatedExams);
     }).catch(function(err) {
         next(err);
@@ -467,32 +362,12 @@ function filterExamsByAuth(formatedExams, auth) {
     //Note: 如果过滤后最终此时间戳key下没有exam了则也不显示此time key
     //Note: 从当前用户中获取此用户权限，从而过滤
     if(auth.isSchoolManager) return formatedExams;
-
-
-console.log('auth === ', auth);
-
-
     //只要是此年级的，那么都能看到这场考试，但是具体的考试的数据要跟着此用户的权限走
     var authGrades = _.keys(auth.gradeAuth);
-
-// console.log('authGrades = ', authGrades);
-
     //过滤formatedExams
     var result = [];
-
-// console.log('================ = ', formatedExams[_.keys(formatedExams)[0]]);
-
-
     _.each(formatedExams, (obj) => {
         var vaildExams = _.filter(obj.values, (examItem) => {
-
-// console.log('===========  grade = ', examItem.grade);
-
-// if(_.includes(examItem.grade, '初二')) {
-//     console.log('grade === ', examItem.grade, '    time = ', timeKey);
-// }
-
-
             return _.includes(authGrades, examItem.grade);
         });
         if(vaildExams.length > 0) result.push({timeKey: obj.timeKey, values: vaildExams});
@@ -521,7 +396,7 @@ console.log('auth === ', auth);
 
 function getCustomExams(owner) {
     return when.promise(function(resolve, reject) {
-        peterFX.query('@Exam', {owner: owner, 'isValid': true}, function(err, results) {
+        peterFX.query('@Exam', {owner: owner, 'isValid': true}, function(err, results) { // TODO: 修改过滤条件为： {'isValid': true, $or: [{'owner': {$eq: owner}}, {$and: [{'owner': {$ne: owner}}, {isPublic: true}]}]}
             if(err) return reject(new errors.data.MongoDBError('find my custom analysis error: ', err));
             //需要的exam格式，从而匹配使用formatExams函数：
             //{'_id': , 'name': , 'event_time': , 'from': 40, '[papers]': [{grade: , paper: , subject: , manfen: }, ...]}
@@ -657,13 +532,8 @@ exports.initExam = function(req, res, next) {
     var grade = decodeURI(req.query.grade);
     examUitls.generateExamInfo(req.user.schoolId, req.query.examid, grade).then(function(exam) {
         req.exam = exam;
-
-// console.log('==========================  1');
-
         return examUitls.generateExamScoresInfo(req.exam, req.user.auth);
     }).then(function(result) {
-// console.log('==========================  2');
-
         req = _.assign(req, result);
         next();
     }).catch(function(err) {
@@ -778,6 +648,7 @@ function findScoreSegmentIndex(segments, des) {
     return high; //取high是受segments的内容影响的
 }
 
+//当前能进来都是自己是创建者，那么就相当于校领导，所以所有权限都是开放的。
 exports.customDashboard = function(req, res, next) {
     req.checkQuery('examid', '无效的examids').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
@@ -1067,8 +938,6 @@ examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义�
 
 
 exports.customSchoolAnalysis = function(req, res, next) {
-    console.log('customSchoolAnalysis');
-
     req.checkQuery('examid', '无效的examids').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
 
@@ -1267,6 +1136,10 @@ function genearteExamClassInfo(exam) {
         examClassesInfo[classItem.name] = obj;
     });
     return examClassesInfo;
+}
+
+exports.customExamList = function(req, res, next) {
+    //获取匹配的考试列表，并且要匹配到科目，后面还要针对班级过滤？
 }
 
 
