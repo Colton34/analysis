@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Table from '../../common/Table';
 import DropdownList from '../../common/DropdownList';
 
-import {makeSegments, makeFactor, makeSegmentsStudentsCount} from '../../api/exam';
+import {makeSegments, makeFactor, makeSegmentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
@@ -107,11 +107,11 @@ const AverageTable = ({tableHeaderData, tableData}) => {
     }
     // 根据数值返回要显示的颜色,传给TableView组件
     colorCallback(value) {
-        if (!_.isNumber(value) || isNaN(value)) 
+        if (!_.isNumber(value) || isNaN(value))
             return colorsMap.C11;
         if (value < 0) {
             return colorsMap.B08;
-        } 
+        }
         return colorsMap.C11;
     }
     render() {
@@ -288,7 +288,7 @@ function theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, currentC
 //只有班级没有全校！！！
     var yAxonses = _.map(currentClasses, (classItem) => {
         var students = examStudentsGroupByClass[classItem.key];
-        var yAxons = makeSegmentsStudentsCount(students, segments);
+        var yAxons = makeSegmentsCount(students, segments);
         return {
             name: classItem.value,
             data: yAxons

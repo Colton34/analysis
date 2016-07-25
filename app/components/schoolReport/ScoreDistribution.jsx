@@ -10,7 +10,7 @@ import _ from 'lodash';
 import {showDialog, hideDialog} from '../../reducers/global-app/actions';//TODO: 设计思路？？？
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07, BACKGROUND_COLOR} from '../../lib/constants';
 
-import {makeSegmentsStudentsCount} from '../../api/exam';
+import {makeSegmentsCount} from '../../api/exam';
 
 import DropdownList from '../../common/DropdownList';
 import TableView from './TableView';
@@ -463,7 +463,7 @@ class ScoreDistribution extends React.Component {
             currentClass: item
         })
     }
-    
+
     render() {
     //Props数据结构：
         var {examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, changeLevels} = this.props;
@@ -610,7 +610,7 @@ class OnlineInfo extends React.Component {
     }
     onMouseEnter(e){
         if (!this.state.needScroll) return;
-        var $target = $(e.target); 
+        var $target = $(e.target);
         var id = $target.attr('id');
         if (!id) {
             id = $target.parents('.online-block').attr('id');
@@ -621,7 +621,7 @@ class OnlineInfo extends React.Component {
     }
     onMouseLeave(e){
         if (!this.state.needScroll) return;
-        var $target = $(e.target); 
+        var $target = $(e.target);
         var id = $target.attr('id');
         if (!id) {
             id = $target.parents('.online-block').attr('id');
@@ -826,12 +826,12 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
 
     //获取到分档Map并且过滤到-1的情况（因为最小值是最低分档线，而又学生的成绩会低于最低分档线）
     //{<levelKey>: <students>} 其中levelKey是String类型的，并且值小代表的是低分段（但是levels中）
-    //从makeSegmentsStudentsCount得到的 countsMap中的 levelKey的个数一定是 segments.length-1 个，所以省去了后面判断没有某一个levelKey对应的数据则要补充。
+    //从makeSegmentsCount得到的 countsMap中的 levelKey的个数一定是 segments.length-1 个，所以省去了后面判断没有某一个levelKey对应的数据则要补充。
 
-//makeSegmentsStudentsCount 获取的是：1.和segments顺序对应的key的count，也就是说低的levelKey对应的是低分段的count  2.包含[0, segments.length-2]共
+//makeSegmentsCount 获取的是：1.和segments顺序对应的key的count，也就是说低的levelKey对应的是低分段的count  2.包含[0, segments.length-2]共
 //segments.length-1个有效值
 
-    var countsGroupByLevel = makeSegmentsStudentsCount(examStudentsInfo, levelSegments);
+    var countsGroupByLevel = makeSegmentsCount(examStudentsInfo, levelSegments);
     //开始创建标准的resultInfo数据结构：
     result.totalSchool = {};
 
@@ -840,7 +840,7 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
     });
 
     _.each(studentsGroupByClass, (studentsFromClass, className) => {
-        var classCountsGroupByLevel = makeSegmentsStudentsCount(studentsFromClass, levelSegments);
+        var classCountsGroupByLevel = makeSegmentsCount(studentsFromClass, levelSegments);
         var temp = {};
         _.each(classCountsGroupByLevel, (count, levelKey) => {
             temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[className].realStudentsCount);

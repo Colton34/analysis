@@ -34,6 +34,12 @@ const config = {
         }]
     };
 
+var One = (one) => {
+    return (
+        <h1>Hell</h1>
+    )
+}
+
 class Test extends React.Component {
     constructor(props) {
       super(props);
@@ -55,22 +61,7 @@ class Test extends React.Component {
         var path = '/school/report'; //'' + 167 +
         return (
             <div>
-                <Link to="/home">主页</Link>
-                <br />
-                <br />
-                <Button onClick={this.downloadFile.bind(this)} bsStyle="primary">Primary</Button>
-                <br />
-                <br />
-                <Link to="/dashboard">看板</Link>
-                <br />
-                <br />
-                <Link to={{ pathname: path, query: { examid: exam.id } }}>校级报告</Link>
-                <br />
-                <br />
-                <Link to={{ pathname: '/rank/report', query: { examid: '167', grade: encodeURI('高三') } }}>
-                    排行榜
-                </Link>
-                <ReactHighcharts config={config}></ReactHighcharts>
+                <One />
             </div>
         );
     }
@@ -91,3 +82,24 @@ function saveAs(uri, filename) {
     location.replace(uri);
   }
 }
+
+/*
+
+                <Link to="/home">主页</Link>
+                <br />
+                <br />
+                <Button onClick={this.downloadFile.bind(this)} bsStyle="primary">Primary</Button>
+                <br />
+                <br />
+                <Link to="/dashboard">看板</Link>
+                <br />
+                <br />
+                <Link to={{ pathname: path, query: { examid: exam.id } }}>校级报告</Link>
+                <br />
+                <br />
+                <Link to={{ pathname: '/rank/report', query: { examid: '167', grade: encodeURI('高三') } }}>
+                    排行榜
+                </Link>
+                <ReactHighcharts config={config}></ReactHighcharts>
+
+ */

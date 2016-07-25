@@ -12,7 +12,6 @@ import {DropdownButton, Button, Table as BootTable, MenuItem} from 'react-bootst
 import commonStyle from '../common/common.css';
 import Spinkit from '../common/Spinkit';
 
-import {tableExport} from '../lib/tableExporter';
 import Radium from 'radium';
 import {B03} from '../lib/constants';
 

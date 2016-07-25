@@ -2,13 +2,10 @@
 * @Author: HellMagic
 * @Date:   2016-05-04 11:14:13
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-24 15:16:23
+* @Last Modified time: 2016-07-19 09:58:10
 */
 
 'use strict';
-
-
-//TODO: 这里添加levelBuffers
 
 import Immutable, {Record, Map, List} from 'immutable';
 

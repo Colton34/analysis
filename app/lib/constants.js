@@ -140,7 +140,7 @@ export const COLORS_MAP = {
     C10 : '#6a6a6a',
     C11:  '#4d4d4d',
     C12 : '#333333',
-    C14 : '#fdfdfd'    
+    C14 : '#fdfdfd'
 }
 export const BACKGROUND_COLOR = '#EFF1F4';
 export const A11 = '#de5d44';
