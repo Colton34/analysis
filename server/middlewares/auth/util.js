@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-03 19:03:53
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-20 18:38:30
+* @Last Modified time: 2016-07-25 11:35:31
 */
 
 'use strict';
@@ -50,6 +50,7 @@ exports.getUserInfo2 = function(name, pwd){
     var url = buildGetUrl(apiCasValid, {username : name, password : pwd});
 
     return getUserId(url).then(function(userId) {
+        if(!userId) return when.resolve(null);
         var token = jwt.sign({}, tokenKey, { algorithm: 'HS512', jwtid : userId, noTimestamp : false});
         return getUserProfile(token, userId);
     }).then(function(data) {

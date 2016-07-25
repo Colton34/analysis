@@ -2,3 +2,91 @@ p, div p {
     font-size: 14px;
     line-height: 22px;
 }
+
+/*  导航的标签页  */
+.tab-ctn {
+    margin: 15px 0 30px 0;
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #ececee;
+}
+
+.tab-ctn ul {
+    overflow: hidden;
+    margin-left: 0;
+    list-style-type: none;
+    padding: 0;
+}
+
+.tab-ctn ul li {
+    height: 40px;
+    padding: 0 15px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 14px;
+    color: #24434f;
+    cursor: pointer;
+    border-top: 1px solid #ececee;
+    border-right: 1px solid #ececee;
+    border-bottom: 1px solid #ececee;
+    border-radius: 3px 3px 0 0;
+}
+
+.tab-ctn ul:first-child{
+    border-left: 1px solid #ececee;
+    border-radius: 3px 3px 0 0;
+}
+
+.tab-ctn ul li.active {
+    color: #59bde5;
+    background: #fff;
+    border-bottom: 0;
+}
+
+.tab-ctn ul .fl {
+    float: left;
+    background: #fbfbfb;
+}
+
+.tab-ctn ul .last {
+    float: right;
+    margin-right: 30px
+}
+/*************************************************/
+
+/**********************提示框样式********************/
+.tip-block {
+    width: 320px;
+    background-color: #fff;
+    border: 1px solid #e7e7e7;
+    position: relative;
+    padding: 20px;
+    font-size: 12px;
+    color: #4d4d4d;
+    text-align: left;
+}
+
+.tip-block:after, .tip-block:before {
+    border: solid transparent;
+    content: ' ';
+    height: 0;
+    width: 0;
+    position: absolute;
+}
+
+/*内三角*/
+.tip-block:after {
+    border-width: 5px;
+    border-bottom-color: #fff;
+    left: 58%;
+    top: -10px;
+}
+/* 外三角 */
+.tip-block:before {
+    border-width: 7px;
+    border-bottom-color: #e7e7e7;
+    left: 57.5%;
+    top: -14px;
+}
+
+/****************************************************/

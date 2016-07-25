@@ -1,22 +1,26 @@
 import React from 'react';
 import _ from 'lodash';
 import Radium from 'radium';
+import {COLORS_MAP as colorsMap} from '../lib/constants';
 
 let style = {
     hide: {
         display: 'none'
     },
     btn: {
-        display: 'inline-block', width:130,height:30,color:'#fff',lineHeight: '30px',textDecoration: 'none',textAlign:'center'
+        display: 'inline-block', minWidth:90, height:30,color:'#fff',lineHeight: '30px',textDecoration: 'none',textAlign:'center'
     },
     dropDownBtn: {
-        display: 'inline-block', width:'100%',height:'100%',color:'#fff',lineHeight: '20px',textDecoration: 'none',textAlign:'center',borderRadius: 3,
-        ':hover': {textDecoration: 'none', backgroundColor: '#dedede', color: '#fff'}
+        display: 'inline-block', width:'100%',height:'100%',color:'#fff',lineHeight: '30px',textDecoration: 'none',textAlign:'center',borderRadius: 3,
+        ':hover': {textDecoration: 'none', backgroundColor: colorsMap.C03}
     },
     list: {
         listStyleType: 'none',
         padding: 0,
-        margin: 0
+        margin: 0,
+        borderRight: '1px solid ' + colorsMap.C04,
+        borderLeft: '1px solid ' + colorsMap.C04,
+        borderBottom: '1px solid ' + colorsMap.C04
     }
 }
 /**
@@ -87,21 +91,19 @@ class DropdownList extends React.Component {
         var _this = this;
         return (
             <div id='dropdownList'>
-                <a style={[style.btn,{backgroundColor:'#00c076', position: 'relative'}]} href="javascript:void(0)" onClick={this.toggleList.bind(this)}>
-                    {this.state.current.value}
-                    <span className='dropdown' style={{position: 'absolute', right: 15}}>
-                        <span className='caret'></span>
-                    </span>
+                <a style={[style.btn,{backgroundColor: '#fff', color: colorsMap.A12, border: '1px solid ' + colorsMap.A12, position: 'relative', paddingLeft: 8}]} href="javascript:void(0)" onClick={this.toggleList.bind(this)}>
+                    <span style={{}}>{this.state.current.value}</span>
+                    <i className='icon-down-open-3' style={{}}></i>
                 </a >
                 {this.props.classList ? (
                     <ul style={this.state.active? style.list : style.hide}>
                         {
                             _.map(_this.state.coveredItems, (item,index) => {
-                                var selectedStyle = item.selected ? {backgroundColor: '#00c076', color: "#fff",':hover': {backgroundColor: '#b66c'}}: {};
+                                var selectedStyle = item.selected ? {backgroundColor: colorsMap.C03}: {};
                                 return (
-                                    <li key={index} style={{width: 130, height: 30, padding: 5, backgroundColor: '#fff'}}>
+                                    <li key={index} style={{minWidth: 90, height: 30, backgroundColor: '#fff'}}>
                                         <a  key={'ddAtag-' + index}
-                                            style={[style.dropDownBtn,{backgroundColor:'#f2f2f2',color: '#333'}, selectedStyle]}
+                                            style={[style.dropDownBtn,{backgroundColor:'#fff',color: '#333'}, selectedStyle]}
                                             href="javascript:void(0)" onClick={this.chooseItem.bind(this,item)}>
                                             {item.value}
                                         </a>

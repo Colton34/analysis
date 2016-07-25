@@ -11,7 +11,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Map, List} from 'immutable';
-
+import { Link } from 'react-router';
 //设计：这里是所有view container的page view。
 //尽量是木偶组件
 
@@ -26,8 +26,27 @@ import StudentPerformance from '../components/schoolReport/StudentPerformance/St
 
 import {initSchoolAnalysisAction, changeLevelAction} from '../reducers/schoolAnalysis/actions';
 import {initParams} from '../lib/util';
-import {SUBJECTS_WEIGHT as subjectWeight} from '../lib/constants';
+import {SUBJECTS_WEIGHT as subjectWeight, BACKGROUND_COLOR} from '../lib/constants';
 import Spinkit from '../common/Spinkit';
+
+class NavHeader extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px -15px', fontSize: 16, color: '#333' }}>
+                <Link to={{ pathname: '/' }} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
+                <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}>
+                    <a style={{ color: '#b4b4b4' }} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> 
+                    {this.props.examInfo.name}
+                    <span><i className='icon-right-open-2'></i>校级分析报告</span>
+                </span>
+            </div>
+        )
+    } 
+}
 
 class SchoolReport extends React.Component {
     static need = [
@@ -63,7 +82,8 @@ class SchoolReport extends React.Component {
                  </div>
              )
         return (
-            <div style={{ width: 1000, margin: '0 auto', marginTop: 20, backgroundColor: '#fff' }}>
+            <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: BACKGROUND_COLOR, zIndex: 0}}>
+                <NavHeader examInfo={examInfo} />
                 <Header examInfo = {examInfo} params={this.props.params} location={this.props.location} />
                 <FullScoreTrend examInfo = {examInfo} examStudentsInfo = {examStudentsInfo} />
                 <ScoreDistribution
@@ -134,6 +154,12 @@ function mapDispatchToProps(dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(SchoolReport);
 
+var localStyle = {
+    titleName: {
+        textDecoration: 'none', display: 'inline-block', width: 10, height: 10,
+        ':hover': { textDecoration: 'none', color: '#333' }
+    }
+}
 /*
 Mock Data:
 var headerInfo = {

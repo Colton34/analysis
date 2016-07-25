@@ -8,7 +8,7 @@ import { Modal, Table as BootTable} from 'react-bootstrap';
 import _ from 'lodash';
 
 import {showDialog, hideDialog} from '../../reducers/global-app/actions';//TODO: 设计思路？？？
-import {NUMBER_MAP as numberMap, A11} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07, BACKGROUND_COLOR} from '../../lib/constants';
 
 import {makeSegmentsStudentsCount} from '../../api/exam';
 
@@ -18,11 +18,38 @@ var {Header, Title, Body, Footer} = Modal;
 
 
 let localStyle = {
-    dialogInput: {width: 150,height: 40, border: '1px solid #e7e7e7', borderRadius: 2, paddingLeft: 12},
+    dialogInput: {width: 100,height: 34, border: '1px solid #e7e7e7', borderRadius: 2, paddingLeft: 12, margin: '0 10px 0 0'},
     btn: {lineHeight: '32px', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',color: '#6a6a6a', margin: '0 6px'},
     tableShowAllBtn: { color: '#333', textDecoration: 'none', width: '100%', height: 30, display: 'inline-block', textAlign: 'center', backgroundColor: '#f2f2f2', lineHeight: '30px', marginTop: 10 }
 }
 
+
+const BasicInfo = ({examInfo, levels, examStudentsInfo, onShowDialog}) => {
+    var levTotal = _.size(levels);
+    return (
+        <div style={{position: 'relative', padding: 30, backgroundColor: A12, color: '#fff', marginBottom: 20}}>
+            <p style={{marginRight: 20, fontSize: 18, marginBottom: 25}}>
+                <span style={{marginRight: 20}}>分档分数线 </span>
+                <span style={{fontSize: 12}}>分档分数线默认分为三档， 分别对应学生总数的10%，30%，60%，如需修改请点击右侧按钮</span>
+            </p>
+            <p>本次考试满分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分，
+            {
+                    _.map(levels, (levObj, levelKey) => {
+                        return (
+                            <span key={'basicInfo-level-' + levelKey}>
+                                {numberMap[(+levelKey + 1)]} 档线 {levels[(levTotal - 1 - levelKey) + ''].score}分{levelKey == levTotal - 1 ? '' : '，'}
+                            </span>
+                        )
+                    })
+            }
+            </p>
+            <span onClick={onShowDialog} style={{ cursor: 'pointer', color: A12, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30}}>
+                    <i className='icon-cog-2' style={{fontSize: 12}}></i>
+                    设置分档参数
+            </span>
+        </div>
+    )
+}
 const Table = ({tableData, levels}) => {
     var levTotal = _.size(levels);
     var widthProp = {};
@@ -36,14 +63,14 @@ const Table = ({tableData, levels}) => {
         }
     }
     return (
-        <BootTable  bordered  hover responsive style={_.assign({},  widthProp)}>
+        <BootTable bordered  hover responsive style={_.assign({}, {marginBottom: 0}, widthProp)}>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa' }}>
                     <th rowSpan="2" className={style['table-unit']}>班级</th>
                     {
                         _.map(_.range(levTotal), (index) =>{
                             return (
-                                <th key={index} colSpan="3" className={style['table-unit']} style={{minWidth: 180}}>
+                                <th key={index} colSpan="3" className={style['table-unit']} style={{minWidth: 200, textAlign: 'center', paddingLeft: 0}}>
                                      {numberMap[(index + 1)]}档
                                 </th>
                             )
@@ -128,7 +155,7 @@ class Dialog extends React.Component {
             })
             return;
         }
-        
+
         var preLength = _.size(this.levels);
         var theDiff = Math.abs(preLength - value);
         if(theDiff === 0) return;
@@ -240,7 +267,7 @@ class Dialog extends React.Component {
                 errorMsg: ''
             })
         }
-        
+
         this.props.changeLevels(this.levels);
         this.props.onHide();
     }
@@ -353,37 +380,36 @@ class Dialog extends React.Component {
         this.levLastIndex = _.size(this.levels) - 1;
 //重绘要不要 来自 props
         return (
-            <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this)}>
+             <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this)}>
                 <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
-                    分档参数设置
+                    设置分档线
                 </Header>
                 <Body style={{padding: 30}}>
-                <div style={{ minHeight: 230 }}>
-                        <span style={{ float: 'right' }}>总分： {examInfo.fullMark}  最高分: {_.last(examStudentsInfo).score}</span>
-                        <span style={{ clear: 'both' }}>
-                            <div style={{marginBottom: 30}}>
-                                整体分档为：<input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={localStyle.dialogInput} defaultValue={_this.state.levelNum} onChange={_this.onChange.bind(_this, 'levelInput') }/> {/*加个'levelInput'是几个意思？*/}
-                                <span style={_.assign({},{color: A11, marginLeft: 10}, this.state.levelNumWrong ? {display: 'inline-block'} : {display: 'none'})}>{this.state.levelNumMsg}</span>
-                            </div>
-                            <div>
-                                {
-                                    _.map(_.range(this.state.levelNum), (index) => {
-                                        return (
-                                            <div key={index} style={{marginBottom: index === this.state.levelNum -1 ? 0 : 30, textAlign: 'center'}}>
-                                                <div style={{ display: 'inline-block', marginRight: 30}}>{numberMap[(index + 1)]}档：
-                                                    <input id={'score-' + index} ref={'score-' + index} defaultValue={this.levels[(this.levLastIndex - index) + ''].score} onBlur={_this.onInputBlur.bind(_this, 'score-' + index) } onChange={_this.onChange.bind(_this, 'score-' + index) } style={localStyle.dialogInput}/>
-                                                </div>
-                                                <div style={{ display: 'inline-block' }}>上线率：
-                                                    <input id={'rate-' + index} ref={'rate-' + index} defaultValue={this.levels[(this.levLastIndex - index) + ''].percentage} onBlur={_this.onInputBlur.bind(_this, 'rate-' + index) } onChange={_this.onChange.bind(_this, 'rate-' + index) } style={localStyle.dialogInput}/>
-                                                    %
-                                                </div>
+                    <div style={{ minHeight: 230 }}>
+                        <div style={{ marginBottom: 20 }}>
+                            考试总分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分, 将整体成绩分档为：
+                            <input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={localStyle.dialogInput} defaultValue={_this.state.levelNum} onChange={_this.onChange.bind(_this, 'levelInput') }/>档
+                            <span style={_.assign({}, { color: A11 }, this.state.levelNumWrong ? { display: 'inline-block' } : { display: 'none' }) }>{this.state.levelNumMsg}</span>
+                        </div>
+                        <div>
+                            {
+                                _.map(_.range(this.state.levelNum), (index) => {
+                                    return (
+                                        <div key={'level-' + index} style={{ marginBottom: index === this.state.levelNum - 1 ? 0 : 30, textAlign: 'left' }}>
+                                            <div style={{ display: 'inline-block' }}>{numberMap[(index + 1)]}档：
+                                                <input id={'score-' + index} ref={'score-' + index} defaultValue={this.levels[(this.levLastIndex - index) + ''].score} onBlur={_this.onInputBlur.bind(_this, 'score-' + index) } onChange={_this.onChange.bind(_this, 'score-' + index) } style={_.assign({}, localStyle.dialogInput, { width: 166, height: 34 }) }/>
+                                                分
                                             </div>
-                                        )
-                                    })
-                                }
-                            </div>
-                            <div style={_.assign({},{color: A11, width: '100%', textAlign: 'center', marginTop: 20}, this.state.hasError ? {display: 'inline-block'} : {display: 'none'})}>{this.state.errorMsg}</div>
-                        </span>
+                                            <i className={'icon-link-1'} style={{ margin: '0 25px', color: colorsMap.C07 }}></i>
+                                            <div style={{ display: 'inline-block' }}>
+                                                <input id={'rate-' + index} ref={'rate-' + index} defaultValue={this.levels[(this.levLastIndex - index) + ''].percentage} onBlur={_this.onInputBlur.bind(_this, 'rate-' + index) } onChange={_this.onChange.bind(_this, 'rate-' + index) } style={_.assign({}, localStyle.dialogInput, { width: 166, height: 34 }) }/>
+                                                % 上线率
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 </Body>
                 <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0, padding: '0 0 30px 0' }}>
@@ -434,6 +460,7 @@ class ScoreDistribution extends React.Component {
             currentClass: item
         })
     }
+    
     render() {
     //Props数据结构：
         var {examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, changeLevels} = this.props;
@@ -446,7 +473,6 @@ class ScoreDistribution extends React.Component {
         //自定义Module数据结构
         var _this = this;
         var levTotal = _.size(levels);
-
 //饼图的数据和select放在一起。是受当前组件的状态值而改变的。通过totalScroeLevelInfo来获取
 // 通过 levelTotalScoreInfo[theKey] 即可获得此scope下所有学生的分档情况
 
@@ -455,7 +481,7 @@ class ScoreDistribution extends React.Component {
         var levelInfo = totalScoreLevelInfo[this.state.currentClass.key];
         var pieChartData = _.map(levelInfo, (levelObj, levelKey)=> {
             var obj = {};
-            obj.name = numberMap[(parseInt(levelKey)+1)] + '档';
+            obj.name = numberMap[(parseInt(levelKey)+1)] + '档上线率';
             obj.y = levelInfo[(levTotal-1-levelKey)+''].count;  //当前scope下当前档次的人数
             return obj;
         });
@@ -469,24 +495,54 @@ class ScoreDistribution extends React.Component {
                 plotShadow: false,
                 type: 'pie'
             },
+            colors:[
+             '#00adfb',
+             '#16d2c7',
+             '#4bc254',
+             '#e7e7e7'
+           ],
             title: {
-                text: ''
+              verticalAlign: 'middle',
+              text: '各档上线率',
+              align:'center',
+              x:-60,
+              y:3,
+              style:{
+                'color':'#767676',
+                'font-size':'14px'
+              }
             },
             tooltip: {
                 pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
             },
             plotOptions: {
                 pie: {
+                  size:'180',
+                  innerSize:'130',//内径大小
                     allowPointSelect: true,
                     cursor: 'pointer',
                     dataLabels: {
-                        enabled: true,
+                        enabled: false,
                         format: '<b>{point.name}</b>: {point.percentage:.1f} %',
                         style: {
                             color: (ReactHighcharts.theme && ReactHighcharts.theme.contrastTextColor) || 'black'
                         }
-                    }
+                    },
+                    showInLegend: true,
+
                 }
+            },
+            legend:{
+              layout: 'vertical',
+              align: 'right',
+              verticalAlign: 'bottom',
+              borderWidth: '0px',
+              enabled: true,
+              itemStyle:{
+                'font-size':'14px',
+                'color':'#333333'
+              },
+              itemMarginBottom:15
             },
             series: [{
                 name: '档位',
@@ -499,83 +555,31 @@ class ScoreDistribution extends React.Component {
 
         };
         return (
-            <div style={{zIndex: 1}} className={schoolReportStyles['section']}>
-                <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-
-                <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
-                    总分分档上线学生人数分布
-                </div>
-
-                <span onClick={_this.onShowDialog.bind(_this)} style={{ cursor: 'pointer', color: '#b686c9', float: 'right', margin: '30px 5px 30px 0', display: 'inline-block', width: 130, height: 30, lineHeight: '30px'}}>
-                    <i className='icon-cog-2' style={{fontSize: 20}}></i>
-                    设置分档参数
-                </span>
-
-                <div style={{ width: 720, margin: '0 auto', clear: 'both' }}>
-                    <p style={{ marginBottom: 20 }}>
-                        了解总分分布趋势后，还需要对总分进行分档分析。设置总分分数线，可以分析得到学生学业综合水平的分层表现，还可以引导出对学科教学贡献的分析。
-                    </p>
-
-                    {/*--------------------------------  总分分档上线学生Header -------------------------------------*/}
-                    <p style={{ marginBottom: 20 }}>
-                        将总分划为<span className={style['school-report-dynamic']}>{_.size(levels)}</span>条分数线(
-                        {
-                            _.map(levels, (levObj, levelKey) => {
-                                return (
-                                    <span key={levelKey}>
-                                        {numberMap[(+levelKey + 1)]} 档分数线为
-                                        <span className={style['school-report-dynamic']}>{levels[(levTotal-1-levelKey)+''].score}</span>
-                                        分{levelKey == levTotal - 1 ? '' : '，'}
-                                    </span>
-                                )
-                            })
-                        })，
-                        全校{_.join(_.map(_.range(_.size(levels)), (index) => numberMap[index+1]), '、')}档上线人数分别为：
-                        <span className={style['school-report-dynamic']}>
-                        {_.join(_.map(levels, (levObj, levelKey) => levels[(levTotal-1-levelKey)].count + '人'), '、')}
-                        </span>
-                        ，上线率分别为：
-                        <span className={style['school-report-dynamic']}>
-                        {_.join(_.map(levels, (levObj, levelKey) => levels[(levTotal-1-levelKey)].percentage + '%'), '、')}
-                        </span>。
-                    </p>
-                    {/*--------------------------------  总分分档上线学生表格 -------------------------------------*/}
-
-                    <p style={{ marginBottom: 20 }}>各班的上线情况见下表：</p>
-                    <TableView tableData={tableData} levels={levels} TableComponent={Table} reserveRows={6}/>
-
-                    {/*--------------------------------  饼图的select -------------------------------------*/}
-                    <span style={{ position: 'absolute', right: 0, marginTop: 40 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this)} classList={_this.classList}/></span>
-
-                    {/*--------------------------------  总分分档上线学生分析说明 -------------------------------------*/}
-                    <div style={{ marginTop: 30 }}>
-                        <div className={style['tips']} style={{ display: 'inline-block', width: 330, backgroundColor: '#e9f7f0',fontSize: 14, marginTop: 0, minHeight: 250}}>
-                            <p>表中显示了全校及各班各档上线人数。上线人数的多少一目了然。考虑到各班级学生总人数会存在有差异，要用上线率来比较：</p>
-                            {
-                                (_.size(disData) > 0) ? (
-                                        _.map(_.range(levTotal), (index) => {
-                                            var levelStr = numberMap[(index+1)], levObj = disData[(levTotal-1-index)];
-                                            return(
-                                                <p key={index}>
-                                                    {levelStr}档线
-                                                    <span style={{color:'#a384ce'}}>上线率高</span>的班级有
-                                                    <span className={style['school-report-dynamic']}>{_.join(_.map(levObj.high, (className) => examInfo.gradeName+className+'班'), '、')+'；'}</span>
-                                                    {levelStr}档线
-                                                    <span style={{color:'#a48382'}}>上线率低</span>的班级有
-                                                    <span className={style['school-report-dynamic']}>{_.join(_.map(levObj.low, (className) => examInfo.gradeName+className+'班'), '、')+'；'}</span>
-                                                </p>
-                                            )
-                                        })
-                                    ) : (<p>只有一个班级，没有可比性</p>)
-                            }
-                        </div>
-                    {/*--------------------------------  总分分档上线学生饼图 -------------------------------------*/}
-                        <ReactHighcharts config={config} style={{ display: 'inline-block', width: 360, height: 250, float: 'right' }}></ReactHighcharts>
+            <div id='scoreDistribution' style={{borderRadius: 2, backgroundColor: BACKGROUND_COLOR, position: 'relative', borderBottom: 20}}>
+                <BasicInfo examInfo={examInfo} levels={levels} examStudentsInfo={examStudentsInfo} onShowDialog={this.onShowDialog.bind(this)}/>
+                <div className={schoolReportStyles['section']}>
+                    <div style={{ marginBottom: 30 }}>
+                        <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
+                        <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>总分分档上线学生人数分布</span>
+                        <span style={{ fontSize: 12, color: C07 }}>总分分档上线学生人数分布，可得到全校及各班在学业综合水平上的分层表现</span>
                     </div>
-                </div>
-            {/*--------------------------------  总分分档上线Dialog -------------------------------------*/}
-                <Dialog changeLevels={changeLevels} levels={levels} show={_this.state.showDialog} onHide={_this.onHideDialog.bind(_this)} examInfo={examInfo} examStudentsInfo={examStudentsInfo} />
+                    <TableView tableData={tableData} levels={levels} TableComponent={Table} reserveRows={6}/>
+                    {/* 上线率高低模块 */}
+                    <div style={{margin: '50px 0 20px 0'}}>
+                        <span style={{color: C12, marginRight: 20}}>按上线率比较</span>
+                        <span style={{ fontSize: 12, color: C07 }}>上线率 = 班级某档上线人数 ÷ 全校某档上线人数，因各班级人数不同，通过比较累积上线率，能更准确的反映各班级上线情况</span>
+                    </div>
+                    <OnlineInfo levTotal={levTotal} disData={disData} examInfo={examInfo}/>
+                    <div style={{ display: 'inline-block', width: 380, height:240, position: 'relative', float: 'right'}}>
+                        {/*--------------------------------  总分分档上线学生饼图 -------------------------------------*/}
+                        <ReactHighcharts config={config} style={{ display: 'inline-block', width: 380, height: 240, border: '1px solid ' + colorsMap.C05 }}></ReactHighcharts>
+                        {/*--------------------------------  饼图的select -------------------------------------*/}
+                        <span style={{ position: 'absolute', right: 30, top: 30 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } classList={_this.classList}/></span>
+                    </div>
+                    {/*--------------------------------  总分分档上线Dialog -------------------------------------*/}
+                    <Dialog changeLevels={changeLevels} levels={levels} show={_this.state.showDialog} onHide={_this.onHideDialog.bind(_this) } examInfo={examInfo} examStudentsInfo={examStudentsInfo} />
             </div>
+        </div>
         )
     }
 
@@ -583,6 +587,91 @@ class ScoreDistribution extends React.Component {
 
 export default ScoreDistribution;
 
+/**
+ * 上线率高低模块组件
+ * props:
+ * levTotal, disData
+ */
+class OnlineInfo extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            showScroll: '',
+            needScroll: _.size(this.props.disData) > 3 ? true : false
+        }
+    }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps && _.size(nextProps.disData) > 3) {
+            this.setState({needScroll: true})
+        }
+    }
+    onMouseEnter(e){
+        if (!this.state.needScroll) return;
+        var $target = $(e.target); 
+        var id = $target.attr('id');
+        if (!id) {
+            id = $target.parents('.online-block').attr('id');
+        }
+        this.setState({
+            showScroll: id
+        })
+    }
+    onMouseLeave(e){
+        if (!this.state.needScroll) return;
+        var $target = $(e.target); 
+        var id = $target.attr('id');
+        if (!id) {
+            id = $target.parents('.online-block').attr('id');
+        }
+        this.setState({
+            showScroll: ''
+        })
+    }
+    render() {
+        var {levTotal, disData, examInfo} = this.props;
+        var disTotal = _.size(disData);
+        return (
+            <div style={_.assign({}, { display: 'inline-block' }) }>
+                <div id='high' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'high' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
+                    onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
+                    <div style={_.assign({}, { width: 215 * disTotal + 95 }) }>
+                        {
+                            (_.size(disData) > 0) ? (
+                                _.map(_.range(levTotal), (index) => {
+                                    var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
+                                    return (
+                                        <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
+                                            <p style={{ fontSize: 12 }}>{levelStr}档线上线率高的班级</p>
+                                            <p style={{ color: B08, marginBottom: 0 }}>{_.join(_.map(levObj.high, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
+                                        </div>
+                                    )
+                                })
+                            ) : (<p>只有一个班级，没有可比性</p>)
+                        }
+                    </div>
+                </div>
+                <div id='low' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'low' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
+                    onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
+                    <div style={_.assign({}, { width: 215 * disTotal + 95 }) }>
+                        {
+                            (_.size(disData) > 0) ? (
+                                _.map(_.range(levTotal), (index) => {
+                                    var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
+                                    return (
+                                        <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
+                                            <p style={{ fontSize: 12 }}>{levelStr}档线上线率低的班级</p>
+                                            <p style={{ color: B04, marginBottom: 0 }}>{_.join(_.map(levObj.low, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
+                                        </div>
+                                    )
+                                })
+                            ) : (<p>只有一个班级，没有可比性</p>)
+                        }
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
 
 //算法：按照分档标准创建对应的segments。segments最小值是最低档线，最大值是满分（即，一档线区间是(一档线score, fullMark]）
 /**

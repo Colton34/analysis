@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-25 11:17:46
+* @Last Modified time: 2016-07-25 11:38:39
 */
 
 'use strict';
@@ -40,6 +40,7 @@ exports.authenticate = function(req, res, next) {
 
     var value = req.body.value.toLowerCase();
     var password = req.body.password;
+
     authUitls.getUserInfo(value).then(function(user) {
         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 2, message: '密码不正确'}));
         if(!user) return authUitls.getUserInfo2(value, password);
@@ -57,7 +58,6 @@ exports.authenticate = function(req, res, next) {
         req.user.auth = authInfo;
         var token = jsonwebtoken.sign({ user: req.user }, config.secret);
         req.user.token = token;
-console.log('登录成功');
         next();
     }).catch(function(err) {
         next(err);

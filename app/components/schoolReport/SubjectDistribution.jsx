@@ -8,10 +8,11 @@ import schoolReportStyles from './schoolReport.css';
 import Table from '../../common/Table.jsx';
 import DropdownList from '../../common/DropdownList';
 
-import {NUMBER_MAP as numberMap} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import {makeFactor} from '../../api/exam';
 import TableView from './TableView';
 import Radium from 'radium';
+import {Tabs, Tab} from 'react-bootstrap';
 
 var localStyle= {
     expanBtn: {
@@ -25,6 +26,128 @@ var localStyle= {
     }
 }
 
+class InfoBlock extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showScroll: false,
+            needScroll: _.size(this.props.disData) > 4 ? true : false
+        }
+    }
+
+    onMouseEnter(e){
+        if (!this.state.needScroll) return;
+        this.setState({
+            showScroll: true
+        })
+    }
+    onMouseLeave(e){
+        if (!this.state.needScroll) return;
+        this.setState({
+            showScroll: false
+        })
+    }
+
+    render() {
+        var {disData, studentsGroupByClass} = this.props;
+        var disDataSize = _.size(disData);
+        return (
+            <div style={_.assign({}, { width: '100%', height: 150, marginTop: 30 }, disDataSize > 4 && this.state.showScroll ? { overflowX: 'scroll' } : {overflowX: 'hidden'})}
+                 onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
+                <div style={_.assign({}, { width: disDataSize * 235 }) }>
+                    {/**先渲染全校数据 */}
+                    <div style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20 }}>
+                        <p style={{ marginBottom: 10, fontSize: 12 }}>全校上线贡献率</p>
+                        {
+                            disData['totalSchool'] ? (
+                                <div>
+                                    <p style={{ fontSize: 12, marginBottom: 0 }}>贡献率高：<span style={{ color: B08 }}>{_.join(disData['totalSchool'].maxSubjects, '、') }</span></p>
+                                    <p style={{ fontSize: 12 }}>贡献率低：<span style={{ color: B04 }}>{_.join(disData['totalSchool'].minSubjects, '、') }</span></p>
+                                </div>
+                            ) : <p>只有一个科目没有可比性</p>
+                        }
+                    </div>
+                    {
+                        _.map(studentsGroupByClass, (students, className) => {
+                            return (
+                                <div key={'infoBlock-' + className} style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
+                                    <p style={{ marginBottom: 10, fontSize: 12 }}>{className + '班'}上线贡献率</p>
+                                    {
+                                        disData[className] ? (
+                                            <div>
+                                                <p style={{ fontSize: 12, marginBottom: 0 }}>贡献率高：<span style={{ color: B08 }}>{_.join(disData[className].maxSubjects, '、') }</span></p>
+                                                <p style={{ fontSize: 12 }}>贡献率低：<span style={{ color: B04 }}>{_.join(disData[className].minSubjects, '、') }</span></p>
+                                            </div>
+                                        ) : <p>只有一个科目没有可比性</p>
+                                    }
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            </div>
+        )
+    }
+}
+
+/**
+ * props:
+ * levels: 包含分档信息的object;
+ * resultData: 计算的结果；
+ * studentsGroupByClass
+ */
+class LevelInfo extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            activeTab: 0
+        }
+    }
+
+    switchTab(event) {
+        this.setState({
+            activeTab: $(event.target).data('num')
+        })
+    }
+    render() {
+        var {levels, resultData, studentsGroupByClass}  = this.props;
+        var {activeTab} = this.state;
+        var levelStr = numberMap[activeTab + 1];
+        var {tableData, disData, chartConfig} = resultData[activeTab];
+        var disDataSize = _.size(disData);
+        return (
+            <div >
+                {/* tab */}
+                <div className='tab-ctn'>
+                    <ul>
+                    {
+                        _.range(_.size(levels)).map((num) => {
+                            return(
+                                <li key={'levelInfo-li-' + num}onClick={this.switchTab.bind(this)} className={'fl ' + (num === this.state.activeTab ? 'active' : '')} data-num={num}>{numberMap[num + 1]}档线上线学生人数分布</li>
+                            )
+                        })
+                    }
+                    </ul>
+                </div>
+                {/* 主要内容显示区 */}
+                <div id='info-block'>
+                   <TableView tableData={tableData} TableComponent={Table} reserveRows={7}/>
+                   {/** 各科贡献率方块*/}
+                   <InfoBlock studentsGroupByClass={studentsGroupByClass} disData={disData}/>
+                    {/* 离差图 */}
+                    <p style={{margin: '50px 0 30px 0'}}>
+                        <span style={{fontSize: 16}}>学科上线率离差</span>
+                        <span style={{fontSize: 12, color: C07}}>通过各班级学科上线率的差异，（学科上线率离差 = 班级某学科上线率 - 全校该学科平均上线率），反映了该学科对班级上线贡献的大小，政治白哦是该科贡献大，负值表示贡献小</span>
+                    </p>
+                   <ReactHighcharts config={chartConfig} style={{width: '100%'}}></ReactHighcharts>
+                </div>
+            </div>
+        )
+    }
+
+
+
+}
 const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, levels, headers}) => {
 
     //算法数据结构：
@@ -35,15 +158,29 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
             type: 'column'
         },
         title: {
-            text: ''
+            text: '(上线率离差)',
+            floating:true,
+            x:-480,
+            y:5,
+            style:{
+              "color": "#767676",
+               "fontSize": "14px"
+            }
         },
         legend: {
             enabled: false
         },
         xAxis: {
+          gridLineColor:'#f2f2f2',
+            tickWidth:'0px',//不显示刻度
+            gridLineWidth:1,
+            gridLineDashStyle:'Dash',
 
         },
         yAxis: {
+          lineWidth:1,
+          gridLineColor:'#f2f2f2',
+          gridLineDashStyle:'Dash',
             title: '',
             reversedStacks: false
         },
@@ -53,7 +190,8 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
             }
         },
         tooltip: {
-            pointFormat: '<b>{point.name}:{point.y:.1f}</b>'
+            pointFormat: '<b>{point.name}:{point.y:.1f}</b>',
+            enabled: false
         },
         credits: {
             enabled: false
@@ -94,10 +232,10 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
 
         var chartConfig = _.cloneDeep(config);
         chartConfig['xAxis']['categories'] = chartData['xAxons'];
-        var series = [{ data: [], color: '#74c13b', stack: 0 }, { data: [], color: '#f2cd45', stack: 0 }];
+        var series = [{ data: [], color: '#00adfb', stack: 0 }, { data: [], color: '#e7e7e7', stack: 0 }];
         _.each(chartData['yAxons'], (yInfoArr, index) => {
-            series[0].data.push({ name: yInfoArr[0].subject, y: yInfoArr[0].count, dataLabels: { enabled: true, format:'{point.name}', y: -10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 绿色柱
-            series[1].data.push({ name: yInfoArr[1].subject, y: yInfoArr[1].count, dataLabels: { enabled: true, format:'{point.name}', y:  10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 黄色柱
+            series[0].data.push({ name: yInfoArr[0].subject, y: yInfoArr[0].count, dataLabels: { enabled: true, format:'{null}', y: -10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 绿色柱
+            series[1].data.push({ name: yInfoArr[1].subject, y: yInfoArr[1].count, dataLabels: { enabled: true, format:'{null}', y:  10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 黄色柱
         });
         chartConfig['series'] = series;
 
@@ -110,71 +248,13 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
     //自定义Module数据结构
     var levelCommonInfo = _.join(_.map(_.range(_.size(levels)), (index) => numberMap[index + 1]));
     return (
-        <div className={schoolReportStyles['section']}>
-            <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-            <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
-                学科分档上线学生人数的分布
+        <div id='subjectDistribution' className={schoolReportStyles['section']}>
+            <div style={{ marginBottom: 30 }}>
+                <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
+                <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科分档上线学生人数的分布</span>
+                <span style={{ fontSize: 12, color: C07 }}>运用大数据算法将总分的分档分数精确地分解到各学科中，得出各学科的个档分数线及其分档上线人数分布，可反映出全校各班在各学科的上线情况</span>
             </div>
-            <div style={{ width: 720, margin: '0 auto', marginTop: 50 }}>
-                <p style={{ marginBottom: 15 }}>
-                    总分是由各个学科的分数构成的，我们用大数据分析技术能科学地将总分分数线分解到各个学科，形成各个学科的
-                    <span className={styles['school-report-dynamic']}>{levelCommonInfo}</span>档分数线。
-                    有了学科分数线，就能明确得到全校及班级各个学科<span className={styles['school-report-dynamic']}>{levelCommonInfo}</span>档上线的学生人数。
-                    下面几个表分别表示<span className={styles['school-report-dynamic']}>{levelCommonInfo}</span>档各个学科的上线人数。
-                </p>
-                <p style={{ color: '#a883fc', marginBottom: 20 }}>
-                    对每个档次而言，学科提供的上线人数越多，该学科就为学生总分上线提供了更大的可能性。
-                    这可以视为该学科的教学贡献。反之，学科上线人数越少，该学科对高端学生的培养处于短板，需要引起高度重视。
-                </p>
-                {
-                    _.map(_.range(_.size(levels)), (index) => {
-                        var levelStr = numberMap[index + 1];
-                        var {tableData, disData, chartConfig} = resultData[index];
-                        return (
-                            <div key={index}>
-                                {/*--------------------------------  学科分档上线学生人数分布表格 -------------------------------------*/}
-                                <p>学校各学科{levelStr}档上线学生人数表：</p>
-                                <TableView tableData={tableData} TableComponent={Table} reserveRows={7}/>
-
-                                {/*--------------------------------  学科分档上线学生人数分布分析说明 -------------------------------------*/}
-                                <div style={{ backgroundColor: '#e7f9f0',marginTop: 15 }} className={styles['tips']}>
-                                    <p>{levelStr}档上线数据分析表明： </p>
-
-                                    {
-                                        (disData['totalSchool']) ? (
-                                            <p>对于全校，<span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].maxSubjects, '、') }学科</span>在本次考试中一档上线率贡献较大，
-                                                <span style={{ color: '#c96925' }}>{_.join(disData['totalSchool'].minSubjects, '、') }学科</span>对高层次的学生培养处于弱势，需要引起高度重视。</p>
-                                                ) : (<p>只有一个学科没有可比性</p>)
-                                    }
-
-
-
-                                    <p style={{ margin: '10px 0' }}>对于各班级而言，各个学科的表现是不一样的，经分析，可得到如下结论：</p>
-                                    {/*
-                                        _.map(studentsGroupByClass, (students, className) => {
-                                            return (<p key={className}>
-                                                对于<span style={{ color: '#00955e' }}>{className}班，{_.join(disData[className].maxSubjects, '、') }</span>贡献较大，
-                                                <span style={{ color: '#00955e' }}>{_.join(disData[className].minSubjects, '、') }</span>贡献较小；
-                                            </p>)
-                                        })*/
-                                    }
-                                    <TextView studentsGroupByClass={studentsGroupByClass} disData={disData}/>
-                                </div>
-                                {/*--------------------------------  学科分档上线学生人数离差图 -------------------------------------*/}
-                                <p>
-                                    各班级的具体情况不一样，综合全校各班级各学科提供的学生总分上线贡献的因素，
-                                    各班级{levelStr}档上线贡献率最大和最小学科如下图所示：
-                                </p>
-                                <p>学科上线率离差：</p>
-                                <ReactHighcharts config={chartConfig}></ReactHighcharts>
-                                <div style={{ backgroundColor: '#e7f9f0', marginTop: 15, fontSize: 12 }} className={styles['tips']}>
-                                    班级学科上线率离差： 指班级的学科上线率与全校各班级该学科的平均上线率之间的差值，反映了班级该学科对上线贡献的大小。
-                                </div>
-                            </div>
-                        )
-                    })
-                }
-            </div>
+            <LevelInfo levels={levels} resultData={resultData} studentsGroupByClass={studentsGroupByClass}/>
         </div>
 
     )
@@ -266,7 +346,7 @@ function theSubjectLevelTable(subjectLevelInfo, validOrderedSubjectMean, examInf
     //没有考某一科目！！！
     var table = [];
     var titleHeader = _.map(validOrderedSubjectMean, (headerObj, index) => {
-        return headerObj.subject + ' <br/>(' + headerObj.mean + ')';
+        return headerObj.subject + '(' + headerObj.mean + ')';
     });
     titleHeader.unshift('班级');
 

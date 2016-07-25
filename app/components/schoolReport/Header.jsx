@@ -5,7 +5,116 @@ import {Link} from 'react-router'
 import {initParams} from '../../lib/util';
 import Radium from 'radium';
 import {saveAs} from '../../lib/util';
+import {COLORS_MAP as colorsMap, B03, C07, C12} from '../../lib/constants'; 
 
+var modules = [
+    {
+        name: '总分分布趋势',
+        id: 'fullScoreTrend'
+    }, {
+        name: '总分分档上线学生人数分布',
+        id: 'scoreDistribution'
+    }, {
+        name: '学科分档上线学生人数分布',
+        id: 'subjectDistribution'
+    }, {
+        name: '班级考试基本表现',
+        id: 'classPerformance'
+    }, {
+        name: '学科考试表现',
+        id: 'subjectPerformance'
+    }, {
+        name: '临界生群体分析',
+        id: 'groupAnalysis'
+    }, {
+        name: '分数排行榜',
+        id: 'studentPerformance'
+    }];
+
+class NavBar extends React.Component {
+    constructor(props) {
+        super(props);
+        //this.position = 'normal';
+        this.state= {
+            activeId: 'fullScoreTrend',
+            position: 'normal'
+        }
+    }
+    componentDidMount() {
+        var navBarTop = document.getElementById('navBar').offsetTop;
+        var scrollTopList = [];
+        _.forEach(modules, (module, index) => {
+            scrollTopList.push(document.getElementById(module.id).offsetTop)
+        })
+        var $body = $('body');
+        var _this = this;
+        window.addEventListener('scroll', function () {
+            var bodyTop = $body.scrollTop();
+            //判断何时吸顶
+            if (navBarTop <= bodyTop) {
+                if(_this.state.position !== 'fixed') {
+                    //$('#header').css({ 'position': 'static' });
+                    _this.setState({
+                        position: 'fixed'
+                    })
+                }
+            } else{
+                _this.setState({
+                    position: 'normal'
+                })    
+            }
+
+            for (var i in scrollTopList) {
+                if (scrollTopList[i] <= bodyTop + 100 && scrollTopList[i] >= bodyTop - 100) {
+                    _this.setState({
+                        activeId: modules[i].id
+                    })
+                    return;
+                }
+            }
+            
+
+        })
+
+    }
+    componentWillUnmount() {
+        window.removeEventListener('scroll', ()=> {
+            console.log('remove scroll listener');
+        })
+    }
+    onClickModule(event) {
+        var $target = $(event.target);
+        var id = $target.data('id');
+        if (!id) {
+            id = $target.parent('#nav-item').data('id');
+        }
+        $('body').scrollTop($('#' + id).offset().top - 100) // -100适当补回导航栏遮挡的部分
+        this.setState({
+            activeId: id
+        })
+        
+    }
+    render() {
+        var moduleLen = modules.length;
+        return (
+            <div id='navBar' style={_.assign({}, {zIndex: 100, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C05, backgroundColor: colorsMap.C02},
+                                    this.state.position === 'normal' ? {position:'absolute', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: 1200, left: '50%', marginLeft: -600, borderBottom: '1px solid ' + colorsMap.C05})}>
+            {
+                modules.map((module, index) => {
+                    return (
+                        <div key={'navItem-' + index} id='nav-item' style={{display: 'table-cell', minWidth: 1200/moduleLen, height: 50, textAlign: 'center', verticalAlign: 'middle', fontSize: 12, cursor: 'pointer'}} 
+                             data-id={module.id} onClick={this.onClickModule.bind(this)}>
+                            <span style={this.state.activeId === module.id ? {paddingBottom: 16, borderBottom: '2px solid ' + colorsMap.A12} : {}}>{module.name} </span>
+                            <span style={_.assign({}, {display: 'inline-block', height: 12, float: 'right', marginTop: 2}, index === modules.length -1 ? {}: {borderRight: '1px solid ' + colorsMap.C05})}></span>
+                        </div>
+                    )
+                })
+            }
+            </div>
+        )
+    }
+  }
+  
 @Radium
 class Header extends React.Component {
     constructor(props) {
@@ -60,49 +169,29 @@ class Header extends React.Component {
         var targetUrl = grade ? '/dashboard?examid=' + examid + '&grade=' + encodeURI(grade) : '/dashboard?examid=' + examid;
 
         return (
-            <div>
-                <div style={{ height: 110, backgroundColor: '#fcfcfc', position: 'relative', display:'table-cell', width: 1000, verticalAlign: 'middle', textAlign: 'center'}}>
-                    <a href={targetUrl} style={[localStyle.goBackLink,{ float: 'left', margin: '20px 0 0 20px'}]}><i className='icon-left-open-3'></i>返回</a>
-                    <div style={{ margin: "0 auto", fontSize: 20, width: 700}}>
-
-                        <div style={{ textAlign: 'center' }}>{examInfo.name}</div>
-                        <div style={{ textAlign: 'center' }}>学校总体分析诊断报告</div>
-
-                    </div>
-{/*
-
-    暂时先注释掉“下载报告”的功能
-                    <a href='javascript: void(0)' className={styles.button}
-                        onClick={this.downloadFile.bind(this)}
-                        style={_.assign({},{
-                            width: 120, height: 30, borderRadius: '20px', backgroundColor: '#698fba', color: '#fff', lineHeight: '30px',
-                            position: 'absolute', right: '30px', top: '50%', marginTop: '-20px'
-                        }, this.state.isDownloading ? {backgroundColor: '#f2f2f2', color: '#bfbfbf'} : {})}>
-                        <i className='icon-tikuai-1'></i>
-                        下载报告
-                    </a>
-
-*/}
-                </div>
-                <div className={styles['school-report-content']}>
-                    <p style={{ lineHeight: '22px', marginTop: 40, textIndent: 28, fontSize: 14}}>
-                        本次考试（考试时间： <span className={styles['school-report-dynamic']}>{startTime}</span>），
-                        我校<span className={styles['school-report-dynamic']}>{examInfo.gradeName}</span>年级<span className={styles['school-report-dynamic']}>{examInfo.realClasses.length}</span>个班级
-                        共<span className={styles['school-report-dynamic']}>{examInfo.realStudentsCount}</span>名学生参加，进行了
-                        <span className={styles['school-report-dynamic']}>
+            <div id='header' style={{zIndex: 100, padding: '30px 0 30px 30px ', marginBottom: 20, borderRadius: 2, backgroundColor: '#fff', position: 'relative', minHeight: 230}}>
+                <p style={{fontSize: 18, color: C12, marginBottom: 15}}>校级分析报告-{examInfo.name}</p>
+                <p style={{fontSize: 12, color: C07, marginBottom: 28}}>
+                    <span style={{marginRight: 15}}>时间: {startTime}</span>
+                    <span style={{marginRight: 15}}>人员: {examInfo.gradeName}年级，{examInfo.realClasses.length}个班级，{examInfo.realStudentsCount}位学生</span>
+                    <span style={{marginRight: 15}}>
+                        科目：
                         {
                             _.map(examInfo.subjects, (subject, index) => {
                                 if (index === examInfo.subjects.length -1) {
                                     return subject
                                 }
-                                return subject + '、'
+                                return subject + ','
                             })
                         }
-                        </span>
-                        ，共<span className={styles['school-report-dynamic']}>{examInfo.subjects.length}</span>个学科的考试。
-                        对全校整体考试结果的分析，可以得到如下诊断分析意见。
-                    </p>
+                    </span>
+                </p>
+                <div className={styles['button']} style={{width: 180, height: 40, lineHeight: '40px', borderRadius:2, backgroundColor: colorsMap.A12, color: '#fff', cursor: 'pointer'}}>
+                    <i className='icon-download-1'></i> 
+                    下载校级分析报告
                 </div>
+                {/************************* 导航条 ******************************/}
+                <NavBar/>
             </div>
         )
     }

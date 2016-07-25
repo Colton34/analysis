@@ -6,8 +6,7 @@ import _ from 'lodash';
 import Table from '../../common/Table';
 
 import {makeSegmentsStudentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, A11} from '../../lib/constants';
-
+import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
 import TableView from './TableView';
@@ -35,6 +34,9 @@ class Dialog extends React.Component {
             hasError: false,
             errorMsg: ''
         }
+        var examFullMark = 0;
+        _.forEach(this.props.examPapersInfo, paperInfo=>{examFullMark += paperInfo.fullMark})
+        this.examFullMark = examFullMark;
     }
     okClickHandler() {
         this.props.onHide();
@@ -136,7 +138,7 @@ class Dialog extends React.Component {
         //     })
         //     return;
         // }
-        
+
         // isValid字段复位
         this.isValid[index] = true;
         //如果value不变。。。那么也不更新
@@ -157,7 +159,7 @@ class Dialog extends React.Component {
                 grades: newGrades
             });
         }
-        
+
     }
 
     onHide() {
@@ -173,12 +175,13 @@ class Dialog extends React.Component {
         var _this = this, gradeLastIndex = this.state.grades.length - 1;
 
         return (
-            <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this) }>
+            <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this)}>
                 <Header closeButton style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
-                    设置等级分数
+                    设置等级参数
                 </Header>
                 <Body style={{padding: 30}}>
                     <div style={{ minHeight: 230 }}>
+                        <div>考试总分为：{this.examFullMark}分</div>
                         <div style={{ borderBottom: '1px solid #f2f2f2', textAlign: 'center'}}>
                             {
                                 _.map(_.range(gradeLastIndex), (index) => {
@@ -188,7 +191,7 @@ class Dialog extends React.Component {
 
                                     if (index === gradeLastIndex-1 && index !== 0) {
                                         return (
-                                            <div style={{ margin: '30px 0 30px 30px', textAlign: 'left'}} onMouseEnter={this.handleMouseEnter}  onMouseLeave={this.handleMouseLeave}  key={index}>
+                                            <div style={{ margin: '30px 0 30px 30px', textAlign: 'left'}} onMouseEnter={this.handleMouseEnter}  onMouseLeave={this.handleMouseLeave}  key={_.now() + index}>
                                                 <span style={{ marginRight: 20 }}>{charStr}等：</span>
 
                                                 <span style={{ marginRight: 20 }}>表示小于满分×{ this.state.grades[gradeLastIndex-index] }%的分数的学生为{charStr}等</span>
@@ -197,7 +200,7 @@ class Dialog extends React.Component {
                                         )
                                     } else if (index === 0) {
                                         return (
-                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={index}>
+                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={_.now() + index}>
                                                 <span style={{ marginRight: 20 }}>{charStr}等：<input ref={'grade-' + index} defaultValue={this.state.grades[gradeLastIndex-index-1]} onBlur={_this.onInputBlur.bind(_this, index)} />%</span>
                                                 <span style={{ marginRight: 20 }}>表示满分×{ this.state.grades[gradeLastIndex-index-1] }%的分数以上的学生为{charStr}等</span>
                                                 <a onClick={_this.onDeleteGrade.bind(_this, index)}  href='javascript:void(0)'style={{textDecoration:'none'}}id='deleteIcon' className='hide'>x</a>
@@ -205,7 +208,7 @@ class Dialog extends React.Component {
                                         )
                                     } else {
                                         return (
-                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={index}>
+                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={_.now() + index}>
                                                 <span style={{ marginRight: 20 }}>{charStr}等：<input ref={'grade-' + index} defaultValue={this.state.grades[gradeLastIndex-index-1]} onBlur={_this.onInputBlur.bind(_this, index)}/>%</span>
                                                 <span style={{ marginRight: 20 }}>表示满分×{ this.state.grades[gradeLastIndex-index-1] }%到{letterMap[index-1]}等分数的学生为{charStr}等</span>
                                                 <a onClick={_this.onDeleteGrade.bind(_this, index)}  href='javascript:void(0)' style={{textDecoration:'none'}} id='deleteIcon' className='hide'>x</a>
@@ -263,7 +266,6 @@ class SubjectPerformance extends React.Component {
             levelPcentages: newLevelPercentages
         })
     }
-
     render() {
 //Props数据结构：
         var {examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers} = this.props;
@@ -271,55 +273,89 @@ class SubjectPerformance extends React.Component {
         //TODO：很明显，levelPercentages不影响 subjectExamTable，只会影响subjectLevelExamTable，所以最后还是抽出去
         var subjectExamTableData = theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers);
         var subjectLevelExamTableData = theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, this.state.levelPcentages);
-        var disData = theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap);
+        // var disData = theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap);
+        var {subjects, factors} = theSubjectExamFactorChartData(examPapersInfo, allStudentsPaperMap, headers);
+        // var subjects=[];
+        // for(let i=0;i<disData.length;i++){
+        //   subjects.push(disData[i].subject);
+        // }
+
 //自定义Moudle数据结构：
-        var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
+
+var config={
+chart: {
+    type: 'column'
+},
+title: {
+    text: '',
+    enabled:false
+},
+subtitle: {
+    text: '(离差)',
+    floating:true,
+    x:-512,
+    y:5,
+    style:{
+      "color": "#767676",
+       "fontSize": "14px"
+    }
+
+},
+colors:['#1daef8','#16d2c7'],
+xAxis: {
+  tickWidth:'0px',//不显示刻度
+  categories:subjects
+},
+yAxis: {
+  lineWidth:1,
+gridLineDashStyle:'Dash',
+title: {
+                text: ''
+            },
+},
+credits:{
+  enabled:false
+},
+tooltip:{
+enabled:false
+},
+legend:{
+  enabled:false
+},
+series: [{
+    data: factors
+}]
+};
+        // var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
+
+        // 表格表头的鼠标悬停提示
+        var tipConfig = {'标准差': {content: '待添加', direction: 'bottom'}, '差异系数': {content: '待添加', direction: 'bottom'}};
         return (
-            <div className={schoolReportStyles['section']}>
-                <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-                <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -140, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 280 }}>
-                    学科考试表现
+            <div id='subjectPerformance' className={schoolReportStyles['section']}>
+                <div style={{ marginBottom: 30 }}>
+                    <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
+                    <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科考试表现</span>
+                    <span style={{ fontSize: 12, color: C07 }}>学科考试表现，通过对不同学科之间基本指标数据的分析，发现学校各学科的教学信息</span>
                 </div>
-                <div className={styles['school-report-content']}>
-                    <p>对于任何考试都需要了解，学科考试后所表现出的基本情况。一般都要有些基本指标来表达，如下面学科考试基本指标一览表所示：</p>
+                <TableView tableData={subjectExamTableData} reserveRows={6} tipConfig={tipConfig}/>
 
-                {/*--------------------------------  学科考试表现基本指标表格 -------------------------------------*/}
-
-                    <TableView tableData={subjectExamTableData} reserveRows={6}/>
-                    <p className={styles.tips}>
-                        学科基本指标的数据虽一目了然，但其中也包含了许多考试信息，值得学校的关注，具体分析和理解各个指标：
-                        <br />
-                        <br />
-                        最高分：反映出学科的最高分，各学科就有差异了；<br />
-                        最低分：反映出学科的最低分，可以看出最低水平；<br />
-                        平均分：表达各科的代表性水平，也反映了学生得分的集中趋势；<br />
-                        标准差：反映了学生分数的分布离散程度，值越大表示个体之间的分数分布的离散程度越大，反之，值越小表示个体之间的分数分布的离散程度越小；<br />
-                        差异系数：标准差与平均分之比，表示不同样本的相对离散程度，值越大表示相对相对离散程度越大，反之，值越小表示相对离散程度越小；<br />
-                        难度：表达学科考试难易程度，难度系数值越大，表明考试越容易，难度系数值越小，考试越难；上表中的难度值明确表达了这次考试最难得学科和考试最容易的学科具体是哪个学科。
-                    </p>
-                    <br />
-                    <p>有关学科分析还有如下几点：</p>
-                    {/*--------------------------------  学科考试表现分析说明 -------------------------------------*/}
-                    {/* TODO: 如果联系到学科的命题难度，其相对离差从大到小的顺序是<span style={{color: 'blue'}}>生物、物理、语文</span>。 缺少*/}
-                    <p className={schoolReportStyles['sub-section']}>
-                        （1）结合前面的分析内容，从各学科的成绩表现来看，每个学科的班级平均分得分率最高的与最低之间的离差，从大到小的顺序是，<span style={{color: 'blue'}}>{_.join(factorSubjects, '、')}</span>。离差较大的学科，反映出班级水平差距较大。离差较小的学科，反映出该学科教学效果比较整齐。（注：语文是母语，学生水平离差来的较小应该是常态）
-                    </p>
-
-                    <p className={schoolReportStyles['sub-section']}>（2）各个学科成绩分布的等级结构比例情况，如下表所示：</p>
-                    <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 130, height: 30, position: 'absolute', right: 0, color: '#b686c9' }}>
+                <p style={{marginBottom: 20}}>
+                    <span className={schoolReportStyles['sub-title']}>学科离差分布</span>
+                    <span className={schoolReportStyles['title-desc']}>离差较大的学科，反映出各班级该学科教学效果差距较大；离差较小的学科，反映出各班级该学科教学效果比较整齐</span>
+                </p>
+                {/* todo： 待补充离差表现图 */}
+                <div style={{display: 'inline-block', width: '100%', height: 380, position: 'relative'}}>
+                  <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
+                </div>
+                <p style={{marginBottom: 20}}>
+                    <span className={schoolReportStyles['sub-title']}>各学科成绩分布的等级结构比例</span>
+                    <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 120, height: 30, float: 'right', backgroundColor: A12, color: '#fff', lineHeight: '30px', borderRadius: 2}}>
                         <i className='icon-cog-2'></i>
                         设置等级参数
                     </a>
-                    <TableView tableData={subjectLevelExamTableData} reserveRows={6}/>
-
-                    {/*--------------------------------  TODO: 暂时空缺的和学科难易程度相关的数据 -------------------------------------*/}
-                    <p className={schoolReportStyles['sub-section']}>（3）有关学科命题</p>
-                    <p>
-                        作为学科考试，必须考虑给水平不同的全体学生都能提供展示其学业水平的机会。有的学科在试题难度分布结构方面，可以进一步完善，防止出现过难或者过易的情况。
-                    </p>
-                    <p>注：各个学科更精细的分析报告，请查阅各个学科详细分析模块。</p>
-                </div>
-               <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} levelPcentages={this.state.levelPcentages} updateGrades={this.updateLevelPercentages.bind(this)} />
+                </p>
+                <TableView tableData={subjectLevelExamTableData} reserveRows={6}/>
+                <Dialog show={this.state.showDialog} onHide={this.onHideDialog.bind(this)} levelPcentages={this.state.levelPcentages} updateGrades={this.updateLevelPercentages.bind(this)} examPapersInfo={examPapersInfo} />
             </div>
         )
     }
@@ -391,6 +427,41 @@ function theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, 
 
     return matrix;
 }
+
+
+function theSubjectExamFactorChartData(examPapersInfo, allStudentsPaperMap, headers) {
+//TODO: PM--给出具体的规则。第三个文案可以写写其他简单的
+//第二个算法：各个学科各个班级的平均得分率，然后max-min，然后从中选出哪几个学科的差值较大或较小
+    //班级考试基本表现中有关于 各个班级各个学科平均得分率的数据结构，可以拿来用！！！
+
+    //各个学科
+        //各个班级的平均得分率
+    var result = _.map(allStudentsPaperMap, (papers, pid) => {
+        var classFactors = _.map(_.groupBy(papers, 'class_name'), (classPapers, className) => {
+            var theMean = _.mean(_.map(classPapers, (paperObj) => paperObj.score));
+            var theFactor = _.round(_.divide(theMean, examPapersInfo[pid].fullMark), 2);
+            return theFactor;
+        });
+        return {pid: pid, subject: examPapersInfo[pid].subject, factor: (_.max(classFactors) - _.min(classFactors))};
+    });
+
+//Note：数据要和科目的顺序对应
+    var subjects = [], factors = [];
+    _.each(headers, (headerObj) => {
+        var target = _.find(result, (obj) => obj.pid == headerObj.id);
+        if(target) {
+            subjects.push(target.subject);
+            factors.push(target.factor);
+        }
+    });
+    return { subjects: subjects, factors: factors };
+
+
+//不再需要排序
+    // var sortedResult = _.sortBy(result, 'factor');
+    // return sortedResult;
+}
+
 
 function theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap) {
 //TODO: PM--给出具体的规则。第三个文案可以写写其他简单的
