@@ -226,20 +226,20 @@ class GroupAnalysis extends React.Component {
 
         var disData = criticalStudentsDiscription(criticalLevelInfo); //缺少UI
 
-        var levels=[];
+        var levelList=[];
         for(let i in criticalLevelInfo){
-          levels[i]=(criticalLevelInfo[i].sort(function(a,b){return a.count<b.count;})).slice(0,3);
+          levelList[i]=(criticalLevelInfo[i].sort(function(a,b){return a.count<b.count;})).slice(0,3);
         }//每档前三
         var xdata=['一档','二档','三档','四档','五档'];//x轴要显示的数据列表
-        var finData=xdata.slice(0,levels.length);
+        var finData=xdata.slice(0,levelList.length);
         var colorList=['#00abfe','#00d3c8','#45c44e','#00abfe','#45c44e'];//颜色列表
         var serisData=[];var datas=[];
         for(let i=0;i<3;i++){
           serisData[i]=[];
-            for(let j=0;j<levels.length;j++){
+            for(let j=0;j<levelList.length;j++){
               serisData[i][j]={
-                  name:levels[j][i].class+'班',
-                  y:levels[j][i].count,
+                  name:levelList[j][i].class+'班',
+                  y:levelList[j][i].count,
                   color:colorList[j]
 
             };
