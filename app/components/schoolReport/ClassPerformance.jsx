@@ -196,12 +196,12 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                 {/* 线图 + 高分多寡班级 */}
                 <div style={{display: 'inline-block', width: 875, height: 380, position: 'relative'}}>
                     <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
-                    <span style={{position: 'absolute', top: 0, right: 0}}>
-                        <span style={{display: 'table-cell', paddingRight: 10}}>对比对象</span>
-                        <span style={{display: 'table-cell'}}><DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true}/></span>
+                    <span style={{position: 'absolute', top: -22, right: 0}}>
+                        <span style={{display: 'table-cell', paddingRight: 10}}>对比对象<span style={{fontSize: 12, color: colorsMap.C07}}>（最多选择5个）</span>:</span>
+                        <span style={{display: 'table-cell'}}><DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true} multiChoiceNum={5}/></span>
                     </span>
                 </div>
-                <div style={{display: 'inline-block', width: 215, float: 'right'}}>
+                <div style={{display: 'inline-block', width: 215, float: 'right', marginTop: 10}}>
                     <div style={{ display: 'table-row'}}>
                         <div style={{ width: 215, height: 110, border: '1px solid ' + C07, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center' }}>
                             <p style={{ fontSize: 12, marginBottom: 10 }}>高分学生较多的班级</p>
