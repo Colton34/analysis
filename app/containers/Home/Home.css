@@ -60,3 +60,11 @@
     height: 173px;
     display: block; 
 }
+
+.blank-list {
+    background-image: url(../../images/noData.png);
+    background-size: contain;
+    width: 159px;
+    height: 130px;
+    display: block;
+}
