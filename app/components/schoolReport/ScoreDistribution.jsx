@@ -545,7 +545,7 @@ class ScoreDistribution extends React.Component {
                 'font-size':'14px',
                 'color':'#333333'
               },
-              itemMarginBottom:15
+              itemMarginBottom:levTotal <= 3 ? 15 : (levTotal === 4 ? 10 : 5)
             },
             series: [{
                 name: '档位',
