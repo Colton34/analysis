@@ -12,9 +12,8 @@ import {DropdownButton, Button, Table as BootTable, MenuItem} from 'react-bootst
 import commonStyle from '../common/common.css';
 import Spinkit from '../common/Spinkit';
 
-import {tableExport} from '../lib/tableExporter';
 import Radium from 'radium';
-import {B03} from '../lib/constants'; 
+import {B03} from '../lib/constants';
 
 var headerMapper = {
     kaohao: '考号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '排名', classRank: '班级排名', score: '分数'
@@ -225,6 +224,7 @@ class RankReportTableView extends React.Component {
             headSeq: this.props.headSeq,                        // 默认显示全部表头
             sortInfo: {}                                        //{head: , order: }
         }
+        // debugger;
     }
     getTableHead() {
         var firstLineHead = [];
@@ -505,8 +505,8 @@ class RankReportTableView extends React.Component {
         var dataEnd = (pageIndex + 1) * pageSize < showData.length ? (pageIndex + 1) * pageSize : showData.length;
 
 
-
         var theRowDatas = this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+        // debugger;
         return (
             <div style={{ margin: '30px 30px 30px 35px' }}>
                 <div style={{border: '1px solid #eeeeee', padding: '5px 30px 0 30px'}}>
@@ -740,7 +740,7 @@ class PageHeader extends React.Component {
         super(props);
     }
     onClickExamName(url) {
-        location.href = url; 
+        location.href = url;
     }
     render() {
         var {examInfo, targetUrl} = this.props;
@@ -750,7 +750,7 @@ class PageHeader extends React.Component {
                 <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span onClick={this.onClickExamName.bind(this, targetUrl)} style={localStyle.examName}>{examInfo.name + ' > '}</span>分数排行榜</span>
             </div>
         )
-        
+
     }
 }
 
@@ -810,11 +810,13 @@ class RankReport extends React.Component {
      */
     // 根据examinfo里的paper来获取表头的显示顺序
     getHeadSeq(examInfo) {
+        // debugger;
         _.forEach(examInfo.papers, paperObj=> {
             _.forEach(['score', 'groupRank', 'classRank'], item => {
                 this.headSeq.push(item + '_' + paperObj.paper)
             })
         })
+        // debugger;
     }
     // 生成所有学生的待显示数据
     generateStudentInfos(rankCache) {
@@ -885,12 +887,17 @@ class RankReport extends React.Component {
     }
 
     handleUndefinedData() {
+        // debugger;
         _.forEach(this.studentInfos, (studentInfo, kaohao) => {
+            // debugger;
             _.forEach(this.headSeq, head => {
                 if (studentInfo[head] === undefined) {
+                    // debugger;
                     if (head.indexOf('score') !== -1) {
+                        // debugger;
                         studentInfo[head] = Number.NEGATIVE_INFINITY;
                     } else if (head.indexOf('groupRank') !== -1 || head.indexOf('classRank') !== -1) {
+                        // debugger;
                         studentInfo[head] = Number.POSITIVE_INFINITY;
                     }
 
@@ -912,10 +919,7 @@ class RankReport extends React.Component {
         this.getHeadSeq(examInfo);
         this.generateStudentInfos(rankCache);
         this.handleUndefinedData();
-// console.log('examInfo === ', examInfo);
-// console.log('rankCache === ', rankCache);
-// console.log('this.studentInfos === ', this.studentInfos);
-
+// debugger;
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
         if (!examid) return;

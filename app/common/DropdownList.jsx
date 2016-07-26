@@ -28,15 +28,15 @@ let style = {
  * list: 下拉菜单显示项目
  * onClickDropdownList: 点击菜单项目时的回调
  * isMultiChoice: 是否多选；
- * multiChoiceNum: 可选数量，默认为2
+ * multiChoiceNum: 可选，多选的数量
  */
 @Radium
 class DropdownList extends React.Component {
     constructor(props) {
         super(props);
         this.multiChoiceNum = this.props.multiChoiceNum ? this.props.multiChoiceNum : this.props.classList.length;
+        var theDropCount = (this.props.classList.length >= 2) ? 2 : 1;
         if (this.props.isMultiChoice) {
-            var theDropCount = (this.props.classList.length >= 2) ? 2 : 1;
             _.each(_.range(theDropCount), index => { //默认选择前两个
                 this.props.classList[index].selected = true;
             })
@@ -45,7 +45,7 @@ class DropdownList extends React.Component {
             active: false,
             current: this.props.isMultiChoice ? {value:'选择班级'} : this.props.classList? this.props.classList[0] : {value:'无数据'},
             coveredItems: this.props.isMultiChoice ? this.props.classList :this.props.classList.slice(1),
-            selectedItems: this.props.classList.slice(0, this.multiChoiceNum)
+            selectedItems: this.props.classList.slice(0, theDropCount)
         }
     }
     handleBodyClick(event) {
@@ -74,11 +74,13 @@ class DropdownList extends React.Component {
                     selectedItems: _.without(this.state.selectedItems, item)
                 })
             } else {
+                var {selectedItems} = this.state;
+                if (selectedItems.length >= this.multiChoiceNum) return;
                 item.selected = true;
                 var {selectedItems} = this.state;
                 selectedItems.push(item);
                 this.setState({
-                    selectedItems: _.takeRight(selectedItems, this.multiChoiceNum)
+                    selectedItems: selectedItems//_.takeRight(selectedItems, this.multiChoiceNum)
                 })
 
             }

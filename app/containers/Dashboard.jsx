@@ -95,7 +95,7 @@ class Dashboard extends React.Component {
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         params.request.put(customBaseUrl, {examId: examid}).then(function(res) {
             location.href = '/';
-            console.log('res.data - ', res.data);
+            // console.log('res.data - ', res.data);
         }).then(function(err) {
             console.log('');
         })
@@ -120,13 +120,15 @@ class Dashboard extends React.Component {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) return;
         var grade = this.props.location.query.grade || '';
-        if ((!examInfoGuide || _.size(examInfoGuide) == 0) || (!scoreRank || _.size(scoreRank) == 0) || this.state.loading)
+        if (this.state.loading)
             //(!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0)
             return (
                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
                     <Spinkit/>
                  </div>
             );
+
+
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
                 <div style={{height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4',  margin: '10px auto 10px -15px', fontSize: 16 , color: '#333'}}>
@@ -139,13 +141,10 @@ class Dashboard extends React.Component {
                         </a> : ''
                     }
                 </div>
-                <ExamGuideComponent data={examInfoGuide} />
-
-
-                {/* */}
+                {(examInfoGuide && _.size(examInfoGuide) > 0) ? <ExamGuideComponent data={examInfoGuide} /> : ''}
                 <div className='row' style={{marginTop: 20}}>
-                    <ScoreRank data={scoreRank} examid={examid} grade={grade}/>
-                    <SchoolReport examid={examid} grade={grade} data={schoolReport}/>
+                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade}/> : ''}
+                    {(schoolReport && _.size(schoolReport) > 0) ? <SchoolReport examid={examid} grade={grade} data={schoolReport}/> : ''}
                 </div>
                 {/* */}
                 <div className='row' style={{marginTop: 20}}>

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-30 18:32:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-21 09:23:48
+* @Last Modified time: 2016-07-19 16:26:27
 */
 
 'use strict';
@@ -23,7 +23,7 @@ import {initParams} from '../../lib/util';
 //在选择的地方知道是不是custom的，告诉到这里。这里再告诉给请求API的地方，然后那个地方再带着query去告诉server api
 export function addPaperInfoAction(papersCache, paperInfo) {
     if (paperInfo.origin === PAPER_ORIGIN.upload) {
-        return { type: ADD_PAPER_INFO_SUCCESS, res: paperInfo.sqm, paperInfo: _.omit(paperInfo,'sqm')} 
+        return { type: ADD_PAPER_INFO_SUCCESS, res: paperInfo.sqm, paperInfo: _.omit(paperInfo,'sqm')}
     } else {
         var targetPaperId = paperInfo.paperId;
         var params = initParams({}, {}, { 'request': window.request, pid: targetPaperId, examId: paperInfo.examId, isFromCustom: paperInfo.isFromCustom });
@@ -31,7 +31,6 @@ export function addPaperInfoAction(papersCache, paperInfo) {
             { type: ADD_PAPER_INFO_SUCCESS, res: papersCache[targetPaperId], isCached: true, paperInfo: paperInfo } :
             { type: ADD_PAPER_INFO, promise: fetchPaper(params), paperInfo: paperInfo };
     }
-    
 }
 
 export function subtractPaperInfoAction(pid) {

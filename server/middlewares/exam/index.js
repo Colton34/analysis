@@ -2,152 +2,195 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-08 11:26:02
+* @Last Modified time: 2016-07-26 13:49:51
 */
 
 'use strict';
 
+var _ = require('lodash');
+var when = require('when');
+var moment = require('moment');
+require('moment/locale/zh-cn');
+var errors = require('common-errors');
+
+var examUitls = require('./util');
 var peterHFS = require('peter').getManager('hfs');
 var peterFX = require('peter').getManager('fx');
 
-var when = require('when');
-var _ = require('lodash');
-var errors = require('common-errors');
-var examUitls = require('./util');
-var moment = require('moment');
-require('moment/locale/zh-cn');
-
-// exports.rankReport = function(req, res, next) {
-//     // var grade = decodeURI(req.query.grade);
-//     // examUitls.filterExam(req.query.examid, grade).then(function(exam) {
-//     //     res.status(200).json(exam);
-//     // });
-
-//     //TODO: 使用这里的数据结构 或者 在rank-server API的scores中添加学生的信息，而不只是分数。但是这里只有总分
-//     //的信息，而没有各科的信息。所以还是需要和schoolAnalysis一样的数据结构。
-
-//     //设计：这里使用和SchoolAnalysis一样的数据结构，这样如果再有相同的需求，则可以考虑将此数据结构作为Common的。
-//     //而且在自定义分析的数据持久化Schema中也是存储的相同的数据结构。
-
-//     var exam = req.exam,
-//         examScoreMap = req.classScoreMap,
-//         examScoreArr = req.orderedScoresArr;
-//     try {
-//         req.examInfo = formatExamInfo(exam);
-//         req.examPapersInfo = generateExamPapersInfo(exam);
-//         req.examClassesInfo = genearteExamClassInfo(exam);
-//     } catch (e) {
-//         next(new errors.Error('schoolAnalysis 同步错误', e));
-//     }
-//     generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo).then(function(examStudentsInfo) {
-//         res.status(200).json({
-//             examInfo: req.examInfo,
-//             examPapersInfo: req.examPapersInfo,
-//             examClassesInfo: req.examClassesInfo,
-//             examStudentsInfo: examStudentsInfo
-//         });
-//     }).catch(function(err) {
-//         next(new errors.Error('schoolAnalysis Error', err));
-//     });
-// }
-
-
-/*
-examInfo: {
-    name: ,
-    papers: [{pid: , paper: , subject: }]   , //注意要在这里添加 totalScore的信息
-    classes:
-}
-
-rankCache: {
-    totalScore: {
-        <className>: [ //已经是有序的（升序）
-            {
-                kaohao: ,
-                name: ,
-                class: ,
-                //score:
-            }
-        ],
-        ...
-    },
-    <pid>: {
-        <className>: [
-            {
-                kaohao: ,
-                name: ,
-                class: ,
-                score
-            }
-        ],
-        ...
-    },
-    ...
-}
-
+/**
+ * 根据当前登录的用户获取其所在学校所产生的考试
+ * [home description]
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
  */
-
-exports.rankReport = function(req, res, next) {
-    //验证过，有examid和grade
-    var grade = decodeURI(req.query.grade);
-    //1.根据exam查找@Exam item，根据grade过滤出有效的paper
-    getValidPaper(req.query.examid, grade).then(function(result) {
-        //2.根据paper的[students]和matrix计算学生的各科成绩
-        // [ {id, kaohao, name, class, score, paper }  ]  -- 整个年级各个学生，各个科目的object
-        var papers = result.papers, examName = result.examName;
-        var allStudentsPaperScoreInfo = _.concat(..._.map(papers, (paper) => { //学生不同的科目算作不同条目，因此是重复的学生信息
-            var scoreMatrix = paper.matrix;
-            return _.map(paper['[students]'], (student, index) => {
-                var paperScore = _.sum(scoreMatrix[index]);
-                return _.assign(student, {score: paperScore, paper: paper._id, pid: paper.id });
-            });
-        }));
-        //先根据学生分组得到其总分
-        var scoreInfoGroupByStudent = _.groupBy(allStudentsPaperScoreInfo, 'id');
-        var allStudentsTotalScoreInfo = _.map(scoreInfoGroupByStudent, (studentPaperInfoArr, studentId) => {
-            //把总分信息添加上去
-            // var totalScore = _.sum(studentPaperInfoArr, (s) => s.paperScore);
-            var totalScore = _.sum(_.map(studentPaperInfoArr, (s) => s.score));
-            var studentBaseInfo = _.pick(studentPaperInfoArr[0], ['id', 'kaohao', 'name', 'class', 'school', 'xuehao']);
-            return _.assign(studentBaseInfo, {score: totalScore, paper: 'totalScore', id: 'totalScore'});
-        });
-
-        var allStudentsScoreInfo = _.concat(allStudentsPaperScoreInfo, allStudentsTotalScoreInfo);
-        var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
-        var rankCache = {};
-        _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperId) => {
-            //这里面都是当前科目的分数
-            rankCache[paperId] = _.groupBy(studentsScoreInfoArr, 'class');
-        });
-
-        //组织examInfo的信息：
-        var examPapers = _.map(papers, (paperObj) => {
-            return {paper: paperObj._id, pid: paperObj.id, name: paperObj.subject};
-        });
-        var examClasses = _.keys(_.groupBy(allStudentsTotalScoreInfo, 'class'));  //总分肯定是包含全部学生的，所以没必要使用allStudentsScoreInfo。
-        var examInfo = {
-            name: examName,
-            papers: examPapers,
-            classes: examClasses
-        };
-
-        res.status(200).json({
-            examInfo: examInfo,
-            rankCache: rankCache
-        })
+exports.home = function(req, res, next) {
+    examUitls.getSchoolById(req.user.schoolId).then(function(school) {
+        return examUitls.getExamsBySchool(school);
+    }).then(function(originalExams) {
+        req.originalExams = originalExams;
+        return getCustomExams(req.user.id);
+    }).then(function(customExams) {
+        try {
+            var validExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
+            var formatedExams = formatExams(validExams);
+            return when.resolve(formatedExams);
+        } catch(e) {
+            return when.reject(new errors.Error('格式化exams错误', e));
+        }
+    }).then(function(formatedExams) {
+        formatedExams = filterExamsByAuth(formatedExams, req.user.auth);
+        var errorInfo = {};
+        if(req.originalExams.length == 0) errorInfo.msg = '此学校没有考试';
+        if(req.originalExams.length > 0 && formatedExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
+        res.status(200).json({examList: formatedExams, errorInfo: errorInfo});
     }).catch(function(err) {
         next(err);
     })
 }
 
+/**
+ * Dashboard需要的API。每一个key对应一个模块。
+ * 当前是把所有模块的计算都放在了后端--因为这些计算本身不太复杂，并且一些数据结构都是立等可取的，不需要二次转换所以放在这里了，如果后期
+ * 需要一些通用的复杂的数据结构那么有可能在global app的位置做了init，从而后面整个app runtime使其都使用这些数据结构。
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+ exports.dashboard = function(req, res, next) {
+    var exam = req.exam,
+        examScoreMap = req.classScoreMap,
+        examScoreArr = req.orderedScoresArr;
+
+    var auth = req.user.auth;
+    var gradeAuth = auth.gradeAuth;
+    var ifShowSchoolReport = (auth.isSchoolManager || (_.isBoolean(gradeAuth[exam.grade.name]) && gradeAuth[exam.grade.name]));
+    try {
+        var examInfoGuideResult = examInfoGuide(exam);
+        var scoreRankResult = scoreRank(examScoreArr);
+        var schoolReportResult = (ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
+        // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
+        // var classScoreReportResult = classScoreReport(examScoreArr, examScoreMap);
+
+        res.status(200).json({
+            examInfoGuide: examInfoGuideResult,
+            scoreRank: scoreRankResult,
+            schoolReport: schoolReportResult
+            // levelScoreReport: levelScoreReportResult,
+            // classScoreReport: classScoreReportResult
+        });
+    } catch (e) {
+        next(new errors.Error('format dashboard error : ', e));
+    }
+}
+
+/**
+ * 自定义分析的Dashboard API
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.customDashboard = function(req, res, next) {
+    req.checkQuery('examid', '无效的examids').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.get(req.query.examid, {isValid: true, owner: req.user.id}, function(err, exam) {
+        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
+        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
+
+        try {
+            var customExamInfoGuideResult = customExamInfoGuide(exam.info);
+            var customScoreRankResult = customScoreRank(exam);
+            var customSchoolReportResult = customExamSchoolReport(exam);
+            // var customLevelScoreReportResult = customLevelScoreReport(exam);
+            // var customClassScoreReportResult = customClassScoreReport(exam);
+
+            res.status(200).json({
+                examInfoGuide: customExamInfoGuideResult,
+                scoreRank: customScoreRankResult,
+                schoolReport: customSchoolReportResult
+                // levelScoreReport: customLevelScoreReportResult,
+                // classScoreReport: customClassScoreReportResult
+            })
+        } catch(e) {
+            next(new errors.Error('format custom dashboard error: ', e));
+        }
+    })
+}
+
+/**
+ * 分数排行榜Module的API
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}
+     {
+          examInfo: {
+            name: ,
+            papers: [{pid: , paper: , subject: }]   , //注意要在这里添加 totalScore的信息
+            classes:
+        }
+
+        rankCache: {
+            totalScore: {
+                <className>: [ //已经是有序的（升序）
+                    {
+                        kaohao: ,
+                        name: ,
+                        class: ,
+                        //score:
+                    }
+                ],
+                ...
+            },
+            <pid>: {
+                <className>: [
+                    {
+                        kaohao: ,
+                        name: ,
+                        class: ,
+                        score
+                    }
+                ],
+                ...
+            },
+            ...
+        }
+    }
+ */
+exports.rankReport = function(req, res, next) {
+    var grade = decodeURI(req.query.grade);
+    var auth = req.user.auth;
+    getExamWithGradePapers(req.query.examid, grade).then(function(result) {
+        var papers = result.papers, examName = result.examName;
+        var rankCache = getOriginalRankCache(papers);
+        var authRankCache = filterAuthRankCache(auth, rankCache, papers);
+        var examInfo = getAuthExamInfo(authRankCache, examName, papers);
+        res.status(200).json({
+            examInfo: examInfo,
+            rankCache: authRankCache
+        });
+    }).catch(function(err) {
+        next(err);
+    })
+}
+
+/**
+ * 自定义分析排行榜报告API
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        返回接口同非自定义分析的接口
+ */
 exports.customRankReport = function(req, res, next) {
     req.checkQuery('examid', '无效的examids').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
 
-    //从exam.studentsInfo中构建allStudentsScoreInfo
-    peterFX.get(req.query.examid, {isValid: true}, function(err, exam) {  //{isValid: true}
-        //1.注意字段名和之前数据结构中不一样（如果它是个数组）
-        //2.有些是Map，但从DB中拿出来是数组
+    //TODO: 测试
+    peterFX.get(req.query.examid, {isValid: true, owner: req.user.id }, function(err, exam) {
         if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
         if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
         try {
@@ -155,48 +198,21 @@ exports.customRankReport = function(req, res, next) {
             if(!examStudentsInfo || examStudentsInfo.length == 0 || !examPapersInfo || examPapersInfo.length == 0) {
                 return next(new errors.Error('no valid custom exam be found'));
             }
-            console.log('examStudentsInfo.length = ', examStudentsInfo.length);
-            var flag = 0, tempResult;
-            var allStudentsScoreInfo = _.concat(..._.map(examStudentsInfo, (student) => {
+            var studentScoresArr = _.concat(..._.map(examStudentsInfo, (student) => {
                 var obj = _.pick(student, ['id', 'kaohao', 'name', 'class']);
                 var totalObj = _.assign({score: student.score, paper: 'totalScore', pid: 'totalScore'}, obj);
-// if(flag == 0) {
-//     console.log('obj === ', obj);
-//     console.log('totalObj === ', totalObj);
-// }
 
                 var paperObjs = _.map(student['[papers]'], (pObj) => {
                     return _.assign({score: pObj.score, paper: examPapersInfo[pObj.paperid].paper, pid: pObj.paperid}, obj);
                 });
-
-// if(flag == 0) {
-//     console.log('totalObj == ', totalObj);
-//     console.log('paperObjs == ', paperObjs);
-// }
-
-
-                tempResult = _.concat([totalObj], paperObjs);
-
-
-// if(flag == 0) {
-//     console.log('tempResult == ', tempResult);
-// }
-
-                flag += tempResult.length;
-                return tempResult;
+                return _.concat([totalObj], paperObjs);
             }));
 
-// console.log('flag = ', flag);
-// console.log('allStudentsScoreInfo.length = ', allStudentsScoreInfo.length);
-
-            var allStudentsScoreInfoGroupByPaper = _.groupBy(allStudentsScoreInfo, 'paper');
+            var studentScoresPaperMap = _.groupBy(studentScoresArr, 'paper');
             var rankCache = {};
-            _.each(allStudentsScoreInfoGroupByPaper, (studentsScoreInfoArr, paperObjectId) => {
-                rankCache[paperObjectId] = _.groupBy(studentsScoreInfoArr, 'class');
+            _.each(studentScoresPaperMap, (studentScoresArrItem, paperObjectId) => {
+                rankCache[paperObjectId] = _.groupBy(studentScoresArrItem, 'class');
             });
-
-// console.log('kyes = ', _.keys(rankCache));
-// console.log(rankCache[_.keys(rankCache)[0]]);
 
             var examPapers = _.map(examPapersInfo, (value, pid) => {
                 return {
@@ -218,84 +234,206 @@ exports.customRankReport = function(req, res, next) {
     })
 }
 
-function getValidPaper(examid, gradeName) {
-    var targetExam;
-    return when.promise(function(resolve, reject) {
-        peterHFS.get('@Exam.'+examid, function(err, exam) {
-            if(err) return reject(new errors.data.MongoDBError('find exam error : ', err));
-            //过滤paper
-            targetExam = exam;
-            resolve(_.filter(exam['[papers]'], (paper) => paper.grade == gradeName));
-        });
-    }).then(function(validPapers) {
-        //查找补全实体信息
-        var paperIds = _.map(validPapers, (paperObj) => paperObj.paper);
-        var paperPromises = _.map(paperIds, (pObjId) => {
-            return when.promise(function(resolve, reject) {
-                peterHFS.get(pObjId, function(err, paper) {
-                    if(err) return reject(new errors.data.MongoDBError('find paper error: ', err));
-                    resolve(paper);
-                });
-            });
-        });
-        return when.all(paperPromises);
-    }).then(function(papers) {
-        return {
-            papers: papers,
-            examName: targetExam.name
+/**
+ * 阅卷校级报告详情API：
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}  返回examInfo、examPapersInfo、examClassesInfo、examStudentsInfo四大数据结构
+/*
+
+    examInfo:
+        {
+            name:
+            gradeName:
+            startTime:
+            realClasses:
+            lostClasses:
+            realStudentsCount:
+            lostStudentsCount:
+            subjects:
+            fullMark:
         }
-    })
+
+    examStudentsInfo
+        [
+            {
+                id:
+                name:
+                class:
+                score:
+                papers: [
+                    {paperid: , score: }  Note: paperid是String id
+                ]
+            },
+            ...
+        ]
+
+    examPapersInfo
+        {
+            <pid>: { //Note: 这里pid也是String id
+                id:
+                paper:
+                subject:
+                fullMark:
+                realClasses:
+                lostClasses:
+                realStudentsCount:
+                lostStudentsCount:
+                class: {
+                    <className>: <此科目此班级参加考试的人数>
+                }
+            },
+            ...
+        }
+
+    examClassesInfo
+        {
+            <className>: {
+                name:
+                students:
+                realStudentsCount:
+                losstStudentsCount:
+            }
+        }
+ */
+exports.schoolAnalysis = function(req, res, next) {
+    var exam = req.exam,
+        examScoreMap = req.classScoreMap,
+        examScoreArr = req.orderedScoresArr;
+    try {
+        req.examInfo = formatExamInfo(exam);
+        req.examPapersInfo = generateExamPapersInfo(exam);
+        req.examClassesInfo = genearteExamClassInfo(exam);
+    } catch (e) {
+        next(new errors.Error('schoolAnalysis 同步错误', e));
+    }
+    generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo).then(function(examStudentsInfo) {
+        res.status(200).json({
+            examInfo: req.examInfo,
+            examPapersInfo: req.examPapersInfo,
+            examClassesInfo: req.examClassesInfo,
+            examStudentsInfo: examStudentsInfo
+        });
+    }).catch(function(err) {
+        next(new errors.Error('schoolAnalysis Error', err));
+    });
 }
 
+/**
+ * 自定义分析校级报告详情API：
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        接口同阅卷校级报告详情API
+ */
+exports.customSchoolAnalysis = function(req, res, next) {
+    req.checkQuery('examid', '无效的examids').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.get(req.query.examid, {isValid: true, owner: req.user.id}, function(err, exam) {
+        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
+        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
+
+        try {
+            var examInfo = makeExamInfo(exam.info);
+            var examStudentsInfo = makeExamStudentsInfo(exam['[studentsInfo]']);
+            var examPapersInfo = makeExamPapersInfo(exam['[papersInfo]']);
+            var examClassesInfo = makeExamClassesInfo(exam['[classesInfo]']);
+            res.status(200).json({
+                examInfo: examInfo,
+                examStudentsInfo: examStudentsInfo,
+                examPapersInfo: examPapersInfo,
+                examClassesInfo: examClassesInfo
+            });
+        } catch(e) {
+            next(new errors.Error('server format custom analysis error: ', e));
+        }
+    });
+}
 
 /**
- * 根据当前登录的用户获取其所在学校所产生的考试
+ * 创建自定义分析
  * @param  {[type]}   req  [description]
  * @param  {[type]}   res  [description]
  * @param  {Function} next [description]
  * @return {[type]}        [description]
- *
- * Note：但是由于当前exam中没有对年级区分--即，会出现不同的年级的paper会出现在同一个exam中，而对于不同年级之间进行比较是没有意义的--
- * 因此需要对exam中papers进行年级的区分，当做不同的exam对待
  */
-/*
-Home View的服务端输出数据结构：
-exam实例的数组：
-[
-    <exam schema>
-]
-*/
-exports.home = function(req, res, next) {
-    // oldHome(req, res, next);
-    //0.通过verify已经有了req.user
-    //1.获取此用户所从属的学校信息
-    examUitls.getSchoolById(req.user.schoolId).then(function(school) {
-        //2.获取此学校所产生的所有的考试信息--因为不牵涉到分数，所以这里直接读DB即可，不需要rank-server的exam api
-        return examUitls.getExamsBySchool(school);
-    }).then(function(originalExams) {
-        req.originalExams = originalExams;
-        return getCustomExams(req.user.id);
-    }).then(function(customExams) {
-        try {
-            var allExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
-            var formatedExams = formatExams(allExams);
-            return when.resolve(formatedExams);
-        } catch(e) {
-            return when.reject(new errors.Error('格式化exams错误'));
-        }
-    }).then(function(formatedExams) {
-        res.status(200).send(formatedExams);
-    }).catch(function(err) {
-        next(err);
+exports.createCustomAnalysis = function(req, res, next) {
+    if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
+
+    var postData = req.body.data;
+    postData.owner = req.user.id;
+
+    peterFX.create('@Exam', req.body.data, function(err, result) {
+        if(err) return next(new errors.data.MongoDBError('创建自定义分析错误', err));
+        res.status(200).json({examId: result});
+    });
+}
+
+/**
+ * “删除”（不是物理删除）一个自定义分析
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.inValidCustomAnalysis = function(req, res, next) {
+    req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.set(req.body.examId, {isValid: false}, function(err, result) {
+        if(err) return next(new errors.data.MongoDBError('更新自定义分析错误', err));
+        res.status(200).send('ok');
     })
 }
 
+/**
+ * 对获取exam API的参数进行校验：examid 和 grade。只是做了参数的校验--因为比较common且独立所以抽取出来作为单独的middleware。
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.validateExam = function(req, res, next) {
+    req.checkQuery('examid', '无效的examids').notEmpty();
+    req.checkQuery('grade', '无效的grade').notEmpty();
+    if (req.validationErrors()) return next(req.validationErrors());
+    if (req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err));
+
+    next();
+}
+
+/**
+ * 初始化exam。得到的exam、orderedScoresArr、classScoreMap三个信息，为基本的examPapersInfo、examClassesInfo、examPapersInfo、examClassesInfo数据结构做准备。
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.initExam = function(req, res, next) {
+    var grade = decodeURI(req.query.grade);
+    examUitls.generateExamInfo(req.query.examid, grade, req.user.schoolId).then(function(exam) {
+        req.exam = exam;
+        return examUitls.generateExamScoresInfo(req.exam, req.user.auth);
+    }).then(function(result) {
+        req = _.assign(req, result);
+        next();
+    }).catch(function(err) {
+        next(err);
+    });
+}
+
+/**
+ * 获取当前登录用户所创建的分析--保证格式和获取阅卷的exam格式相同，从而方便下面一起被formated。
+ * @param  {[type]} owner [description]
+ * @return {[type]}       [description]
+ */
 function getCustomExams(owner) {
     return when.promise(function(resolve, reject) {
+// TODO(当添加自定义分析的分享功能的时候): 修改过滤条件为： {'isValid': true, $or: [{'owner': {$eq: owner}}, {$and: [{'owner': {$ne: owner}}, {isPublic: true}]}]}
         peterFX.query('@Exam', {owner: owner, 'isValid': true}, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('find my custom analysis error: ', err));
-            //需要的exam格式，从而匹配使用formatExams函数：
-            //{'_id': , 'name': , 'event_time': , 'from': 40, '[papers]': [{grade: , paper: , subject: , manfen: }, ...]}
             resolve(_.map(results, (examItem) => {
                 var obj = _.pick(examItem.info, ['name', 'from']);
                 obj._id = examItem._id;
@@ -312,14 +450,13 @@ function getCustomExams(owner) {
     });
 }
 
-
 /**
  * 对exams进行排序格式化，从而符合首页的数据展示
  * @param  {[type]} exams [description]
- * @return {[type]}       [description]
+ * @return {[type]}       返回最终被格式化好的，有序的（不同时间戳之间有序，同一时间戳内也是有序的）exam实例
  */
 function formatExams(exams) {
-    var examGroupsByEventTime = _.groupBy(exams, function(exam) {
+    var examEventTimeMap = _.groupBy(exams, function(exam) {
         var time = moment(exam["event_time"]);
         var year = time.get('year') + '';
         var month = time.get('month') + 1;
@@ -328,26 +465,27 @@ function formatExams(exams) {
         return key;
     });
 
-    //result用来保存格式化后的结果；resultOrder用来对group中的不同时间戳进行排序（统一时间戳下的数组在内部排序）；finalResult将
-    //result和resultOrder结合得到有序的格式化后的结果
+    //result用来保存格式化后的结果；
+    //resultOrder用来对group中的不同时间戳进行排序（统一时间戳下的数组在内部排序）；
+    //finalResult将result和resultOrder结合得到有序的格式化后的结果；
     var result = {},
         resultOrder = [];
 
-    _.each(examGroupsByEventTime, function(examsItem, timeKey) {
+    _.each(examEventTimeMap, function(examsItemArr, timeKey) {
         var flag = {
             key: timeKey,
             value: moment(timeKey.split('.')).valueOf()
         };
         resultOrder.push(flag);
         var temp = {};
-        _.each(examsItem, function(exam) {
+        _.each(examsItemArr, function(exam) {
             temp[exam._id] = {
                 exam: exam
             };
-            var papersFromExamGroupByGrade = _.groupBy(exam["[papers]"], function(paper) {
+            var papersGradeMap = _.groupBy(exam["[papers]"], function(paper) {
                 return paper.grade;
             });
-            temp[exam._id].papersMap = papersFromExamGroupByGrade;
+            temp[exam._id].papersMap = papersGradeMap;
         });
 
         if (!result[timeKey]) result[timeKey] = [];
@@ -369,7 +507,7 @@ function formatExams(exams) {
                     }
                 });
                 obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
-                obj.from = value.exam.from; //TODO: 这里数据库里只是存储的是数字，但是显示需要的是文字，所以需要有一个map转换
+                obj.from = value.exam.from;
 
                 result[timeKey].push(obj);
             });
@@ -389,97 +527,66 @@ function formatExams(exams) {
     return finallyResult;
 }
 
-
-//TODO:转移到exam.util中
 /**
- * 对获取exam API的参数进行校验：examid 和 grade
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
- * @return {[type]}        [description]
+ * 对首页的examList进行Auth过滤
+ * @param  {[type]} formatedExams [description]
+ * @param  {[type]} auth          [description]
+ * @return {[type]}               [description]
  */
-/*
-因为当前exam中没有区分年级，所以要传递examid和grade来确定到底是由哪些papers构成的一个exam
- */
-exports.validateExam = function(req, res, next) {
-    req.checkQuery('examid', '无效的examids').notEmpty();
-    req.checkQuery('grade', '无效的grade').notEmpty();
-    if (req.validationErrors()) return next(req.validationErrors());
-    if (req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err));
-
-    next();
-}
-
-//TODO:在这里完成首页所需的信息：重点是分类好所有exam相关的信息：
-//数据来源rank-server的http://ct.yunxiao.com:8156/exams?examids=167,168,...去获取当前学校所有发生考试的exam
-/*
-{
-    name:
-    event_time:
-    grade:
-    fullMark:
-    realClasses:
-    lostClasses:
-    realStudentsCount:
-    lostStudentsCount:
-}
-*/
-exports.initExam = function(req, res, next) {
-    var grade = decodeURI(req.query.grade);
-    examUitls.generateExamInfo(req.user.schoolId, req.query.examid, grade).then(function(exam) {
-        req.exam = exam;
-        return examUitls.generateExamScoresInfo(req.exam);
-    }).then(function(result) {
-        req = _.assign(req, result);
-        next();
-    }).catch(function(err) {
-        next(err);
-    });
-}
-
-
-
-/**
- * 返回dashboard数据结构的结果
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
- * @return {[type]}        [description]
- */
-exports.dashboard = function(req, res, next) {
-    var exam = req.exam,
-        examScoreMap = req.classScoreMap,
-        examScoreArr = req.orderedScoresArr;
-
-    try {
-        var examInfoGuideResult = examInfoGuide(exam);
-        var scoreRankResult = scoreRank(examScoreArr);
-        var schoolReportResult = schoolReport(exam, examScoreArr);
-        // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
-        // var classScoreReportResult = classScoreReport(examScoreArr, examScoreMap);
-
-        res.status(200).json({
-            examInfoGuide: examInfoGuideResult,
-            scoreRank: scoreRankResult,
-            schoolReport: schoolReportResult
-            // levelScoreReport: levelScoreReportResult,
-            // classScoreReport: classScoreReportResult
+function filterExamsByAuth(formatedExams, auth) {
+    //Note: 如果过滤后最终此时间戳key下没有exam了则也不显示此time key
+    //Note: 从当前用户中获取此用户权限，从而过滤
+    if(auth.isSchoolManager) return formatedExams;
+    //Note: 只要是此年级的，那么都能看到这场考试，但是具体的考试的数据要跟着此用户的权限走
+    var authGrades = _.keys(auth.gradeAuth);
+    var result = [];
+    _.each(formatedExams, (obj) => {
+        var vaildExams = _.filter(obj.values, (examItem) => {
+            return _.includes(authGrades, examItem.grade);
         });
-    } catch (e) {
-        next(new errors.Error('format dashboard error : ', e));
-    }
-
-    // getStudentSelfReport(examScoreArr, examScoreMap).then(function(studentSelfReportResult) {
-
-    // }).catch(function(err) {
-    //     next(err);
-    // });
-    // var studentSelfReportResult = studentSelfReport(examScoreArr);
+        if(vaildExams.length > 0) result.push({timeKey: obj.timeKey, values: vaildExams});
+    });
+    return result;
 }
 
+/**
+ * 格式化输出examInfo
+ * @param  {[type]} exam [description]
+ * @return {[type]}      [description]
+ */
+function examInfoGuide(exam) {
+    return {
+        name: exam.name,
+        from: exam.from,
+        subjectCount: exam['[papers]'].length,
+        realClassesCount: exam.realClasses.length,
+        realStudentsCount: exam.realStudentsCount,
+        lostStudentsCount: exam.lostStudentsCount
+    };
+}
+
+//TODO: 下列使用常数的部分可能都需要抽取出作为常量使用，而不是写死。
+/**
+ * 一般阅卷Dashboard排行榜的API--注意排列顺序
+ * @param  {[type]} examScoreArr [description]
+ * @return {[type]}              [description]
+ */
+function scoreRank(examScoreArr) {
+    return {
+        top: _.reverse(_.takeRight(examScoreArr, 6)),
+        low: _.reverse(_.take(examScoreArr, 6))
+    }
+}
+
+/**
+ * 阅卷Dashboard校级报告模块
+ * @param  {[type]} exam         [description]
+ * @param  {[type]} examScoreArr [description]
+ * @return {[type]}              [description]
+ * 和校级报告详情的总分趋势的接口相同
+ */
 function schoolReport(exam, examScoreArr) {
     var segments = makeSegments(exam.fullMark);
-
     var xAxons = _.slice(segments, 1);
     var yAxons = makeSegmentsStudentsCount(examScoreArr, segments);
 
@@ -544,35 +651,96 @@ function findScoreSegmentIndex(segments, des) {
     return high; //取high是受segments的内容影响的
 }
 
-exports.customDashboard = function(req, res, next) {
-    req.checkQuery('examid', '无效的examids').notEmpty();
-    if(req.validationErrors()) return next(req.validationErrors());
+//TODO：阅卷Dashboar暂时用不到的模块视图API
+/**
+ * 一般阅卷Dashboard的分档模块。按照默认的分档标准进行分档划分。Note: 注意这里是按照百分比的常量进行计算的--这样不受总分的影响。
+ * @param  {[type]} exam         [description]
+ * @param  {[type]} examScoreArr [description]
+ * @return {[type]}              [description]
+ */
+// function levelScoreReport(exam, examScoreArr) {
+//     var levels = {
+//         0: {
+//             score: 0,
+//             count: 0,
+//             percentage: 15
+//         },
+//         1: {
+//             score: 0,
+//             count: 0,
+//             percentage: 25
+//         },
+//         2: {
+//             score: 0,
+//             count: 0,
+//             percentage: 60
+//         }
+//     };
 
-    peterFX.get(req.query.examid, {isValid: true}, function(err, exam) {  //{isValid: true}
-        //1.注意字段名和之前数据结构中不一样（如果它是个数组）
-        //2.有些是Map，但从DB中拿出来是数组
-        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
-        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
-        try {
-            var customExamInfoGuideResult = customExamInfoGuide(exam.info);
-            var customScoreRankResult = customScoreRank(exam);
-            var customSchoolReportResult = customExamSchoolReport(exam);
-            // var customLevelScoreReportResult = customLevelScoreReport(exam);
-            // var customClassScoreReportResult = customClassScoreReport(exam);
+//     var totalStudentCount = exam.realStudentsCount;
+//     _.each(levels, (levObj, levelKey) => {
+//         levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
+//         var targetStudent = _.takeRight(examScoreArr, levObj.count)[0];
+//         levObj.score = targetStudent ? targetStudent.score : 0;
+//     });
+//     return levels;
+// }
 
-            res.status(200).json({
-                examInfoGuide: customExamInfoGuideResult,
-                scoreRank: customScoreRankResult,
-                schoolReport: customSchoolReportResult
-                // levelScoreReport: customLevelScoreReportResult,
-                // classScoreReport: customClassScoreReportResult
-            })
-        } catch(e) {
-            next(new errors.Error('format custom dashboard error: ', e));
-        }
-    })
+/**
+ * 一般阅卷Dashboard的班级报告API。
+ * @param  {[type]} examScoreArr [description]
+ * @param  {[type]} examScoreMap [description]
+ * @return {[type]}              [description]
+ */
+// function classScoreReport(examScoreArr, examScoreMap) {
+//     var scoreMean = _.round(_.mean(_.map(examScoreArr, (scoreObj) => scoreObj.score)), 2);
+//     var classesMean = _.map(examScoreMap, (classesScore, className) => {
+//         return {
+//             name: className,
+//             mean: _.round(_.mean(_.map(classesScore, (scoreObj) => scoreObj.score)), 2)
+//         }
+//     });
+//     var orderedClassesMean = _.sortBy(classesMean, 'mean');
+//     return {
+//         gradeMean: scoreMean,
+//         top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
+//     };
+// }
+
+/**
+ * 自定义分析Dashboard总体概览模块
+ * @param  {[type]} examInfo [description]
+ * @return {[type]}          [description]
+ */
+function customExamInfoGuide(examInfo) {
+    return {
+        name: examInfo.name,
+        from: examInfo.from,
+        subjectCount: examInfo['[subjects]'].length,
+        realClassesCount: examInfo['[realClasses]'].length,
+        realStudentsCount: examInfo.realStudentsCount,
+        lostStudentsCount: examInfo.lostStudentsCount
+    }
 }
 
+/**
+ * 自定义分析Dashboard排行榜模块
+ * @param  {[type]} exam [description]
+ * @return {[type]}      [description]
+ */
+function customScoreRank(exam) {
+    var examStudentsInfo = exam['[studentsInfo]'];
+    return {
+        top: _.reverse(_.takeRight(examStudentsInfo, 6)),
+        low: _.reverse(_.take(examStudentsInfo, 6))
+    }
+}
+
+/**
+ * 自定义分析Dashboard校级报告模块
+ * @param  {[type]} exam [description]
+ * @return {[type]}      [description]
+ */
 function customExamSchoolReport(exam) {
     var examInfo = exam.info;
     var examStudentsInfo = exam['[studentsInfo]'];
@@ -588,355 +756,209 @@ function customExamSchoolReport(exam) {
     };
 }
 
-function customExamInfoGuide(examInfo) {
-    return {
-        name: examInfo.name,
-        from: examInfo.from,
-        subjectCount: examInfo['[subjects]'].length,
-        realClassesCount: examInfo['[realClasses]'].length,
-        realStudentsCount: examInfo.realStudentsCount,
-        lostStudentsCount: examInfo.lostStudentsCount
-    }
-}
+//TODO:自定义Dashboard暂时不用到的模块视图
+/**
+ * 自定义分析的Dahsboard的分档模块
+ * @param  {[type]} exam [description]
+ * @return {[type]}      [description]
+ */
+// function customLevelScoreReport(exam) {
+//     var levels = {
+//         0: {
+//             score: 0,
+//             count: 0,
+//             percentage: 15
+//         },
+//         1: {
+//             score: 0,
+//             count: 0,
+//             percentage: 25
+//         },
+//         2: {
+//             score: 0,
+//             count: 0,
+//             percentage: 60
+//         }
+//     };
+//     var totalStudentCount = exam.info.realStudentsCount;
+//     var examStudentsInfo = exam['[studentsInfo]'];
+//     _.each(levels, (levObj, levelKey) => {
+//         levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
+//         var targetStudent = _.takeRight(examStudentsInfo, levObj.count)[0];
+//         levObj.score =  targetStudent ? targetStudent.score : 0;
+//     });
+//     return levels;
+// }
 
+/**
+ * 自定义分析Dashboard班级分析报告模块
+ * @param  {[type]} exam [description]
+ * @return {[type]}      [description]
+ */
+// function customClassScoreReport(exam) {
+//     var examStudentsInfo = exam['[studentsInfo]'];
+//     var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
 
-function examInfoGuide(exam) {
-    return {
-        name: exam.name,
-        from: exam.from,
-        subjectCount: exam['[papers]'].length,
-        realClassesCount: exam.realClasses.length,
-        realStudentsCount: exam.realStudentsCount,
-        lostStudentsCount: exam.lostStudentsCount
-    };
-}
+//     var scoreMean = _.round(_.mean(_.map(examStudentsInfo, (student) => student.score)), 2);
+//     var classesMean = _.map(studentsGroupByClass, (classesStudents, className) => {
+//         return {
+//             name: className,
+//             mean: _.round(_.mean(_.map(classesStudents, (student) => student.score)), 2)
+//         }
+//     });
+//     var orderedClassesMean = _.sortBy(classesMean, 'mean');
+//     return {
+//         gradeMean: scoreMean,
+//         top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
+//     };
+// }
 
-function scoreRank(examScoreArr) {
-    //Top的排名
-    return {
-        top: _.reverse(_.takeRight(examScoreArr, 6)),
-        low: _.reverse(_.take(examScoreArr, 6))
-    }
-}
-
-function customScoreRank(exam) {
-    var examStudentsInfo = exam['[studentsInfo]'];
-    return {
-        top: _.reverse(_.takeRight(examStudentsInfo, 6)),
-        low: _.reverse(_.take(examStudentsInfo, 6))
-    }
-}
-
-//这个也是走默认level的设定：即，三挡，每一档有默认的上线率，然后反求对应的此档线的分数，统计人数
-function levelScoreReport(exam, examScoreArr) {
-    var levels = {
-        0: {
-            score: 0,
-            count: 0,
-            percentage: 15
-        },
-        1: {
-            score: 0,
-            count: 0,
-            percentage: 25
-        },
-        2: {
-            score: 0,
-            count: 0,
-            percentage: 60
-        }
-    };
-
-    var totalStudentCount = exam.realStudentsCount;
-    _.each(levels, (levObj, levelKey) => {
-        levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
-        var targetStudent = _.takeRight(examScoreArr, levObj.count)[0];
-        levObj.score = targetStudent ? targetStudent.score : 0;
-    });
-    return levels;
-}
-
-function customLevelScoreReport(exam) {
-    var levels = {
-        0: {
-            score: 0,
-            count: 0,
-            percentage: 15
-        },
-        1: {
-            score: 0,
-            count: 0,
-            percentage: 25
-        },
-        2: {
-            score: 0,
-            count: 0,
-            percentage: 60
-        }
-    };
-    var totalStudentCount = exam.info.realStudentsCount;
-    var examStudentsInfo = exam['[studentsInfo]'];
-    _.each(levels, (levObj, levelKey) => {
-        levObj.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
-        var targetStudent = _.takeRight(examStudentsInfo, levObj.count)[0];
-        levObj.score =  targetStudent ? targetStudent.score : 0;
-    });
-    return levels;
-}
-
-function classScoreReport(examScoreArr, examScoreMap) {
-    //年级平均分
-    var scoreMean = _.round(_.mean(_.map(examScoreArr, (scoreObj) => scoreObj.score)), 2);
-    var classesMean = _.map(examScoreMap, (classesScore, className) => {
+/**
+ * 根据examid获取到一个exam。并保证此exam种所有的papers来自同一个grade。
+ * @param  {[type]} examid    目标exam的id
+ * @param  {[type]} gradeName  过滤条件grade value
+ * @return {[type]}           {papers: <所查找的exam下的，并且同属于一个年级的，并且是paper对象>, examName: <exam name>}
+ */
+function getExamWithGradePapers(examid, gradeName) {
+    var targetExam;
+    return when.promise(function(resolve, reject) {
+        peterHFS.get('@Exam.'+examid, function(err, exam) {
+            if(err) return reject(new errors.data.MongoDBError('[getExamWithGradePapers] Error ', err));
+            targetExam = exam;
+            resolve(_.filter(exam['[papers]'], (paper) => paper.grade == gradeName));
+        });
+    }).then(function(validPapers) {
+        var paperIds = _.map(validPapers, (paperObj) => paperObj.paper);
+        var paperPromises = _.map(paperIds, (pObjId) => {
+            return when.promise(function(resolve, reject) {
+                peterHFS.get(pObjId, function(err, paper) {
+                    if(err) return reject(new errors.data.MongoDBError('find paper error: ', err));
+                    resolve(paper);
+                });
+            });
+        });
+        return when.all(paperPromises);
+    }).then(function(papers) {
         return {
-            name: className,
-            mean: _.round(_.mean(_.map(classesScore, (scoreObj) => scoreObj.score)), 2)
+            papers: papers,
+            examName: targetExam.name
         }
-    });
-    var orderedClassesMean = _.sortBy(classesMean, 'mean');
-    return {
-        gradeMean: scoreMean,
-        top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
-    };
+    })
 }
 
-function customClassScoreReport(exam) {
-    var examStudentsInfo = exam['[studentsInfo]'];
-    var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
-
-    var scoreMean = _.round(_.mean(_.map(examStudentsInfo, (student) => student.score)), 2);
-    var classesMean = _.map(studentsGroupByClass, (classesStudents, className) => {
-        return {
-            name: className,
-            mean: _.round(_.mean(_.map(classesStudents, (student) => student.score)), 2)
-        }
+/**
+ * 获取普通全量的rankCache
+ * @param  {[type]} papers [description]
+ * @return {[type]}       rankCache--以每一个paper.ObjectId为key，value是一个Object--以每个班级className为key，value是某科目，某班级的学生分数数据数组
+ */
+function getOriginalRankCache(papers) {
+    var perStudentPerPaperArr = _.concat(..._.map(papers, (paper) => {
+        var scoreMatrix = paper.matrix;
+        return _.map(paper['[students]'], (student, index) => {
+            var paperScore = _.sum(scoreMatrix[index]);
+            return _.assign({score: paperScore, paper: paper._id, pid: paper.id }, student);
+        });
+    }));
+    var paperStudentMap = _.groupBy(perStudentPerPaperArr, 'id');
+    var perStudentTotalScoreArr = _.map(paperStudentMap, (studentPapersArr, studentId) => {
+        var totalScore = _.sum(_.map(studentPapersArr, (s) => s.score));
+        var studentBaseInfo = _.pick(studentPapersArr[0], ['id', 'kaohao', 'name', 'class', 'school', 'xuehao']);
+        return _.assign({score: totalScore, paper: 'totalScore', id: 'totalScore'}, studentBaseInfo);
     });
-    var orderedClassesMean = _.sortBy(classesMean, 'mean');
+
+    var studentScoresArr = _.concat(perStudentPerPaperArr, perStudentTotalScoreArr);
+    var studentScoresPaperMap = _.groupBy(studentScoresArr, 'paper');
+    var rankCache = {};
+    _.each(studentScoresPaperMap, (studentsScoreItemArr, paperId) => {
+        rankCache[paperId] = _.groupBy(studentsScoreItemArr, 'class');
+    });
+    return rankCache;
+}
+
+/**
+ * 根据rankCache获取匹配此用户权限的对应数据
+ * @param  {[type]} auth      [description]
+ * @param  {[type]} rankCache [description]
+ * @return {[type]}           [description]
+ */
+function filterAuthRankCache(auth, rankCache, papers) {
+    var authRankCache = {}, allPaperIds = _.keys(rankCache);
+    //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
+    if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
+        var gradeAuthObj = auth.gradeAuth[grade];
+        //Note: 过滤有效科目
+        _.each(gradeAuthObj.subjectManagers, (obj) => {
+            var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
+            if(targetAuthPaper) {
+                authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
+            }
+        });
+        //过滤有效科目下的有效班级
+        _.each(gradeAuthObj.groupManagers, (obj) => {
+            _.each(allPaperIds, (paperId) => {
+                var authExistClasses = (authRankCache[paperId]) ? _.keys(authRankCache[paperId]) : [];
+                //Note: 如果当前authExistClasses还没有添加此班级的数据，并且此班级是有效的（即在原来的数据中能找到），则添加对应的班级数据到authRankCache中
+                if(!_.includes(authExistClasses, obj.group) && (_.includes(_.keys(rankCache[paperId]), obj.group))) {
+                    if(!authRankCache[paperId]) authRankCache[paperId] = {};
+                    authRankCache[paperId][obj.group] = rankCache[paperId][obj.group];
+                }
+            });
+        });
+        //Note: 因为auth中已经做了冗余的排查，所以如果这里有subjectTeachers那么就一定是前面所没有包含的
+        _.each(gradeAuthObj.subjectTeachers, (obj) => {
+            var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
+            if(targetAuthPaper) {
+                if(!authRankCache[targetAuthPaper._id]) authRankCache[targetAuthPaper._id] = {};
+                authRankCache[targetAuthPaper._id][obj.group] = rankCache[targetAuthPaper._id][obj.group];
+            }
+        });
+    } else {
+        authRankCache = rankCache;
+    }
+
+    if(!authRankCache.totalScore) {
+        //Note: 如果没有totalScore，则添加进来：
+        authRankCache.totalScore = rankCache.totalScore;
+    }
+    return authRankCache;
+}
+
+/**
+ * 根据authRankCache组织examInfo的信息
+ * @param  {[type]} authRankCache [description]
+ * @param  {[type]} examName      [description]
+ * @return {[type]}               {name: xxx, papers: xxx, classes: xxx}
+ */
+function getAuthExamInfo(authRankCache, examName, papers) {
+    var authPaperIds = _.keys(authRankCache);
+    var examPapers = [];
+    _.each(authPaperIds, (paperId) => {
+        if(paperId == 'totalScore') return;
+        var targetPaper = _.find(papers, (paperObj) => paperObj._id.toString() == paperId+"");
+        examPapers.push({paper: targetPaper._id, pid: targetPaper.id, name: targetPaper.subject});
+    });
+    var tempAuthObjs = [], examClasses = [];
+    _.each(authRankCache, (obj, pid) => {
+        if(pid != 'totalScore') {
+            tempAuthObjs.push(_.keys(obj));
+        }
+    })
+    _.each(tempAuthObjs, (authArr) => {
+        examClasses = _.concat(examClasses, authArr);
+    })
+    examClasses = _.uniq(examClasses);
     return {
-        gradeMean: scoreMean,
-        top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
+        name: examName,
+        papers: examPapers,
+        classes: examClasses
     };
 }
 
 /**
- * 怎么定义的？？？本来想是req.user--但是不对，应为当前登录应该为教师等级的。。。
- * @return {[type]} [description]
+ * 对examInfo进行字段格式化
+ * @param  {[type]} exam [description]
+ * @return {[type]}      [description]
  */
-// TODO: 暂时注释
-// function getStudentSelfReport(examScoreArr, examScoreMap) {
-//     // return { todo: '待定'};
-//     // 所有学生：
-//         //[{name: , score: scoolRanking: , classRanking: , subject: }, <name>]
-//     var top20Students = _.reverse(_.takeRight(examScoreArr, 20));
-//     var topStudent = top20Students[0];
-//     var restStudents = _.slice(top20Students, 1);
-//     return getStudentInfo(topStudent.id).then(function(student) {
-//         //TODO: 在这里拼接第一个学生的相关数据
-//     })
-// }
-
-
-// function getStudentInfo(studentId) {
-//     return when.promise(function(resolve, reject) {
-//         peterHFS.get('@Student' + studentId, function(err, student) {
-//             if(err) return reject(new errors.data.MongoDBError('find single student error : ', err));
-//             resolve(student);
-//         });
-//     });
-// }
-
-
-
-exports.schoolAnalysis = function(req, res, next) {
-    var exam = req.exam,
-        examScoreMap = req.classScoreMap,
-        examScoreArr = req.orderedScoresArr;
-    try {
-        req.examInfo = formatExamInfo(exam);
-        req.examPapersInfo = generateExamPapersInfo(exam);
-        req.examClassesInfo = genearteExamClassInfo(exam);
-    } catch (e) {
-        next(new errors.Error('schoolAnalysis 同步错误', e));
-    }
-    generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo).then(function(examStudentsInfo) {
-        res.status(200).json({
-            examInfo: req.examInfo,
-            examPapersInfo: req.examPapersInfo,
-            examClassesInfo: req.examClassesInfo,
-            examStudentsInfo: examStudentsInfo
-        });
-    }).catch(function(err) {
-        next(new errors.Error('schoolAnalysis Error', err));
-    });
-}
-
-
-/*
-
-examInfo:
-{
-    name:
-    gradeName:
-    startTime:
-    realClasses:
-    lostClasses:
-    realStudentsCount:
-    lostStudentsCount:
-    subjects:
-    fullMark:
-
-}
-
-examStudentsInfo
-[
-    {
-        id:
-        name:
-        class:
-        score:
-        papers: [
-            {paperid: , score: }
-        ]
-    },
-    ...
-]
-
-examPapersInfo
-{
-    <pid>: {
-        id:
-        paper:
-        subject:
-        fullMark:
-        realClasses:
-        lostClasses:
-        realStudentsCount:
-        lostStudentsCount:
-        class: {
-            <className>: <此科目此班级参加考试的人数>
-        }
-    },
-    ...
-}
-
-examClassesInfo : 班级的整个exam的参加考试人数没有太大的意义（特别是对于统计计算，因为肯定是走哪个科目的这个班级的参加考试人数--这个在papersInfo的class中有）
-{
-    <className>: {
-        name:
-        students:
-        realStudentsCount:
-        losstStudentsCount:
-    }
-}
-
- */
-
-
-exports.customSchoolAnalysis = function(req, res, next) {
-    console.log('customSchoolAnalysis');
-
-    req.checkQuery('examid', '无效的examids').notEmpty();
-    if(req.validationErrors()) return next(req.validationErrors());
-
-    peterFX.get(req.query.examid, {isValid: true}, function(err, exam) {
-        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
-        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
-
-        try {
-            var examInfo = makeExamInfo(exam.info);
-            var examStudentsInfo = makeExamStudentsInfo(exam['[studentsInfo]']);
-            var examPapersInfo = makeExamPapersInfo(exam['[papersInfo]']);
-            var examClassesInfo = makeExamClassesInfo(exam['[classesInfo]']);
-            res.status(200).json({
-                examInfo: examInfo,
-                examStudentsInfo: examStudentsInfo,
-                examPapersInfo: examPapersInfo,
-                examClassesInfo: examClassesInfo
-            });
-        } catch(e) {
-            next(new errors.Error('server format custom analysis error: ', e));
-        }
-    });
-}
-
-function makeExamInfo(examInfo) {
-    var result = _.pick(examInfo, ['name', 'gradeName', 'startTime', 'realStudentsCount', 'lostStudentsCount', 'fullMark']);
-    result.realClasses = examInfo['[realClasses]'];
-    result.lostClasses = examInfo['[lostClasses]'];
-    result.subjects = examInfo['[subjects]'];
-    return result;
-}
-
-function makeExamStudentsInfo(examStudentsInfo) {
-    var result = _.map(examStudentsInfo, (studentItem) => {
-        var studentObj = _.pick(studentItem, ['id', 'name', 'class', 'score', 'kaohao']);
-        studentObj.papers = studentItem['[papers]'];
-        return studentObj;
-    });
-    return result;
-}
-
-function makeExamPapersInfo(examPapersInfo) {
-    var examPapersInfoArr = _.map(examPapersInfo, (paperItem) => {
-        var paperObj = _.pick(paperItem, ['id', 'paper', 'subject', 'fullMark', 'realStudentsCount', 'lostStudentsCount']);
-        paperObj = _.assign(paperObj, { realClasses: paperItem['[realClasses]'], lostClasses: paperItem['[lostClasses]']});
-        var classCountsMap = {};
-        _.each(paperItem['[class]'], (classCountItem) => {
-            classCountsMap[classCountItem.name] = classCountItem.count;
-        });
-        paperObj.class = classCountsMap;
-        return paperObj;
-    });
-    return _.keyBy(examPapersInfoArr, 'id');
-}
-
-function makeExamClassesInfo(examClassesInfo) {
-    var examClassesInfoArr = _.map(examClassesInfo, (classItem) => {
-        var classObj = _.pick(classItem, ['name', 'realStudentsCount', 'lostStudentsCount']);
-        classObj.students = classItem['[students]'];
-        return classObj;
-    });
-    return _.keyBy(examClassesInfoArr, 'name');
-}
-
-
-
-exports.createCustomAnalysis = function(req, res, next) {
-    if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
-
-    var postData = req.body.data;
-    postData.owner = req.user.id;
-
-    peterFX.create('@Exam', req.body.data, function(err, result) {
-        if(err) return next(new errors.data.MongoDBError('创建自定义分析错误', err));
-
-        res.status(200).json({examId: result});
-    });
-}
-
-//注意：(TODO：)destroy方法好像不能用
-// exports.deleteCustomAnalysis = function(req, res, next) {
-//     req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
-//     if(req.validationErrors()) return next(req.validationErrors());
-
-//     peterFX.destroy(req.body.examId, function(err, result) {
-//         if(err) return next(new errors.data.MongoDBError('删除自定义分析错误', err));
-//         console.log('删除的result = ', result);
-//         res.status(200).send('ok');
-//     })
-// }
-
-exports.inValidCustomAnalysis = function(req, res, next) {
-    req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
-    if(req.validationErrors()) return next(req.validationErrors());
-
-    peterFX.set(req.body.examId, {isValid: false}, function(err, result) {
-        if(err) return next(new errors.data.MongoDBError('更新自定义分析错误', err));
-        res.status(200).send('ok');
-    })
-}
-
-
 function formatExamInfo(exam) {
     var examInfo = _.pick(exam, ['name', 'realStudentsCount', 'lostStudentsCount', 'realClasses', 'lostClasses', 'fullMark']);
     examInfo.gradeName = exam.grade.name;
@@ -945,62 +967,11 @@ function formatExamInfo(exam) {
     return examInfo;
 }
 
-function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo) {
-    //在examScoreArr的每个对象中添加papers属性信息: 一个数组，里面就是{id: <pid>, score: <分数>}
-    //req.exam['[papers]'] item.paper
-    return generateStudentsPaperInfo(exam, examClassesInfo).then(function(studentsPaperInfo) {
-        //遍历examScoreArr是为了保证有序
-        _.each(examScoreArr, (scoreObj) => {
-            scoreObj.papers = studentsPaperInfo[scoreObj.id]; //注意，这里id是短id...
-        });
-        return when.resolve(examScoreArr);
-    });
-}
-
-//如果某些班级没有参加某场paper，那么此班级里的所有学生的papers属性就会缺少对应的pid对象
-/*
-studentsPaperInfo:
-{
-    <student._id>: [
-        {
-           paperid:
-           score:
-        },
-        ...
-    ]
-}
-
+/**
+ * 生成examPapersInfo
+ * @param  {[type]} exam [description]
+ * @return {[type]}      [description]
  */
-function generateStudentsPaperInfo(exam, examClassesInfo) {
-    //拿到所有exam['[papers]']的paper实例
-    var studentsPaperInfo = {};
-    var targetPaperIds = _.map(exam['[papers]'], (paperItem) => paperItem.id);
-    //对每一个paper实例建立<studentId>:<paperScore>的Map。或者也可以通过查询Student实例来得到每个学生的papers信息，但是那样的话查询的压力就大了许多，但是
-    //studnet.id上有索引。。。这个时间对比就不好评估了，先使用查询看看性能如何。。。
-    //方法一：直接使用@Student表中已经计算好的各科的成绩，但需要过滤属于此场考试的papers才是有效的papers。使用$in操作符，或者getMany，不知道那个性能好一些
-    //
-
-    var studentIds = _.map(_.concat(..._.map(exam.realClasses, (className) => examClassesInfo[className].students)), (sid) => '@Student.' + sid); //当前年级的所有参考班级的所有学生（可能会包含缺考学生，但是这样的学生其papers的length就是0了，所以也没有问题）
-    return when.promise(function(resolve, reject) {
-        peterHFS.getMany(studentIds, {project: ['_id', '[papers]']}, function(err, students) {
-            if(err) return reject(new errors.data.MongoDBError('query students error : ', err));
-            //过滤student['papers']，建立Map
-            try {
-                _.each(students, (studentItem) => {
-                    var targetPapers = _.filter(studentItem['[papers]'], (paperItem) => _.includes(targetPaperIds, paperItem.paperid));
-                    targetPapers = _.map(targetPapers, (paperItem) => _.pick(paperItem, ['paperid', 'score', 'class_name']));
-                    var studentId = studentItem._id.toString();
-                    studentId = studentId.slice(_.findIndex(studentId, (c) => c !== '0'));
-                    studentsPaperInfo[studentId] = targetPapers;
-                });
-                resolve(studentsPaperInfo);
-            } catch (e) {
-                reject(new errors.Error('generateStudentsPaperInfo error : ', e));
-            }
-        });
-    });
-}
-
 function generateExamPapersInfo(exam) {
     var examPapersInfo = {};
     _.each(exam['[papers]'], (paperItem) => {
@@ -1017,13 +988,18 @@ function generateExamPapersInfo(exam) {
             paperClass[className] = classScores.length;
         });
         obj.classes = paperClass;
-        examPapersInfo[paperItem.id] = obj; //这里选用id而不是paper是因为studentInfo中paper的成绩的id是paper.id而不是objectId
+        //Note: 这里选用id而不是paper是因为studentInfo中paper的成绩的id是paper.id而不是objectId
+        examPapersInfo[paperItem.id] = obj;
     });
 
     return examPapersInfo;
 }
 
-
+/**
+ * 生成examClassesInfo
+ * @param  {[type]} exam [description]
+ * @return {[type]}      [description]
+ */
 function genearteExamClassInfo(exam) {
     var examClassesInfo = {};
     _.each(exam.grade['[classes]'], (classItem) => {
@@ -1035,339 +1011,199 @@ function genearteExamClassInfo(exam) {
     return examClassesInfo;
 }
 
+/**
+ * 在examScoreArr的每个对象中添加papers属性信息: 一个数组，里面就是{id: <pid>, score: <分数>}
+ * @param  {[type]} exam            [description]
+ * @param  {[type]} examScoreArr    [description]
+ * @param  {[type]} examClassesInfo [description]
+ * @return {[type]}                 [description]
+ */
 
-// function oldHome(req, res, next) {
-//     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
-//         return examUitls.getExamsBySchool(school);
-//     }).then(function(exams) {
-//         try {
-//             exams = _.filter(exams, (examObj) => examObj['[papers]'].length > 0);
-//             var formatedExams = formatExams(exams);
-//             return when.resolve(formatedExams);
-//         } catch(e) {
-//             return when.reject(new errors.Error('格式化exams错误'));
-//         }
-//     }).then(function(formatedExams) {
-//         res.status(200).send(formatedExams);
-//     }).catch(function(err) {
-//         next(err);
-//     })
-// }
+function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo) {
+    return generateStudentsPaperInfo(exam).then(function(studentsPaperInfo) {
+        //遍历examScoreArr是为了保证有序
+        _.each(examScoreArr, (scoreObj) => {
+            scoreObj.papers = studentsPaperInfo[scoreObj.id];
+        });
+        return when.resolve(examScoreArr);
+    });
+}
 
 
-//方法二：
-// return getPapersInfo(exam).then(function(papers) {
-//     // '[students]'  matrix 使用这个去拼凑每个学生各科成绩
+function generateStudentsPaperInfo(exam) {
+    //1.通过exam['[papers]']获取到各个paper的具体实例
+    //2.收集各个科目每个学生的成绩，打散组成perStudentPerPaper数组--这里好像没必要构成
+    //totalScore。
+    //3.构成 studentsPaperInfo
+    return getPaperInstanceByExam(exam).then(function(papers) {
+        var perStudentPerPaperArr = _.concat(..._.map(papers, (paper) => {
+            return _.map(paper['[students]'], (student, index) => {
+                // studentId: xxx, class_name: xxx, paperid: xxx, score: xxx
+                //注意：student.id是个什么样的id？后面studentsPaperInfo的key是
+                //student的短id
+                return {id: student.id, class_name: student.class, paperid: paper.id, score: student.score};
+            });
+        }));
+        var studentsPaperInfo = _.groupBy(perStudentPerPaperArr, 'id');
+        return when.resolve(studentsPaperInfo);
+    });
+}
 
-// })
-//顺带生成examPapersInfo
+function getPaperInstanceByExam(exam) {
+    var papersPromise = _.map(exam['[papers]'], (paperObj) => {
+        return when.promise(function(resolve, reject) {
+            peterHFS.get(paperObj.paper, function(err, paper) {
+                if(err) return reject(new errors.Data.MongDBError('find paper: ' + paperId + '  Error', err));
+                resolve(paper);
+            });
+        });
+    });
+    return when.all(papersPromise);
+}
 
-// function getPapersInfo(exam) {
-//     var papersPromise = _.map(exam['[papers]'], (paperDoc) => {
-//         return getPaperPromise(paperDoc.paper);
+
+
+/**
+ * 构造examInfo
+ * @param  {[type]} examInfo [description]
+ * @return {[type]}          [description]
+ */
+function makeExamInfo(examInfo) {
+    var result = _.pick(examInfo, ['name', 'gradeName', 'startTime', 'realStudentsCount', 'lostStudentsCount', 'fullMark']);
+    result.realClasses = examInfo['[realClasses]'];
+    result.lostClasses = examInfo['[lostClasses]'];
+    result.subjects = examInfo['[subjects]'];
+    return result;
+}
+
+/**
+ * 构造examStudentsInfo
+ * @param  {[type]} examStudentsInfo [description]
+ * @return {[type]}                  [description]
+ */
+function makeExamStudentsInfo(examStudentsInfo) {
+    var result = _.map(examStudentsInfo, (studentItem) => {
+        var studentObj = _.pick(studentItem, ['id', 'name', 'class', 'score', 'kaohao']);
+        studentObj.papers = studentItem['[papers]'];
+        return studentObj;
+    });
+    return result;
+}
+
+/**
+ * 构造examPapersInfo
+ * @param  {[type]} examPapersInfo [description]
+ * @return {[type]}                [description]
+ */
+function makeExamPapersInfo(examPapersInfo) {
+    var examPapersInfoArr = _.map(examPapersInfo, (paperItem) => {
+        var paperObj = _.pick(paperItem, ['id', 'paper', 'subject', 'fullMark', 'realStudentsCount', 'lostStudentsCount']);
+        paperObj = _.assign(paperObj, { realClasses: paperItem['[realClasses]'], lostClasses: paperItem['[lostClasses]']});
+        var classCountsMap = {};
+        _.each(paperItem['[class]'], (classCountItem) => {
+            classCountsMap[classCountItem.name] = classCountItem.count;
+        });
+        paperObj.class = classCountsMap;
+        return paperObj;
+    });
+    return _.keyBy(examPapersInfoArr, 'id');
+}
+
+/**
+ * 构造examClassesInfo
+ * @param  {[type]} examClassesInfo [description]
+ * @return {[type]}                 [description]
+ */
+function makeExamClassesInfo(examClassesInfo) {
+    var examClassesInfoArr = _.map(examClassesInfo, (classItem) => {
+        var classObj = _.pick(classItem, ['name', 'realStudentsCount', 'lostStudentsCount']);
+        classObj.students = classItem['[students]'];
+        return classObj;
+    });
+    return _.keyBy(examClassesInfoArr, 'name');
+}
+
+
+
+
+//Note: (方案一) -- 性能不work
+// function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo) {
+//     return generateStudentsPaperInfo(exam, examClassesInfo).then(function(studentsPaperInfo) {
+//         //遍历examScoreArr是为了保证有序
+//         _.each(examScoreArr, (scoreObj) => {
+//             scoreObj.papers = studentsPaperInfo[scoreObj.id];
+//         });
+//         return when.resolve(examScoreArr);
 //     });
-//     return when.all(papersPromise);
 // }
+//如果某些班级没有参加某场paper，那么此班级里的所有学生的papers属性就会缺少对应的pid对象
+ /**
+  * 获取每个学生各个科目的相关考试信息
+  * @param  {[type]} exam            [description]
+  * @param  {[type]} examClassesInfo [description]
+  * @return {[type]}
+{
+    <student._id>: [
+        {
+           paperid:
+           score:
+        },
+        ...
+    ],
+    ...
+}
 
-// function getPaperPromise(paperId) {
+  */
+// function generateStudentsPaperInfo(exam, examClassesInfo) {
+//     var studentsPaperInfo = {};
+//     var targetPaperIds = _.map(exam['[papers]'], (paperItem) => paperItem.id);
+//     //Note: 当前参加此场exam考试的所有学生。因为是面向所有exam，但有可能有些学生考了某科目而有些没有考，甚至会包含缺考的考生--因为
+//     //走的是班级人数--但只会让这些学生的papers相应的缺少对应的paper而已。
+//     var studentIds = _.map(_.concat(..._.map(exam.realClasses, (className) => examClassesInfo[className].students)), (sid) => '@Student.' + sid);
 //     return when.promise(function(resolve, reject) {
-//         peterHFS.get(paperId, function(err, paper) {
-//             if(err) return reject(new errors.Data.MongDBError('find paper: ' + paperId + '  Error', err));
-//             resolve(paper);
-//         });
-//     });
-// }
-
-
-
-//返回排好序的，学生考试信息。主要是对orderedScoresArr中的每一个对象添加papers属性
-//考虑是否是需要同时生成examPapersInfo和examClassesInfo以及examInfo
-// function generateDataExamInfo(exam) {
-//     //examInfo
-
-// }
-
-
-
-// /**
-//  * 建立后面所需要的各种元数据（来自DB）
-//  * @param  {[type]}   req  [description]
-//  * @param  {[type]}   res  [description]
-//  * @param  {Function} next [description]
-//  * @return {[type]}        [description]
-//  */
-// exports.initExam = function(req, res, next) {
-//     res.result = {};
-//     examUitls.getExamById(req.query.examid).then(function(exam) {
-//         req.exam = exam;
-//         return examUitls.getAllPapersByExam(exam);
-//     }).then(function(papers) {
-//         req.papers = papers;
-//         return examUitls.getSchoolById(req.exam.schoolId);
-//     }).then(function(school) {
-//         req.school = school;
-//         next();
-//     }).catch(function(err) {
-//         next(err);
-//     })
-// }
-
-// exports.initExamTotalScore = function(req, res, next) {
-// // console.log('initExamTotalScore ....');
-// //要所有学生的top6，那么可以只取每一个班级的top6，这样从这些top6中获取总的top6
-//     return examUitls.getScoresByExamid(req.query.examid).then(function(allTotalScoreGroupByClssName) {
-//         try {
-//             var result = scoreFilter(allTotalScoreGroupByClssName);
-//             req.scoreRank = result.scoreRank;
-//             req.levelReport = result.levelReport;
-//             next();
-//         } catch(e) {
-//             return when.reject(new errors.Error('initExamTotalScore Format Error', e));
-//         }
-//     }).catch(function(err) {
-//         next(err);
-//     })
-// }
-
-// function scoreFilter(totalScoreGroup) {
-//     var orderedScores = _.chain(totalScoreGroup)
-//         .map((scores) => _.take(scores, 6))
-//         .value()
-//     ;
-//     orderedScores = _.orderBy(_.concat(...orderedScores), ['score'], ['desc']);
-
-//     var scoreRank = {
-//         top: _.take(orderedScores, 6),
-//         low: _.takeRight(orderedScores, 6)
-//     };
-
-//     var totalCount = orderedScores.length;
-//     var firstValues = _.filter(orderedScores, (obj) => obj.score>600);
-//     var secondValues = _.filter(orderedScores, (obj) => obj.score>520);
-//     var thirdValues = _.filter(orderedScores, (obj) => obj.score>480);
-
-//     var levelReport = {
-//         'first': {flag: 600, percentage:_.round(_.multiply(_.divide(firstValues.length, totalCount), 100), 1), count: firstValues.length},
-//         'second': {flag: 520, percentage: _.round(_.multiply(_.divide(secondValues.length, totalCount), 100), 1), count: secondValues.length},
-//         'third': {flag: 480, percentage: _.round(_.multiply(_.divide(thirdValues.length, totalCount), 100), 1), count: thirdValues.length}
-//     };
-
-//     return {
-//         scoreRank: scoreRank,
-//         levelReport: levelReport
-//     }
-// }
-
-
-
-/**
- * 返回SchoolAnalysis的基本数据结构。不同于Home和Dashboard，因为schoolAnalysis有许多交互改变条件从而改变展示数据的场景，所以
- * 没有直接返回格式化程度高的数据格式
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
- * @return {[type]}        [description]
- */
-
-
-
-/**
- * 对所给学校所发生的所有exam进行分组排序
- * @param  {[type]} exams  此学校所发生过的所有exam
- * @return {[type]}        按照exam发生时间分组并且排序好的，组内部按照exam发生时间进行排序好的数组
- * @InterFaceFormat        [{timeKey: [{examName: xxx, eventTime: xxx, subjectCount: xx, fullMark: xxx, from: xxx}]}]，其中time字段只是为了排序用的
- */
-
-
-//两个获得的数据一样！！！
-exports.testLevel = function(req, res, next) {
-    var result = [];
-    examUitls.getScoresById(req.query.examid)
-        .then(function(scores) {
-            _.each(scores, function(value, className) {
-                result = _.concat(result, value);
-            });
-
-            var levelScore = _.groupBy(result, function(score, index) {
-                if (score >= 600) return 'first';
-                if (score >= 520) return 'second';
-                if (score >= 400) return 'third';
-                return 'other';
-            });
-            res.result.testlevel = {};
-            _.each(levelScore, function(value, key) {
-                res.result.testlevel[key] = value.length;
-            });
-            next();
-        }).catch(function(err) {
-            next(err);
-        })
-}
-
-
-
-/**
- * 获取当前用户所从属学校的信息--拿到此学校所发生的所有exam实例id，从而到@Exam中获取实例req.exams
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
- * @return {[type]}        [description]
- */
-// exports.initSchool = function(req, res, next) {
-//     examUitls.getSchoolById(req.user.schoolId)
-//         .then(function(school) {
-//             req.school = school;
-//             return examUitls.getExamsBySchool(req.school);
-//         }).then(function(exams) {
-//             req.exams = exams;
-//             next();
-//         }).catch(function(err) {
-//             next(err);
-//         })
-//     ;
-// }
-
-
-/*
-
-DST1:
-[
-    {
-        'a1': {name: 'hellmagic', score: 40, class: 'A2' },
-        totalScore: 40,
-        '123': {name: '语文', score: 50 }
-    },
-    {
-        'a2': {name: 'liucong', score: 70, class: 'A1' },
-        totalScore: 40,
-        '456': {name: '数学', score: 56 }
-    },
-    {
-        'a3': {name: 'liujuan', score: 40, class: 'A1' },
-        totalScore: 40,
-        '789': {name: '语文', score: 70 }
-    },
-    {
-        'a4': {name: 'wangrui', score: 80, class: 'A2' },
-        totalScore: 40,
-        '789': {name: '数学', score: 35 },
-    },
-    {
-        'a3': {name: '哈哈', score: 1000, class: 'A2' },
-        totalScore: 40,
-        '789': 70,
-        '456': 60,
-        '098': 80,
-    }
-]
-
-DST2：
-{
-    <paperId> : {name: '', fullMark: 100}
-}
-
-DST3:
-About Class
-{
-    'A1': {studentsCount: 100},
-    'A2': {studentsCount: 120}
-}
-
-
-
-
- */
-
-/*
-总分趋势：
-    当前有所有学生的
-
-
-
-
-
- */
-
-
-
-//     req.checkQuery('examid', '无效的examids').notEmpty();
-//     if(req.validationErrors()) return next(req.validationErrors());
-
-//     //因为本身就是对一场考试的分析，所以就只接收一个examid（本身rank-server接收多个examid，所以是examids）
-//     if(req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err))
-
-//     var url = config.rankBaseUrl + examPath + '?' + 'examids=' + req.query.examid;
-//     var result = {
-//         subjectCount: 0,
-//         totalProblemCount: 0,
-//         classCount: 0,
-//         totalStudentCount: 0
-//     };
-//     //因为支持一次查询多场exam，所以req.query,examids是复数--多个examid通过逗号隔开，返回的结果是个Map，其中key是examid，value是exam
-//     //实体。
-//     when.promise(function(resolve, reject) {
-//         client.get(url, {}, function(err, res, body) {
-//             if(err) return reject(new errors.URIError('查询rank server失败', err));
-//             resolve(JSON.parse(body)[req.query.examid]);
-//         })
-//     }).then(function(data) {
-//         //data是一个以examid为key，exam实例为vlaue的Map
-//         // console.log('data.name = ', data.name);
-//         result.subjectCount = data["[papers]"] ? data["[papers]"].length : 0;
-
-// console.log('data["[papers]"].length = ', data["[papers]"].length);
-
-//         var findPapersPromises = _.map(data["[papers]"], function(pobj) {
-//             return when.promise(function(resolve, reject) {
-
-// console.log('paper = ', pobj.paper);
-
-//                 peterHFS.get(pobj.paper, function(err, paper) {
-//                     if(err) return reject(new errors.data.MongoDBError('find paper:'+pid+' error', err));
-//                     resolve(paper);
+//         peterHFS.getMany(studentIds, {project: ['_id', '[papers]']}, function(err, students) {
+//             if(err) return reject(new errors.data.MongoDBError('query students error : ', err));
+//             try {
+//                 _.each(students, (studentItem) => {
+//                     //Note: 必要的过滤--保证只有同属于一个年级的科目被添加进来--其他的服务接口都不能（或直接方便地）达到这个目的
+//                     var targetPapers = _.filter(studentItem['[papers]'], (paperItem) => _.includes(targetPaperIds, paperItem.paperid));
+//                     targetPapers = _.map(targetPapers, (paperItem) => _.pick(paperItem, ['paperid', 'score', 'class_name']));
+//                     var studentId = studentItem._id.toString();
+//                     studentId = studentId.slice(_.findIndex(studentId, (c) => c !== '0'));
+//                     studentsPaperInfo[studentId] = targetPapers;
 //                 });
-//             });
+//                 resolve(studentsPaperInfo);
+//             } catch (e) {
+//                 reject(new errors.Error('generateStudentsPaperInfo error : ', e));
+//             }
 //         });
-//         return when.all(findPapersPromises);
-//     }).then(function(papers) {
-
-//         res.status(200).send('ok');
-//     })
-//     .catch(function(err) {
-//         next(err);
 //     });
+// }
 
-    // var result = {
-    //     totalProblemCount: 0,
-    //     totalStudentCount: 0
-    // };
-    // result.subjectCount = req.exam.papers ? req.exam.papers.length : 0;
-    // var findPapersPromises = _.map(req.exam.papers, function(pid) {
-    //     return when.promise(function(resolve, reject) {
-    //         peterHFS.find(pid, function(err, paper) {
-    //             if(err) return reject(new errors.data.MongoDBError('find paper:'+pid+' error', err));
-    //             resolve(paper);
-    //         });
-    //     });
-    // });
-    // //这里有遍历查找
-    // when.all(findPapersPromises).then(function(papers) {
-    //     var examStduentIds = [];
-    //     _.each(papers, function(paper) {
-    //         result.totalProblemCount += (paper.questions ? paper.questions.length : 0);
-    //         //总学生数目：参加各个考试的学生的并集 （缺考人数：班级里所有学生人数-参加此场考试的学生人数）
-    //         // result.totalStudentCount += (paper.students ? paper.students.length || 0);
-    //         var paperStudentIds = _.map(paper.students, function(student) {
-    //             return student._id;
-    //         });
-    //         examStduentIds = _.union(examStduentIds, paperStudentIds);
-    //     });
-    //     result.totalStudentCount = examStduentIds.length; //这里拿到了参加此场考试(exam)的所有学生id
-    //     return examUitls.getExamClass();
-    // }).then(function(classCount) {
-    //     result.classCount = classCount;
-    //     res.status(200).json(result);
-    // })
-    // .catch(function(err) {
-    //     next(err);
-    // });
+//===============================================================================================================
+
+/**
+ * TODO: 关于Dashboard中学生个人报告模块API
+ * 怎么定义的？？？本来想是req.user--但是不对，应为当前登录应该为教师等级的。。。
+ * @return {[type]} [description]
+ */
+// function getStudentSelfReport(examScoreArr, examScoreMap) {
+//     // return { todo: '待定'};
+//     // 所有学生：
+//         //[{name: , score: scoolRanking: , classRanking: , subject: }, <name>]
+//     var top20Students = _.reverse(_.takeRight(examScoreArr, 20));
+//     var topStudent = top20Students[0];
+//     var restStudents = _.slice(top20Students, 1);
+//     return getStudentInfo(topStudent.id).then(function(student) {
+//         //TODO: 在这里拼接第一个学生的相关数据
+//     })
+// }
+
+// function getStudentInfo(studentId) {
+//     return when.promise(function(resolve, reject) {
+//         peterHFS.get('@Student' + studentId, function(err, student) {
+//             if(err) return reject(new errors.data.MongoDBError('find single student error : ', err));
+//             resolve(student);
+//         });
+//     });
+// }

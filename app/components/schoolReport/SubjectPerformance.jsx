@@ -5,7 +5,7 @@ import _ from 'lodash';
 
 import Table from '../../common/Table';
 
-import {makeSegmentsStudentsCount} from '../../api/exam';
+import {makeSegmentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
@@ -276,11 +276,12 @@ class SubjectPerformance extends React.Component {
         //TODO：很明显，levelPercentages不影响 subjectExamTable，只会影响subjectLevelExamTable，所以最后还是抽出去
         var subjectExamTableData = theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers);
         var subjectLevelExamTableData = theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, this.state.levelPcentages);
-        var disData = theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap);
-        var subjects=[];
-        for(let i=0;i<disData.length;i++){
-          subjects.push(disData[i].subject);
-        }
+        // var disData = theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap);
+        var {subjects, factors} = theSubjectExamFactorChartData(examPapersInfo, allStudentsPaperMap, headers);
+        // var subjects=[];
+        // for(let i=0;i<disData.length;i++){
+        //   subjects.push(disData[i].subject);
+        // }
 
 //自定义Moudle数据结构：
 
@@ -325,13 +326,14 @@ legend:{
   enabled:false
 },
 series: [{
-    data: [49.9, 71.5]
+    data: factors
 }]
 };
-        var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
+        // var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
+
         // 表格表头的鼠标悬停提示
         var tipConfig = {'标准差': {content: '反映了学生分数的分布离散程度，值越大表示个体之间的分数分布的离散程度越大，反之，值越小表示个体之间的分数分布的离散程度越小；', direction: 'bottom'}, '差异系数': {content: '标准差与平均分之比，表示不同样本的相对离散程度。值越大表示相对离散程度越大，反之，值越小表示相对离散程度越小；', direction: 'bottom'}};
-        return (    
+        return (
             <div id='subjectPerformance' className={schoolReportStyles['section']}>
                 <div style={{ marginBottom: 30 }}>
                     <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
@@ -416,7 +418,7 @@ function theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, 
         var segments = makeSubjectLevelSegments(paperObj.fullMark, levelPcentages);
         //这应该是当前科目的区分段的count--而不是总分（且一定不包含总分）
         //获取此科目下所有学生的成绩
-        var result = makeSegmentsStudentsCount(allStudentsPaperMap[paperObj.id], segments); //注意：低分档次的人数在前
+        var result = makeSegmentsCount(allStudentsPaperMap[paperObj.id], segments); //注意：低分档次的人数在前
 
         result = _.map(_.reverse(result), (count) => {
             var percentage = _.round(_.multiply(_.divide(count, paperObj.realStudentsCount), 100), 2);
@@ -428,6 +430,41 @@ function theSubjectLevelExamTable(examPapersInfo, allStudentsPaperMap, headers, 
 
     return matrix;
 }
+
+
+function theSubjectExamFactorChartData(examPapersInfo, allStudentsPaperMap, headers) {
+//TODO: PM--给出具体的规则。第三个文案可以写写其他简单的
+//第二个算法：各个学科各个班级的平均得分率，然后max-min，然后从中选出哪几个学科的差值较大或较小
+    //班级考试基本表现中有关于 各个班级各个学科平均得分率的数据结构，可以拿来用！！！
+
+    //各个学科
+        //各个班级的平均得分率
+    var result = _.map(allStudentsPaperMap, (papers, pid) => {
+        var classFactors = _.map(_.groupBy(papers, 'class_name'), (classPapers, className) => {
+            var theMean = _.mean(_.map(classPapers, (paperObj) => paperObj.score));
+            var theFactor = _.round(_.divide(theMean, examPapersInfo[pid].fullMark), 2);
+            return theFactor;
+        });
+        return {pid: pid, subject: examPapersInfo[pid].subject, factor: (_.max(classFactors) - _.min(classFactors))};
+    });
+
+//Note：数据要和科目的顺序对应
+    var subjects = [], factors = [];
+    _.each(headers, (headerObj) => {
+        var target = _.find(result, (obj) => obj.pid == headerObj.id);
+        if(target) {
+            subjects.push(target.subject);
+            factors.push(target.factor);
+        }
+    });
+    return { subjects: subjects, factors: factors };
+
+
+//不再需要排序
+    // var sortedResult = _.sortBy(result, 'factor');
+    // return sortedResult;
+}
+
 
 function theSubjectExamDiscription(examPapersInfo, allStudentsPaperMap) {
 //TODO: PM--给出具体的规则。第三个文案可以写写其他简单的

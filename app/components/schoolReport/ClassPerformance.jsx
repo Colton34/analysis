@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Table from '../../common/Table';
 import DropdownList from '../../common/DropdownList';
 
-import {makeSegments, makeFactor, makeSegmentsStudentsCount} from '../../api/exam';
+import {makeSegments, makeFactor, makeSegmentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
@@ -107,11 +107,11 @@ const AverageTable = ({tableHeaderData, tableData}) => {
     }
     // 根据数值返回要显示的颜色,传给TableView组件
     colorCallback(value) {
-        if (!_.isNumber(value) || isNaN(value)) 
+        if (!_.isNumber(value) || isNaN(value))
             return colorsMap.C11;
         if (value < 0) {
             return colorsMap.B08;
-        } 
+        }
         return colorsMap.C11;
     }
     render() {
@@ -196,12 +196,12 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                 {/* 线图 + 高分多寡班级 */}
                 <div style={{display: 'inline-block', width: 875, height: 380, position: 'relative'}}>
                     <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
-                    <span style={{position: 'absolute', top: 0, right: 0}}>
-                        <span style={{display: 'table-cell', paddingRight: 10}}>对比对象</span>
-                        <span style={{display: 'table-cell'}}><DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true}/></span>
+                    <span style={{position: 'absolute', top: -22, right: 0}}>
+                        <span style={{display: 'table-cell', paddingRight: 10}}>对比对象<span style={{fontSize: 12, color: colorsMap.C07}}>（最多选择5个）</span>:</span>
+                        <span style={{display: 'table-cell'}}><DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true} multiChoiceNum={5}/></span>
                     </span>
                 </div>
-                <div style={{display: 'inline-block', width: 215, float: 'right'}}>
+                <div style={{display: 'inline-block', width: 215, float: 'right', marginTop: 10}}>
                     <div style={{ display: 'table-row'}}>
                         <div style={{ width: 215, height: 110, border: '1px solid ' + C07, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center' }}>
                             <p style={{ fontSize: 12, marginBottom: 10 }}>高分学生较多的班级</p>
@@ -288,7 +288,7 @@ function theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, currentC
 //只有班级没有全校！！！
     var yAxonses = _.map(currentClasses, (classItem) => {
         var students = examStudentsGroupByClass[classItem.key];
-        var yAxons = makeSegmentsStudentsCount(students, segments);
+        var yAxons = makeSegmentsCount(students, segments);
         return {
             name: classItem.value,
             data: yAxons

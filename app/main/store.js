@@ -5,8 +5,6 @@ import rootReducer from '../reducers';
 import promiseMiddleware from '../lib/promiseMiddleware';
 import createLogger from 'redux-logger';
 
-
-//TODO: 解决组件init之前需要异步数据的问题。。。
 export default function configureStore(initialState, history) {
     const middleware = [thunk, promiseMiddleware];
 
