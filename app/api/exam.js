@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-25 20:22:15
+* @Last Modified time: 2016-07-26 10:33:56
 */
 
 
@@ -43,10 +43,10 @@ var paperPath = '/papers';
 export function fetchHomeData(params) {
     var url = examPath + '/home';
 
-
     return params.request.get(url).then(function(res) {
         // console.log('res.data========');
         // console.log(res.data);
+        // return Promise.resolve([]);
         return Promise.resolve(res.data);
     })
 }

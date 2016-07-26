@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Link} from 'react-router';
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 
 import {initHomeAction} from '../../reducers/home/actions';
 import {initParams, saveAs} from '../../lib/util';
@@ -330,6 +330,12 @@ const Content = ({examList}) => {
     )
 }
 
+function HomeBlank({errorInfo}) {
+    return (
+        <h1>{errorInfo.msg}</h1>
+    )
+}
+
 class Home extends React.Component {
     static need = [
         initHomeAction
@@ -343,12 +349,21 @@ class Home extends React.Component {
 
     render() {
         var examList = (List.isList(this.props.home.examList)) ? this.props.home.examList.toJS() : this.props.home.examList;
-        if(!examList || examList.length == 0)
+        var errorInfo = (Map.isMap(this.props.home.errorInfo)) ? this.props.home.errorInfo.toJS() : this.props.home.errorInfo;
+        // if(!examList || examList.length == 0)
+        //     return (
+        //         <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
+        //             <HomeBlank message="exam.length == 0" />
+        //         </div>
+        //     );
+        if(errorInfo && errorInfo.msg) {
             return (
                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
-                    <Spinkit/>
+                    <HomeBlank errorInfo={errorInfo} />
                 </div>
             );
+        }
+
         return (
             <div >
                 <Content examList={examList}/>

@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-25 20:06:43
+* @Last Modified time: 2016-07-26 10:03:12
 */
 
 'use strict';
@@ -20,6 +20,8 @@ var jsonwebtoken = require("jsonwebtoken");
 var authUitls = require('./util');
 var config = require('../../config/env');
 var peterHFS = require('peter').getManager('hfs');
+
+var adminPrivilege = {grade: null, subject: null, group: null};
 
 /**
  * 登录的验证。验证的逻辑调用的是阅卷通用的登录接口--包含两部分：先尝试查找1.5，没有找到再
@@ -63,7 +65,7 @@ exports.authenticate = function(req, res, next) {
     }).then(function(auth) {
         var authInfo = getUserAuthInfo(auth);
         req.user.auth = authInfo;
-        var token = jsonwebtoken.sign({ user: user }, config.secret);
+        var token = jsonwebtoken.sign({ user: req.user }, config.secret);
         req.user.token = token;
         next();
     }).catch(function(err) {
