@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-26 13:49:51
+* @Last Modified time: 2016-07-26 17:40:50
 */
 
 'use strict';
@@ -167,7 +167,7 @@ exports.rankReport = function(req, res, next) {
     getExamWithGradePapers(req.query.examid, grade).then(function(result) {
         var papers = result.papers, examName = result.examName;
         var rankCache = getOriginalRankCache(papers);
-        var authRankCache = filterAuthRankCache(auth, rankCache, papers);
+        var authRankCache = filterAuthRankCache(auth, rankCache, papers, grade);
         var examInfo = getAuthExamInfo(authRankCache, examName, papers);
         res.status(200).json({
             examInfo: examInfo,
@@ -881,8 +881,8 @@ function getOriginalRankCache(papers) {
  * @param  {[type]} rankCache [description]
  * @return {[type]}           [description]
  */
-function filterAuthRankCache(auth, rankCache, papers) {
-    var authRankCache = {}, allPaperIds = _.keys(rankCache);
+function filterAuthRankCache(auth, rankCache, papers, grade) {
+    var authRankCache = {}, allPaperIds = _.keys(rankCache), authClasses = [];
     //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
     if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
         var gradeAuthObj = auth.gradeAuth[grade];
@@ -900,7 +900,10 @@ function filterAuthRankCache(auth, rankCache, papers) {
                 //Note: 如果当前authExistClasses还没有添加此班级的数据，并且此班级是有效的（即在原来的数据中能找到），则添加对应的班级数据到authRankCache中
                 if(!_.includes(authExistClasses, obj.group) && (_.includes(_.keys(rankCache[paperId]), obj.group))) {
                     if(!authRankCache[paperId]) authRankCache[paperId] = {};
+                    // if(!authRankCache.totalScore) authRankCache.totalScore = {};
                     authRankCache[paperId][obj.group] = rankCache[paperId][obj.group];
+                    authClasses.push(obj.group);
+                    // authRankCache.totalScore[obj.group] = rankCache.totalScore[obj.group];
                 }
             });
         });
@@ -910,6 +913,7 @@ function filterAuthRankCache(auth, rankCache, papers) {
             if(targetAuthPaper) {
                 if(!authRankCache[targetAuthPaper._id]) authRankCache[targetAuthPaper._id] = {};
                 authRankCache[targetAuthPaper._id][obj.group] = rankCache[targetAuthPaper._id][obj.group];
+                authClasses.push(obj.group);
             }
         });
     } else {
@@ -917,8 +921,13 @@ function filterAuthRankCache(auth, rankCache, papers) {
     }
 
     if(!authRankCache.totalScore) {
-        //Note: 如果没有totalScore，则添加进来：
-        authRankCache.totalScore = rankCache.totalScore;
+        //Note: 如果没有totalScore，则添加进来，但是也有走过滤班级
+        authClasses = _.uniq(authClasses);
+        authRankCache.totalScore = {};
+        _.each(authClasses, (className) => {
+            authRankCache.totalScore[className] = rankCache.totalScore[className];
+        })
+        // authRankCache.totalScore = rankCache.totalScore;
     }
     return authRankCache;
 }
