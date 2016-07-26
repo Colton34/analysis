@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-26 10:54:44
+* @Last Modified time: 2016-07-26 12:25:47
 */
 
 'use strict';
@@ -64,10 +64,14 @@ exports.home = function(req, res, next) {
         examScoreMap = req.classScoreMap,
         examScoreArr = req.orderedScoresArr;
 
+    var auth = req.user.auth;
+    var gradeAuth = req.user.gradeAuth;
+    var ifShowSchoolReport = (auth.isSchoolManager || (_.isBoolean(gradeAuth[exam.grade.name]) && gradeAuth[exam.grade.name]));
+
     try {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
-        var schoolReportResult = schoolReport(exam, examScoreArr);
+        var schoolReportResult = (ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
         // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
         // var classScoreReportResult = classScoreReport(examScoreArr, examScoreMap);
 
@@ -164,8 +168,8 @@ exports.rankReport = function(req, res, next) {
     getExamWithGradePapers(req.query.examid, grade).then(function(result) {
         var papers = result.papers, examName = result.examName;
         var rankCache = getOriginalRankCache(papers);
-        var authRankCache = filterAuthRankCache(auth, rankCache);
-        var examInfo = getAuthExamInfo(authRankCache);
+        var authRankCache = filterAuthRankCache(auth, rankCache, papers);
+        var examInfo = getAuthExamInfo(authRankCache, examName, papers);
         res.status(200).json({
             examInfo: examInfo,
             rankCache: authRankCache
@@ -878,7 +882,7 @@ function getOriginalRankCache(papers) {
  * @param  {[type]} rankCache [description]
  * @return {[type]}           [description]
  */
-function filterAuthRankCache(auth, rankCache) {
+function filterAuthRankCache(auth, rankCache, papers) {
     var authRankCache = {}, allPaperIds = _.keys(rankCache);
     //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
     if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
@@ -926,7 +930,7 @@ function filterAuthRankCache(auth, rankCache) {
  * @param  {[type]} examName      [description]
  * @return {[type]}               {name: xxx, papers: xxx, classes: xxx}
  */
-function getAuthExamInfo(authRankCache, examName) {
+function getAuthExamInfo(authRankCache, examName, papers) {
     var authPaperIds = _.keys(authRankCache);
     var examPapers = [];
     _.each(authPaperIds, (paperId) => {
