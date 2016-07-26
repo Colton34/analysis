@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-26 12:25:47
+* @Last Modified time: 2016-07-26 13:49:51
 */
 
 'use strict';
@@ -65,9 +65,8 @@ exports.home = function(req, res, next) {
         examScoreArr = req.orderedScoresArr;
 
     var auth = req.user.auth;
-    var gradeAuth = req.user.gradeAuth;
+    var gradeAuth = auth.gradeAuth;
     var ifShowSchoolReport = (auth.isSchoolManager || (_.isBoolean(gradeAuth[exam.grade.name]) && gradeAuth[exam.grade.name]));
-
     try {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
