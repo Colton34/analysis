@@ -5,8 +5,9 @@ import _ from 'lodash';
 
 import Table from '../../common/Table';
 
+import {makeSegmentsStudentsCount} from '../../api/exam';
 import {makeSegmentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, LETTER_MAP as letterMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
 import TableView from './TableView';
@@ -29,151 +30,164 @@ class Dialog extends React.Component {
         super(props);
         this.isValid = _.map(_.range(_.size(this.props.levelPcentages)), (index) => true);
         this.isUpdate = false;
+        var percentageLen = this.props.levelPcentages.length;
         this.state = {
-            grades: this.props.levelPcentages,
+            grades: this.props.levelPcentages.slice(1, percentageLen-1), //传入的数组的第一个和最后一个在此没有作用
             hasError: false,
-            errorMsg: ''
+            errorMsg: '',
+            invalidIndex: -1
         }
         var examFullMark = 0;
         _.forEach(this.props.examPapersInfo, paperInfo=>{examFullMark += paperInfo.fullMark})
         this.examFullMark = examFullMark;
     }
+    
     okClickHandler() {
+        if (this.state.hasError) {
+            return;
+        }
+        var isValid = true;
+        var {grades} = this.state;
+        var invalidIndex = -1;
+        for(let i = 0; i < grades.length; i++) {
+            if (isNaN(grades[i])) {
+                this.setState({
+                    hasError: true,
+                    errorMsg:  '等级百分比必须是数字',
+                    invalidIndex: i
+                })
+                return;
+            }
+        }
+        if (grades.length !== 1) {
+            isValid = _.every(_.range(grades.length - 1), index => {
+                var valid = grades[index] < grades[index + 1];
+                invalidIndex = valid ? -1 : index + 1;  
+                return valid;
+            })
+        }
+        if (!isValid) {
+             this.setState({
+                hasError: true,
+                errorMsg: '等级靠前百分比必须比靠后的高',
+                invalidIndex: invalidIndex
+            })
+            return;
+        }
+        // 前后补充0和100
+        var tmp = _.clone(this.state.grades);
+        tmp = [0].concat(tmp);
+        tmp.push(100);
+        this.props.updateGrades(tmp);
         this.props.onHide();
     }
-    handleMouseEnter(event) {
-        $(event.target).find('#deleteIcon').removeClass('hide');
-    }
-
-    handleMouseLeave(event) {
-        $(event.target).find('#deleteIcon').addClass('hide');
-    }
-
-    onAddGrade() {
-        var newGrades = this.state.grades;
-        newGrades.splice(1, 0, 1); //这里没有push 0， 是因为不能等于0，要大于0
-        this.isUpdate = true;
-        this.setState({
-            grades: newGrades
-        })
-    }
-
-    onDeleteGrade(index) { //其实传递item是不是更好，直接without或者其他方法都比较方便
-        var newGrades = this.state.grades;
-        var gradeLastIndex = newGrades.length - 1;
-        newGrades.splice(gradeLastIndex-index-1, 1);
-        this.isUpdate = true;
-        this.setState({
-            grades: newGrades
-        })
-    }
-
-    okClickHandler() {
-        //this.props.updateLevelPercentages(newLevelPercentages);
-
-        var formValid = _.every(this.isValid, (flag) => flag);
-        if(!formValid || this.state.hasError) {
-            console.log('表单验证不通过');
-            this.setState({
-                hasError: true,
-                errorMsg: '等级百分数输入有误'
-            })
-            return;
-        }
-
-        if(!this.isUpdate) {
-            console.log('表单没有更新');
-            this.setState({
-                hasError: true,
-                errorMsg: '等级设置未有改动'
-            })
-            return;
-        }
-        if (this.state.hasError) {
-            this.setState({
-                hasError: false,
-                errorMsg: ''
-            })
-        }
-        this.isUpdate = false;
-
-        this.props.updateGrades(this.state.grades);
-        this.props.onHide();
-    }
-
-    onInputBlur(index) {
-        var gradeLastIndex = this.state.grades.length - 1;
-        var value = parseInt(this.refs['grade-'+ index].value);
-        if (!(value && _.isNumber(value) && value >= 0)) {
-            console.log('所给百分比不是有效的数字');
-            this.isValid[index] = false;
-            this.setState({
-                hasError: true,
-                errorMsg: letterMap[index + ''] + '等设置的百分比不是有效数字'
-            })
-            return;
-        };  //可以添加isValid = true，即如果isValid是false压根就进不来，也可以！但是这样就没有重置
-        //的机会了。。。不可以~
-
-        var higherLevPer = this.state.grades[gradeLastIndex-index];
-        var lowerLevPer = this.state.grades[gradeLastIndex-index-2];
-
-        if(!((value < 100) && (!higherLevPer || (value < higherLevPer)) && (!lowerLevPer || (value > lowerLevPer)))) {
-            console.log('所给的百分比不符合规则');
-            this.isValid[index] = false;
-            this.setState({
-                hasError: true,
-                errorMsg: letterMap[index + ''] + '等设置的百分比较前一等级高或比后一等级低'
-            })
-            return;
-        }
-
-        // 检查当前input即可，点确定再检查其他的。
-        // var formValid = _.every(this.isValid, (flag) => flag);
-        // if(!formValid) {
-        //     console.log('表单验证不通过');
-        //     this.setState({
-        //         hasError: true,
-        //         errorMsg: '表单验证不通过'
-        //     })
-        //     return;
-        // }
-
-        // isValid字段复位
-        this.isValid[index] = true;
-        //如果value不变。。。那么也不更新
-        if(this.state.grades[gradeLastIndex-index-1] == value) return;
-
-        this.isUpdate = true;
-        var newGrades = this.state.grades;
-        newGrades[gradeLastIndex-index-1] = value;
-
-        if (this.state.hasError) {
-            this.setState({
-                hasError: false,
-                errorMsg: '',
-                grades: newGrades
-            })
-        } else {
-            this.setState({
-                grades: newGrades
-            });
-        }
-
-    }
-
     onHide() {
+        var percentageLen = this.props.levelPcentages.length;
         this.setState({
+            grades: this.props.levelPcentages.slice(1, percentageLen-1),
             hasError: false,
-            errorMsg: ''
+            errorMsg: '',
+            invalidIndex: -1
         })
         this.isUpdate = false;
         this.isValid = _.map(_.range(_.size(this.props.levelPcentages)), (index) => true);
         this.props.onHide();
     }
+
+    setGradeNum() {
+        var gradeNum = parseInt(this.refs['gradeNum'].value);
+        
+        if (isNaN(gradeNum)) {
+            this.setState({
+                hasError: true,
+                errorMsg: '输入等级数目错误'
+            })
+            $(this.refs.gradeNum).css({border: '2px solid ' + colorsMap.B08});
+            return;
+        } else if(gradeNum > 6){
+            this.setState({
+                hasError: true,
+                errorMsg: '输入等级数目不能大于6' //letterMap支持到6
+            })
+            $(this.refs.gradeNum).css({border: '2px solid ' + colorsMap.B08});
+            return;
+        }
+        var {grades} = this.state;
+        var gradesLen = grades.length;
+        if (gradeNum > gradesLen) {
+            grades = _.fill(Array(gradeNum - gradesLen), 1).concat(grades);
+            this.setState({
+                grades: grades,
+                hasError: false,
+                errorMsg: '',
+                invalidIndex: -1
+            })
+        } else if (gradeNum < gradesLen) {
+            this.setState({
+                grades: grades.slice(gradesLen-gradeNum, gradesLen), //grdes是倒序
+                hasError: false,
+                errorMsg: '',
+                invalidIndex: -1
+            })
+        } else if (gradeNum === gradesLen && this.state.hasError) {
+            this.setState({
+                hasError: false,
+                errorMsg: '',
+                invalidIndex: -1
+            })
+        }
+        $(this.refs.gradeNum).css({border: '1px solid ' + colorsMap.C05});
+    }
+
+    setGrade(ref) {
+        var value = parseInt(this.refs[ref].value);
+        var {grades} = this.state;
+        var index = parseInt(ref.split('-')[1]);
+        if (value === grades[index]) return;
+        grades[index] = this.refs[ref].value; //先置用户输入的值，如果错误方便显示
+        if (isNaN(value)) {
+            this.setState({
+                hasError: true,
+                errorMsg: '等级百分比必须是数字',
+                invalidIndex: index
+            })    
+            return;
+        }
+        
+        // todo: 验证输入的value正确， 首先不能大于100，其次不比前一个大，不比前一个小；
+        if (value > 100 || value <= 0) {
+            this.setState({
+                hasError: true,
+                errorMsg: '输入的百分比不正确',
+                invalidIndex: index
+            })
+            return;
+        }
+        grades[index] = value;
+        var isValid = true;
+        var invalidIndex = -1;
+        if (grades.length !== 1) {
+            isValid = _.every(_.range(grades.length - 1), index => {
+                var valid = grades[index] < grades[index + 1];
+                invalidIndex = valid ? -1 : index + 1;  
+                return valid;
+            })
+        }
+        if (!isValid) {
+            this.setState({
+                hasError: true,
+                errorMsg: '等级靠前百分比必须比靠后的高',
+                invalidIndex: invalidIndex
+            })
+            return;
+        }
+        var errorState = {};
+        errorState =  _.assign({}, (this.state.hasError || (index === this.state.invalidIndex)) ? {hasError: false, errorMsg: '', invalidIndex: -1} : {});
+        
+        this.setState(_.assign({grades: grades}, errorState));
+    }
     render() {
         var _this = this, gradeLastIndex = this.state.grades.length - 1;
-
         return (
             <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this)}>
                 <Header closeButton={false} style={{textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
@@ -184,48 +198,24 @@ class Dialog extends React.Component {
                 </Header>
                 <Body style={{padding: 30}}>
                     <div style={{ minHeight: 230 }}>
-                        <div>考试总分为：{this.examFullMark}分</div>
+                        <div style={{marginBottom: 30}}>考试总分为：{this.examFullMark}分, 将整体成绩分为 <input ref='gradeNum' defaultValue={this.state.grades.length} onBlur={this.setGradeNum.bind(this)} style={{width: 100, height: 34, border: '1px solid ' + colorsMap.C05, paddingLeft: 20}} /> 个等级 </div>
                         <div style={{ borderBottom: '1px solid #f2f2f2', textAlign: 'center'}}>
-                            {
-                                _.map(_.range(gradeLastIndex), (index) => {
-
-                                    // var charGrade = String.fromCharCode(charCode_A + index);
-                                    var charStr = letterMap[index];
-
-                                    if (index === gradeLastIndex-1 && index !== 0) {
-                                        return (
-                                            <div style={{ margin: '30px 0 30px 30px', textAlign: 'left'}} onMouseEnter={this.handleMouseEnter}  onMouseLeave={this.handleMouseLeave}  key={_.now() + index}>
-                                                <span style={{ marginRight: 20 }}>{charStr}等：</span>
-
-                                                <span style={{ marginRight: 20 }}>表示小于满分×{ this.state.grades[gradeLastIndex-index] }%的分数的学生为{charStr}等</span>
-                                                <a onClick={_this.onDeleteGrade.bind(_this, index)} href='javascript:void(0)' style={{textDecoration:'none'}} id='deleteIcon' className='hide'>x</a>
+                        {
+                            _.map(_.range(this.state.grades.length), (index)=> {
+                                    return (
+                                        <div key={'gradelevel-' + index + '-' + _.now()}  style={{ marginBottom: index === this.state.levelNum - 1 ? 0 : 30, textAlign: 'left' }}>
+                                            <div style={{ display: 'inline-block' }}>{letterMap[(index)]}等：
+                                                <span style={{ margin: '0 10px' }}>
+                                                    <input ref={'grade-' + (gradeLastIndex - index) } defaultValue={this.state.grades[gradeLastIndex - index]} onBlur={this.setGrade.bind(this, 'grade-' + (gradeLastIndex - index)) } style={_.assign({}, { width: 148, height: 34, paddingLeft: 20 }, this.state.invalidIndex === (gradeLastIndex - index) ? { border: '2px solid ' + colorsMap.B08 } : { border: '1px solid ' + colorsMap.C05 }) }/>
+                                                    %
+                                                </span>
+                                                <span>表示在总分×{this.state.grades[gradeLastIndex -index]}%的分数以上学生为{letterMap[index]}等</span>
                                             </div>
-                                        )
-                                    } else if (index === 0) {
-                                        return (
-                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={_.now() + index}>
-                                                <span style={{ marginRight: 20 }}>{charStr}等：<input ref={'grade-' + index} defaultValue={this.state.grades[gradeLastIndex-index-1]} onBlur={_this.onInputBlur.bind(_this, index)} />%</span>
-                                                <span style={{ marginRight: 20 }}>表示满分×{ this.state.grades[gradeLastIndex-index-1] }%的分数以上的学生为{charStr}等</span>
-                                                <a onClick={_this.onDeleteGrade.bind(_this, index)}  href='javascript:void(0)'style={{textDecoration:'none'}}id='deleteIcon' className='hide'>x</a>
-                                            </div>
-                                        )
-                                    } else {
-                                        return (
-                                            <div style={{ margin: '30px 0' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}  key={_.now() + index}>
-                                                <span style={{ marginRight: 20 }}>{charStr}等：<input ref={'grade-' + index} defaultValue={this.state.grades[gradeLastIndex-index-1]} onBlur={_this.onInputBlur.bind(_this, index)}/>%</span>
-                                                <span style={{ marginRight: 20 }}>表示满分×{ this.state.grades[gradeLastIndex-index-1] }%到{letterMap[index-1]}等分数的学生为{charStr}等</span>
-                                                <a onClick={_this.onDeleteGrade.bind(_this, index)}  href='javascript:void(0)' style={{textDecoration:'none'}} id='deleteIcon' className='hide'>x</a>
-                                            </div>
-                                        )
-                                    }
+                                        </div>
+                                    )
                                 })
-                            }
-                        </div>
-                        <div style={{ textAlign: 'center', marginTop: 20 }}>
-                            <a href='javascript:void(0)' onClick={this.onAddGrade.bind(this)} className={styles.button} style={{ textDecoration: 'none',width: 140, height: 30, border: '1px solid #bcbcbc', lineHeight: '30px', marginRight: 20 }}>
-                                添加等级
-                            </a>
-                        </div>
+                        }
+                        </div>                       
                         <div style={_.assign({},{color: A11, width: '100%', textAlign:'center', marginTop: 20}, this.state.hasError ? {display: 'inline-block'} : {display: 'none'})}>{this.state.errorMsg}</div>
                     </div>
                 </Body>
@@ -346,7 +336,6 @@ series: [{
                     <span className={schoolReportStyles['sub-title']}>学科离差分布</span>
                     <span className={schoolReportStyles['title-desc']}>离差较大的学科，反映出各班级该学科教学效果差距较大；离差较小的学科，反映出各班级该学科教学效果比较整齐</span>
                 </p>
-                {/* todo： 待补充离差表现图 */}
                 <div style={{display: 'inline-block', width: '100%', height: 380, position: 'relative'}}>
                   <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
                 </div>
