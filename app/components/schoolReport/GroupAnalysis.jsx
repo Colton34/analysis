@@ -110,13 +110,6 @@ class Dialog extends React.Component {
         //调用父类传递来的函数  this.props.updateLevelBuffers(this.levelBuffers)，从而更新父类
         this.props.updateLevelBuffers(this.levelBuffers);
         this.props.onHide();
-
-        // var levels = this.props.totalScoreLevel.length;
-        // var floatScores = [];
-        // for(var i=0; i < levels; i++) {
-        //     floatScores.push(parseFloat(this.refs['float-' + i].value));
-        // }
-        // console.log('================== set float scores: ' + JSON.stringify(floatScores));
     }
 
     onHide() {
@@ -129,12 +122,7 @@ class Dialog extends React.Component {
         this.props.onHide();
     }
     render() {
-        // var {totalScoreLevel} = this.props;
         var _this = this;
-
-        // this.levelBuffers = this.props.levelBuffers;
-        // this.isValid = _.map(_.range(this.levelBuffers.length), (index) => true);
-        // this.isUpdate = false;
         var {levels} = this.props;
         var levelNum = _.size(levels);
         return (
@@ -207,14 +195,6 @@ class GroupAnalysis extends React.Component {
         })
     }
 
-//     updateLevelBuffers(newLevelBuffers) {
-// console.log('updateLevelBuffers = ', newLevelBuffers);
-
-//         this.setState({
-//             levelBuffers: newLevelBuffers
-//         });
-//     }
-
     render() {
 //Props数据结构：
         var {examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers} = this.props;
@@ -224,109 +204,108 @@ class GroupAnalysis extends React.Component {
 //算法数据结构：
         var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers);
 
-        var disData = criticalStudentsDiscription(criticalLevelInfo); //缺少UI
+        var xAxis = _.map(levels, (levObj, levelKey) => numberMap[(levelKey-0)+1]+'档');
+        var disData = criticalStudentsDiscription(criticalLevelInfo);
 
-        var levels=[];
-        for(let i in criticalLevelInfo){
-          levels[i]=(criticalLevelInfo[i].sort(function(a,b){return a.count<b.count;})).slice(0,3);
-        }//每档前三
-        var xdata=['一档','二档','三档','四档','五档'];//x轴要显示的数据列表
-        var finData=xdata.slice(0,levels.length);
-        var colorList=['#00abfe','#00d3c8','#45c44e','#00abfe','#45c44e'];//颜色列表
-        var serisData=[];var datas=[];
-        for(let i=0;i<3;i++){
-          serisData[i]=[];
-            for(let j=0;j<levels.length;j++){
-              serisData[i][j]={
-                  name:examInfo.gradeName+levels[j][i].class+'班',
-                  y:levels[j][i].count,
-                  color:colorList[j]
+        var serisData = {}, colorList=['#00abfe','#00d3c8','#45c44e','#00abfe','#45c44e'];//TODO: 颜色列表
+        _.each(disData, (dataMap, dataKey) => {
+            var serisItem = [];
+            _.each(dataMap, (dataArr, levelKey) => {
+                _.each(dataArr, (data, index) => {
+                    var eachLevelIndex = serisItem[index];
+                    if(!eachLevelIndex) {
+                        eachLevelIndex = [];
+                        serisItem[index] = eachLevelIndex;
+                    }
+                    eachLevelIndex.push({
+                        name: data.class + '班',
+                        y: data.count,
+                        color: colorList[levelKey-0]
+                    });
+                });
+            });
+            serisData[dataKey] = serisItem;
+        });
+        var serisDataTop = _.map(serisData.top, (data, index) => {
+            return {
+                name: numberMap[index] + '档',
+                data: data
+            }
+        });
+        var serisDataLow = _.map(serisData.low, (data, index) => {
+            return {
+                name: numberMap[index] + '档',
+                data: data
+            }
+        });
 
-            };
-          }
 
-        }
 //自定义Module数据结构：
-var config={
-chart: {
-    type: 'column'
-},
-title: {
-    text: '',
-},
-subtitle: {
-    text: '(人数)',
-    floating:true,
-    x:-500,
-    y:43,
-    style:{
-      "color": "#767676",
-       "fontSize": "12px"
-    }
-
-},
-
-xAxis: {
-  tickWidth:'0px',//不显示刻度
-    categories: finData
-},
-yAxis: {
-  lineWidth:1,
-gridLineDashStyle:'Dash',
-title: {
-                text: ''
+        var config={
+            chart: {
+                type: 'column'
             },
-},
-credits:{
-  enabled:false
-},
-tooltip:{
-enabled:false,
-backgroundColor:'#000',
-borderColor:'#000',
-style:{
-  color:'#fff'
-},
-formatter: function(){
-     return this.point.name;
-}
-},
-legend:{
-enabled:false,
-align:'center',
-verticalAlign:'top'
-},
-plotOptions: {
-            column: {
-              cursor: 'pointer',
-                dataLabels: {
-                    enabled: true,
-                    color: '#000',
-                    style: {
-                        fontWeight: 'bold'
-                    },
-                    formatter: function() {
-                        return this.point.name ;
+            title: {
+                text: '',
+            },
+            subtitle: {
+                text: '(人数)',
+                floating:true,
+                x:-500,
+                y:43,
+                style:{
+                  "color": "#767676",
+                   "fontSize": "12px"
+                }
+            },
+            xAxis: {
+              tickWidth:'0px',//不显示刻度
+                categories: xAxis
+            },
+            yAxis: {
+              lineWidth:1,
+                gridLineDashStyle:'Dash',
+                title: {
+                    text: ''
+                },
+            },
+            credits:{
+                enabled:false
+            },
+            tooltip:{
+                enabled:false,
+                backgroundColor:'#000',
+                borderColor:'#000',
+                style:{
+                    color:'#fff'
+                },
+                formatter: function(){
+                    return this.point.name;
+                }
+            },
+            legend:{
+                enabled:false,
+                align:'center',
+                verticalAlign:'top'
+            },
+            plotOptions: {
+                column: {
+                  cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        color: '#000',
+                        style: {
+                            fontWeight: 'bold'
+                        },
+                        formatter: function() {
+                            return this.point.name ;
+                        }
                     }
                 }
-            }
-        },
-  series: [{
-    name:'一档',
+            },
+            series: serisDataTop
+        };
 
-    data:serisData[0],
-  },
-  {
-    name:'二档',
-    data:serisData[1],
-  },
-  {
-    name:'三档',
-    data:serisData[2]
-  }
-]
-
-};
         return (
             <div id='groupAnalysis' className={schoolReportStyles['section']}>
                 <div style={{ marginBottom: 30 }}>
@@ -346,7 +325,7 @@ plotOptions: {
                 </p>
                 {/* todo： 图待补充 */}
                 <div style={{width:1110,height:280,display:'inline-block',paddingTop:30,marginRight:30}}>
-                  <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
+                  {((_.size(disData.top) == 0) || (_.size(disData.low) == 0)) ? '' : <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts> }
                 </div>
                 <Dialog levels={levels} levelBuffers={levelBuffers} updateLevelBuffers={this.props.updateLevelBuffers} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }/>
             </div>
@@ -422,9 +401,8 @@ function makeCriticalSegments(levelBuffers, levels) {
 }
 
 //TODO:如果是1个班级--即targetCount===0，即result的top和low中没有任何内容的时候，显示文案“无可比性...”
-function criticalStudentsDiscription(criticalLevelInfo) {  //Done
-    //上面的 criticalLevelInfo，已经是反转后的数据了
-    // 每一档
+function criticalStudentsDiscription(criticalLevelInfo) {
+    //上面的 criticalLevelInfo，已经是反转后的数据了--但是只是针对level进行反转，但是还需要对最终的结果展示进行反转
     var result = {top: {}, low: {}};
     _.each(criticalLevelInfo, (counts, levelKey) => {
         var baseLineCount = counts.length - 1;
@@ -432,10 +410,10 @@ function criticalStudentsDiscription(criticalLevelInfo) {  //Done
 
         if(targetCount == 0) return;
 
-        var orderedCounts = _.sortBy(counts, 'count');// 升序
-        var top = _.map(_.takeRight(orderedCounts, targetCount), (cobj) => cobj.class+'班');
+        var orderedCounts = _.sortBy(counts, 'count');// 降序
+        var top = _.reverse(_.takeRight(orderedCounts, targetCount));
         result.top[levelKey] = top;
-        var low = _.map(_.take(orderedCounts, targetCount), (cobj) => cobj.class+'班');
+        var low = _.reverse(_.take(orderedCounts, targetCount));
         result.low[levelKey] = low;
     });
     return result;//小值代表高档
