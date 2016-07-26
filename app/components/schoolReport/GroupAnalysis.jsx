@@ -238,7 +238,7 @@ class GroupAnalysis extends React.Component {
           serisData[i]=[];
             for(let j=0;j<levels.length;j++){
               serisData[i][j]={
-                  name:examInfo.gradeName+levels[j][i].class+'班',
+                  name:levels[j][i].class+'班',
                   y:levels[j][i].count,
                   color:colorList[j]
 
