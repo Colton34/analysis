@@ -182,9 +182,6 @@ class ExamSelect extends React.Component {
         //新的年级~注意：年级是针对exam的，而这里一次选择只是针对一个科目的（一个科目肯定要保证所勾选的是同一年级），但是不同科目同样也要保证是同一年级！所以这个
         //currentGrade应该是resultSet里的一个直属属性--它指代了resultSet中所有分析的科目都是来自同一年级。
 
-// console.log(exam);
-// console.log(event);
-
         //对一个paper的checkbox交互，判断是增加还是减少，执行相应的action，从而执行相应的更新操作
         var checked = event.target.checked;
         var paperId = event.target.value;
@@ -240,7 +237,6 @@ class ExamSelect extends React.Component {
     }
 
     doMerge(mergeType, SQMs) {
-        console.log('merge matrix');
         // todo: 合并题目
         var
             finSQM,
@@ -282,7 +278,6 @@ class ExamSelect extends React.Component {
         _.each(finSQM.x, function (item) {
             item.default = "第" + (count++) + "题";
         });
-        //console.log('========== merge result: ' + JSON.stringify(finSQM));
         var {currentSubject} = this.props;
         if (mergeType === currentSubject.mergeType && currentSubject.SQM !== undefined && !this.diff(finSQM.x, currentSubject.SQM.x)) {
             this.props.onNextPage();
@@ -325,7 +320,6 @@ class ExamSelect extends React.Component {
     }
 
     downloadTPL(isLiankao) {
-        console.log('downloadTPL');
         var path = isLiankao ? '/file/download/tpl?liankao=true' : '/file/download/tpl';
         saveAs(window.request.defaults.baseURL+path);
     }
@@ -392,12 +386,6 @@ class ExamSelect extends React.Component {
             baseUrl : '/api/v1/file/import/exam/data',
             chooseAndUpload : true,
             fileFieldName : 'importData', //指定上传文件的名字，而不是使用默认的呃file.name，这个名字和multer的single对应。
-            chooseFile : function(files){
-                console.log('filename',typeof files == 'string' ? files : files[0].name);
-            },
-            uploading : function(progress){
-                console.log('loading...',progress.loaded/progress.total+'%');
-            },
             uploadSuccess : function(resp){
                 // Note: 检查是否同一年级
                 if (!_this.isGradeValid(resp.grade)) {
@@ -564,7 +552,6 @@ class Dialog extends React.Component {
         super(props);
     }
     doMerge(type) {
-        console.log('type:' + type);
         this.props.doMerge(type, this.props.legalSQMs);
         this.props.onHide();
     }

@@ -121,11 +121,6 @@ class CustomizeAnalysis extends React.Component {
         var postData = makeExamSchema(resultSet, this.props.analysisName);
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         //创建成功后根据返回的examId去到其相应的dashboard--这部分API要添加新的，就不是之前的API了
-
-        // $.post(url, {data: postData}, function(data, textStatus) {
-        //     console.log('textStatus = ', textStatus);
-        //     console.log('data = ', data);
-        // });
         params.request.post(customBaseUrl, { data: postData }).then(function (res) {
             //创建成功后进入到此分析的Dashboard
             browserHistory.push('/dashboard?examid=' + res.data.examId);
@@ -306,13 +301,16 @@ function filterAuthExamList(originalExamList, auth) {
     var authGrades = _.keys(auth.gradeAuth);
     var result = [];
     _.each(originalExamList, (obj) => {
-        var vaildExams = _.filter(obj.values, (examItem) => {
-            return _.includes(authGrades, examItem.grade);
-        });
-        if(vaildExams.length == 0) return;
+        //这个在服务端应该是已经过滤好的
+        // var validExams = _.filter(obj.values, (examItem) => {
+        //     return _.includes(authGrades, examItem.grade);
+        // });
+        // if(validExams.length == 0) return;
         //有对应的年级exam实例--则，针对validExams获取科目。你是2班的语文老师，但是2班没有考试语文，3班考试了
-        _.each(vaildExams, (examItem) => {
+        var validExams = obj.values;
+        _.each(validExams, (examItem) => {
             var examPapers = examItem.papers;
+            if(examItem.from == '40') return;
             //如果是此年级的年级组长--那么可以看到所有科目；或者如果是此年级某n(n>0)班级的班主任，那么也可以看到所有科目，则都不需要对此exam再进行科目过滤
             if((_.isBoolean(auth.gradeAuth[examItem.grade]) && auth.gradeAuth[examItem.grade]) || ((_.isObject(auth.gradeAuth[examItem.grade])) && auth.gradeAuth[examItem.grade].groupManagers.length > 0)) return;
             //否则：
@@ -325,8 +323,8 @@ function filterAuthExamList(originalExamList, auth) {
             examItem.papers = authValidSubjectObjs;
         });
         //Note: 保证显示的都是有paper内容的
-        vaildExams = _.filter(vaildExams, (examItem) => examItem.papers.length > 0);
-        if(vaildExams.length > 0) result.push({timeKey: obj.timeKey, values: vaildExams });
+        validExams = _.filter(validExams, (examItem) => examItem.papers.length > 0);
+        if(validExams.length > 0) result.push({timeKey: obj.timeKey, values: validExams });
     });
     return result;
 }

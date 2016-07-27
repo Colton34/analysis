@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-27 10:30:26
+* @Last Modified time: 2016-07-27 16:07:45
 */
 
 'use strict';
@@ -30,8 +30,18 @@ exports.home = function(req, res, next) {
         return examUitls.getExamsBySchool(school);
     }).then(function(originalExams) {
         req.originalExams = originalExams;
+
+var commNames = _.map(originalExams, (obj) => obj.name);
+// console.log('common names = ', commNames);
         return getCustomExams(req.user.id);
     }).then(function(customExams) {
+
+
+var names = _.map(customExams, (obj) => obj.name);
+// console.log('names ====  ', names);
+
+
+
         try {
             var validExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
             var formatedExams = formatExams(validExams);
@@ -40,10 +50,14 @@ exports.home = function(req, res, next) {
             return when.reject(new errors.Error('格式化exams错误', e));
         }
     }).then(function(formatedExams) {
-        formatedExams = filterExamsByAuth(formatedExams, req.user.auth);
+        formatedExams = filterExamsByAuth(formatedExams, req.user.auth, req.user.id);
         var errorInfo = {};
         if(req.originalExams.length == 0) errorInfo.msg = '此学校没有考试';
         if(req.originalExams.length > 0 && formatedExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
+
+
+
+
         res.status(200).json({examList: formatedExams, errorInfo: errorInfo});
     }).catch(function(err) {
         next(err);
@@ -436,6 +450,7 @@ function getCustomExams(owner) {
             if(err) return reject(new errors.data.MongoDBError('find my custom analysis error: ', err));
             resolve(_.map(results, (examItem) => {
                 var obj = _.pick(examItem.info, ['name', 'from']);
+                obj.owner = examItem.owner;
                 obj._id = examItem._id;
                 obj.event_time = examItem.info.startTime;
                 var examPapersInfo = examItem['[papersInfo]'];
@@ -508,6 +523,7 @@ function formatExams(exams) {
                 });
                 obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
                 obj.from = value.exam.from;
+                obj.owner = value.exam.owner;
 
                 result[timeKey].push(obj);
             });
@@ -533,7 +549,14 @@ function formatExams(exams) {
  * @param  {[type]} auth          [description]
  * @return {[type]}               [description]
  */
-function filterExamsByAuth(formatedExams, auth) {
+function filterExamsByAuth(formatedExams, auth, uid) {
+console.log('uid =========', uid);
+// var tempNames = _.concat(..._.map(formatedExams, (obj, index) => {
+//     return _.map(obj.values, (so) => so.examName);
+// }));
+// console.log(tempNames);
+
+
     //Note: 如果过滤后最终此时间戳key下没有exam了则也不显示此time key
     //Note: 从当前用户中获取此用户权限，从而过滤
     if(auth.isSchoolManager) return formatedExams;
@@ -542,7 +565,12 @@ function filterExamsByAuth(formatedExams, auth) {
     var result = [];
     _.each(formatedExams, (obj) => {
         var vaildExams = _.filter(obj.values, (examItem) => {
-            return _.includes(authGrades, examItem.grade);
+            //Note: 先过滤掉联考；只有自定义或者阅卷
+
+if(examItem.owner) console.log('owner = ', examItem.owner);
+
+
+            return (((examItem.from != '30')) && ((examItem.from != '40') && (_.includes(authGrades, examItem.grade))) || ((examItem.from == '40') && (examItem.owner == uid)));
         });
         if(vaildExams.length > 0) result.push({timeKey: obj.timeKey, values: vaildExams});
     });
@@ -882,9 +910,6 @@ function getOriginalRankCache(papers) {
  * @return {[type]}           [description]
  */
 function filterAuthRankCache(auth, rankCache, papers, grade) {
-
-console.log('auth === ', JSON.stringify(auth));// subjectTeachers : group: 2, 4, 但是authClasses却是个空数组[]
-
     var authRankCache = {}, allPaperIds = _.keys(rankCache), authClasses = [];
     //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
     if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
@@ -920,8 +945,8 @@ console.log('auth === ', JSON.stringify(auth));// subjectTeachers : group: 2, 4,
 
 
 var allPapperSubjects = _.map(papers, (paperObj) => paperObj.subject);
-console.log('allPapperSubjects ==== ', allPapperSubjects);
-console.log('rankCache.length == ', _.size(rankCache));
+// console.log('allPapperSubjects ==== ', allPapperSubjects);
+// console.log('rankCache.length == ', _.size(rankCache));
 
         _.each(gradeAuthObj.subjectTeachers, (obj) => {
             var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
@@ -938,7 +963,7 @@ console.log('rankCache.length == ', _.size(rankCache));
     if(!authRankCache.totalScore) {
         //Note: 如果没有totalScore，则添加进来，但是也有走过滤班级
         // authClasses = _.uniq(authClasses);
-console.log('authClasses = ', authClasses);
+// console.log('authClasses = ', authClasses);
 
         authRankCache.totalScore = {};
         _.each(authClasses, (className) => {
