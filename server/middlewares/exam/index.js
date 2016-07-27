@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-26 13:49:51
+* @Last Modified time: 2016-07-27 16:42:33
 */
 
 'use strict';
@@ -40,10 +40,14 @@ exports.home = function(req, res, next) {
             return when.reject(new errors.Error('格式化exams错误', e));
         }
     }).then(function(formatedExams) {
-        formatedExams = filterExamsByAuth(formatedExams, req.user.auth);
+        formatedExams = filterExamsByAuth(formatedExams, req.user.auth, req.user.id);
         var errorInfo = {};
         if(req.originalExams.length == 0) errorInfo.msg = '此学校没有考试';
         if(req.originalExams.length > 0 && formatedExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
+
+
+
+
         res.status(200).json({examList: formatedExams, errorInfo: errorInfo});
     }).catch(function(err) {
         next(err);
@@ -167,7 +171,7 @@ exports.rankReport = function(req, res, next) {
     getExamWithGradePapers(req.query.examid, grade).then(function(result) {
         var papers = result.papers, examName = result.examName;
         var rankCache = getOriginalRankCache(papers);
-        var authRankCache = filterAuthRankCache(auth, rankCache, papers);
+        var authRankCache = filterAuthRankCache(auth, rankCache, papers, grade);
         var examInfo = getAuthExamInfo(authRankCache, examName, papers);
         res.status(200).json({
             examInfo: examInfo,
@@ -436,6 +440,7 @@ function getCustomExams(owner) {
             if(err) return reject(new errors.data.MongoDBError('find my custom analysis error: ', err));
             resolve(_.map(results, (examItem) => {
                 var obj = _.pick(examItem.info, ['name', 'from']);
+                obj.owner = examItem.owner;
                 obj._id = examItem._id;
                 obj.event_time = examItem.info.startTime;
                 var examPapersInfo = examItem['[papersInfo]'];
@@ -508,6 +513,7 @@ function formatExams(exams) {
                 });
                 obj.fullMark = _.sum(_.map(papers, (item) => item.manfen));
                 obj.from = value.exam.from;
+                obj.owner = value.exam.owner;
 
                 result[timeKey].push(obj);
             });
@@ -533,7 +539,7 @@ function formatExams(exams) {
  * @param  {[type]} auth          [description]
  * @return {[type]}               [description]
  */
-function filterExamsByAuth(formatedExams, auth) {
+function filterExamsByAuth(formatedExams, auth, uid) {
     //Note: 如果过滤后最终此时间戳key下没有exam了则也不显示此time key
     //Note: 从当前用户中获取此用户权限，从而过滤
     if(auth.isSchoolManager) return formatedExams;
@@ -542,7 +548,8 @@ function filterExamsByAuth(formatedExams, auth) {
     var result = [];
     _.each(formatedExams, (obj) => {
         var vaildExams = _.filter(obj.values, (examItem) => {
-            return _.includes(authGrades, examItem.grade);
+            //Note: 先过滤掉联考；只有自定义或者阅卷
+            return (((examItem.from != '30')) && ((examItem.from != '40') && (_.includes(authGrades, examItem.grade))) || ((examItem.from == '40') && (examItem.owner == uid)));
         });
         if(vaildExams.length > 0) result.push({timeKey: obj.timeKey, values: vaildExams});
     });
@@ -881,8 +888,8 @@ function getOriginalRankCache(papers) {
  * @param  {[type]} rankCache [description]
  * @return {[type]}           [description]
  */
-function filterAuthRankCache(auth, rankCache, papers) {
-    var authRankCache = {}, allPaperIds = _.keys(rankCache);
+function filterAuthRankCache(auth, rankCache, papers, grade) {
+    var authRankCache = {}, allPaperIds = _.keys(rankCache), authClasses = [];
     //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
     if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
         var gradeAuthObj = auth.gradeAuth[grade];
@@ -893,20 +900,29 @@ function filterAuthRankCache(auth, rankCache, papers) {
                 authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
             }
         });
-        //过滤有效科目下的有效班级
+        //过滤有效科目下的有效班级。
         _.each(gradeAuthObj.groupManagers, (obj) => {
             _.each(allPaperIds, (paperId) => {
+                //要么是上面学科组长已经把当前学科所需要的所有classes已经添加进来了，要么是个空数组--之前还没有遇到某一学科
                 var authExistClasses = (authRankCache[paperId]) ? _.keys(authRankCache[paperId]) : [];
+                authClasses = _.union(authClasses, authExistClasses);
                 //Note: 如果当前authExistClasses还没有添加此班级的数据，并且此班级是有效的（即在原来的数据中能找到），则添加对应的班级数据到authRankCache中
                 if(!_.includes(authExistClasses, obj.group) && (_.includes(_.keys(rankCache[paperId]), obj.group))) {
                     if(!authRankCache[paperId]) authRankCache[paperId] = {};
+                    // if(!authRankCache.totalScore) authRankCache.totalScore = {};
                     authRankCache[paperId][obj.group] = rankCache[paperId][obj.group];
+                    authClasses = _.union(authClasses, [obj.group]);
+                    // authRankCache.totalScore[obj.group] = rankCache.totalScore[obj.group];
                 }
             });
         });
         //Note: 因为auth中已经做了冗余的排查，所以如果这里有subjectTeachers那么就一定是前面所没有包含的
+
+//Case: 一个教初二2，4两个班级的语文老师，查看一个只考了生物一门学科的考试--能看到dashboard中排行榜总分，进入排行榜详情中能看到对应班级的总分
+//5班的班主任，此考试只有4班考试的生物
         _.each(gradeAuthObj.subjectTeachers, (obj) => {
             var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
+            authClasses = _.union(authClasses, [obj.group]);//Note: 无论是不是当前所考试科目的任课考试，他都能看到所对应班级的总分--authClasses是为了totalScore的数据结构
             if(targetAuthPaper) {
                 if(!authRankCache[targetAuthPaper._id]) authRankCache[targetAuthPaper._id] = {};
                 authRankCache[targetAuthPaper._id][obj.group] = rankCache[targetAuthPaper._id][obj.group];
@@ -917,8 +933,13 @@ function filterAuthRankCache(auth, rankCache, papers) {
     }
 
     if(!authRankCache.totalScore) {
-        //Note: 如果没有totalScore，则添加进来：
-        authRankCache.totalScore = rankCache.totalScore;
+        //Note: 如果没有totalScore，则添加进来，但是也有走过滤班级
+        // authClasses = _.uniq(authClasses); -- Note: 没必要，因为前面使用的union
+        authRankCache.totalScore = {};
+        _.each(authClasses, (className) => {
+            authRankCache.totalScore[className] = rankCache.totalScore[className];
+        })
+        // authRankCache.totalScore = rankCache.totalScore;
     }
     return authRankCache;
 }
@@ -937,16 +958,17 @@ function getAuthExamInfo(authRankCache, examName, papers) {
         var targetPaper = _.find(papers, (paperObj) => paperObj._id.toString() == paperId+"");
         examPapers.push({paper: targetPaper._id, pid: targetPaper.id, name: targetPaper.subject});
     });
-    var tempAuthObjs = [], examClasses = [];
-    _.each(authRankCache, (obj, pid) => {
-        if(pid != 'totalScore') {
-            tempAuthObjs.push(_.keys(obj));
-        }
-    })
-    _.each(tempAuthObjs, (authArr) => {
-        examClasses = _.concat(examClasses, authArr);
-    })
-    examClasses = _.uniq(examClasses);
+    var examClasses = _.keys(authRankCache.totalScore);
+    // var tempAuthObjs = [], examClasses = [];
+    // _.each(authRankCache, (obj, pid) => {
+    //     if(pid != 'totalScore') {
+    //         tempAuthObjs.push(_.keys(obj));
+    //     }
+    // })
+    // _.each(tempAuthObjs, (authArr) => {
+    //     examClasses = _.concat(examClasses, authArr);
+    // })
+    // examClasses = _.uniq(examClasses);
     return {
         name: examName,
         papers: examPapers,

@@ -8,70 +8,6 @@ import dashboardStyle from './dashboard.css';
 import {Link, browserHistory} from 'react-router';
 import {Table} from 'react-bootstrap';
 import {NUMBER_MAP} from '../../lib/constants';
-/*
-
-    return {
-        top: _.reverse(_.takeRight(examScoreArr, 6)),
-        low: _.reverse(_.take(examScoreArr, 6))
-    }
-
- */
-/*
-const ScoreRank = ({data, examid, grade}) => {
-    var flagFirstColor =  {color: '#FF0033'};
-    var flagSecondColor = {color: '#54ba54'};
-    var flagThirdColor =  {color: '#ce9dff'};
-    var tops = _.map(data.top, function(obj, index) {
-        var flagColor = {};
-        if(index === 0) {flagColor.first = true};
-        if(index === 1) {flagColor.second = true};
-        if(index === 2) {flagColor.third = true};
-
-        var result = ((flagColor.first && flagFirstColor) || (flagColor.second && flagSecondColor) || (flagColor.third && flagThirdColor));
-
-        return (
-            <div key={index} style={[styles.container, result, styles.common.radius, {marginBottom: 8}]}>
-                <div>{obj.name}</div>
-                <div>{obj.class}班</div>
-                <div>{obj.score}分</div>
-            </div>
-        )
-    });
-
-    var lows = _.map(data.low, function(obj, index) {
-        return (
-            <div key={index} style={[styles.container, styles.common.radius, {marginBottom: 2}]}>
-                <div>{obj.name}</div>
-                <div>{obj.score}分</div>
-            </div>
-        )
-    });
-
-// if(grade) {
-//     console.log('-================  不可能');
-// }
-
-
-
-    var queryOptions = (grade) ? {examid: examid, grade: grade} : {examid: examid};
-
-    return (
-        <div className={dashboardStyle.card}>
-            <div className={dashboardStyle['card-title']}>分数排行榜</div>
-            <div style={{flexGrow: 1, display: 'flex', marginTop: 20}}>
-                <div style={[styles.box,{marginLeft: 5}]}>
-                    <p style={{textAlign: 'center', marginBottom: 20}}>最高分排行榜top6</p>
-                    {tops}
-                </div>
-            </div>
-            <Link to={{ pathname: '/rank/report', query: queryOptions }} className={dashboardStyle['detail-btn']}>
-                查看详情
-            </Link>
-        </div>
-    )
-
-}
-*/
 
 /**
  * props:
@@ -117,7 +53,7 @@ class ScoreRank extends React.Component {
         super(props);
         this.scoreMap = {};
     }
-   
+
     onClickScoreRank(queryOptions) {
         var targetUrl = '/rank/report?examid=' + queryOptions.examid + (queryOptions.grade ? '&grade=' + queryOptions.grade : '' );
         browserHistory.push(targetUrl);
@@ -142,11 +78,11 @@ class ScoreRank extends React.Component {
         })
         this.scoreMap = scoreMap;
     }
-    
+
     render() {
         var {data, examid, grade} = this.props;
         this.sortScore();
-            
+
         var queryOptions = (grade) ? {examid: examid, grade: grade} : {examid: examid};
         return (
             <div style={{ display: 'inline-block', minHeight: 340, padding: '0 10px 0 0', cursor: 'pointer'}} onClick={this.onClickScoreRank.bind(this, queryOptions)} className='col-md-6'>
