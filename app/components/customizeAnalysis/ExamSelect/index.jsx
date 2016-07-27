@@ -78,53 +78,6 @@ var MERGE_TYPE = {
 
 }
 
-function filterExamsByAuth(formatedExams, auth) {
-    if(auth.isSchoolManager) return formatedExams;
-    //只要是此年级的，那么都能看到这场考试，但是具体的考试的数据要跟着此用户的权限走
-    var authGrades = _.keys(auth.gradeAuth);
-    //过滤formatedExams
-    var result = [];
-    _.each(formatedExams, (obj) => {
-        var vaildExams = _.filter(obj.values, (examItem) => {
-            return _.includes(authGrades, examItem.grade);
-        });
-        if(vaildExams.length > 0) result.push({timeKey: obj.timeKey, values: vaildExams});
-    });
-    return result;
-}
-
-function filterAuthExamList(originalExamList, auth) {
-    //针对时间戳中的每一个exam实体都进行auth匹配，这里匹配到科目
-    //当前能获取到自定义分析的就相当于自己是此自定义分析考试的校领导，所以没有问题。而能创建自定义分析最开始也是有一个年级属性的--但是有个问题，在没有上权限之前一个初二的老师可以创建初三的自定义考试，但是有了权限之后他就看不到了
-    if(auth.isSchoolManager) return originalExamList;
-    var authGrades = _.keys(auth.gradeAuth);
-    var result = [];
-    _.each(originalExamList, (obj) => {
-        var vaildExams = _.filter(obj.values, (examItem) => {
-            return _.includes(authGrades, examItem.grade);
-        });
-        if(vaildExams.length == 0) return;
-        //有对应的年级exam实例--则，针对validExams获取科目。你是2班的语文老师，但是2班没有考试语文，3班考试了
-        _.each(vaildExams, (examItem) => {
-            var examPapers = examItem.papers;
-            //如果是此年级的年级组长--那么可以看到所有科目；或者如果是此年级某n(n>0)班级的班主任，那么也可以看到所有科目，则都不需要对此exam再进行科目过滤
-            if((_.isBoolean(auth.gradeAuth[examItem.grade]) && auth.gradeAuth[examItem.grade]) || ((_.isObject(auth.gradeAuth[examItem.grade])) && auth.gradeAuth[examItem.grade].groupManagers.length > 0)) return;
-            //否则：
-            // var allValidPaperSubjects = _.map(exam.papers, (paperObj) => paperObj.subject);
-            var authSubjectManagerSubjects = _.map(auth.gradeAuth[examItem.grade].subjectManagers, (obj) => obj.subject);
-            var authSubjectTeacherSubjects = _.map(auth.gradeAuth[examItem.grade].subjectTeachers, (obj) => obj.subject);
-            var allAuthSubjects = _.union(authSubjectManagerSubjects, authSubjectTeacherSubjects);
-            var authValidSubjectObjs = _.filter(examPapers, (paperObj) => {
-                return _.includes(allAuthSubjects, paperObj.subject);
-            });
-            examItem.papers = authValidSubjectObjs;
-        });
-        result.push({timeKey: obj.timeKey, values: vaildExams });
-    });
-    return result;
-}
-
-
 /**
  * props:
  * isLiankao: 是否联考
@@ -137,15 +90,12 @@ function filterAuthExamList(originalExamList, auth) {
 class ExamSelect extends React.Component {
     constructor(props) {
         super(props);
-        //var {currentSubject} = this.props;
-        var authExamList = filterAuthExamList(this.props.examList, this.props.user.auth);
         this.state = {
-            //currentPapers: currentSubject.src ? currentSubject.src : {},
             showDialog: false,
             showInfoDialog: false,
             startDate: moment().month(moment().month() - 12),  //默认显示一年内的考试
             endDate: moment(),
-            examList: authExamList,
+            examList: this.props.examList,
             infoDialogMsg: ''
         }
     }
@@ -436,7 +386,6 @@ class ExamSelect extends React.Component {
         var {currentSubject} = this.props;
         var currentPapers = Map.isMap(currentSubject) ? currentSubject.toJS().src : currentSubject.src;
         var {examList} = this.state;
-
         var paperIds = Object.keys(currentPapers);
         var _this = this;
         var options = {
@@ -450,33 +399,35 @@ class ExamSelect extends React.Component {
                 console.log('loading...',progress.loaded/progress.total+'%');
             },
             uploadSuccess : function(resp){
-                /*通过mill找到对应的文件，删除对应tmpFile*/
-                // 检查是否同一年级
+                // Note: 检查是否同一年级
                 if (!_this.isGradeValid(resp.grade)) {
                     return;
                 }
+                // Note：检查是否和权限匹配：年级，班级，科目。当前检测的只是“是否和已选择的年级相同”的判断。当然最好是在post存储到DB之前就只存储其对应的权限数据
+                var authMatrix = getAuthMatrix(_this.props.user.auth, resp.matrix, resp.grade, resp.subject);
+                var validGrade = (authMatrix.m.length == 0) ? '' : resp.grade;
+                var validSubject = (authMatrix.m.length == 0) ? '' : resp.subject;
                 // 填充currentPaper
                 var paperInfo = {
                     isFromCustom: false,
                     origin: PAPER_ORIGIN.upload,
                     paperId: _.now(),
-                    paperName: resp.subject,
+                    paperName: validSubject,
                     examName: '自定义考试数据',
-                    grade: resp.grade,
-                    sqm: resp.matrix
-                }
+                    grade: validGrade,
+                    sqm: authMatrix
+                };
                 //为统一reducer处理
                 paperInfo.sqm.id = paperInfo.paperId;
                 var {papersCache} = _this.props;
                 papersCache = Map.isMap(papersCache) ? papersCache.toJS() : papersCache;
                 _this.props.addPaperInfo(papersCache, paperInfo);
-                console.log('upload success', resp);
             },
             uploadError : function(err){
                 console.log('Error: ', err);
             },
             uploadFail : function(resp){
-//会走这里：{message: '解析考试分数数据错误', name: 'Error'}
+                //Note：{message: '解析考试分数数据错误', name: 'Error'}
                 console.log('Fail: ', resp.message);
                 _this.setState({
                     showInfoDialog: true,
@@ -558,6 +509,8 @@ class ExamSelect extends React.Component {
                                             questionInfo.selected = true;
                                         isAllChecked &= questionInfo.selected;
                                     })
+
+                                    if(currentPapers[paperId].oriSQM.m.length == 0) return;//给出Tip: 没有权限匹配的数据
                                     return (
                                         <div key={'qblock-' + index} className={ownClassNames['data-question-list']} data-paperId={paperId} >
                                             <div style={{ marginBottom: 20 }}>
@@ -568,7 +521,7 @@ class ExamSelect extends React.Component {
                                                     <label for={'checker-question-all-' + paperId}></label>
                                                     <span>全选</span>
                                                 </div>
-                                                {currentPapers[paperId].origin === PAPER_ORIGIN.upload ? <span style={localStyle.paperDelBtn} key={paperId} data-paperid={paperId} onClick={this.onDelUploadPaper.bind(this)}>删除</span>:''}
+                                                {(currentPapers[paperId].origin === PAPER_ORIGIN.upload) ? <span style={localStyle.paperDelBtn} key={paperId} data-paperid={paperId} onClick={this.onDelUploadPaper.bind(this)}>删除</span>:''}
                                             </div>
                                             <div id={'qlist-' + paperId} style={{ overflow: 'auto' }}>
                                                 <ul style={{paddingLeft: 0}}>
@@ -721,6 +674,27 @@ function mapDispatchToProps(dispatch) {
         setPaperSqm: bindActionCreators(setPaperSqmAction, dispatch),
         setMergedSqm: bindActionCreators(setMergedSqmAction, dispatch)
     }
+}
+
+//TODO: 会不会上传的数据包含两个年级？？？或者包含两个科目？？？
+function getAuthMatrix(auth, originalDataMatrix, dataGrade, dataSubject) {
+    //根据auth，返回新的matrix
+    var emptyMatrix = {x: [], y: [], m: []};
+    if(auth.isSchoolManager) return originalDataMatrix;
+    var gradeAuthObj = auth.gradeAuth[dataGrade];
+    if(!gradeAuthObj) {
+        console.log('没有匹配的年级');
+        return emptyMatrix;
+    }
+    if(_.isBoolean(gradeAuthObj) && gradeAuthObj) return originalDataMatrix;
+    var authSubjectManagerSubjects = _.map(gradeAuthObj.subjectManagers, (obj) => obj.subject);
+    if(_.includes(authSubjectManagerSubjects, dataSubject)) return originalDataMatrix;
+    //是5班的班主任，但是originalMatirx中有4班数学科目的数据，依然给全部，因为那边应该是会对班级进行筛选的，后面重构的时候可以考虑怎么规整。
+    if(gradeAuthObj.groupManagers.length > 0) return originalDataMatrix;
+    var authSubjectTeacherSubjects = _.map(gradeAuthObj.subjectTeachers, (obj) => obj.subject);
+    if(_.includes(authSubjectTeacherSubjects, dataSubject)) return originalDataMatrix;
+    console.log('没有合适的权限');
+    return emptyMatrix;
 }
 
 
