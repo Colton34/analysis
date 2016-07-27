@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-27 14:14:53
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-07-27 16:12:25
 */
 
 
@@ -44,9 +44,6 @@ export function fetchHomeData(params) {
     var url = examPath + '/home';
 
     return params.request.get(url).then(function(res) {
-        // console.log('res.data========');
-        // console.log(res.data);
-        // return Promise.resolve([]);
         return Promise.resolve(res.data);
     })
 }

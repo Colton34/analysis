@@ -20,9 +20,6 @@ import {initExamGuide} from '../../reducers/dashboard/actions';
  */
 
 const GlobalGuideCom = ({data}) => {
-//     if(!data || !data.data || (_.size(_.keys(data))==0)) return (<div></div>);
-// console.log('examGuide = ', data);
-
     return (
         <div className='row'>
             <div style={{ width: '100%', height: 87, lineHeight: '87px', backgroundColor: '#fff', borderRadius: 2, display: 'table-cell', verticalAlign: 'middle'}}>
