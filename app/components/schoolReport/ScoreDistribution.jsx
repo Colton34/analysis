@@ -636,7 +636,7 @@ class OnlineInfo extends React.Component {
             <div style={_.assign({}, { display: 'inline-block' }) }>
                 <div id='high' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'high' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
                     onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
-                    <div style={_.assign({}, { width: 215 * disTotal + 95 }) }>
+                    <div style={_.assign({}, { width: disTotal !== 0 ? 215 * disTotal + 95 : '100%'}) }>
                         {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
@@ -649,13 +649,13 @@ class OnlineInfo extends React.Component {
                                         </div>
                                     )
                                 })
-                            ) : (<p>只有一个班级，没有可比性</p>)
+                            ) : (<p style={{paddingLeft: 30}}>只有一个班级，没有可比性</p>)
                         }
                     </div>
                 </div>
                 <div id='low' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'low' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
                     onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
-                    <div style={_.assign({}, { width: 215 * disTotal + 95 }) }>
+                    <div style={_.assign({}, { width: disTotal !== 0 ? 215 * disTotal + 95 : '100%'}) }>
                         {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
@@ -668,7 +668,7 @@ class OnlineInfo extends React.Component {
                                         </div>
                                     )
                                 })
-                            ) : (<p>只有一个班级，没有可比性</p>)
+                            ) : (<p style={{paddingLeft: 30}}>只有一个班级，没有可比性</p>)
                         }
                     </div>
                 </div>
