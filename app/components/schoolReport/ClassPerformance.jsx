@@ -12,6 +12,11 @@ import schoolReportStyles from './schoolReport.css';
 import TableView from './TableView';
 import {Table as BootTable} from 'react-bootstrap';
 
+var localStyle = {
+     lengthControl: {
+        overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'
+    }
+}
 const AverageTable = ({tableHeaderData, tableData}) => {
 
     return (
@@ -136,10 +141,12 @@ const AverageTable = ({tableHeaderData, tableData}) => {
 
         var config = {
           colors:[
-           '#00adfb',
-           '#4bc254',
-           '#16d2c7',
-           '#e7e7e7'
+           '#0099ff',
+           '#33cc33',
+           '#33cccc',
+           '#ff9900',
+           '#ff6633',
+           '#6666cc'
          ],
          title: {
              text: '(人数)',
@@ -195,7 +202,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                 <div style={{display: 'inline-block', width: 875, height: 380, position: 'relative'}}>
                     <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
                     <span style={{position: 'absolute', top: -22, right: 0}}>
-                        <span style={{display: 'table-cell', paddingRight: 10}}>对比对象<span style={{fontSize: 12, color: colorsMap.C07}}>（最多选择5个）</span>:</span>
+                        <span style={{display: 'table-cell', paddingRight: 10}}>对比对象<span style={{fontSize: 12, color: colorsMap.C09}}>（最多选择5个）</span>:</span>
                         <span style={{display: 'table-cell'}}><DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true} multiChoiceNum={5}/></span>
                     </span>
                 </div>
@@ -203,13 +210,13 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                     <div style={{ display: 'table-row'}}>
                         <div style={{ width: 215, height: 110, border: '1px solid ' + C07, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center' }}>
                             <p style={{ fontSize: 12, marginBottom: 10 }}>高分学生较多的班级</p>
-                            <p style={{ fontSize: 30, color: B08 }}>{_.join(headerInfo.greater, '、') }</p>
+                            <div style={_.assign({ fontSize: 30, color: B08, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.greater, '、')}>{_.join(headerInfo.greater, '、')}</div>
                         </div>
                     </div>
                     <div style={{height: 20}}></div>
                     <div style={{width: 215, height: 110, border: '1px solid ' + C07, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center'}}>
                         <p style={{fontSize: 12, marginBottom: 10}}>高分学生较少的班级</p>
-                        <p style={{fontSize: 30, color: B04}}>{_.join(headerInfo.lesser, '、')}</p>
+                        <div style={_.assign({ fontSize: 30, color: B08, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.lesser, '、')}>{_.join(headerInfo.lesser, '、')}</div>
                     </div>
                     <p style={{fontSize: 12, color: C07, marginTop: 20}}>
                         <span style={{color: B08}}>*</span>

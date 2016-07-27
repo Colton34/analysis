@@ -41,7 +41,7 @@ class Dialog extends React.Component {
         _.forEach(this.props.examPapersInfo, paperInfo=>{examFullMark += paperInfo.fullMark})
         this.examFullMark = examFullMark;
     }
-    
+
     okClickHandler() {
         if (this.state.hasError) {
             return;
@@ -62,7 +62,7 @@ class Dialog extends React.Component {
         if (grades.length !== 1) {
             isValid = _.every(_.range(grades.length - 1), index => {
                 var valid = grades[index] < grades[index + 1];
-                invalidIndex = valid ? -1 : index + 1;  
+                invalidIndex = valid ? -1 : index + 1;
                 return valid;
             })
         }
@@ -96,7 +96,7 @@ class Dialog extends React.Component {
 
     setGradeNum() {
         var gradeNum = parseInt(this.refs['gradeNum'].value);
-        
+
         if (isNaN(gradeNum)) {
             this.setState({
                 hasError: true,
@@ -150,10 +150,10 @@ class Dialog extends React.Component {
                 hasError: true,
                 errorMsg: '等级百分比必须是数字',
                 invalidIndex: index
-            })    
+            })
             return;
         }
-        
+
         // todo: 验证输入的value正确， 首先不能大于100，其次不比前一个大，不比前一个小；
         if (value > 100 || value <= 0) {
             this.setState({
@@ -169,7 +169,7 @@ class Dialog extends React.Component {
         if (grades.length !== 1) {
             isValid = _.every(_.range(grades.length - 1), index => {
                 var valid = grades[index] < grades[index + 1];
-                invalidIndex = valid ? -1 : index + 1;  
+                invalidIndex = valid ? -1 : index + 1;
                 return valid;
             })
         }
@@ -183,7 +183,7 @@ class Dialog extends React.Component {
         }
         var errorState = {};
         errorState =  _.assign({}, (this.state.hasError || (index === this.state.invalidIndex)) ? {hasError: false, errorMsg: '', invalidIndex: -1} : {});
-        
+
         this.setState(_.assign({grades: grades}, errorState));
     }
     render() {
@@ -215,7 +215,7 @@ class Dialog extends React.Component {
                                     )
                                 })
                         }
-                        </div>                       
+                        </div>
                         <div style={_.assign({},{color: A11, width: '100%', textAlign:'center', marginTop: 20}, this.state.hasError ? {display: 'inline-block'} : {display: 'none'})}>{this.state.errorMsg}</div>
                     </div>
                 </Body>
@@ -292,7 +292,6 @@ subtitle: {
       "color": "#767676",
        "fontSize": "14px"
     }
-
 },
 colors:['#1daef8','#16d2c7'],
 xAxis: {
@@ -300,11 +299,11 @@ xAxis: {
   categories:subjects
 },
 yAxis: {
+  title:{
+    text:''
+  },
   lineWidth:1,
 gridLineDashStyle:'Dash',
-title: {
-                text: ''
-            },
 },
 credits:{
   enabled:false
@@ -315,6 +314,11 @@ enabled:false
 legend:{
   enabled:false
 },
+plotOptions: {
+           column: {
+               pointWidth:subjects.length<=6?55:null
+           }
+       },
 series: [{
     data: factors
 }]

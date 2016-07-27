@@ -92,7 +92,7 @@ class DropdownList extends React.Component {
     render() {
         var _this = this;
         return (
-            <div id='dropdownList'>
+            <div id='dropdownList' style={{textAlign: 'center'}}>
                 <a style={[style.btn,{backgroundColor: '#fff', color: colorsMap.A12, border: '1px solid ' + colorsMap.A12, position: 'relative', paddingLeft: 8}]} href="javascript:void(0)" onClick={this.toggleList.bind(this)}>
                     <span style={{}}>{this.state.current.value}</span>
                     <i className='icon-down-open-3' style={{}}></i>

@@ -34,6 +34,11 @@ class Dialog extends React.Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.isValid = _.map(_.range(nextProps.levelBuffers.length), (index) => true);
+        this.isUpdate = false;
+        this.levelBuffers = nextProps.levelBuffers;
+    }
     onChange(ref, event) {
         this.refs[ref].value = event.target.value;
     }
@@ -58,16 +63,24 @@ class Dialog extends React.Component {
             return;
         }
 
+        
         //levelBuffers的顺序是和levels对应的--显示的时候是倒序
         this.levelBuffers[levBufLastIndex-index] = value;
         //检测如果添加了此buffer，那么保证顺序是对的，由小到大。拿到当前生成的两个值，左边的要比它左边的大，右边的要比它右边的小（前提是如果左右边有值的话）：
         var newSegments = makeCriticalSegments(this.levelBuffers, this.props.levels);
-        var segmentsIsValid = _.every(_.range(newSegments.length-1), (index) => (newSegments[index+1] > newSegments[index]));
+        var invalidIndex = -1;
+        var segmentsIsValid = true;
+        
+        segmentsIsValid = _.every(_.range(newSegments.length-1), (index) => {
+            var valid = newSegments[index+1] > newSegments[index] 
+            invalidIndex = valid ? -1 : (levBufLastIndex - parseInt(index/2));
+            return valid;
+        });
         if(!segmentsIsValid) {
             console.log('newSegments is invalid');
             this.setState({
                 hasError: true,
-                errorMsg: '浮动分数过大'
+                errorMsg: numberMap[invalidIndex] + '、' + numberMap[invalidIndex + 1] + '档浮动分数重合'
             })
             return;
         }
@@ -150,7 +163,7 @@ class Dialog extends React.Component {
                                 return (
                                     <div key={index} style={{marginBottom: index === this.levelBuffers.length - 1 ? 0 : 30}}>
                                         {numberMap[index+1]}档线上下浮分数：
-                                        <input ref={'buffer-' + index} onBlur={_this.onInputBlur.bind(_this, index) } defaultValue={this.levelBuffers[this.levelBuffers.length-1-index]} style={{ width: 280, heigth: 34, display: 'inline-block', textAlign: 'left', paddingLeft: 20, margin: '0 20px'}}/>分
+                                        <input ref={'buffer-' + index} onBlur={_this.onInputBlur.bind(_this, index) } defaultValue={this.levelBuffers[this.levelBuffers.length-1-index]} style={{ width: 280, height: 34, display: 'inline-block', textAlign: 'left', paddingLeft: 20, margin: '0 20px'}}/>分
                                     </div>
                                 )
                             })
