@@ -148,7 +148,6 @@ class Dialog extends React.Component {
 
         //分档只能是这几个数字
         if (!(_.includes([1, 2, 3, 4, 5], value))) {
-            //console.log('分档值必须是包含1~5之间的数字');
             this.setState({
                 levelNumWrong: true,
                 levelNumMsg: '分档值是1至5的整数'
@@ -231,7 +230,6 @@ class Dialog extends React.Component {
         //this.levels的个数和input的值是一样的；所有的input都不为空
         var levTotal = parseInt(this.refs.levelInput.value);
         if (!(levTotal && _.isNumber(levTotal) && levTotal > 0)) {
-            //console.log('levTotal 分档个数必须是正数');
             this.setState({
                 levelNumWrong: true,
                 levelNumMsg: '分档数应是正数'
@@ -253,7 +251,6 @@ class Dialog extends React.Component {
         });
 
         if(!isValid) {
-            //console.log('表单验证不通过');
             this.setState({
                 hasError: true,
                 errorMsg: '档位靠前分数必须比靠后的高'

@@ -87,8 +87,6 @@ const AverageTable = ({tableHeaderData, tableData}) => {
     }
 
     onClickDropdownList(classItem) {
-        //if(_.includes(this.classList, classItem)) return;
-        console.log('change the choosen class = ', classItem.key);
         var {currentClasses} = this.state;
         if (_.includes(currentClasses)) return;
         else if (classItem.selected){

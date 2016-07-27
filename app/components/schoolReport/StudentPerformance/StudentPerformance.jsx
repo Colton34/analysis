@@ -329,8 +329,6 @@ function theStudentExamTables(examInfo, examStudentsInfo, allStudentsPaperMap, h
         var row = [];
         //headers就是真正考的科目+总分
         _.each(headers, (headerObj, index) => {
-            // console.log(value[headerObj.id]);
-            // _.isNumber(value[headerObj.id]) ? row.push(value[headerObj.id]) : row.push('无数据');
             row.push(value[headerObj.id]);
         });
         row.unshift(examInfo.gradeName + className + '班');

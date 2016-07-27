@@ -121,11 +121,6 @@ class CustomizeAnalysis extends React.Component {
         var postData = makeExamSchema(resultSet, this.props.analysisName);
         var params = initParams(this.props.params, this.props.location, { 'request': window.request });
         //创建成功后根据返回的examId去到其相应的dashboard--这部分API要添加新的，就不是之前的API了
-
-        // $.post(url, {data: postData}, function(data, textStatus) {
-        //     console.log('textStatus = ', textStatus);
-        //     console.log('data = ', data);
-        // });
         params.request.post(customBaseUrl, { data: postData }).then(function (res) {
             //创建成功后进入到此分析的Dashboard
             browserHistory.push('/dashboard?examid=' + res.data.examId);
@@ -175,12 +170,12 @@ class CustomizeAnalysis extends React.Component {
         var currentSubject = Map.isMap(this.props.currentSubject) ? this.props.currentSubject.toJS() : this.props.currentSubject;
         var resultSet = Map.isMap(this.props.resultSet) ? this.props.resultSet.toJS() : this.props.resultSet;
         var user = Map.isMap(this.props.user) ? this.props.user.toJS() : this.props.user;
+
         var customExamList = [];
+        examList = filterAuthExamList(examList, user.auth);
         _.each(examList, (obj, index) => {
             customExamList = _.concat(customExamList, obj.values);
         });
-
-// debugger;
 
         return (
             <div style={{ width: 1000, minHeight: 600, margin: '20px auto', background: '#fff', paddingBottom: 30 }}>
@@ -297,6 +292,41 @@ function mapDispatchToProps(dispatch) {
         updateSubjectSqm: bindActionCreators(updateSubjectSqmAction, dispatch),
         setCurSubjectSqm: bindActionCreators(setCurSubjectSqmAction, dispatch)
     }
+}
+
+function filterAuthExamList(originalExamList, auth) {
+    //针对时间戳中的每一个exam实体都进行auth匹配，这里匹配到科目
+    //当前能获取到自定义分析的就相当于自己是此自定义分析考试的校领导，所以没有问题。而能创建自定义分析最开始也是有一个年级属性的--但是有个问题，在没有上权限之前一个初二的老师可以创建初三的自定义考试，但是有了权限之后他就看不到了
+    if(auth.isSchoolManager) return originalExamList;
+    var authGrades = _.keys(auth.gradeAuth);
+    var result = [];
+    _.each(originalExamList, (obj) => {
+        //这个在服务端应该是已经过滤好的
+        // var validExams = _.filter(obj.values, (examItem) => {
+        //     return _.includes(authGrades, examItem.grade);
+        // });
+        // if(validExams.length == 0) return;
+        //有对应的年级exam实例--则，针对validExams获取科目。你是2班的语文老师，但是2班没有考试语文，3班考试了
+        var validExams = obj.values;
+        _.each(validExams, (examItem) => {
+            var examPapers = examItem.papers;
+            if(examItem.from == '40') return;
+            //如果是此年级的年级组长--那么可以看到所有科目；或者如果是此年级某n(n>0)班级的班主任，那么也可以看到所有科目，则都不需要对此exam再进行科目过滤
+            if((_.isBoolean(auth.gradeAuth[examItem.grade]) && auth.gradeAuth[examItem.grade]) || ((_.isObject(auth.gradeAuth[examItem.grade])) && auth.gradeAuth[examItem.grade].groupManagers.length > 0)) return;
+            //否则：
+            var authSubjectManagerSubjects = _.map(auth.gradeAuth[examItem.grade].subjectManagers, (obj) => obj.subject);
+            var authSubjectTeacherSubjects = _.map(auth.gradeAuth[examItem.grade].subjectTeachers, (obj) => obj.subject);
+            var allAuthSubjects = _.union(authSubjectManagerSubjects, authSubjectTeacherSubjects);
+            var authValidSubjectObjs = _.filter(examPapers, (paperObj) => {
+                return _.includes(allAuthSubjects, paperObj.subject);
+            });
+            examItem.papers = authValidSubjectObjs;
+        });
+        //Note: 保证显示的都是有paper内容的
+        validExams = _.filter(validExams, (examItem) => examItem.papers.length > 0);
+        if(validExams.length > 0) result.push({timeKey: obj.timeKey, values: validExams });
+    });
+    return result;
 }
 
 
