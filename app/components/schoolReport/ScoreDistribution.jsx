@@ -642,10 +642,11 @@ class OnlineInfo extends React.Component {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
                                     var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
+                                    var classStr = _.join(_.map(levObj.high, (className) => examInfo.gradeName + className + '班'), '、') + '；';
                                     return (
                                         <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
                                             <p style={{ fontSize: 12 }}>{levelStr}档线上线率高的班级</p>
-                                            <p style={{ color: B08, marginBottom: 0 }}>{_.join(_.map(levObj.high, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
+                                            <p style={{ width: '100%', color: B08, marginBottom: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}} title={classStr}>{classStr}</p>
                                         </div>
                                     )
                                 })
@@ -660,10 +661,11 @@ class OnlineInfo extends React.Component {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
                                     var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
+                                    var classStr = _.join(_.map(levObj.low, (className) => examInfo.gradeName + className + '班'), '、') + '；';
                                     return (
                                         <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
                                             <p style={{ fontSize: 12 }}>{levelStr}档线上线率低的班级</p>
-                                            <p style={{ color: B04, marginBottom: 0 }}>{_.join(_.map(levObj.low, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
+                                            <p style={{ width: '100%', color: B08, marginBottom: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}} title={classStr}>{classStr}</p>
                                         </div>
                                     )
                                 })
