@@ -300,6 +300,7 @@ class GroupAnalysis extends React.Component {
             plotOptions: {
                 column: {
                   cursor: 'pointer',
+                  pointWidth:16,
                     dataLabels: {
                         enabled: true,
                         color: '#000',

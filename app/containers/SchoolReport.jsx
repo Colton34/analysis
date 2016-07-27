@@ -33,7 +33,7 @@ class NavHeader extends React.Component {
     constructor(props) {
         super(props);
     }
-    
+
     render() {
         var {examId, grade} = this.props;
         var queries = grade ? {examid: examId, grade: grade} : {examid: examId}
@@ -41,13 +41,13 @@ class NavHeader extends React.Component {
             <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: colorsMap.C12 }}>
                 <Link to={{ pathname: '/dashboard',  query: queries}} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
                 <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}>
-                    <a style={{ color: '#b4b4b4' }} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> 
+                  {/*  <a style={{ color: '#b4b4b4' }} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> */}
                     <Link to={{ pathname: '/dashboard',  query: queries}} style={{color: colorsMap.C12}}>{this.props.examInfo.name}</Link>
                     <span><i className='icon-right-open-2'></i>校级分析报告</span>
                 </span>
             </div>
         )
-    } 
+    }
 }
 
 class SchoolReport extends React.Component {

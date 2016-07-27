@@ -4,7 +4,7 @@ import dashboardStyle from './dashboard.css';
 import ReactHighcharts from 'react-highcharts';
 
 /**
- * grade, examid, 
+ * grade, examid,
  * toViewSchoolAnalysis: 返回校级报告的函数
  */
 class CardHeader extends React.Component {
@@ -25,7 +25,7 @@ class CardHeader extends React.Component {
             hoverLink: false
         })
     }
-    
+
     render() {
         return (
             <div onClick={this.props.toViewSchoolAnalysis}
@@ -70,6 +70,7 @@ class SchoolReportCard extends React.Component {
              chart: {
                 type: 'spline'
             },
+            colors:['#0099ff'],
             title: {
                 text: '',
                 x: -20 //center
@@ -120,7 +121,7 @@ class SchoolReportCard extends React.Component {
 
 var localStyles = {
      linkHeader: {
-        display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' 
+        display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer'
     }
 }
 export default SchoolReportCard;
