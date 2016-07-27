@@ -636,37 +636,39 @@ class OnlineInfo extends React.Component {
             <div style={_.assign({}, { display: 'inline-block' }) }>
                 <div id='high' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'high' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
                     onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
-                    <div style={_.assign({}, { width: 215 * disTotal + 95 }) }>
+                    <div style={_.assign({}, { width: disTotal !== 0 ? 215 * disTotal + 95 : '100%'}) }>
                         {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
                                     var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
+                                    var classStr = _.join(_.map(levObj.high, (className) => examInfo.gradeName + className + '班'), '、') + '；';
                                     return (
                                         <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
                                             <p style={{ fontSize: 12 }}>{levelStr}档线上线率高的班级</p>
-                                            <p style={{ color: B08, marginBottom: 0 }}>{_.join(_.map(levObj.high, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
+                                            <p style={{ width: '100%', color: B08, marginBottom: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}} title={classStr}>{classStr}</p>
                                         </div>
                                     )
                                 })
-                            ) : (<p>只有一个班级，没有可比性</p>)
+                            ) : (<p style={{paddingLeft: 30}}>只有一个班级，没有可比性</p>)
                         }
                     </div>
                 </div>
                 <div id='low' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'low' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
                     onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
-                    <div style={_.assign({}, { width: 215 * disTotal + 95 }) }>
+                    <div style={_.assign({}, { width: disTotal !== 0 ? 215 * disTotal + 95 : '100%'}) }>
                         {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
                                     var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
+                                    var classStr = _.join(_.map(levObj.low, (className) => examInfo.gradeName + className + '班'), '、') + '；';
                                     return (
                                         <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
                                             <p style={{ fontSize: 12 }}>{levelStr}档线上线率低的班级</p>
-                                            <p style={{ color: B04, marginBottom: 0 }}>{_.join(_.map(levObj.low, (className) => examInfo.gradeName + className + '班'), '、') + '；'}</p>
+                                            <p style={{ width: '100%', color: B08, marginBottom: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'}} title={classStr}>{classStr}</p>
                                         </div>
                                     )
                                 })
-                            ) : (<p>只有一个班级，没有可比性</p>)
+                            ) : (<p style={{paddingLeft: 30}}>只有一个班级，没有可比性</p>)
                         }
                     </div>
                 </div>

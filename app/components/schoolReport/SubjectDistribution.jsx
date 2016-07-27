@@ -23,6 +23,9 @@ var localStyle= {
         ':link' : {
             textDecoration: 'none'
         }
+    },
+    lengthControl: {
+        overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'
     }
 }
 
@@ -57,13 +60,13 @@ class InfoBlock extends React.Component {
                  onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
                 <div style={_.assign({}, { width: (_.size(studentsGroupByClass) + 1) * 235 }) }>
                     {/**先渲染全校数据 */}
-                    <div style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20 }}>
+                    <div style={{ float: 'left', display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20 }}>
                         <p style={{ marginBottom: 10, fontSize: 12 }}>全校上线贡献率</p>
                         {
                             disData['totalSchool'] ? (
                                 <div>
-                                    <p style={{ fontSize: 12, marginBottom: 0 }}>贡献率高：<span style={{ color: B08 }}>{_.join(disData['totalSchool'].maxSubjects, '、') }</span></p>
-                                    <p style={{ fontSize: 12 }}>贡献率低：<span style={{ color: B04 }}>{_.join(disData['totalSchool'].minSubjects, '、') }</span></p>
+                                    <p style={_.assign({ fontSize: 12, marginBottom: 0, width: '100%'}, localStyle.lengthControl)}>贡献率高：<span style={{ color: B08}} title={_.join(disData['totalSchool'].maxSubjects, '、')}>{_.join(disData['totalSchool'].maxSubjects, '、') }</span></p>
+                                    <p style={_.assign({ fontSize: 12, width: '100%'}, localStyle.lengthControl)}>贡献率低：<span style={{ color: B04 }} title={_.join(disData['totalSchool'].maxSubjects, '、')}>{_.join(disData['totalSchool'].maxSubjects, '、')}</span></p>
                                 </div>
                             ) : <p style={{fontSize: 12}}>只有一个科目没有可比性</p>
                         }
@@ -71,13 +74,13 @@ class InfoBlock extends React.Component {
                     {
                         _.map(studentsGroupByClass, (students, className) => {
                             return (
-                                <div key={'infoBlock-' + className} style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
+                                <div key={'infoBlock-' + className} style={{ float: 'left', display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
                                     <p style={{ marginBottom: 10, fontSize: 12 }}>{className + '班'}上线贡献率</p>
                                     {
                                         disData[className] ? (
                                             <div>
-                                                <p style={{ fontSize: 12, marginBottom: 0 }}>贡献率高：<span style={{ color: B08 }}>{_.join(disData[className].maxSubjects, '、') }</span></p>
-                                                <p style={{ fontSize: 12 }}>贡献率低：<span style={{ color: B04 }}>{_.join(disData[className].minSubjects, '、') }</span></p>
+                                                <p style={_.assign({ fontSize: 12, marginBottom: 0, width: '100%'}, localStyle.lengthControl)}>贡献率高：<span style={{ color: B08}} title={_.join(disData[className].maxSubjects, '、') }>{_.join(disData[className].maxSubjects, '、') }</span></p>
+                                                <p style={_.assign({ fontSize: 12, width: '100%'}, localStyle.lengthControl)}>贡献率低：<span style={{ color: B04 }} title={_.join(disData[className].minSubjects, '、') }>{_.join(disData[className].minSubjects, '、') }</span></p>
                                             </div>
                                         ) : <p style={{fontSize: 12}}>只有一个科目没有可比性</p>
                                     }
@@ -135,14 +138,9 @@ class LevelInfo extends React.Component {
                    {/** 各科贡献率方块*/}
                    <InfoBlock studentsGroupByClass={studentsGroupByClass} disData={disData}/>
                     {/* 离差图 */}
-                    <p style={{margin: '50px 0 30px 0'}}>
-
-
+                    <p style={{margin: '40px 0 30px 0'}}>
                         <span style={{fontSize: 16,marginRight:20}}>学科上线率离差</span>
                         <span style={{fontSize: 12, color: C07}}>通过各班级学科上线率的差异，（学科上线率离差 = 班级某学科上线率 - 全校该学科平均上线率），反映了该学科对班级上线贡献的大小，正值表示该科贡献大，负值表示贡献小</span>
-
-
-
                     </p>
                    <ReactHighcharts config={chartConfig} style={{width: '100%'}}></ReactHighcharts>
                 </div>
