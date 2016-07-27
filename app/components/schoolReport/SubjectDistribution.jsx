@@ -137,8 +137,10 @@ class LevelInfo extends React.Component {
                     {/* 离差图 */}
                     <p style={{margin: '50px 0 30px 0'}}>
 
+
                         <span style={{fontSize: 16,marginRight:20}}>学科上线率离差</span>
                         <span style={{fontSize: 12, color: C07}}>通过各班级学科上线率的差异，（学科上线率离差 = 班级某学科上线率 - 全校该学科平均上线率），反映了该学科对班级上线贡献的大小，正值表示该科贡献大，负值表示贡献小</span>
+
 
 
                     </p>
