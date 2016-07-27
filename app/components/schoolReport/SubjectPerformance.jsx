@@ -316,7 +316,7 @@ legend:{
 },
 plotOptions: {
            column: {
-               pointWidth:subjects.length<=6?55:null
+               pointWidth:16
            }
        },
 series: [{

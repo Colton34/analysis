@@ -190,6 +190,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
         plotOptions: {
             column: {
                 stacking: 'normal',
+                pointWidth:16
             },
         },
         tooltip: {
@@ -236,8 +237,8 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
         chartConfig['xAxis']['categories'] = chartData['xAxons'];
         var series = [{ data: [], color: '#00adfb', stack: 0 }, { data: [], color: '#e7e7e7', stack: 0 }];
         _.each(chartData['yAxons'], (yInfoArr, index) => {
-            series[0].data.push({ name: yInfoArr[0].subject, y: yInfoArr[0].count, dataLabels: { enabled: true, format:'{point.name}', y: -10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 绿色柱
-            series[1].data.push({ name: yInfoArr[1].subject, y: yInfoArr[1].count, dataLabels: { enabled: true, format:'{point.name}', y:  10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 黄色柱
+            series[0].data.push({ name: yInfoArr[0].subject, y: yInfoArr[0].count, dataLabels: { enabled: true, format:'{point.name}', y: 0, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 绿色柱
+            series[1].data.push({ name: yInfoArr[1].subject, y: yInfoArr[1].count, dataLabels: { enabled: true, format:'{point.name}', y: 0, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 黄色柱
         });
         chartConfig['series'] = series;
 
