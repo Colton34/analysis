@@ -499,10 +499,12 @@ class ScoreDistribution extends React.Component {
                 type: 'pie'
             },
             colors:[
-             '#00adfb',
-             '#16d2c7',
-             '#4bc254',
-             '#e7e7e7'
+             '#0099ff',
+             '#33cc33',
+             '#33cccc',
+             '#ff9900',
+             '#ff6633',
+             '#6666cc'
            ],
             title: {
               verticalAlign: 'middle',
