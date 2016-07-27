@@ -3,7 +3,7 @@ import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
 import ReactHighcharts from 'react-highcharts';
 import { B03, C04, C07, C12, C14 } from '../../lib/constants';
-import {makeSegments, makeSegmentsStudentsCount} from '../../api/exam';
+import {makeSegments, makeSegmentsCount} from '../../api/exam';
 
 const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
 //算法数据结构：
@@ -155,7 +155,7 @@ function theTotalScoreTrenderChart(examInfo, examStudentsInfo) {
     var segments = makeSegments(examInfo.fullMark);
 
     var xAxons = _.slice(segments, 1);
-    var yAxons = makeSegmentsStudentsCount(examStudentsInfo, segments);
+    var yAxons = makeSegmentsCount(examStudentsInfo, segments);
 
     return {
         'x-axon': xAxons,

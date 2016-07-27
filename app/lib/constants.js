@@ -130,6 +130,7 @@ export const COLORS_MAP = {
     B06 : '#f7be38',
     B07 : '#f6953d',
     B08 : '#ee6b52',
+    B12 : '#e0f4fc',
     C02:  '#FAFAFA',
     C03 : '#f2f2f2',
     C04 : '#eeeeee',
@@ -140,7 +141,7 @@ export const COLORS_MAP = {
     C10 : '#6a6a6a',
     C11:  '#4d4d4d',
     C12 : '#333333',
-    C14 : '#fdfdfd'    
+    C14 : '#fdfdfd'
 }
 export const BACKGROUND_COLOR = '#EFF1F4';
 export const A11 = '#de5d44';

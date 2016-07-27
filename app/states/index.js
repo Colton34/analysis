@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:02:04
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-30 19:03:09
+* @Last Modified time: 2016-07-14 18:10:37
 */
 
 'use strict';
@@ -18,9 +18,9 @@ var _initState = {
     app: new gloablInitState,
     home: new homeInitState,
     dashboard: new dashboardInitState,
+    rankReport: new rankReportState,
     schoolAnalysis: new schoolAnalysisState,
-    customAnalysis: new customAnalysisState,
-    rankReport: new rankReportState
+    customAnalysis: new customAnalysisState
 };
 
 export default _initState;

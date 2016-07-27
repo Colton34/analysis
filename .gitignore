@@ -1,5 +1,5 @@
 node_modules
-npm-debug.log
+npm-debug.log*
 .tmp
 .idea
 public/assets
@@ -16,3 +16,4 @@ tempFiles/
 start-dev.sh
 start.sh
 .DS_Store
+designeNote.js

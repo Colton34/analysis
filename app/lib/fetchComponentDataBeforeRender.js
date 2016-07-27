@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-06-01 20:48:30
+* @Last Modified time: 2016-07-19 16:55:00
 */
 import _ from 'lodash';
 
@@ -31,11 +31,3 @@ export function fetchComponentDataBeforeRender(dispatch, components, params, loc
     const promises = needs.map(need => dispatch(need(params)));
     return Promise.all(promises);
 }
-
-
-//     params = params || {};
-//     location.query = location.query || {};
-//     params = _.merge(params, location.query);
-
-//     params['_user'] = req.user;
-// console.log('最终的params = ', params);

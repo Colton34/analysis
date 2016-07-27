@@ -11,8 +11,6 @@ var InitialState = Record({
 
 	examInfo: {},
 	rankCache: Map({})
-	// rankInfo: Map({})
-
 });
 
 export default InitialState;

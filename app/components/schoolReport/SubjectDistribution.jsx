@@ -31,7 +31,7 @@ class InfoBlock extends React.Component {
         super(props);
         this.state = {
             showScroll: false,
-            needScroll: _.size(this.props.disData) > 4 ? true : false
+            needScroll: _.size(this.props.studentsGroupByClass) > 3 ? true : false  //一个“全校”信息卡片 + 超过3个班级卡片就会超出边界
         }
     }
 
@@ -50,11 +50,12 @@ class InfoBlock extends React.Component {
 
     render() {
         var {disData, studentsGroupByClass} = this.props;
-        var disDataSize = _.size(disData);
+        //var disDataSize = _.size(disData);
+        var studentGroupSize = _.size(studentsGroupByClass);
         return (
-            <div style={_.assign({}, { width: '100%', height: 150, marginTop: 30 }, disDataSize > 4 && this.state.showScroll ? { overflowX: 'scroll' } : {overflowX: 'hidden'})}
+            <div style={_.assign({}, { width: '100%', height: 150, marginTop: 30 }, studentGroupSize > 3 && this.state.showScroll ? { overflowX: 'scroll' } : {overflowX: 'hidden'})}
                  onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
-                <div style={_.assign({}, { width: disDataSize * 235 }) }>
+                <div style={_.assign({}, { width: (_.size(studentsGroupByClass) + 1) * 235 }) }>
                     {/**先渲染全校数据 */}
                     <div style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20 }}>
                         <p style={{ marginBottom: 10, fontSize: 12 }}>全校上线贡献率</p>
@@ -64,7 +65,7 @@ class InfoBlock extends React.Component {
                                     <p style={{ fontSize: 12, marginBottom: 0 }}>贡献率高：<span style={{ color: B08 }}>{_.join(disData['totalSchool'].maxSubjects, '、') }</span></p>
                                     <p style={{ fontSize: 12 }}>贡献率低：<span style={{ color: B04 }}>{_.join(disData['totalSchool'].minSubjects, '、') }</span></p>
                                 </div>
-                            ) : <p>只有一个科目没有可比性</p>
+                            ) : <p style={{fontSize: 12}}>只有一个科目没有可比性</p>
                         }
                     </div>
                     {
@@ -78,7 +79,7 @@ class InfoBlock extends React.Component {
                                                 <p style={{ fontSize: 12, marginBottom: 0 }}>贡献率高：<span style={{ color: B08 }}>{_.join(disData[className].maxSubjects, '、') }</span></p>
                                                 <p style={{ fontSize: 12 }}>贡献率低：<span style={{ color: B04 }}>{_.join(disData[className].minSubjects, '、') }</span></p>
                                             </div>
-                                        ) : <p>只有一个科目没有可比性</p>
+                                        ) : <p style={{fontSize: 12}}>只有一个科目没有可比性</p>
                                     }
                                 </div>
                             )
@@ -114,7 +115,6 @@ class LevelInfo extends React.Component {
         var {activeTab} = this.state;
         var levelStr = numberMap[activeTab + 1];
         var {tableData, disData, chartConfig} = resultData[activeTab];
-        var disDataSize = _.size(disData);
         return (
             <div >
                 {/* tab */}
@@ -136,8 +136,11 @@ class LevelInfo extends React.Component {
                    <InfoBlock studentsGroupByClass={studentsGroupByClass} disData={disData}/>
                     {/* 离差图 */}
                     <p style={{margin: '50px 0 30px 0'}}>
+
                         <span style={{fontSize: 16,marginRight:20}}>学科上线率离差</span>
-                        <span style={{fontSize: 12, color: C07}}>通过各班级学科上线率的差异，（学科上线率离差 = 班级某学科上线率 - 全校该学科平均上线率），反映了该学科对班级上线贡献的大小，政治白哦是该科贡献大，负值表示贡献小</span>
+                        <span style={{fontSize: 12, color: C07}}>通过各班级学科上线率的差异，（学科上线率离差 = 班级某学科上线率 - 全校该学科平均上线率），反映了该学科对班级上线贡献的大小，正值表示该科贡献大，负值表示贡献小</span>
+
+
                     </p>
                    <ReactHighcharts config={chartConfig} style={{width: '100%'}}></ReactHighcharts>
                 </div>

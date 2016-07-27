@@ -6,8 +6,6 @@ var webpack = require("webpack");
 var assetsPath = path.join(__dirname, "..", "public", "assets");
 var publicPath = "/assets/";
 
-// var node_modules_path = path.resolve(__dirname, '..', 'node_modules');
-
 var commonLoaders = [
     {
         test: /\.js$|\.jsx$/,
@@ -145,7 +143,7 @@ module.exports = [
                 compressor: {
                     warnings: false
                 },
-                sourceMap: true //用户在线上生成source map文件
+                sourceMap: true //用户在线上生成source map文件.TODO:当前没有生成有效的source map--404
             }),
             new webpack.DefinePlugin({
                 __DEVCLIENT__: false,

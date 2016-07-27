@@ -4,11 +4,11 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Link} from 'react-router';
-import {List} from 'immutable';
+import {List, Map} from 'immutable';
 
 import {initHomeAction} from '../../reducers/home/actions';
 import {initParams, saveAs} from '../../lib/util';
-import {FROM_FLAG as fromFlag, FROM_CUSTOM_TEXT} from '../../lib/constants';
+import {FROM_FLAG as fromFlag, FROM_CUSTOM_TEXT, COLORS_MAP as colorsMap} from '../../lib/constants';
 
 import styles from './Home.css';
 import _ from 'lodash';
@@ -102,9 +102,9 @@ class TeacherHelper extends React.Component {
         return (
             <div>
                 <div className={styles.title}>老师助手</div>
-                <a  href='/faq?section=intro&sub=introVideo' 
+                <a  href='/faq?section=intro&sub=introVideo'
                     onMouseEnter={this.onHoverVideoLink.bind(this)}
-                    onMouseLeave={this.onLeaveVideoLink.bind(this)} 
+                    onMouseLeave={this.onLeaveVideoLink.bind(this)}
                     className={this.state.videoLinkHover ? styles['video-img-hover'] : styles['video-img']} ></a>
                 <a style={localStyle.downloadBtn}
                     target='_blank'
@@ -266,13 +266,22 @@ class ExamList extends React.Component {
         }
     }
     render() {
-        var {examList} = this.props;
+        var {examList, errorInfo} = this.props;
         var {pageIndex, pageSize} = this.state;
         return (
             <div style={{ display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 25, backgroundColor: '#fff' }}>
                 <div className={styles['banner-img']}></div>
                 {
-                    examList.length ? _.map(examList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize), (obj) => {
+                    errorInfo && errorInfo.msg ? (
+                        <div style={{width: 940, height: 505, display: 'table-cell', textAlign: 'center', verticalAlign: 'middle'}}>
+                            <div className={styles['blank-list']} style={{margin: '0 auto', marginBottom: 30}}></div>
+                            <p style={{color: colorsMap.C10, fontSize: 18, marginBottom: 30}}>抱歉，暂时没有和您相关的考试分析数据</p>
+                            <p style={{color: colorsMap.C09}}>{errorInfo.msg}</p>
+                        </div>
+                    ) : ''
+                }
+                {
+                    examList.length && _.isEmpty(errorInfo) ? _.map(examList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize), (obj) => {
                         return _.map(obj.values, (exam, index) => {
                             if (index === 0) {
                                 return <ExamItem key={index} timeKey={obj.timeKey} item={exam}/>
@@ -282,11 +291,11 @@ class ExamList extends React.Component {
                                 return <ExamItem key={index} item={exam}/>
                             }
                         })
-                    }) : <NoExamList />
+                    }) : ''
                 }
                 {/*-------------------------------------------分页----------------------------------------------------------*/}
                 {
-                    examList.length ?
+                    examList.length  && _.isEmpty(errorInfo) ?
                         <div style={{marginTop: 15, color: '#9a9a9a'}}>
                             <ul style={{margin: '0 auto', width: '50%', listStyleType: 'none', textAlign: 'center'}}>
                                 <li key='pagePrev' style={localStyle.pageDirection} data-page='prev' onClick={this.onClickPage.bind(this)}>
@@ -319,11 +328,11 @@ class ExamList extends React.Component {
 
 }
 
-const Content = ({examList}) => {
+const Content = ({examList, errorInfo}) => {
 
     return (
         <div style={{ width: 1200, margin: '0 auto', minHeight: 900, backgroundColor: '#eff1f4', position:'relative', paddingBottom: 80}}>
-            <ExamList examList={examList} />
+            <ExamList examList={examList} errorInfo={errorInfo}/>
             <Sidebar/>
             <div style={{clear:'both'}}></div>
         </div>
@@ -343,17 +352,18 @@ class Home extends React.Component {
 
     render() {
         var examList = (List.isList(this.props.home.examList)) ? this.props.home.examList.toJS() : this.props.home.examList;
-        if(!examList || examList.length == 0)
-            return (
-                <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
-                    <Spinkit/>
-                </div>
-            );
-
+        var errorInfo = (Map.isMap(this.props.home.errorInfo)) ? this.props.home.errorInfo.toJS() : this.props.home.errorInfo;
+        // if(!examList || examList.length == 0)
+        //     return (
+        //         <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
+        //             <HomeBlank message="exam.length == 0" />
+        //         </div>
+        //     );
+       
 
         return (
             <div >
-                <Content examList={examList}/>
+                <Content examList={examList} errorInfo={errorInfo}/>
             </div>
         );
     }
