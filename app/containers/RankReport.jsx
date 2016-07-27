@@ -516,7 +516,7 @@ class RankReportTableView extends React.Component {
                         {
                             examInfo.papers.map((subjectObj, index) => {
                                 return (
-                                    <a key={'papers-' + index} onClick={this.onSelectPaper.bind(this) } data-paperid={subjectObj.paper} href='javascript:;' style={this.state.currentPaper.name === subjectObj.name ? localStyle.activeSubject : localStyle.subject}>{subjectObj.name}</a>
+                                    <a key={'papers-' + index} onClick={this.onSelectPaper.bind(this) } data-paperid={subjectObj.paper} href='javascript:;' style={this.state.currentPaper.name === subjectObj.name && this.state.currentPaper.pid === subjectObj.paper? localStyle.activeSubject : localStyle.subject}>{subjectObj.name}</a>
                                 )
                             })
                         }
