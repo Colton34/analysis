@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-26 17:40:50
+* @Last Modified time: 2016-07-27 10:30:26
 */
 
 'use strict';
@@ -882,6 +882,9 @@ function getOriginalRankCache(papers) {
  * @return {[type]}           [description]
  */
 function filterAuthRankCache(auth, rankCache, papers, grade) {
+
+console.log('auth === ', JSON.stringify(auth));// subjectTeachers : group: 2, 4, 但是authClasses却是个空数组[]
+
     var authRankCache = {}, allPaperIds = _.keys(rankCache), authClasses = [];
     //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
     if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
@@ -893,27 +896,39 @@ function filterAuthRankCache(auth, rankCache, papers, grade) {
                 authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
             }
         });
-        //过滤有效科目下的有效班级
+        //过滤有效科目下的有效班级。
         _.each(gradeAuthObj.groupManagers, (obj) => {
             _.each(allPaperIds, (paperId) => {
+                //要么是上面学科组长已经把当前学科所需要的所有classes已经添加进来了，要么是个空数组--之前还没有遇到某一学科
                 var authExistClasses = (authRankCache[paperId]) ? _.keys(authRankCache[paperId]) : [];
+                authClasses = _.union(authClasses, authExistClasses);
+// console.log('authExistClasses ==== ', authExistClasses);
                 //Note: 如果当前authExistClasses还没有添加此班级的数据，并且此班级是有效的（即在原来的数据中能找到），则添加对应的班级数据到authRankCache中
                 if(!_.includes(authExistClasses, obj.group) && (_.includes(_.keys(rankCache[paperId]), obj.group))) {
                     if(!authRankCache[paperId]) authRankCache[paperId] = {};
                     // if(!authRankCache.totalScore) authRankCache.totalScore = {};
                     authRankCache[paperId][obj.group] = rankCache[paperId][obj.group];
-                    authClasses.push(obj.group);
+                    authClasses = _.union(authClasses, [obj.group]);
                     // authRankCache.totalScore[obj.group] = rankCache.totalScore[obj.group];
                 }
             });
         });
         //Note: 因为auth中已经做了冗余的排查，所以如果这里有subjectTeachers那么就一定是前面所没有包含的
+
+//Case: 一个教初二2，4两个班级的语文老师，查看一个只考了生物一门学科的考试--能看到dashboard中排行榜总分，进入排行榜详情中能看到对应班级的总分
+//5班的班主任，此考试只有4班考试的生物
+
+
+var allPapperSubjects = _.map(papers, (paperObj) => paperObj.subject);
+console.log('allPapperSubjects ==== ', allPapperSubjects);
+console.log('rankCache.length == ', _.size(rankCache));
+
         _.each(gradeAuthObj.subjectTeachers, (obj) => {
             var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
+            authClasses = _.union(authClasses, [obj.group]);//Note: 无论是不是当前所考试科目的任课考试，他都能看到所对应班级的总分--authClasses是为了totalScore的数据结构
             if(targetAuthPaper) {
                 if(!authRankCache[targetAuthPaper._id]) authRankCache[targetAuthPaper._id] = {};
                 authRankCache[targetAuthPaper._id][obj.group] = rankCache[targetAuthPaper._id][obj.group];
-                authClasses.push(obj.group);
             }
         });
     } else {
@@ -922,7 +937,9 @@ function filterAuthRankCache(auth, rankCache, papers, grade) {
 
     if(!authRankCache.totalScore) {
         //Note: 如果没有totalScore，则添加进来，但是也有走过滤班级
-        authClasses = _.uniq(authClasses);
+        // authClasses = _.uniq(authClasses);
+console.log('authClasses = ', authClasses);
+
         authRankCache.totalScore = {};
         _.each(authClasses, (className) => {
             authRankCache.totalScore[className] = rankCache.totalScore[className];
@@ -946,16 +963,17 @@ function getAuthExamInfo(authRankCache, examName, papers) {
         var targetPaper = _.find(papers, (paperObj) => paperObj._id.toString() == paperId+"");
         examPapers.push({paper: targetPaper._id, pid: targetPaper.id, name: targetPaper.subject});
     });
-    var tempAuthObjs = [], examClasses = [];
-    _.each(authRankCache, (obj, pid) => {
-        if(pid != 'totalScore') {
-            tempAuthObjs.push(_.keys(obj));
-        }
-    })
-    _.each(tempAuthObjs, (authArr) => {
-        examClasses = _.concat(examClasses, authArr);
-    })
-    examClasses = _.uniq(examClasses);
+    var examClasses = _.keys(authRankCache.totalScore);
+    // var tempAuthObjs = [], examClasses = [];
+    // _.each(authRankCache, (obj, pid) => {
+    //     if(pid != 'totalScore') {
+    //         tempAuthObjs.push(_.keys(obj));
+    //     }
+    // })
+    // _.each(tempAuthObjs, (authArr) => {
+    //     examClasses = _.concat(examClasses, authArr);
+    // })
+    // examClasses = _.uniq(examClasses);
     return {
         name: examName,
         papers: examPapers,
