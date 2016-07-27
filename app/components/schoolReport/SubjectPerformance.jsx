@@ -299,6 +299,9 @@ xAxis: {
   categories:subjects
 },
 yAxis: {
+  title:{
+    text:''
+  },
   lineWidth:1,
 gridLineDashStyle:'Dash',
 },

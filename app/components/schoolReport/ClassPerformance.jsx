@@ -143,10 +143,12 @@ const AverageTable = ({tableHeaderData, tableData}) => {
 
         var config = {
           colors:[
-           '#00adfb',
-           '#4bc254',
-           '#16d2c7',
-           '#e7e7e7'
+           '#0099ff',
+           '#33cc33',
+           '#33cccc',
+           '#ff9900',
+           '#ff6633',
+           '#6666cc'
          ],
          title: {
              text: '(人数)',
