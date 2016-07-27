@@ -60,7 +60,7 @@ class InfoBlock extends React.Component {
                  onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
                 <div style={_.assign({}, { width: (_.size(studentsGroupByClass) + 1) * 235 }) }>
                     {/**先渲染全校数据 */}
-                    <div style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20 }}>
+                    <div style={{ float: 'left', display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20 }}>
                         <p style={{ marginBottom: 10, fontSize: 12 }}>全校上线贡献率</p>
                         {
                             disData['totalSchool'] ? (
@@ -74,7 +74,7 @@ class InfoBlock extends React.Component {
                     {
                         _.map(studentsGroupByClass, (students, className) => {
                             return (
-                                <div key={'infoBlock-' + className} style={{ display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
+                                <div key={'infoBlock-' + className} style={{ float: 'left', display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
                                     <p style={{ marginBottom: 10, fontSize: 12 }}>{className + '班'}上线贡献率</p>
                                     {
                                         disData[className] ? (
