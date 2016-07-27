@@ -58,3 +58,11 @@
     top: -16px;
     right: -15px;
 }
+
+.blank-list {
+    background-image: url(../images/noData.png);
+    background-size: contain;
+    width: 159px;
+    height: 130px;
+    display: block;
+}
