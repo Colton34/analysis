@@ -68,7 +68,7 @@ class SchoolReportCard extends React.Component {
         })
         var config = {
              chart: {
-                type: 'spline'
+                type: 'line'
             },
             colors:['#0099ff'],
             title: {

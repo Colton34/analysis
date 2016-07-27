@@ -34,6 +34,11 @@ class Dialog extends React.Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.isValid = _.map(_.range(nextProps.levelBuffers.length), (index) => true);
+        this.isUpdate = false;
+        this.levelBuffers = nextProps.levelBuffers;
+    }
     onChange(ref, event) {
         this.refs[ref].value = event.target.value;
     }
