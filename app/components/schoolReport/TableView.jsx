@@ -60,8 +60,8 @@ class TableView extends React.Component {
                 {
                     this.state.showAllEnable ?
                         (this.state.showAll ?
-                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击收缩表格数据 <i style={{color: colorsMap.A12}} className='icon-up-open-2'></i></a> :
-                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击查看更多数据 <i style={{color: colorsMap.A12}} className='icon-down-open-2'></i> </a>
+                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击收缩表格数据 <i style={{color: colorsMap.B03}} className='icon-up-open-2'></i></a> :
+                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击查看更多数据 <i style={{color: colorsMap.B03}} className='icon-down-open-2'></i> </a>
                         ) : ''
                 }
             </div>

@@ -354,7 +354,7 @@ series: [{
                 </div>
                 <p style={{marginBottom: 20}}>
                     <span className={schoolReportStyles['sub-title']}>各学科成绩分布的等级结构比例</span>
-                    <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 120, height: 30, float: 'right', backgroundColor: A12, color: '#fff', lineHeight: '30px', borderRadius: 2}}>
+                    <a href="javascript:void(0)"  onClick={this.onShowDialog.bind(this)} className={styles.button} style={{ width: 120, height: 30, float: 'right', backgroundColor: colorsMap.B03, color: '#fff', lineHeight: '30px', borderRadius: 2}}>
                         <i className='icon-cog-2'></i>
                         设置等级参数
                     </a>

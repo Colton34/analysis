@@ -27,7 +27,7 @@ let localStyle = {
 const BasicInfo = ({examInfo, levels, examStudentsInfo, onShowDialog}) => {
     var levTotal = _.size(levels);
     return (
-        <div style={{position: 'relative', padding: 30, backgroundColor: A12, color: '#fff', marginBottom: 20}}>
+        <div style={{position: 'relative', padding: 30, backgroundColor: colorsMap.B03, color: '#fff', marginBottom: 20}}>
             <p style={{marginRight: 20, fontSize: 18, marginBottom: 25}}>
                 <span style={{marginRight: 20}}>分档分数线 </span>
                 <span style={{fontSize: 12}}>分档分数线默认分为三档， 分别对应学生总数的10%，30%，60%，如需修改请点击右侧按钮</span>
@@ -43,7 +43,7 @@ const BasicInfo = ({examInfo, levels, examStudentsInfo, onShowDialog}) => {
                     })
             }
             </p>
-            <span onClick={onShowDialog} style={{ cursor: 'pointer', color: A12, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30}}>
+            <span onClick={onShowDialog} style={{ cursor: 'pointer', color: colorsMap.B03, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30}}>
                     <i className='icon-cog-2' style={{fontSize: 12}}></i>
                     设置分档参数
             </span>
@@ -469,7 +469,6 @@ class ScoreDistribution extends React.Component {
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
         var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
         var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels);
-
         //自定义Module数据结构
         var _this = this;
         var levTotal = _.size(levels);
@@ -641,7 +640,7 @@ class OnlineInfo extends React.Component {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
                                     var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
-                                    var classStr = _.join(_.map(levObj.high, (className) => examInfo.gradeName + className + '班'), '、') + '；';
+                                    var classStr = _.join(_.map(levObj.high, (className) => className + '班'), '、') + '；';
                                     return (
                                         <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
                                             <p style={{ fontSize: 12 }}>{levelStr}档线上线率高的班级</p>
@@ -660,7 +659,7 @@ class OnlineInfo extends React.Component {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
                                     var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
-                                    var classStr = _.join(_.map(levObj.low, (className) => examInfo.gradeName + className + '班'), '、') + '；';
+                                    var classStr = _.join(_.map(levObj.low, (className) => className + '班'), '、') + '；';
                                     return (
                                         <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
                                             <p style={{ fontSize: 12 }}>{levelStr}档线上线率低的班级</p>
@@ -699,7 +698,6 @@ function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
         totalClassRow.unshift(theKey+'班');
         table.push(totalClassRow);
     });
-
     return table;
 }
 
