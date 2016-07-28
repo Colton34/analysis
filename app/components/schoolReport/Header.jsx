@@ -97,17 +97,17 @@ class NavBar extends React.Component {
         var moduleLen = modules.length;
         var {position} = this.state;
         return (
-            <div id='navBar' style={_.assign({}, {zIndex: 100, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C05, backgroundColor: colorsMap.C02},
-                                    position === 'normal' ? {position:'absolute', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: '100%', borderBottom: '1px solid ' + colorsMap.C05})}>
+            <div id='navBar' style={_.assign({}, {zIndex: 100, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C04, backgroundColor: colorsMap.C02},
+                                    position === 'normal' ? {position:'absolute', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: '100%', borderBottom: '1px solid ' + colorsMap.C04})}>
                 <div style={_.assign(position !== 'normal' ? {position: 'absolute', left: '50%', marginLeft: -600} : {})}>
             {
                 modules.map((module, index) => {
                     return (
                         <div key={'navItem-' + index} id='nav-item' style={{display: 'table-cell', minWidth: 1200/moduleLen, height: 50, textAlign: 'center', verticalAlign: 'middle', fontSize: 12, cursor: 'pointer'}} 
                              data-id={module.id} onClick={this.onClickModule.bind(this)}>
-                            <span style={_.assign({}, {height: 12, float: 'left', marginTop: 2}, index === 0 && position !== 'normal'? {borderRight: '1px solid ' + colorsMap.C05, display: 'inline-block'} : {})}></span> 
+                            <span style={_.assign({}, {height: 12, float: 'left', marginTop: 2}, index === 0 && position !== 'normal'? {borderRight: '1px solid ' + colorsMap.C04, display: 'inline-block'} : {})}></span> 
                             <span style={this.state.activeId === module.id ? {paddingBottom: 16, borderBottom: '2px solid ' + colorsMap.A12} : {}}>{module.name} </span>
-                            <span style={_.assign({}, {display: 'inline-block', height: 12, float: 'right', marginTop: 2}, index === modules.length -1 && position === 'normal'? {}: {borderRight: '1px solid ' + colorsMap.C05})}></span>
+                            <span style={_.assign({}, {display: 'inline-block', height: 12, float: 'right', marginTop: 2}, index === modules.length -1 && position === 'normal'? {}: {borderRight: '1px solid ' + colorsMap.C04})}></span>
                         </div>
                     )
                 })

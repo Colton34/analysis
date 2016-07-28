@@ -6,7 +6,7 @@ import {COLORS_MAP as colorsMap} from '../../lib/constants';
 let localStyle = {
     tableShowAllBtn: { 
         color: colorsMap.C12, textDecoration: 'none', width: '100%', height: 40, display: 'inline-block', textAlign: 'center', backgroundColor: '#fff', lineHeight: '40px',
-        border: '1px solid ' + colorsMap.C05, borderTop: 0
+        border: '1px solid ' + colorsMap.C04, borderTop: 0
     }
 }
 /**

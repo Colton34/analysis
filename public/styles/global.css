@@ -8,7 +8,7 @@ p, div p {
     margin: 15px 0 30px 0;
     height: 40px;
     line-height: 40px;
-    border-bottom: 1px solid #ececee;
+    border-bottom: 1px solid #eeeeee;
 }
 
 .tab-ctn ul {
@@ -26,14 +26,14 @@ p, div p {
     font-size: 14px;
     color: #24434f;
     cursor: pointer;
-    border-top: 1px solid #ececee;
-    border-right: 1px solid #ececee;
-    border-bottom: 1px solid #ececee;
+    border-top: 1px solid #eeeeee;
+    border-right: 1px solid #eeeeee;
+    border-bottom: 1px solid #eeeeee;
     border-radius: 3px 3px 0 0;
 }
 
 .tab-ctn ul:first-child{
-    border-left: 1px solid #ececee;
+    border-left: 1px solid #eeeeee;
     border-radius: 3px 3px 0 0;
 }
 
