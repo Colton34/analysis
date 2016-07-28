@@ -326,7 +326,7 @@ class GroupAnalysis extends React.Component {
             },
             series: serisDataTop
         };
-
+        var showHighChart = (_.size(disData.top) == 0) || (_.size(disData.low) == 0);
         return (
             <div id='groupAnalysis' className={schoolReportStyles['section']}>
                 <div style={{ marginBottom: 30 }}>
@@ -344,10 +344,16 @@ class GroupAnalysis extends React.Component {
                     <span className={schoolReportStyles['sub-title']}>临界生较多班级</span>
                   <span className={schoolReportStyles['title-desc']}>临界生较多班级，存在更大提高班级该档上线率的空间，学校和班级应该基于更多关注，对整体教学成就有显著的积极作用。</span>
                 </p>
-                {/* todo： 图待补充 */}
-                <div style={{width:1110,height:280,display:'inline-block',paddingTop:30,marginRight:30}}>
-                  {((_.size(disData.top) == 0) || (_.size(disData.low) == 0)) ? '' : <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts> }
-                </div>
+                {
+                    showHighChart ? (
+                        <div style={{color: colorsMap.C10}}>只有一个班级没有可比性</div>
+                    )  : (
+                        <div style={{ width: 1110, height: 280, display: 'inline-block', paddingTop: 30, marginRight: 30 }}>
+                            <ReactHighcharts config={config} style={{ width: '100%', height: '100%' }}></ReactHighcharts>
+                        </div>
+                    )
+                }
+                
                 <Dialog levels={levels} levelBuffers={levelBuffers} updateLevelBuffers={this.props.updateLevelBuffers} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }/>
             </div>
         )
