@@ -282,10 +282,10 @@ class RankReportTableView extends React.Component {
     onSelectPaper(event) {
         var paperId = $(event.target).data('paperid');
         var paperName = $(event.target).text();
+        var {rankCache} = this.props;
         // 如果paperId不是'all'，则通过rankCache来筛选学生
         if (paperId !== 'all') {
             //配合curerentClass来获得学生ID
-            var {rankCache} = this.props;
             var studentGroups = _.pick(rankCache, [paperId]);
             //Note: 显示只在当前用户权限下的班级列表
             this.props.examInfo.classes = _.keys(rankCache[paperId]);
@@ -310,6 +310,7 @@ class RankReportTableView extends React.Component {
                 sortInfo: {}
             })
         } else {
+            this.props.examInfo.classes = _.keys(rankCache.totalScore);
             this.setState({
                 currentPaper: {name: paperName},
                 currentClasses: this.props.examInfo.classes,
