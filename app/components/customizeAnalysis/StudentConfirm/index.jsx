@@ -33,16 +33,15 @@ var examInfos = {
 
  */
 //Note: （遗留）没有很好的解决“上传”的问题
-function getAuthClasses(auth, gradeKey) {
+function getAuthClasses(auth, gradeKey, currentSubjectName) {
     //获取此页面需要的auth classes
     //如果是校级领导，年级主任，任意一门学科的学科组长，那么都将看到所有学生--因为这里涉及的自定义分析到选择学生页面没有学科的筛选了，就没办法和学科再联系一起了
     if(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]) || ((_.isObject(auth.gradeAuth[gradeKey])) && auth.gradeAuth[gradeKey].subjectManagers.length > 0)) return true;
     //Note: 是自定义--不属于自己管理的年级
     if(!auth.gradeAuth[gradeKey]) return true;
 
-
     var authGroupManagerClasses = _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => obj.group);
-    var authSubjectTeacherClasses = _.map(auth.gradeAuth[gradeKey].subjectTeachers, (obj) => obj.group);
+    var authSubjectTeacherClasses = _.map(_.filter(auth.gradeAuth[gradeKey].subjectTeachers, (obj) => obj.subject == currentSubjectName), (obj) => obj.group);
     var allAuthClasses = _.union(authGroupManagerClasses, authSubjectTeacherClasses);
     return allAuthClasses;
 }
@@ -73,7 +72,7 @@ class StudentConfirm extends React.Component {
 
     //Note：收集学生的时候只能收集自己管辖范围内的学生；此时一定是确定了某一年级！！！从currenetSubject中获取年级--因为所有科目的年级肯定是一样的
     getGroupMap(currentSubject) {
-        var authClasses = getAuthClasses(this.props.user.auth, currentSubject.grade);
+        var authClasses = getAuthClasses(this.props.user.auth, currentSubject.grade, currentSubject.name);
         var studentInfos = currentSubject.SQM.y;
         var groupMap = {};
         var isLiankao = studentInfos[0].school ? true : false;
