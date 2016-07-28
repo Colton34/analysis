@@ -42,7 +42,7 @@ class NavHeader extends React.Component {
                 <Link to={{ pathname: '/dashboard',  query: queries}} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
                 <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}>
                   {/*  <a style={{ color: '#b4b4b4' }} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> */}
-                    <Link to={{ pathname: '/dashboard',  query: queries}} style={{color: colorsMap.C12}}>{this.props.examInfo.name}</Link>
+                    <Link to={{ pathname: '/dashboard',  query: queries}} style={{color: '#b4b4b4'}}>{this.props.examInfo.name}</Link>
                     <span><i className='icon-right-open-2'></i>校级分析报告</span>
                 </span>
             </div>
