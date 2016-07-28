@@ -309,7 +309,15 @@ credits:{
   enabled:false
 },
 tooltip:{
-enabled:false
+enabled:true,
+backgroundColor:'#000',
+borderColor:'#000',
+style:{
+  color:'#fff'
+},
+formatter: function(){
+     return this.point.y.toFixed(2);
+}
 },
 legend:{
   enabled:false
