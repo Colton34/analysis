@@ -137,7 +137,7 @@ class Dashboard extends React.Component {
                                 <Link to={{ pathname: '/' }} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
                                 <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}><a style={{ color: '#b4b4b4' }} href='/'>{'首页'}</a></span>
                             </div>
-                            <div style={{ backgroundColor: '#fff', width: 1200, height: 900, display: 'table-cell', textAlign: 'center', verticalAlign: 'middle' }}>
+                            <div style={{ backgroundColor: '#fff', width: 1200, height: 650, display: 'table-cell', textAlign: 'center', verticalAlign: 'middle' }}>
                                 <div className={commonStyles['blank-list']} style={{ margin: '0 auto', marginBottom: 30 }}></div>
                                 <p style={{ color: colorsMap.C10, fontSize: 18, marginBottom: 30 }}>好桑心，您无法查看分析详情</p>
                                 <p style={{ color: colorsMap.C09 }}>您的角色、年级、班级、学科等基础信息与系统不匹配，请尽快联系管理员老师确认。</p>
