@@ -30,7 +30,7 @@
     margin: 0 10px;
 }
 .table-unit {
-     border: 1px solid #d7d7d7;
+     border: 1px solid #eeeeee; 
      text-align: left;
      vertical-align: middle !important;
      height: 40px;
@@ -57,4 +57,12 @@
     border: 0;
     top: -16px;
     right: -15px;
+}
+
+.blank-list {
+    background-image: url(../images/noData.png);
+    background-size: contain;
+    width: 159px;
+    height: 130px;
+    display: block;
 }

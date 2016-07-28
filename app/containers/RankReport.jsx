@@ -744,7 +744,7 @@ class PageHeader extends React.Component {
     render() {
         var {examInfo, targetUrl} = this.props;
         return (
-            <div style={{ paddingLeft: 30, backgroundColor: '#fafafa', height: 50, lineHeight: '50px' }}>
+            <div style={{ paddingLeft: 0, backgroundColor: '#EFF1F4', height: 50, lineHeight: '50px' }}>
                 <a href={targetUrl} style={{ fontSize: 12, textDecoration: 'none', color: '#59bde5', float: 'left' }}><i className='icon-fanhui2' style={{color: '#59bde5', fontSize: 16}}></i></a>
                 <span style={{ fontSize: 14,color: '#333', marginLeft: 10}}><span onClick={this.onClickExamName.bind(this, targetUrl)} style={localStyle.examName}>{examInfo.name + ' > '}</span>分数排行榜</span>
             </div>
@@ -918,7 +918,7 @@ class RankReport extends React.Component {
         var targetUrl = grade ? '/dashboard?examid=' + examid + '&grade=' + encodeURI(grade) : '/dashboard?examid=' + examid;
 
         return (
-            <div style={{ width: 1200, minHeight: 830, backgroundColor: '#fff', margin: '0 auto', marginTop: 30 }}>
+            <div style={{ width: 1200, minHeight: 830, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 }}>
                 <PageHeader examInfo={examInfo} targetUrl={targetUrl}/>
                 <RankReportTableView
                     examInfo={examInfo}
@@ -989,21 +989,3 @@ var localStyle = {
 
 
 // 3阶段 根据 rankFactor排序。前面是确定内容，这里确定顺序。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

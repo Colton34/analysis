@@ -28,11 +28,11 @@ const Table = ({tableHeaderData, isGood, current, tableData}) => {
         <BootTable bordered hover responsive style={{marginBottom: 0}}>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa' }}>
-                    <th className={styles['table-unit']}>班级</th>
+                    <th className={styles['table-unit']} style={{borderColor: colorsMap.C04}}>班级</th>
                     {
                         _.map(tableHeaderData, (th, index) => {
                             return (
-                                <th key={index} className={styles['table-unit']} style={{minWidth: 100}}>{th}</th>
+                                <th key={index} className={styles['table-unit']} style={{minWidth: 100, borderColor: colorsMap.C04}}>{th}</th>
                             )
                         })
                     }
@@ -44,7 +44,7 @@ const Table = ({tableHeaderData, isGood, current, tableData}) => {
                                 {
                                     _.map(rowData, (data, index) => {
                                         return (
-                                            <td key={index} className={styles['table-unit']} style={{minWidth: 100}}>
+                                            <td key={index} className={styles['table-unit']} style={{minWidth: 100, borderColor: colorsMap.C04}}>
                                                 {data}
                                             </td>
                                         )
@@ -160,7 +160,7 @@ class StudentPerformanceTable extends React.Component {
                 {/* 名次/比例输入框  */}
                 <div style={{position: 'absolute', right: 0, top: -55 }}>
                     <span style={{marginRight: 8}}>年级{(isGood) ? '前' : '后'}</span>
-                    <input ref='numInput' value={this.state.inputNum} onChange={this.onChangeInput.bind(this)} style={{ display: 'inline-block', width: 52, height: 30, lineHeight: '30px', textAlign:'center', marginRight: 5 }}/>
+                    <input ref='numInput' value={this.state.inputNum} onChange={this.onChangeInput.bind(this)} style={{ display: 'inline-block', width: 52, height: 30, lineHeight: '30px', textAlign:'center', marginRight: 5, border: '1px solid ' + colorsMap.C04}}/>
                     <span style={{marginRight: 10}}>{_this.state.current.key === 'ranking' ? '名' : '%'}</span>
                     <span onClick={this.onConfirmChange.bind(this)} style={{display: 'inline-block', width: 42, height: 30, lineHeight: '30px', borderRadius: 2, backgroundColor: colorsMap.A12, color: '#fff', cursor: 'pointer', textAlign: 'center'}}>
                         确定
@@ -195,8 +195,8 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
                 _.range(2).map(posNum => {
                     {/* 分别渲染前、后十名列表 */}
                     return (
-                        <div key={'table-' + posNum} style={_.assign({}, { width: 555, minHeight: 338, display: 'inline-block', border: '1px solid ' + C05, paddingTop: 30 }, posNum === 0 ? { marginRight: 30 } : {}) }>
-                            <div style={{ padding: '0 30px 20px 0', marginLeft: 30, borderBottom: '1px solid ' + C05 }}>{'本次考试' + (posNum === 0 ? '前' : '后') + '十名的学生'}</div>
+                        <div key={'table-' + posNum} style={_.assign({}, { width: 555, minHeight: 338, display: 'inline-block', border: '1px solid ' + colorsMap.C04, paddingTop: 30 }, posNum === 0 ? { marginRight: 30 } : {}) }>
+                            <div style={{ padding: '0 30px 20px 0', marginLeft: 30, borderBottom: '1px solid ' + colorsMap.C04 }}>{'本次考试' + (posNum === 0 ? '前' : '后') + '十名的学生'}</div>
                             {
                                 _.range(2).map(num => {
                                     {/* 分别渲染列表内的左右边表格 */ }

@@ -395,6 +395,14 @@ class ExamSelect extends React.Component {
                 var authMatrix = getAuthMatrix(_this.props.user.auth, resp.matrix, resp.grade, resp.subject);
                 var validGrade = (authMatrix.m.length == 0) ? '' : resp.grade;
                 var validSubject = (authMatrix.m.length == 0) ? '' : resp.subject;
+                // 检查返回的矩阵做权限提示判断；
+                if (authMatrix.m.length === 0) {
+                    _this.setState({
+                        showInfoDialog: true,
+                        infoDialogMsg: '没有权限匹配的数据'
+                    })
+                    return;
+                }
                 // 填充currentPaper
                 var paperInfo = {
                     isFromCustom: false,
@@ -497,8 +505,7 @@ class ExamSelect extends React.Component {
                                             questionInfo.selected = true;
                                         isAllChecked &= questionInfo.selected;
                                     })
-
-                                    if(currentPapers[paperId].oriSQM.m.length == 0) return;//给出Tip: 没有权限匹配的数据
+                                    
                                     return (
                                         <div key={'qblock-' + index} className={ownClassNames['data-question-list']} data-paperId={paperId} >
                                             <div style={{ marginBottom: 20 }}>

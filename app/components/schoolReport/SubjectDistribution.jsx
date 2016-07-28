@@ -8,7 +8,7 @@ import schoolReportStyles from './schoolReport.css';
 import Table from '../../common/Table.jsx';
 import DropdownList from '../../common/DropdownList';
 
-import {NUMBER_MAP as numberMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 import {makeFactor} from '../../api/exam';
 import TableView from './TableView';
 import Radium from 'radium';
@@ -60,7 +60,7 @@ class InfoBlock extends React.Component {
                  onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
                 <div style={_.assign({}, { width: (_.size(studentsGroupByClass) + 1) * 235 }) }>
                     {/**先渲染全校数据 */}
-                    <div style={{ float: 'left', display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20 }}>
+                    <div style={{ float: 'left', display: 'inline-block', border: '1px solid ' + colorsMap.C04, width: 215, height: 115, padding: 20, marginRight: 20 }}>
                         <p style={{ marginBottom: 10, fontSize: 12 }}>全校上线贡献率</p>
                         {
                             disData['totalSchool'] ? (
@@ -74,7 +74,7 @@ class InfoBlock extends React.Component {
                     {
                         _.map(studentsGroupByClass, (students, className) => {
                             return (
-                                <div key={'infoBlock-' + className} style={{ float: 'left', display: 'inline-block', border: '1px solid ' + C05, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
+                                <div key={'infoBlock-' + className} style={{ float: 'left', display: 'inline-block', border: '1px solid ' + colorsMap.C04, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
                                     <p style={{ marginBottom: 10, fontSize: 12 }}>{className + '班'}上线贡献率</p>
                                     {
                                         disData[className] ? (
@@ -174,7 +174,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
             enabled: false
         },
         xAxis: {
-          gridLineColor:'#f2f2f2',
+          gridLineColor:'#f2f2f3',
             tickWidth:'0px',//不显示刻度
             gridLineWidth:1,
             gridLineDashStyle:'Dash',
@@ -182,7 +182,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
         },
         yAxis: {
           lineWidth:1,
-          gridLineColor:'#f2f2f2',
+          gridLineColor:'#f2f2f3',
           gridLineDashStyle:'Dash',
             title: '',
             reversedStacks: false
@@ -190,11 +190,18 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
         plotOptions: {
             column: {
                 stacking: 'normal',
+                pointWidth:16
             },
         },
         tooltip: {
-            pointFormat: '<b>{point.name}:{point.y:.1f}</b>',
-            enabled: false
+            backgroundColor:'#000',
+            borderColor:'#000',
+            style:{
+                color:'#fff'
+            },
+            formatter: function(){
+                return this.point.name+':'+this.point.y;
+            }
         },
         credits: {
             enabled: false
@@ -236,8 +243,8 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
         chartConfig['xAxis']['categories'] = chartData['xAxons'];
         var series = [{ data: [], color: '#00adfb', stack: 0 }, { data: [], color: '#e7e7e7', stack: 0 }];
         _.each(chartData['yAxons'], (yInfoArr, index) => {
-            series[0].data.push({ name: yInfoArr[0].subject, y: yInfoArr[0].count, dataLabels: { enabled: true, format:'{point.name}', y: -10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 绿色柱
-            series[1].data.push({ name: yInfoArr[1].subject, y: yInfoArr[1].count, dataLabels: { enabled: true, format:'{point.name}', y:  10, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 黄色柱
+            series[0].data.push({ name: yInfoArr[0].subject, y: yInfoArr[0].count, dataLabels: { enabled: true, format:'{point.name}', y: 0, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 绿色柱
+            series[1].data.push({ name: yInfoArr[1].subject, y: yInfoArr[1].count, dataLabels: { enabled: true, format:'{point.name}', y: 0, inside: false, style:{fontWeight:'bold', color: '#333'}}}); // 黄色柱
         });
         chartConfig['series'] = series;
 

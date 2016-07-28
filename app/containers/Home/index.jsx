@@ -13,6 +13,7 @@ import {FROM_FLAG as fromFlag, FROM_CUSTOM_TEXT, COLORS_MAP as colorsMap} from '
 import styles from './Home.css';
 import _ from 'lodash';
 import Spinkit from '../../common/Spinkit';
+import commonStyles from '../../common/common.css';
 
 let questionnaireItem = [
     '非常喜欢',
@@ -274,7 +275,7 @@ class ExamList extends React.Component {
                 {
                     errorInfo && errorInfo.msg ? (
                         <div style={{width: 940, height: 505, display: 'table-cell', textAlign: 'center', verticalAlign: 'middle'}}>
-                            <div className={styles['blank-list']} style={{margin: '0 auto', marginBottom: 30}}></div>
+                            <div className={commonStyles['blank-list']} style={{margin: '0 auto', marginBottom: 30}}></div>
                             <p style={{color: colorsMap.C10, fontSize: 18, marginBottom: 30}}>抱歉，暂时没有和您相关的考试分析数据</p>
                             <p style={{color: colorsMap.C09}}>{errorInfo.msg}</p>
                         </div>
