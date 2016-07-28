@@ -127,7 +127,6 @@ class Dashboard extends React.Component {
                     <Spinkit/>
                  </div>
             );
-
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
                 {
@@ -157,7 +156,7 @@ class Dashboard extends React.Component {
                                 </div>
                                 {(examInfoGuide && _.size(examInfoGuide) > 0) ? <ExamGuideComponent data={examInfoGuide} /> : ''}
                                 <div className='row' style={{ marginTop: 20 }}>
-                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade}/> : ''}
+                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} expand={_.size(schoolReport) === 0 ? true : false}/> : ''}
                                     {(schoolReport && _.size(schoolReport) > 0) ? <SchoolReport examid={examid} grade={grade} data={schoolReport}/> : ''}
                                 </div>
                                 {/* */}
