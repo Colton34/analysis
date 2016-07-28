@@ -174,7 +174,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
             enabled: false
         },
         xAxis: {
-          gridLineColor:'#f2f2f2',
+          gridLineColor:'#f2f2f3',
             tickWidth:'0px',//不显示刻度
             gridLineWidth:1,
             gridLineDashStyle:'Dash',
@@ -182,7 +182,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
         },
         yAxis: {
           lineWidth:1,
-          gridLineColor:'#f2f2f2',
+          gridLineColor:'#f2f2f3',
           gridLineDashStyle:'Dash',
             title: '',
             reversedStacks: false
@@ -200,7 +200,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
                 color:'#fff'
             },
             formatter: function(){
-                return this.point.y;
+                return this.point.name+':'+this.point.y;
             }
         },
         credits: {
