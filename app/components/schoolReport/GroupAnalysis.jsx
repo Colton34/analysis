@@ -287,14 +287,14 @@ class GroupAnalysis extends React.Component {
                 enabled:false
             },
             tooltip:{
-                enabled:false,
+                enabled:true,
                 backgroundColor:'#000',
                 borderColor:'#000',
                 style:{
                     color:'#fff'
                 },
                 formatter: function(){
-                    return this.point.name;
+                    return this.point.y;
                 }
             },
             legend:{

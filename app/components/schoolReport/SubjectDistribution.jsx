@@ -194,8 +194,14 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
             },
         },
         tooltip: {
-            pointFormat: '<b>{point.name}:{point.y:.1f}</b>',
-            enabled: false
+            backgroundColor:'#000',
+            borderColor:'#000',
+            style:{
+                color:'#fff'
+            },
+            formatter: function(){
+                return this.point.y;
+            }
         },
         credits: {
             enabled: false
