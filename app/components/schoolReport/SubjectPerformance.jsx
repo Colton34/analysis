@@ -304,6 +304,7 @@ yAxis: {
   },
   lineWidth:1,
 gridLineDashStyle:'Dash',
+  gridLineColor:'#f2f2f3',
 },
 credits:{
   enabled:false

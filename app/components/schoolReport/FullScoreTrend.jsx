@@ -42,13 +42,14 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
         yAxis: {
           lineWidth:1,
           gridLineDashStyle:'Dash',
+            gridLineColor:'#f2f2f3',
             title: {
                 text: '',
             },
             plotLines: [{
                 value: 0,
                 width: 1,
-                color: '#808080'
+                color: '#f2f2f3'
             }]
         },
         tooltip: {
@@ -58,9 +59,8 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
           color:'#fff'
         },
             formatter: function(){
-                 return this.point.low + '-' + this.point.high +
-                '区间人数<br />' + this.point.y +
-                '人,占'+Math.round(((this.point.y/examInfo.realStudentsCount)*100))+'%';
+                 return (this.point.low>0?'(':'[')+this.point.low + '-' + this.point.high +']区间人数<br />'+ this.point.y +'人,占'
+                 +Math.round(((this.point.y/examInfo.realStudentsCount)*100))+'%';
             }
         },
         legend: {
