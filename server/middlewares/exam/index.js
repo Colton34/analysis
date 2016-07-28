@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-27 16:42:33
+* @Last Modified time: 2016-07-28 16:46:02
 */
 
 'use strict';
@@ -888,6 +888,7 @@ function getOriginalRankCache(papers) {
  * @param  {[type]} rankCache [description]
  * @return {[type]}           [description]
  */
+//Test Case: 2、4班的语文老师，2班的班主任；语文科目下有2、4班；其他科目下面只有2班
 function filterAuthRankCache(auth, rankCache, papers, grade) {
     var authRankCache = {}, allPaperIds = _.keys(rankCache), authClasses = [];
     //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
@@ -900,9 +901,10 @@ function filterAuthRankCache(auth, rankCache, papers, grade) {
                 authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
             }
         });
-        //过滤有效科目下的有效班级。
+        //Note: 过滤有效科目下的有效班级。
         _.each(gradeAuthObj.groupManagers, (obj) => {
             _.each(allPaperIds, (paperId) => {
+                if(paperId == 'totalScore') return;
                 //要么是上面学科组长已经把当前学科所需要的所有classes已经添加进来了，要么是个空数组--之前还没有遇到某一学科
                 var authExistClasses = (authRankCache[paperId]) ? _.keys(authRankCache[paperId]) : [];
                 authClasses = _.union(authClasses, authExistClasses);
@@ -918,8 +920,8 @@ function filterAuthRankCache(auth, rankCache, papers, grade) {
         });
         //Note: 因为auth中已经做了冗余的排查，所以如果这里有subjectTeachers那么就一定是前面所没有包含的
 
-//Case: 一个教初二2，4两个班级的语文老师，查看一个只考了生物一门学科的考试--能看到dashboard中排行榜总分，进入排行榜详情中能看到对应班级的总分
-//5班的班主任，此考试只有4班考试的生物
+        //Test Case: 一个教初二2，4两个班级的语文老师，查看一个只考了生物一门学科的考试--能看到dashboard中排行榜总分，进入排行榜详情中能看到对应班级的总分
+        //5班的班主任，此考试只有4班考试的生物
         _.each(gradeAuthObj.subjectTeachers, (obj) => {
             var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
             authClasses = _.union(authClasses, [obj.group]);//Note: 无论是不是当前所考试科目的任课考试，他都能看到所对应班级的总分--authClasses是为了totalScore的数据结构
@@ -939,7 +941,6 @@ function filterAuthRankCache(auth, rankCache, papers, grade) {
         _.each(authClasses, (className) => {
             authRankCache.totalScore[className] = rankCache.totalScore[className];
         })
-        // authRankCache.totalScore = rankCache.totalScore;
     }
     return authRankCache;
 }

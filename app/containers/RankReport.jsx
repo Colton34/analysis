@@ -224,7 +224,6 @@ class RankReportTableView extends React.Component {
             headSeq: this.props.headSeq,                        // 默认显示全部表头
             sortInfo: {}                                        //{head: , order: }
         }
-        // debugger;
     }
     getTableHead() {
         var firstLineHead = [];
@@ -288,6 +287,8 @@ class RankReportTableView extends React.Component {
             //配合curerentClass来获得学生ID
             var {rankCache} = this.props;
             var studentGroups = _.pick(rankCache, [paperId]);
+            //Note: 显示只在当前用户权限下的班级列表
+            this.props.examInfo.classes = _.keys(rankCache[paperId]);
             // 获取学生kaohao,组成一个新的数组
             var kaohaoList = [];
 
@@ -504,9 +505,7 @@ class RankReportTableView extends React.Component {
         var dataBegin = pageIndex * pageSize + 1;
         var dataEnd = (pageIndex + 1) * pageSize < showData.length ? (pageIndex + 1) * pageSize : showData.length;
 
-
         var theRowDatas = this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
-        // debugger;
         return (
             <div style={{ margin: '30px 30px 30px 35px' }}>
                 <div style={{border: '1px solid #eeeeee', padding: '5px 30px 0 30px'}}>
@@ -810,13 +809,11 @@ class RankReport extends React.Component {
      */
     // 根据examinfo里的paper来获取表头的显示顺序
     getHeadSeq(examInfo) {
-        // debugger;
         _.forEach(examInfo.papers, paperObj=> {
             _.forEach(['score', 'groupRank', 'classRank'], item => {
                 this.headSeq.push(item + '_' + paperObj.paper)
             })
         })
-        // debugger;
     }
     // 生成所有学生的待显示数据
     generateStudentInfos(rankCache) {
@@ -887,17 +884,12 @@ class RankReport extends React.Component {
     }
 
     handleUndefinedData() {
-        // debugger;
         _.forEach(this.studentInfos, (studentInfo, kaohao) => {
-            // debugger;
             _.forEach(this.headSeq, head => {
                 if (studentInfo[head] === undefined) {
-                    // debugger;
                     if (head.indexOf('score') !== -1) {
-                        // debugger;
                         studentInfo[head] = Number.NEGATIVE_INFINITY;
                     } else if (head.indexOf('groupRank') !== -1 || head.indexOf('classRank') !== -1) {
-                        // debugger;
                         studentInfo[head] = Number.POSITIVE_INFINITY;
                     }
 
@@ -919,7 +911,7 @@ class RankReport extends React.Component {
         this.getHeadSeq(examInfo);
         this.generateStudentInfos(rankCache);
         this.handleUndefinedData();
-// debugger;
+
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
         if (!examid) return;
