@@ -66,11 +66,11 @@ const Table = ({tableData, levels}) => {
         <BootTable bordered  hover responsive style={_.assign({}, {marginBottom: 0}, widthProp)}>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa' }}>
-                    <th rowSpan="2" className={style['table-unit']}>班级</th>
+                    <th rowSpan="2" className={style['table-unit']} style={{borderColor: colorsMap.C04}}>班级</th>
                     {
                         _.map(_.range(levTotal), (index) =>{
                             return (
-                                <th key={index} colSpan="3" className={style['table-unit']} style={{minWidth: 200, textAlign: 'center', paddingLeft: 0}}>
+                                <th key={index} colSpan="3" className={style['table-unit']} style={{minWidth: 200, textAlign: 'center', paddingLeft: 0, borderColor: colorsMap.C04}}>
                                      {numberMap[(index + 1)]}档
                                 </th>
                             )
@@ -83,11 +83,11 @@ const Table = ({tableData, levels}) => {
                             return  _.map(_.range(3), (index) =>  {
                                 switch(index ) {
                                     case 0:
-                                        return <th key={index} className={style['table-unit']}>人数</th>
+                                        return <th key={index} className={style['table-unit']} style={{borderColor: colorsMap.C04}}>人数</th>
                                     case 1:
-                                        return  <th key={index} className={style['table-unit']}>累计人数</th>
+                                        return  <th key={index} className={style['table-unit']} style={{borderColor: colorsMap.C04}}>累计人数</th>
                                     case 2:
-                                        return <th key={index} className={style['table-unit']}>累计占比</th>
+                                        return <th key={index} className={style['table-unit']} style={{borderColor: colorsMap.C04}}>累计上线率</th>
                                 }
                             })
                         })
@@ -100,7 +100,7 @@ const Table = ({tableData, levels}) => {
                             {
                                 _.map(rowData, (data, index) =>{
                                     return (
-                                        <td key={index} className={style['table-unit']}>{data}</td>
+                                        <td key={index} className={style['table-unit']} style={{borderColor: colorsMap.C04}}>{data}</td>
                                     )
                                 })
                             }
@@ -574,7 +574,7 @@ class ScoreDistribution extends React.Component {
                     <OnlineInfo levTotal={levTotal} disData={disData} examInfo={examInfo}/>
                     <div style={{ display: 'inline-block', width: 380, height:240, position: 'relative', float: 'right'}}>
                         {/*--------------------------------  总分分档上线学生饼图 -------------------------------------*/}
-                        <ReactHighcharts config={config} style={{ display: 'inline-block', width: 380, height: 240, border: '1px solid ' + colorsMap.C05 }}></ReactHighcharts>
+                        <ReactHighcharts config={config} style={{ display: 'inline-block', width: 380, height: 240, border: '1px solid ' + colorsMap.C04 }}></ReactHighcharts>
                         {/*--------------------------------  饼图的select -------------------------------------*/}
                         <span style={{ position: 'absolute', right: 30, top: 30 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } classList={_this.classList}/></span>
                     </div>
@@ -634,7 +634,7 @@ class OnlineInfo extends React.Component {
         var disTotal = _.size(disData);
         return (
             <div style={_.assign({}, { display: 'inline-block' }) }>
-                <div id='high' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'high' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
+                <div id='high' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + colorsMap.C04, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'high' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
                     onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
                     <div style={_.assign({}, { width: disTotal !== 0 ? 215 * disTotal + 95 : '100%'}) }>
                         {
@@ -653,7 +653,7 @@ class OnlineInfo extends React.Component {
                         }
                     </div>
                 </div>
-                <div id='low' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + C05, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'low' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
+                <div id='low' className='online-block' style={_.assign({}, { width: 740, minHeight: 110, border: '1px solid ' + colorsMap.C04, padding: '30px 0 0 0', marginBottom: 20 }, disTotal > 3 && this.state.showScroll === 'low' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
                     onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
                     <div style={_.assign({}, { width: disTotal !== 0 ? 215 * disTotal + 95 : '100%'}) }>
                         {

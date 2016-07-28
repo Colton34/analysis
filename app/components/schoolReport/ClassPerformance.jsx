@@ -23,11 +23,11 @@ const AverageTable = ({tableHeaderData, tableData}) => {
         <BootTable  bordered hover responsive style={{marginBottom: 0}}>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa' }}>
-                    <th className={styles['table-unit']} rowSpan="2">班级</th>
+                    <th className={styles['table-unit']} rowSpan="2" style={{borderColor: colorsMap.C04}}>班级</th>
                     {
                         _.map(tableHeaderData, (subject, index) => {
                             return (
-                                <th colSpan="2" key={index} className={styles['table-unit']} style={{minWidth: 100}}>{subject}</th>
+                                <th colSpan="2" key={index} className={styles['table-unit']} style={{minWidth: 100, borderColor: colorsMap.C04}}>{subject}</th>
                             )
                         })
                     }
@@ -37,8 +37,8 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                     _.map(_.range(tableHeaderData.length), (num) => {
                         return _.map(_.range(2), (index) => {
                             if (index === 0)
-                                return <th className={styles['table-unit']} key={index} style={{minWidth: 100}}>平均分</th>
-                            return <th className={styles['table-unit']} key={index} style={{minWidth: 100}}>平均得分率</th>
+                                return <th className={styles['table-unit']} key={index} style={{minWidth: 100, borderColor: colorsMap.C04}}>平均分</th>
+                            return <th className={styles['table-unit']} key={index} style={{minWidth: 100, borderColor: colorsMap.C04}}>平均得分率</th>
                         })
                     })
                 }
@@ -50,7 +50,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                                 {
                                     _.map(tdList, (td, tindex) => {
                                         return (
-                                            <td key={'td' + tindex}className={styles['table-unit']} style={{minWidth: 100}}>
+                                            <td key={'td' + tindex}className={styles['table-unit']} style={{minWidth: 100, borderColor: colorsMap.C04}}>
                                                 {td}
                                             </td>
                                         )
@@ -166,18 +166,27 @@ const AverageTable = ({tableHeaderData, tableData}) => {
             yAxis: {
               lineWidth:1,
               gridLineDashStyle:'Dash',
+                gridLineColor:'#f2f2f3',
                 title: {
                     text: ''
                 },
                 plotLines: [{
                     value: 0,
                     width: 1,
-                    color: '#808080'
-                }]
+                    color: '#f2f2f3'
+                }],
             },
             tooltip: {
-                valueSuffix: '人数',
-                enabled:false
+              valueSuffix: '人数',
+              enabled:true,
+            backgroundColor:'#000',
+            borderColor:'#000',
+            style:{
+              color:'#fff'
+            },
+                formatter: function(){
+                     return this.point.y ;
+                }
             },
             legend: {
                 layout: 'horizontal',
@@ -208,13 +217,13 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                 </div>
                 <div style={{display: 'inline-block', width: 215, float: 'right', marginTop: 10}}>
                     <div style={{ display: 'table-row'}}>
-                        <div style={{ width: 215, height: 110, border: '1px solid ' + C07, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center' }}>
+                        <div style={{ width: 215, height: 110, border: '1px solid ' + colorsMap.C04, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center' }}>
                             <p style={{ fontSize: 12, marginBottom: 10 }}>高分学生较多的班级</p>
                             <div style={_.assign({ fontSize: 30, color: B08, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.greater, '、')}>{_.join(headerInfo.greater, '、')}</div>
                         </div>
                     </div>
                     <div style={{height: 20}}></div>
-                    <div style={{width: 215, height: 110, border: '1px solid ' + C07, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center'}}>
+                    <div style={{width: 215, height: 110, border: '1px solid ' + colorsMap.C04, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center'}}>
                         <p style={{fontSize: 12, marginBottom: 10}}>高分学生较少的班级</p>
                         <div style={_.assign({ fontSize: 30, color: B08, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.lesser, '、')}>{_.join(headerInfo.lesser, '、')}</div>
                     </div>

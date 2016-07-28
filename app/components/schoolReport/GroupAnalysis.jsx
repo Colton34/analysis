@@ -63,16 +63,16 @@ class Dialog extends React.Component {
             return;
         }
 
-        
+
         //levelBuffers的顺序是和levels对应的--显示的时候是倒序
         this.levelBuffers[levBufLastIndex-index] = value;
         //检测如果添加了此buffer，那么保证顺序是对的，由小到大。拿到当前生成的两个值，左边的要比它左边的大，右边的要比它右边的小（前提是如果左右边有值的话）：
         var newSegments = makeCriticalSegments(this.levelBuffers, this.props.levels);
         var invalidIndex = -1;
         var segmentsIsValid = true;
-        
+
         segmentsIsValid = _.every(_.range(newSegments.length-1), (index) => {
-            var valid = newSegments[index+1] > newSegments[index] 
+            var valid = newSegments[index+1] > newSegments[index]
             invalidIndex = valid ? -1 : (levBufLastIndex - parseInt(index/2));
             return valid;
         });
@@ -221,7 +221,7 @@ class GroupAnalysis extends React.Component {
         var xAxis = _.map(levels, (levObj, levelKey) => numberMap[(levelKey-0)+1]+'档');
         var disData = criticalStudentsDiscription(criticalLevelInfo);
 
-        var serisData = {}, colorList=['#00abfe','#00d3c8','#45c44e','#00abfe','#45c44e'];//TODO: 颜色列表
+        var serisData = {}, colorList=['#0099ff','#33cc33','#33cccc','#ff9900','#ff6633','#6666cc'];//TODO: 颜色列表
         _.each(disData, (dataMap, dataKey) => {
             var serisItem = [];
             _.each(dataMap, (dataArr, levelKey) => {
@@ -279,22 +279,28 @@ class GroupAnalysis extends React.Component {
             yAxis: {
               lineWidth:1,
                 gridLineDashStyle:'Dash',
+                  gridLineColor:'#f2f2f3',
                 title: {
                     text: ''
                 },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#f2f2f3'
+                }],
             },
             credits:{
                 enabled:false
             },
             tooltip:{
-                enabled:false,
+                enabled:true,
                 backgroundColor:'#000',
                 borderColor:'#000',
                 style:{
                     color:'#fff'
                 },
                 formatter: function(){
-                    return this.point.name;
+                    return this.point.y;
                 }
             },
             legend:{
@@ -305,6 +311,7 @@ class GroupAnalysis extends React.Component {
             plotOptions: {
                 column: {
                   cursor: 'pointer',
+                  pointWidth:16,
                     dataLabels: {
                         enabled: true,
                         color: '#000',

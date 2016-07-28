@@ -304,19 +304,28 @@ yAxis: {
   },
   lineWidth:1,
 gridLineDashStyle:'Dash',
+  gridLineColor:'#f2f2f3',
 },
 credits:{
   enabled:false
 },
 tooltip:{
-enabled:false
+enabled:true,
+backgroundColor:'#000',
+borderColor:'#000',
+style:{
+  color:'#fff'
+},
+formatter: function(){
+     return this.point.y.toFixed(2);
+}
 },
 legend:{
   enabled:false
 },
 plotOptions: {
            column: {
-               pointWidth:subjects.length<=6?55:null
+               pointWidth:16
            }
        },
 series: [{
@@ -338,7 +347,7 @@ series: [{
 
                 <p style={{margin: '40px 0 20px 0'}}>
                     <span className={schoolReportStyles['sub-title']}>学科离差分布</span>
-                    <span className={schoolReportStyles['title-desc']}>离差较大的学科，反映出各班级该学科教学效果差距较大；离差较小的学科，反映出各班级该学科教学效果比较整齐</span>
+                    <span className={schoolReportStyles['title-desc']}>班级平均得分率差异较大的学科，反映出各班该学科班级平均水平差距较大；班级平均得分率差异较小的学科，反映出各班该学科班级平均水平比较整齐（注：语文是母语，具有特殊性）</span>
                 </p>
                 <div style={{display: 'inline-block', width: '100%', height: 380, position: 'relative'}}>
                   <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>

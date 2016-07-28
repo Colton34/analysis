@@ -25,8 +25,9 @@ import {Map, List} from 'immutable';
 
 import dashboardStyle from '../components/dashboard/dashboard.css';
 import Spinkit from '../common/Spinkit';
-import { Modal } from 'react-bootstrap';
-import {FROM_FLAG, FROM_CUSTOM_TEXT} from '../lib/constants';
+import commonStyles from '../common/common.css';
+import { Modal } from 'react-bootstrap';    
+import {FROM_FLAG, FROM_CUSTOM_TEXT, COLORS_MAP as colorsMap} from '../lib/constants';
 
 var {Header, Title, Body, Footer} = Modal;
 
@@ -126,85 +127,48 @@ class Dashboard extends React.Component {
                     <Spinkit/>
                  </div>
             );
-
-
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
-                <div style={{height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4',  margin: '10px auto 10px -15px', fontSize: 16 , color: '#333'}}>
-                    <Link to={{pathname: '/'}} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{color: '#59bde5'}}></i></Link>
-                    <span style={{ fontSize: 14,color: '#333', marginLeft: 20}}><a style={{color: '#b4b4b4'}} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> {examInfoGuide.name}</span>
-                    {
-                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ?
-                        <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this)} style={styles.aBtn}>
-                            <i className='icon-delete'></i>删除
-                        </a> : ''
-                    }
-                </div>
-                {(examInfoGuide && _.size(examInfoGuide) > 0) ? <ExamGuideComponent data={examInfoGuide} /> : ''}
-                <div className='row' style={{marginTop: 20}}>
-                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade}/> : ''}
-                    {(schoolReport && _.size(schoolReport) > 0) ? <SchoolReport examid={examid} grade={grade} data={schoolReport}/> : ''}
-                </div>
-                {/* */}
-                <div className='row' style={{marginTop: 20}}>
-                    <LevelReport />
-                    <SubjectReport />
-                    <ClassReport />
-                </div>
-                {/**
-                    <div style={[styles.box, styles.common.radius]}>
-                    <div style={[styles.container, styles.common.radius]}>
-                        <ExamGuideComponent data={examInfoGuide} />
-                        <ScoreRank data={scoreRank} examid={examid} grade={grade}/>
-                        <div key="test"   style={{cursor: 'pointer'}}className={dashboardStyle['card']} onClick={this.toViewSchoolAnalysis.bind(this) }>
-                            <div className={dashboardStyle['card-title']}>学校成绩总报告</div>
-                            <div className={dashboardStyle['analysis-report'] + ' ' + dashboardStyle['card-image']}></div>
-                            <div className={dashboardStyle['detail-btn']}>查看详情</div>
+                {
+                    _.size(examInfoGuide) === 0 && _.size(scoreRank) === 0 && _.size(schoolReport) === 0 ? (
+                        <div>
+                            <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: '#333' }}>
+                                <Link to={{ pathname: '/' }} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
+                                <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}><a style={{ color: '#b4b4b4' }} href='/'>{'首页'}</a></span>
+                            </div>
+                            <div style={{ backgroundColor: '#fff', width: 1200, height: 650, display: 'table-cell', textAlign: 'center', verticalAlign: 'middle' }}>
+                                <div className={commonStyles['blank-list']} style={{ margin: '0 auto', marginBottom: 30 }}></div>
+                                <p style={{ color: colorsMap.C10, fontSize: 18, marginBottom: 30 }}>好桑心，您无法查看分析详情</p>
+                                <p style={{ color: colorsMap.C09 }}>您的角色、年级、班级、学科等基础信息与系统不匹配，请尽快联系管理员老师确认。</p>
+                            </div>
                         </div>
-                    </div>
-                    <div style={[styles.container, styles.common.radius]}>
-                        <LevelReport data={levelScoreReport} />
-                        <div className={dashboardStyle['card']}>
-                            <div className={dashboardStyle['card-title']}>班级分析报告</div>
-                            <ClassReport data={classScoreReport}/>
+                    ) : (
+                            <div>
+                                <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px -15px', fontSize: 16, color: '#333' }}>
+                                    <Link to={{ pathname: '/' }} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
+                                    <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}><a style={{ color: '#b4b4b4' }} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> {examInfoGuide.name}</span>
+                                    {
+                                        FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ?
+                                            <a key='delAnalysisBtn' href='javascript:;' onClick={this.onShowDialog.bind(this) } style={styles.aBtn}>
+                                                <i className='icon-delete'></i>删除
+                                            </a> : ''
+                                    }
+                                </div>
+                                {(examInfoGuide && _.size(examInfoGuide) > 0) ? <ExamGuideComponent data={examInfoGuide} /> : ''}
+                                <div className='row' style={{ marginTop: 20 }}>
+                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} expand={_.size(schoolReport) === 0 ? true : false}/> : ''}
+                                    {(schoolReport && _.size(schoolReport) > 0) ? <SchoolReport examid={examid} grade={grade} data={schoolReport}/> : ''}
+                                </div>
+                                {/* */}
+                                <div className='row' style={{ marginTop: 20 }}>
+                                    <LevelReport />
+                                    <SubjectReport />
+                                    <ClassReport />
+                                </div>
+                                <Dialog show={this.state.showConfirmDialog} onHide={this.onHideDialog.bind(this) } onConfirm={this.onDeleteAnalysis.bind(this) }/>
                         </div>
-                        <div className={dashboardStyle.card}>
-                            <div className={dashboardStyle['card-title']}>学科数据报告</div>
-                            <div className={dashboardStyle['subject-data'] + ' ' + dashboardStyle['card-image']} style={{ marginTop: 20 }}></div>
-                            <div className={dashboardStyle['detail-btn']}>查看详情</div>
-                        </div>
-                    </div>
-                    <div style={[styles.container, styles.common.radius]}>
-                        <div className={dashboardStyle.card}>
-                            <div className={dashboardStyle['card-title']}>学生个人报告</div>
-                            <StudentReport/>
-                        </div>
-                        <div className={dashboardStyle.card}>
-                            <div className={dashboardStyle['card-title']}>知识点分析情况</div>
-                            <div className={dashboardStyle['knowledge-point'] + ' ' + dashboardStyle['card-image']} style={{ marginTop: 20 }}></div>
-                            <div style={{ fontSize: 5, color: '#a2a2a2', position: 'absolute', bottom: 0, margin: '0 0 10px 10px' }}>查看知识点对不同学业水平学生的区分能力</div>
-                            <div className={dashboardStyle['detail-btn']}>查看详情</div>
-                        </div>
-                        <div className={dashboardStyle.card}>
-                            <div className={dashboardStyle['card-title']}>试卷质量分析</div>
-                            <PaperQuality/>
-                        </div>
-                    </div>
-                    <div style={[styles.container, styles.common.radius]}>
-                        <div className={dashboardStyle.card}>
-                            <div className={dashboardStyle['card-title']}>试卷讲评</div>
-                            <PaperComment />
-                        </div>
-                        <div className={dashboardStyle.card}>
-                            <div className={dashboardStyle['card-title']}>老师个人报告</div>
-                            <div className={dashboardStyle['teacher-report'] + ' ' + dashboardStyle['card-image']}  style={{ marginTop: 20 }}></div>
-                            <div className={dashboardStyle['detail-btn']}>查看详情</div>
-                        </div>
-                    </div>
-                </div>
-                 */}
-
-                <Dialog show={this.state.showConfirmDialog} onHide={this.onHideDialog.bind(this)} onConfirm={this.onDeleteAnalysis.bind(this)}/>
+                    )
+                }
             </div>
         );
     }
