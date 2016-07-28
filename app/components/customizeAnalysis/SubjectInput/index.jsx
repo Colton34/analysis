@@ -58,7 +58,8 @@ class SubjectInput extends React.Component {
         super(props);
         this.state = {
             checkedTagIndex: -1,
-            showInfoDialog: false
+            showInfoDialog: false,
+            infoDialogMsg: ''
         }
     }
     onClickSubject(index) {
@@ -76,13 +77,17 @@ class SubjectInput extends React.Component {
     onNextPage() {
         var subjectName = this.refs.subjectName.value;
         if (subjectName === '') {
-            alert('学科名不能为空');//todo: 使用dialog
+            this.setState({
+                showInfoDialog: true,
+                infoDialogMsg: '学科名不能为空' 
+            })
             return;
         }
         if (subjectName !== this.props.currentSubject.name) {
             if (this.props.subjectList.indexOf(subjectName) !== -1) {
                 this.setState({
-                    showInfoDialog: true
+                    showInfoDialog: true,
+                    infoDialogMsg: '学科名已存在'
                 })
                 return;
             }
@@ -119,7 +124,7 @@ class SubjectInput extends React.Component {
                     </div>
                 </div>
                 <Footer pageIndex={this.props.pageIndex} onNextPage={this.onNextPage.bind(this) }/>
-                <InfoDialog show={this.state.showInfoDialog} onHide={this.onHideDialog.bind(this)} content='学科名已存在'/>
+                <InfoDialog show={this.state.showInfoDialog} onHide={this.onHideDialog.bind(this)} content={this.state.infoDialogMsg}/>
             </div>
         )
     }
