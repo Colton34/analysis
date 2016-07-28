@@ -469,7 +469,6 @@ class ScoreDistribution extends React.Component {
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
         var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
         var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels);
-
         //自定义Module数据结构
         var _this = this;
         var levTotal = _.size(levels);
@@ -641,7 +640,7 @@ class OnlineInfo extends React.Component {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
                                     var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
-                                    var classStr = _.join(_.map(levObj.high, (className) => examInfo.gradeName + className + '班'), '、') + '；';
+                                    var classStr = _.join(_.map(levObj.high, (className) => className + '班'), '、') + '；';
                                     return (
                                         <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
                                             <p style={{ fontSize: 12 }}>{levelStr}档线上线率高的班级</p>
@@ -660,7 +659,7 @@ class OnlineInfo extends React.Component {
                             (_.size(disData) > 0) ? (
                                 _.map(_.range(levTotal), (index) => {
                                     var levelStr = numberMap[(index + 1)], levObj = disData[(levTotal - 1 - index)];
-                                    var classStr = _.join(_.map(levObj.low, (className) => examInfo.gradeName + className + '班'), '、') + '；';
+                                    var classStr = _.join(_.map(levObj.low, (className) => className + '班'), '、') + '；';
                                     return (
                                         <div key={index} style={_.assign({}, { display: 'inline-block', width: 215, paddingLeft: 30 }, index === levTotal - 1 ? {} : { borderRight: '1px solid ' + C05 }) }>
                                             <p style={{ fontSize: 12 }}>{levelStr}档线上线率低的班级</p>
@@ -699,7 +698,6 @@ function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
         totalClassRow.unshift(theKey+'班');
         table.push(totalClassRow);
     });
-
     return table;
 }
 
