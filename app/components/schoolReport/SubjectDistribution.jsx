@@ -53,6 +53,7 @@ class InfoBlock extends React.Component {
 
     render() {
         var {disData, studentsGroupByClass} = this.props;
+        
         //var disDataSize = _.size(disData);
         var studentGroupSize = _.size(studentsGroupByClass);
         return (
@@ -62,28 +63,30 @@ class InfoBlock extends React.Component {
                     {/**先渲染全校数据 */}
                     <div style={{ float: 'left', display: 'inline-block', border: '1px solid ' + colorsMap.C04, width: 215, height: 115, padding: 20, marginRight: 20 }}>
                         <p style={{ marginBottom: 10, fontSize: 12 }}>全校上线贡献率</p>
-                        {
-                            disData['totalSchool'] ? (
-                                <div>
-                                    <p style={_.assign({ fontSize: 12, marginBottom: 0, width: '100%'}, localStyle.lengthControl)}>贡献率高：<span style={{ color: B08}} title={_.join(disData['totalSchool'].maxSubjects, '、')}>{_.join(disData['totalSchool'].maxSubjects, '、') }</span></p>
-                                    <p style={_.assign({ fontSize: 12, width: '100%'}, localStyle.lengthControl)}>贡献率低：<span style={{ color: B04 }} title={_.join(disData['totalSchool'].maxSubjects, '、')}>{_.join(disData['totalSchool'].maxSubjects, '、')}</span></p>
-                                </div>
-                            ) : <p style={{fontSize: 12}}>只有一个科目没有可比性</p>
-                        }
+                        <div>
+                            <p style={_.assign({ fontSize: 12, marginBottom: 0, width: '100%' }, localStyle.lengthControl) }>
+                                贡献率高：
+                                <span style={{ color: B08 }} title={disData['totalSchool'] ? _.join(disData['totalSchool'].maxSubjects, '、') : ''}>{disData['totalSchool'] ? _.join(disData['totalSchool'].maxSubjects, '、') : '仅一科，无可比性'}</span>
+                            </p>
+                            <p style={_.assign({ fontSize: 12, width: '100%' }, localStyle.lengthControl) }>
+                                贡献率低：<span style={{ color: B04 }} title={disData['totalSchool'] ? _.join(disData['totalSchool'].minSubjects, '、') : '' }>{disData['totalSchool'] ? _.join(disData['totalSchool'].minSubjects, '、') : '仅一科，无可比性' }</span></p>
+                        </div>
                     </div>
                     {
                         _.map(studentsGroupByClass, (students, className) => {
                             return (
                                 <div key={'infoBlock-' + className} style={{ float: 'left', display: 'inline-block', border: '1px solid ' + colorsMap.C04, width: 215, height: 115, padding: 20, marginRight: 20, fontSize: 12 }}>
                                     <p style={{ marginBottom: 10, fontSize: 12 }}>{className + '班'}上线贡献率</p>
-                                    {
-                                        disData[className] ? (
-                                            <div>
-                                                <p style={_.assign({ fontSize: 12, marginBottom: 0, width: '100%'}, localStyle.lengthControl)}>贡献率高：<span style={{ color: B08}} title={_.join(disData[className].maxSubjects, '、') }>{_.join(disData[className].maxSubjects, '、') }</span></p>
-                                                <p style={_.assign({ fontSize: 12, width: '100%'}, localStyle.lengthControl)}>贡献率低：<span style={{ color: B04 }} title={_.join(disData[className].minSubjects, '、') }>{_.join(disData[className].minSubjects, '、') }</span></p>
-                                            </div>
-                                        ) : <p style={{fontSize: 12}}>只有一个科目没有可比性</p>
-                                    }
+                                    <div>
+                                        <p style={_.assign({ fontSize: 12, marginBottom: 0, width: '100%' }, localStyle.lengthControl) }>
+                                            贡献率高：
+                                            <span style={{ color: B08 }} title={disData[className] ? _.join(disData[className].maxSubjects, '、') : ''}>{disData[className] ? _.join(disData[className].maxSubjects, '、') : '仅一科，无可比性'}</span>
+                                        </p>
+                                        <p style={_.assign({ fontSize: 12, width: '100%' }, localStyle.lengthControl) }>
+                                            贡献率低：
+                                            <span style={{ color: B04 }} title={disData[className] ? _.join(disData[className].minSubjects, '、') : '' }>{disData[className] ? _.join(disData[className].minSubjects, '、') : '仅一科，无可比性' }</span>
+                                        </p>
+                                    </div>
                                 </div>
                             )
                         })
