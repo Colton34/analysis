@@ -143,7 +143,7 @@ class LevelInfo extends React.Component {
                     {/* 离差图 */}
                     <p style={{margin: '40px 0 30px 0'}}>
                         <span style={{fontSize: 16,marginRight:20}}>学科上线率离差</span>
-                        <span style={{fontSize: 12, color: C07}}>通过各班级学科上线率的差异，（学科上线率离差 = 班级某学科上线率 - 全校该学科平均上线率），反映了该学科对班级上线贡献的大小，正值表示该科贡献大，负值表示贡献小</span>
+                        <span className={schoolReportStyles['title-desc']}>通过各班级学科上线率的差异，（学科上线率离差 = 班级某学科上线率 - 全校该学科平均上线率），反映了该学科对班级上线贡献的大小，正值表示该科贡献大，负值表示贡献小</span>
                     </p>
                    <ReactHighcharts config={chartConfig} style={{width: '100%'}}></ReactHighcharts>
                 </div>
@@ -264,7 +264,7 @@ const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examCl
             <div style={{ marginBottom: 30 }}>
                 <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                 <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科分档上线学生人数的分布</span>
-                <span style={{ fontSize: 12, color: C07 }}>运用大数据算法将总分的分档分数精确地分解到各学科中，得出各学科的个档分数线及其分档上线人数分布，可反映出全校各班在各学科的上线情况</span>
+                <span className={schoolReportStyles['title-desc']}>运用大数据算法将总分的分档分数精确地分解到各学科中，得出各学科的个档分数线及其分档上线人数分布，可反映出全校各班在各学科的上线情况</span>
             </div>
             <LevelInfo levels={levels} resultData={resultData} studentsGroupByClass={studentsGroupByClass}/>
         </div>

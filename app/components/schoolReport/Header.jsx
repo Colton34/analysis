@@ -174,7 +174,7 @@ class Header extends React.Component {
         return (
             <div id='header' style={{zIndex: 100, padding: '30px 0 30px 30px ', marginBottom: 20, borderRadius: 2, backgroundColor: '#fff', position: 'relative'}}>
                 <p style={{fontSize: 18, color: C12, marginBottom: 15}}>校级分析报告-{examInfo.name}</p>
-                <p style={{fontSize: 12, color: C07, marginBottom: 28}}>
+                <p style={{fontSize: 12, color: colorsMap.C10, marginBottom: 28}}>
                     <span style={{marginRight: 15}}>时间: {startTime}</span>
                     <span style={{marginRight: 15}}>人员: {examInfo.gradeName}年级，{examInfo.realClasses.length}个班级，{examInfo.realStudentsCount}位学生</span>
                     <span style={{marginRight: 15}}>

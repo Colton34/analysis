@@ -562,13 +562,13 @@ class ScoreDistribution extends React.Component {
                     <div style={{ marginBottom: 30 }}>
                         <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                         <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>总分分档上线学生人数分布</span>
-                        <span style={{ fontSize: 12, color: C07 }}>总分分档上线学生人数分布，可得到全校及各班在学业综合水平上的分层表现</span>
+                        <span className={schoolReportStyles['title-desc']}>总分分档上线学生人数分布，可得到全校及各班在学业综合水平上的分层表现</span>
                     </div>
                     <TableView tableData={tableData} levels={levels} TableComponent={Table} reserveRows={6}/>
                     {/* 上线率高低模块 */}
                     <div style={{margin: '50px 0 20px 0'}}>
                         <span style={{color: C12, marginRight: 20}}>按上线率比较</span>
-                        <span style={{ fontSize: 12, color: C07 }}>上线率 = 班级某档上线人数 ÷ 全校某档上线人数，因各班级人数不同，通过比较累积上线率，能更准确的反映各班级上线情况</span>
+                        <span className={schoolReportStyles['title-desc']}>上线率 = 班级某档上线人数 ÷ 全校某档上线人数，因各班级人数不同，通过比较累积上线率，能更准确的反映各班级上线情况</span>
                     </div>
                     <OnlineInfo levTotal={levTotal} disData={disData} examInfo={examInfo}/>
                     <div style={{ display: 'inline-block', width: 380, height:240, position: 'relative', float: 'right'}}>

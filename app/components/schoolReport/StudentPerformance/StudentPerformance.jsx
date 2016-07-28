@@ -187,7 +187,7 @@ const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, he
             <div style={{ marginBottom: 30 }}>
                 <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                 <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>分数排行榜</span>
-                <span style={{ fontSize: 12, color: C07 }}>分数排行榜，可得出相对优秀及相对落后的学生在各个班级中的分布数量</span>
+                <span className={schoolReportStyles['title-desc']}>分数排行榜，可得出相对优秀及相对落后的学生在各个班级中的分布数量</span>
             </div>
             {/******************************   前后十名列表 *******************************************/}
             <div id='rank-table'>

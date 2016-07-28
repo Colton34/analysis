@@ -2,7 +2,7 @@ import React from 'react';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
 import ReactHighcharts from 'react-highcharts';
-import { B03, C04, C07, C12, C14 } from '../../lib/constants';
+import { COLORS_MAP as colorsMap, B03, C04, C07, C12, C14 } from '../../lib/constants';
 import {makeSegments, makeSegmentsCount} from '../../api/exam';
 
 const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
@@ -97,7 +97,7 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
              */}
              <div style={{marginBottom: 30}}>
                 <span style={{border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left'}}></span>
-                <span style={{fontSize: 18, color: C12, marginRight: 20}}>总分分布趋势</span> <span style={{fontSize: 12, color: C07}}>学生总分分布趋势，可反映本次考试全校学生的综合学习水平</span>
+                <span style={{fontSize: 18, color: C12, marginRight: 20}}>总分分布趋势</span> <span className={schoolReportStyles['title-desc']}>学生总分分布趋势，可反映本次考试全校学生的综合学习水平</span>
              </div>
              <div style={{}}>
                 <ReactHighcharts config={config} style={{ width: 870, height: 330, display: 'inline-block'}}></ReactHighcharts>
@@ -134,7 +134,7 @@ class FullScoreInfo extends React.Component {
     render() {
         var {yData} = this.props;
         return (
-            <ul style={_.assign({ width: 240, height: 360, padding: '30px 0 40px 20px', marginBottom: 0, backgroundColor: C14, border: '1px solid ' + C04, position: 'absolute', right: 0, bottom: 0,listStyleType: 'none', fontSize: 12 }, this.state.showScroll ? { overflowY: 'scroll'}: {overflowY: 'hidden'})} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
+            <ul style={_.assign({ width: 240, height: 360, padding: '20px 0 40px 20px', marginBottom: 0, backgroundColor: C14, border: '1px solid ' + C04, position: 'absolute', right: 0, bottom: 0,listStyleType: 'none', fontSize: 12 }, this.state.showScroll ? { overflowY: 'scroll'}: {overflowY: 'hidden'})} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
                 {
                     yData.map((data, index) => {
                         return (

@@ -205,13 +205,13 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                 <div style={{ marginBottom: 30 }}>
                     <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                     <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>班级的考试基本表现</span>
-                    <span style={{ fontSize: 12, color: C07 }}>通过各班在数据上的突出表现及其差异，来分析不同班级之间的考试表现情况，但要注意结合各班级的实际教学情况及历史原因，做客观分析判断。</span>
+                    <span className={schoolReportStyles['title-desc']}>通过各班在数据上的突出表现及其差异，来分析不同班级之间的考试表现情况，但要注意结合各班级的实际教学情况及历史原因，做客观分析判断。</span>
                 </div>
                 {/* 线图 + 高分多寡班级 */}
                 <div style={{display: 'inline-block', width: 875, height: 380, position: 'relative'}}>
                     <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
                     <span style={{position: 'absolute', top: -22, right: 0}}>
-                        <span style={{display: 'table-cell', paddingRight: 10}}>对比对象<span style={{fontSize: 12, color: colorsMap.C09}}>（最多选择5个）</span>:</span>
+                        <span style={{display: 'table-cell', paddingRight: 10}}>对比对象<span style={{fontSize: 12, color: colorsMap.C10}}>（最多选择5个）</span>:</span>
                         <span style={{display: 'table-cell'}}><DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true} multiChoiceNum={5}/></span>
                     </span>
                 </div>
@@ -225,9 +225,9 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                     <div style={{height: 20}}></div>
                     <div style={{width: 215, height: 110, border: '1px solid ' + colorsMap.C04, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center'}}>
                         <p style={{fontSize: 12, marginBottom: 10}}>高分学生较少的班级</p>
-                        <div style={_.assign({ fontSize: 30, color: B08, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.lesser, '、')}>{_.join(headerInfo.lesser, '、')}</div>
+                        <div style={_.assign({ fontSize: 30, color: colorsMap.B04, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.lesser, '、')}>{_.join(headerInfo.lesser, '、')}</div>
                     </div>
-                    <p style={{fontSize: 12, color: C07, marginTop: 20}}>
+                    <p style={{fontSize: 12, color: colorsMap.C10, marginTop: 20}}>
                         <span style={{color: B08}}>*</span>
                         高分年级结论以各班自身水平为基础推导得出，可能会有特别好的班级也出现相对与班级自身水平的高分学生人数少于低分学生人数的，说明该班级还没有充分挖掘出学生的潜力
                     </p>

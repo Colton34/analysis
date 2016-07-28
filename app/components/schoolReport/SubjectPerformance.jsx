@@ -341,12 +341,12 @@ series: [{
                 <div style={{ marginBottom: 30 }}>
                     <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                     <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>学科考试表现</span>
-                    <span style={{ fontSize: 12, color: C07 }}>学科考试表现，通过对不同学科之间基本指标数据的分析，发现学校各学科的教学信息</span>
+                    <span className={schoolReportStyles['title-desc']}>学科考试表现，通过对不同学科之间基本指标数据的分析，发现学校各学科的教学信息</span>
                 </div>
                 <TableView tableData={subjectExamTableData} reserveRows={6} tipConfig={tipConfig}/>
 
                 <p style={{margin: '40px 0 20px 0'}}>
-                    <span className={schoolReportStyles['sub-title']}>学科离差分布</span>
+                    <span className={schoolReportStyles['sub-title']}>学科的班级平均得分率差异</span>
                     <span className={schoolReportStyles['title-desc']}>班级平均得分率差异较大的学科，反映出各班该学科班级平均水平差距较大；班级平均得分率差异较小的学科，反映出各班该学科班级平均水平比较整齐（注：语文是母语，具有特殊性）</span>
                 </p>
                 <div style={{display: 'inline-block', width: '100%', height: 380, position: 'relative'}}>
