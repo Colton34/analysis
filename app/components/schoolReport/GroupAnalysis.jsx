@@ -10,7 +10,7 @@ import Table from '../../common/Table';
 
 import {updateLevelBuffersAction} from '../../reducers/schoolAnalysis/actions';
 import {makeSegmentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
+import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
@@ -333,7 +333,7 @@ class GroupAnalysis extends React.Component {
                     <span style={{ border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left' }}></span>
                     <span style={{ fontSize: 18, color: C12, marginRight: 20 }}>临界生群体分析</span>
                     <span style={{ fontSize: 12, color: C07 }}>临界生群体分析，通过设置临界分数线来计算全校及各班的总分在不同分档分数线左右徘徊的人数分布</span>
-                    <a href="javascript:void(0)" onClick={this.onShowDialog.bind(this) }className={styles.button} style={{ width: 120, height: 30, backgroundColor: A12, color: '#fff', float: 'right', borderRadius: 2, lineHeight: '30px' }}>
+                    <a href="javascript:void(0)" onClick={this.onShowDialog.bind(this) }className={styles.button} style={{ width: 120, height: 30, backgroundColor: colorsMap.B03, color: '#fff', float: 'right', borderRadius: 2, lineHeight: '30px' }}>
                         <i className='icon-cog-2'></i>
                         设置临界分数
                     </a>

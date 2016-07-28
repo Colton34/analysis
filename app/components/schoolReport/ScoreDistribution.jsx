@@ -27,7 +27,7 @@ let localStyle = {
 const BasicInfo = ({examInfo, levels, examStudentsInfo, onShowDialog}) => {
     var levTotal = _.size(levels);
     return (
-        <div style={{position: 'relative', padding: 30, backgroundColor: A12, color: '#fff', marginBottom: 20}}>
+        <div style={{position: 'relative', padding: 30, backgroundColor: colorsMap.B03, color: '#fff', marginBottom: 20}}>
             <p style={{marginRight: 20, fontSize: 18, marginBottom: 25}}>
                 <span style={{marginRight: 20}}>分档分数线 </span>
                 <span style={{fontSize: 12}}>分档分数线默认分为三档， 分别对应学生总数的10%，30%，60%，如需修改请点击右侧按钮</span>
@@ -43,7 +43,7 @@ const BasicInfo = ({examInfo, levels, examStudentsInfo, onShowDialog}) => {
                     })
             }
             </p>
-            <span onClick={onShowDialog} style={{ cursor: 'pointer', color: A12, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30}}>
+            <span onClick={onShowDialog} style={{ cursor: 'pointer', color: colorsMap.B03, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30}}>
                     <i className='icon-cog-2' style={{fontSize: 12}}></i>
                     设置分档参数
             </span>
