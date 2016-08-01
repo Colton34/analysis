@@ -1,14 +1,15 @@
 import React from 'react';
+import Radium from 'radium';
 import {Link} from 'react-router';
-
+import { bindActionCreators } from 'redux';
+import {Map, List} from 'immutable';
+import { connect } from 'react-redux';
 import { Button } from 'react-bootstrap';
 import Navbar from 'react-bootstrap/lib/Navbar';
-
-import Radium from 'radium';
-
 const ReactHighcharts = require('react-highcharts');
 
 import {initParams} from '../lib/util';
+import {changeOne, changeTwo} from '../reducers/test/actions';
 
 const config = {
         chart: {
@@ -34,10 +35,31 @@ const config = {
         }]
     };
 
-var One = (one) => {
-    return (
-        <h1>Hell</h1>
-    )
+class One extends React.Component {
+    render() {
+        console.log('one render');
+        var one = (Map.isMap(this.props.one)) ? this.props.one.toJS() : this.props.one;
+        // var one = this.props.one;
+        return (
+            <h1>Hi, {one.a.age}</h1>
+        );
+    }
+}
+
+class Two extends React.Component {
+    shouldComponentUpdate(nextProps, nextState) {
+      console.log('two if equal: ', nextProps.two.equals(this.props.two));
+      return (!nextProps.two.equals(this.props.two));
+    }
+
+    render() {
+        console.log('two render');
+        var two= (List.isList(this.props.two)) ? this.props.two.toJS() : this.props.two;
+        // var two = this.props.two;
+        return (
+            <h1>oh, {two.length}</h1>
+        );
+    }
 }
 
 class Test extends React.Component {
@@ -57,18 +79,32 @@ class Test extends React.Component {
     }
 
     render() {
-        var exam = {id: 167}
-        var path = '/school/report'; //'' + 167 +
         return (
             <div>
-                <One />
+                <div><button onClick={this.props.changeOne}>Click One</button></div>
+                <div><button onClick={this.props.changeTwo}>Click Two</button></div>
+                <One one={this.props.one} />
+                <Two two={this.props.two} />
             </div>
         );
     }
 }
 
-export default Test;
+export default connect(mapStateToProps, mapDispatchToProps)(Test);
 
+function mapStateToProps(state) {
+    return {
+        one: state.test.one,
+        two: state.test.two
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        changeOne: bindActionCreators(changeOne, dispatch),
+        changeTwo: bindActionCreators(changeTwo, dispatch)
+    }
+}
 
 function saveAs(uri, filename) {
   var link = document.createElement('a');

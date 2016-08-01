@@ -158,3 +158,9 @@ export const C07 = '#BFBFBF';
 export const C09 = '#999999';
 export const C12 = '#333333';
 export const C14 = '#fdfdfd';
+
+
+//============================  Test ===============================
+export const TEST_CHANGE_ONE = 'TEST_CHANGE_ONE';
+export const TEST_CHANGE_TWO = 'TEST_CHANGE_TWO';
+
