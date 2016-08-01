@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:02:04
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-01 15:47:27
+* @Last Modified time: 2016-08-01 16:21:00
 */
 
 'use strict';
@@ -23,6 +23,7 @@ var _initState = {
     rankReport: new rankReportState,
     schoolAnalysis: new schoolAnalysisState,
     customAnalysis: new customAnalysisState,
+    //设计成使用嵌套的reducer
     test: {
         one: initOne,
         two: initTwo

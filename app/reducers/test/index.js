@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-01 08:57:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-01 15:48:02
+* @Last Modified time: 2016-08-01 16:22:00
 */
 
 'use strict';
@@ -11,6 +11,7 @@ import {TEST_CHANGE_ONE, TEST_CHANGE_TWO} from '../../lib/constants';
 import {initOne, initTwo} from '../../states/test-state';
 import {Map, List} from 'immutable';
 
+//设计成嵌套的reducer
 export function one(state, action) {
     if(_.isUndefined(state)) return initOne;
     if(!(state instanceof Map)) return initOne.merge(state);
