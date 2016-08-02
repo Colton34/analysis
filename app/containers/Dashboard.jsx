@@ -1,5 +1,4 @@
 'use strict';
-
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -26,7 +25,7 @@ import {Map, List} from 'immutable';
 import dashboardStyle from '../components/dashboard/dashboard.css';
 import Spinkit from '../common/Spinkit';
 import commonStyles from '../common/common.css';
-import { Modal } from 'react-bootstrap';    
+import { Modal } from 'react-bootstrap';
 import {FROM_FLAG, FROM_CUSTOM_TEXT, COLORS_MAP as colorsMap} from '../lib/constants';
 
 var {Header, Title, Body, Footer} = Modal;
@@ -74,7 +73,7 @@ class Dashboard extends React.Component {
     componentDidMount() {
         if (this.props.dashboard.haveInit) return;
 
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         this.props.initDashboard(params);
     }
 
@@ -93,7 +92,7 @@ class Dashboard extends React.Component {
         })
         var _this = this;
         var examid = this.props.location.query.examid;
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         params.request.put(customBaseUrl, {examId: examid}).then(function(res) {
             location.href = '/';
         }).then(function(err) {

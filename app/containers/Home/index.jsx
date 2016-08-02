@@ -347,7 +347,7 @@ class Home extends React.Component {
 
     componentDidMount() {
         if(this.props.home.haveInit) return;
-        var params = initParams(this.props.params, this.props.location, {'request': window.request});
+        var params = initParams({'request': window.request}, this.props.params, this.props.location);
         this.props.initHome(params);
     }
 
@@ -360,7 +360,7 @@ class Home extends React.Component {
         //             <HomeBlank message="exam.length == 0" />
         //         </div>
         //     );
-       
+
 
         return (
             <div >

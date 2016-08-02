@@ -1,12 +1,13 @@
 import { createStore, applyMiddleware } from 'redux';
 import { routerMiddleware } from 'react-router-redux';
 import thunk from 'redux-thunk';
+import multi from 'redux-multi'
 import rootReducer from '../reducers';
 import promiseMiddleware from '../lib/promiseMiddleware';
 import createLogger from 'redux-logger';
 
 export default function configureStore(initialState, history) {
-    const middleware = [thunk, promiseMiddleware];
+    const middleware = [thunk, promiseMiddleware, multi];
 
     const reactRouterReduxMiddleware = routerMiddleware(history);
     if (__DEVCLIENT__) {

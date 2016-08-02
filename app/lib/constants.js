@@ -1,3 +1,18 @@
+export const REQUEST_SUFFIX = '_REQUEST';
+export const SUCCESS_SUFFIX = '_SUCCESS';
+export const FAILURE_SUFFIX = '_FAILURE';
+
+export const LOADING_DONE = 'LOADING_DONE';
+export const LOADING_START = 'LOADING_START';
+
+export const THROW_ERROR = 'THROW_ERROR';
+export const HIDE_ERROR = 'HIDE_ERROR';
+
+
+
+
+
+
 //================= Global ===========================
 export const INIT_USER_ME = 'INIT_USER_ME';
 export const INIT_USER_ME_SUCCESS = 'INIT_USER_ME_SUCCESS';
@@ -11,7 +26,9 @@ export const HIDE_LOADING = 'HIDE_LOADING';
 
 //================= Home =============================
 export const INIT_HOME = 'INIT_HOME';
+export const INIT_HOME_REQUEST = 'INIT_HOME_REQUEST';
 export const INIT_HOME_SUCCESS = 'INIT_HOME_SUCCESS';
+export const INIT_HOME_FAILURE = 'INIT_HOME_FAILURE';
 export const FETCH_HOME_RAW_DATA_SUCCESS = 'FETCH_HOME_RAW_DATA_SUCCESS';
 
 //注意：这两个变量值是一一对应的，如果修改其中一个，那么另一个也要修改。
@@ -29,33 +46,9 @@ export const  PAPER_ORIGIN = {
 //================= Dashboard ==========================
 
 export const INIT_DASHBOARD = 'INIT_DASHBOARD';
+export const INIT_DASHBOARD_REQUEST = 'INIT_DASHBOARD_REQUEST';
 export const INIT_DASHBOARD_SUCCESS = 'INIT_DASHBOARD_SUCCESS';
 export const INIT_DASHBOARD_FAILURE = 'INIT_DASHBOARD_FAILURE';
-
-// export const INIT_GLOBAL_GUIDE = 'INIT_GLOBAL_GUIDE';
-// export const INIT_GLOBAL_GUIDE_SUCCESS = 'INIT_GLOBAL_GUIDE_SUCCESS';
-
-// export const INIT_SCORE_RANK = 'INIT_SCORE_RANK';
-// export const INIT_SCORE_RANK_SUCCESS = 'INIT_SCORE_RANK_SUCCESS';
-
-// export const INIT_CLASS_REPORT = 'INIT_CLASS_REPORT';
-// export const INIT_CLASS_REPORT_SUCCESS = 'INIT_CLASS_REPORT_SUCCESS';
-
-
-// export const INIT_LEVEL_REPORT = 'INIT_LEVEL_REPORT';
-// export const INIT_LEVEL_REPORT_SUCCESS = 'INIT_LEVEL_REPORT_SUCCESS';
-
-// export const INIT_SUBJECT_REPORT = 'INIT_SUBJECT_REPORT';
-// export const INIT_SUBJECT_REPORT_SUCCESS = 'INIT_SUBJECT_REPORT_SUCCESS';
-
-// export const SOME_EXAM_TOTAL_ONE = 'SOME_EXAM_TOTAL_ONE';
-// export const SOME_EXAM_TOTAL_TWO = 'SOME_EXAM_TOTAL_TWO';
-// export const SOME_EXAM_TOTAL_THREE = 'SOME_EXAM_TOTAL_THREE';
-
-// export const SOME_EXAM_ANALYSIS_ONE = 'SOME_EXAM_ANALYSIS_ONE';
-// export const SOME_EXAM_ANALYSIS_TWO = 'SOME_EXAM_ANALYSIS_TWO';
-// export const SOME_EXAM_ANALYSIS_THREE = 'SOME_EXAM_ANALYSIS_THREE';
-
 
 //=============== SchoolAnalysis =============================
 export const FETCH_SCHOOL_ANALYSIS_DATA = 'FETCH_SCHOOL_ANALYSIS_DATA';

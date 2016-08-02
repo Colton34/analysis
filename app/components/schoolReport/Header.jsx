@@ -5,7 +5,7 @@ import {Link} from 'react-router'
 import {initParams} from '../../lib/util';
 import Radium from 'radium';
 import {saveAs} from '../../lib/util';
-import {COLORS_MAP as colorsMap, B03, C07, C12} from '../../lib/constants'; 
+import {COLORS_MAP as colorsMap, B03, C07, C12} from '../../lib/constants';
 
 var modules = [
     {
@@ -41,7 +41,7 @@ class NavBar extends React.Component {
         }
     }
     scrollHandler(navBarTop, scrollTopList) {
-        
+
         var bodyTop = $('body').scrollTop();
         //判断何时吸顶
         if (navBarTop <= bodyTop) {
@@ -91,7 +91,7 @@ class NavBar extends React.Component {
         this.setState({
             activeId: id
         })
-        
+
     }
     render() {
         var moduleLen = modules.length;
@@ -103,9 +103,9 @@ class NavBar extends React.Component {
             {
                 modules.map((module, index) => {
                     return (
-                        <div key={'navItem-' + index} id='nav-item' style={{display: 'table-cell', minWidth: 1200/moduleLen, height: 50, textAlign: 'center', verticalAlign: 'middle', fontSize: 12, cursor: 'pointer'}} 
+                        <div key={'navItem-' + index} id='nav-item' style={{display: 'table-cell', minWidth: 1200/moduleLen, height: 50, textAlign: 'center', verticalAlign: 'middle', fontSize: 12, cursor: 'pointer'}}
                              data-id={module.id} onClick={this.onClickModule.bind(this)}>
-                            <span style={_.assign({}, {height: 12, float: 'left', marginTop: 2}, index === 0 && position !== 'normal'? {borderRight: '1px solid ' + colorsMap.C04, display: 'inline-block'} : {})}></span> 
+                            <span style={_.assign({}, {height: 12, float: 'left', marginTop: 2}, index === 0 && position !== 'normal'? {borderRight: '1px solid ' + colorsMap.C04, display: 'inline-block'} : {})}></span>
                             <span style={this.state.activeId === module.id ? {paddingBottom: 16, borderBottom: '2px solid ' + colorsMap.B03, color: colorsMap.B03} : {}}>{module.name} </span>
                             <span style={_.assign({}, {display: 'inline-block', height: 12, float: 'right', marginTop: 2}, index === modules.length -1 && position === 'normal'? {}: {borderRight: '1px solid ' + colorsMap.C04})}></span>
                         </div>
@@ -117,7 +117,7 @@ class NavBar extends React.Component {
         )
     }
   }
-  
+
 @Radium
 class Header extends React.Component {
     constructor(props) {
@@ -138,7 +138,7 @@ class Header extends React.Component {
         })
         //_this.isDownloading = true;
 
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         // var baseURL = (window.client.hostname == 'localhost') ? 'http://' + window.client.hostname + ':' + window.http_port : 'http://' + window.client.hostname
         var path = this.props.location.pathname+this.props.location.search;
 
@@ -191,7 +191,7 @@ class Header extends React.Component {
                 </p>
                 {/*
                 <div className={styles['button']} style={{width: 180, height: 40, lineHeight: '40px', borderRadius:2, backgroundColor: colorsMap.A12, color: '#fff', cursor: 'pointer'}}>
-                    <i className='icon-download-1'></i> 
+                    <i className='icon-download-1'></i>
                     下载校级分析报告
                 </div>
                 */}

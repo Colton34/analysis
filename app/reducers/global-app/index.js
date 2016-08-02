@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-11 19:19:03
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-19 16:25:36
+* @Last Modified time: 2016-08-02 15:45:34
 */
 
 'use strict';
@@ -13,6 +13,12 @@ import {Record} from 'immutable';
 import InitialState from '../../states/global-app-state';
 
 import {
+    LOADING_START,
+    LOADING_DONE,
+
+    THROW_ERROR,
+    HIDE_ERROR,
+
     INIT_USER_ME_SUCCESS,
     ALTER_COMMENT_DIALOG_STATUS,
     SHOW_DIALOG,
@@ -26,6 +32,16 @@ export default function reducer(state, action) {
     if(!(state instanceof InitialState)) return initialState.merge(state);
 
     switch(action.type) {
+        case THROW_ERROR:
+            console.log('THROW_ERROR: ', action.error);
+            return state.set('ifError', true);
+        case HIDE_ERROR:
+            return state.set('ifError', false);
+        case LOADING_START:
+            return state.set('isLoading', true);
+        case LOADING_DONE:
+            return state.set('isLoading', false);
+
         case INIT_USER_ME_SUCCESS:
             return state.set('user', action.res.data).set('haveInit', true);
         case ALTER_COMMENT_DIALOG_STATUS:

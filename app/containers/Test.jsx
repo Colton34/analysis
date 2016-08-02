@@ -46,7 +46,7 @@ class Test extends React.Component {
     }
 
     downloadFile() {
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         params.request.get('/file/download?url='+this.props.location.pathname+this.props.location.search).then(function(res) {
             console.log('===================  res.data = ', res.data);
             saveAs("http://localhost:3000/api/v1/file/get?filename="+res.data, '报告.png');

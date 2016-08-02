@@ -12,8 +12,6 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Map, List} from 'immutable';
 import { Link } from 'react-router';
-//设计：这里是所有view container的page view。
-//尽量是木偶组件
 
 import Header from '../components/schoolReport/Header';
 import FullScoreTrend from '../components/schoolReport/FullScoreTrend';
@@ -57,13 +55,12 @@ class SchoolReport extends React.Component {
 
     componentDidMount() {
         if (this.props.haveInit) return;
-        //TODO: 将initParams的参数调换一下位置--request是肯定要有的，所以应该放在前面，不叫做other而是request
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         this.props.initSchoolAnalysis(params);
     }
 
     render() {
-        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, headers, levels, isLoading} = this.props;
+        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, headers, levels} = this.props;
 
         examInfo = (Map.isMap(examInfo)) ? examInfo.toJS() : examInfo;
         examStudentsInfo = (List.isList(examStudentsInfo)) ? examStudentsInfo.toJS() : examStudentsInfo;

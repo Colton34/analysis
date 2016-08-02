@@ -143,6 +143,7 @@
     "redux": "3.3.1",
     "redux-devtools": "3.2.0",
     "redux-logger": "2.6.1",
+    "redux-multi": "0.1.12",
     "redux-thunk": "2.0.1",
     "request": "^2.72.0",
     "response-time": "2.3.1",

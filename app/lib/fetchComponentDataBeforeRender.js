@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-19 16:55:00
+* @Last Modified time: 2016-08-02 16:01:47
 */
 import _ from 'lodash';
 
@@ -26,7 +26,7 @@ export function fetchComponentDataBeforeRender(dispatch, components, params, loc
 
     if(!request.defaults.headers) request.defaults.headers = { common: {} };
     request.defaults.headers.common['x-access-token'] = req.user.token;
-    params = initParams(params, location, {"_user": req.user, 'request': request});
+    params = initParams({"_user": req.user, 'request': request}, params, location);
 
     const promises = needs.map(need => dispatch(need(params)));
     return Promise.all(promises);

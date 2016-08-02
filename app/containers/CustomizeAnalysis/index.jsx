@@ -55,9 +55,8 @@ class CustomizeAnalysis extends React.Component {
         }
     }
     componentDidMount() {
-        // var existsExamList = (List.isList(this.props.examList)) ? this.props.examList.toJS() : this.props.examList
         if (this.props.examList.size === 0) {
-            var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+            var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
             this.props.initHome(params);
         }
     }
@@ -103,11 +102,6 @@ class CustomizeAnalysis extends React.Component {
             generatingAnalysis: true
         })
         var resultSet = Map.isMap(this.props.resultSet) ? this.props.resultSet.toJS() : this.props.resultSet;
-        // var newResultSet = {};
-        // _.each(resultSet, (value, subjectName) => {
-        //     var newSQM = this.deleteStudentFromSQM(resultSet[subjectName]);
-        //     newResultSet[subjectName] = newSQM;
-        // });
         for (var subjectName in resultSet) {
             var newSQM = this.deleteStudentFromSQM(resultSet[subjectName])
             this.props.updateSubjectSqm(subjectName, newSQM);
@@ -116,11 +110,9 @@ class CustomizeAnalysis extends React.Component {
             var newSQM = this.deleteStudentFromSQM(resultSet[subjectName]);
             value.newSQM = newSQM;
         });
-        // var resultSetJS = this.props.resultSet.toJS();
-        // var currentSubjectJS = this.props.currentSubject.toJS();
+
         var postData = makeExamSchema(resultSet, this.props.analysisName);
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
-        //创建成功后根据返回的examId去到其相应的dashboard--这部分API要添加新的，就不是之前的API了
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         params.request.post(customBaseUrl, { data: postData }).then(function (res) {
             //创建成功后进入到此分析的Dashboard
             browserHistory.push('/dashboard?examid=' + res.data.examId);

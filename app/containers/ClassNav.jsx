@@ -5,6 +5,8 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
+import {initParams} from '../lib/util';
+import {CommonErrorView, CommonLoadingView} from '../common/ErrorView';
 import {initSchoolAnalysisAction} from '../reducers/schoolAnalysis/actions';
 
 //TODO:ClassNav需要的数据结构设计--同样也走report DS
@@ -16,15 +18,16 @@ class ClassNav extends React.Component {
 
     componentDidMount() {
         if (this.props.haveInit) return;
-        //TODO: 将initParams的参数调换一下位置--request是肯定要有的，所以应该放在前面，不叫做other而是request
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         this.props.initSchoolAnalysis(params);
     }
 
     render() {
         return (
             <div>
-                <h1>I'm ClassNav</h1>
+                {(this.props.ifError) ? <CommonErrorView /> : (this.props.isLoading ? <CommonLoadingView /> : (
+                    <h1>hi, I'm ClassNav, 萨瓦迪卡~~~</h1>
+                ))}
             </div>
         );
     }

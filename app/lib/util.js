@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-27 16:19:27
+* @Last Modified time: 2016-08-02 16:10:31
 */
 
 'use strict';
@@ -22,16 +22,13 @@ var numberMapper = {
     10: '十'
 
 }
+
 export function convertJS(data) {
     return JSON.parse(JSON.stringify(data));
 }
 
-export function initParams(params, location, other) {
-    params = params || {};
-    var query = location.query || {};
-    params = _.merge(params, query);
-    if(other && _.isObject(other)) params = _.merge(params, other);
-    return params;
+export function initParams(custom, params, location) {
+    return _.merge({}, custom, params, ((location) ? location.query : {}));
 }
 
 export function getNumberCharacter(num) {

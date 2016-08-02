@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-30 18:32:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-19 16:26:27
+* @Last Modified time: 2016-08-02 16:02:01
 */
 
 'use strict';
@@ -26,7 +26,7 @@ export function addPaperInfoAction(papersCache, paperInfo) {
         return { type: ADD_PAPER_INFO_SUCCESS, res: paperInfo.sqm, paperInfo: _.omit(paperInfo,'sqm')}
     } else {
         var targetPaperId = paperInfo.paperId;
-        var params = initParams({}, {}, { 'request': window.request, pid: targetPaperId, examId: paperInfo.examId, isFromCustom: paperInfo.isFromCustom });
+        var params = initParams({ 'request': window.request, pid: targetPaperId, examId: paperInfo.examId, isFromCustom: paperInfo.isFromCustom });
         return papersCache[targetPaperId] ?
             { type: ADD_PAPER_INFO_SUCCESS, res: papersCache[targetPaperId], isCached: true, paperInfo: paperInfo } :
             { type: ADD_PAPER_INFO, promise: fetchPaper(params), paperInfo: paperInfo };

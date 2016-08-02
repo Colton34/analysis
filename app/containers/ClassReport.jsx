@@ -21,8 +21,7 @@ class ClassReport extends React.Component {
 
     componentDidMount() {
         if (this.props.haveInit) return;
-        //TODO: 将initParams的参数调换一下位置--request是肯定要有的，所以应该放在前面，不叫做other而是request
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         this.props.initSchoolAnalysis(params);
     }
 
