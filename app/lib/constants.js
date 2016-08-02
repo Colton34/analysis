@@ -1,3 +1,4 @@
+//================== New Global ========================
 export const REQUEST_SUFFIX = '_REQUEST';
 export const SUCCESS_SUFFIX = '_SUCCESS';
 export const FAILURE_SUFFIX = '_FAILURE';
@@ -9,7 +10,11 @@ export const THROW_ERROR = 'THROW_ERROR';
 export const HIDE_ERROR = 'HIDE_ERROR';
 
 
-
+//================== New ReportDS ========================
+export const INIT_REPORT_DS = 'INIT_REPORT_DS';
+export const INIT_REPORT_DS_REQUEST = 'INIT_REPORT_DS_REQUEST';
+export const INIT_REPORT_DS_SUCCESS = 'INIT_REPORT_DS_SUCCESS';
+export const INIT_REPORT_DS_FAILURE = 'INIT_REPORT_DS_FAILURE';
 
 
 
