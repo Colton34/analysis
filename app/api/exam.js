@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-03 14:21:28
+* @Last Modified time: 2016-08-03 16:47:22
 */
 
 
@@ -40,7 +40,7 @@ var paperPath = '/papers';
  * @param  {[type]} params [description]
  * @return {[type]}        [description]
  */
-export function fetchHomeData(params) {
+export function initHomeData(params) {
     var url = examPath + '/home';
 
     return params.request.get(url).then(function(res) {
@@ -53,7 +53,7 @@ export function fetchHomeData(params) {
  * @param  {[type]} params [description]
  * @return {[type]}        [description]
  */
-export function fetchDashboardData(params) {
+export function initDashboardData(params) {
     var url = (params.grade) ? examPath + '/dashboard?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/dashboard?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
@@ -98,7 +98,7 @@ export function fetchDashboardData(params) {
         ...
     }
  */
-export function fetchRankReportdData(params) {
+export function initRankReportdData(params) {
     var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/rank/report?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
@@ -234,6 +234,8 @@ export function initReportDS(params) {
             id: 'totalScore'
         });
         headers = _.concat(headers, restPapers);
+        var levels = makeDefaultLevles(examInfo, examStudentsInfo);
+        var levelBuffers = _.map(levels, (value, key) => 5);
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
@@ -242,76 +244,12 @@ export function initReportDS(params) {
             examClassesInfo: examClassesInfo,
             studentsGroupByClass: studentsGroupByClass,
             allStudentsPaperMap: allStudentsPaperMap,
-            headers: headers
+            headers: headers,
+            levels: levels,
+            levelBuffers: levelBuffers
         });
     });
 }
-
-export function initSchoolAnalysisPart(params) {
-    var levels = makeDefaultLevles(examInfo, examStudentsInfo);
-    var levelBuffers = _.map(levels, (value, key) => 5);
-    return Promise.resolve({levels: levels, levelBuffers: levelBuffers});
-}
-
-export function initSchoolAnalysis(params) {
-    console.log('3');
-    return initReportDS(params).then(function(result) {
-        var levels = makeDefaultLevles(examInfo, examStudentsInfo);
-        var levelBuffers = _.map(levels, (value, key) => 5);
-        return Promise.resolve({levels: levels, levelBuffers: levelBuffers});
-    });
-}
-
-// export function fetchSchoolAnalysisData(params) {
-//     var url = (params.grade) ? examPath + '/school/analysis?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/school/analysis?examid=' + params.examid;
-
-//     var examInfo, examStudentsInfo, examPapersInfo, examClassesInfo;
-//     var studentsGroupByClass, allStudentsPaperMap;
-//     var headers = [];
-//     var levels;
-
-//     return params.request.get(url).then(function(res) {
-//         var examInfo = res.data.examInfo;
-//         var examStudentsInfo = res.data.examStudentsInfo;
-//         var examPapersInfo = res.data.examPapersInfo;
-//         var examClassesInfo = res.data.examClassesInfo;
-//         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
-//         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
-//         var headers = [], restPapers = [];
-//         _.each(examPapersInfo, (paper, pid) => {
-//             var index = _.findIndex(subjectWeight, (s) => (s == paper.subject));
-//             if (index >= 0) {
-//                 headers.push({
-//                     index: index,
-//                     subject: paper.subject,
-//                     id: pid
-//                 });
-//             } else {
-//                 restPapers.push({id: pid, subject: paper.subject});
-//             }
-//         });
-//         headers = _.sortBy(headers, 'index');
-//         headers.unshift({
-//             subject: '总分',
-//             id: 'totalScore'
-//         });
-//         headers = _.concat(headers, restPapers);
-//         var levels = makeDefaultLevles(examInfo, examStudentsInfo);
-//         var levelBuffers = _.map(levels, (value, key) => 5);
-//         return Promise.resolve({
-//             haveInit: true,
-//             examInfo: examInfo,
-//             examStudentsInfo: examStudentsInfo,
-//             examPapersInfo: examPapersInfo,
-//             examClassesInfo: examClassesInfo,
-//             studentsGroupByClass: studentsGroupByClass,
-//             allStudentsPaperMap: allStudentsPaperMap,
-//             headers: headers,
-//             levels: levels,
-//             levelBuffers: levelBuffers
-//         });
-//     });
-// }
 
 /**
  * 创建segments。这里count是区间段的个数，所以segments.length = count + 1(自动填充了最后的end值)

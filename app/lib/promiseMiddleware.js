@@ -8,14 +8,13 @@ import {REQUEST_SUFFIX, SUCCESS_SUFFIX, FAILURE_SUFFIX, LOADING_START, LOADING_D
 export default function promiseMiddleware() {
   return next => action => {
     const { promise, type, ...rest } = action;
-
     if (!promise) return next(action);
 
     const REQUEST = type + REQUEST_SUFFIX;
     const SUCCESS = type + SUCCESS_SUFFIX;
     const FAILURE = type + FAILURE_SUFFIX;
+
     next([{ ...rest, type: REQUEST }, {type: LOADING_START}]);
-    console.log('4--关键');
     return promise
       .then(res => {
         next([{ ...rest, res, type: SUCCESS }, {type: LOADING_DONE}, {type: HIDE_ERROR}]);

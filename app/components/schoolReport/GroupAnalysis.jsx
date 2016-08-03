@@ -8,7 +8,6 @@ import {List} from 'immutable';
 
 import Table from '../../common/Table';
 
-import {updateLevelBuffersAction} from '../../reducers/schoolAnalysis/actions';
 import {makeSegmentsCount} from '../../api/exam';
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 
@@ -210,15 +209,14 @@ class GroupAnalysis extends React.Component {
 
     render() {
 //Props数据结构：
-        var {reportDS, schoolAnalysis} = this.props;
+        var {reportDS} = this.props;
         var examInfo = reportDS.examInfo.toJS(),
             examStudentsInfo = reportDS.examStudentsInfo.toJS(),
             studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
-            levels = schoolAnalysis.levels.toJS(),
-            levelBuffers = schoolAnalysis.levelBuffers.toJS();
+            levels = reportDS.levels.toJS(),
+            levelBuffers = reportDS.levelBuffers.toJS();
 //算法数据结构：
         var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers);
-
 
         var xAxis = _.map(levels, (levObj, levelKey) => numberMap[(levelKey-0)+1]+'档');
         var disData = criticalStudentsDiscription(criticalLevelInfo);
@@ -363,19 +361,7 @@ class GroupAnalysis extends React.Component {
 }
 
 //设计：这里将GroupAnalysis作为container，而不是pure render function--就是为了降级，将整个校级分析只是作为一个集装箱，而不是container component
-export default connect(mapStateToProps, mapDispatchToProps)(GroupAnalysis);
-
-function mapStateToProps(state) {
-    return {
-        levelBuffers: state.schoolAnalysis.levelBuffers
-    }
-}
-
-function mapDispatchToProps(dispatch) {
-    return {
-        updateLevelBuffers: bindActionCreators(updateLevelBuffersAction, dispatch)
-    }
-}
+export default GroupAnalysis;
 
 function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers) {
     // levels = levels || makeDefaultLevles(examInfo, examStudentsInfo);

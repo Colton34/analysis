@@ -486,13 +486,12 @@ class ScoreDistribution extends React.Component {
 
     render() {
     //Props数据结构：
-        // var {examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, changeLevels} = this.props;
-        var examInfo = this.props.reportDS.examInfo.toJS(),
-            examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS(),
-            examClassesInfo = this.props.reportDS.examClassesInfo.toJS(),
-            studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(),
-            levels = this.props.schoolAnalysis.levels.toJS(),
-            {changeLevels} = this.props;
+        var {reportDS, changeLevels} = this.props;
+        var examInfo = reportDS.examInfo.toJS(),
+            examStudentsInfo = reportDS.examStudentsInfo.toJS(),
+            examClassesInfo = reportDS.examClassesInfo.toJS(),
+            studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
+            levels = reportDS.levels.toJS();
 
     //算法数据结构
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);

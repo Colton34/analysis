@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 
 import {
-	fetchRankReportdData
+	initRankReportdData
 } from '../../api/exam';
 
 import {
@@ -11,6 +11,6 @@ import {
 export function initRankReportAction(params) {
 	return {
 		type: INIT_RANKREPORT,
-		promise: fetchRankReportdData(params)
+		promise: initRankReportdData(params)
 	}
 }

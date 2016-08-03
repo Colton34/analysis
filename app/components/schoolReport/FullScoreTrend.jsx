@@ -94,6 +94,7 @@ const FullScoreTrend = ({reportDS}) => {
     )
 }
 
+
 export default FullScoreTrend;
 
 /**

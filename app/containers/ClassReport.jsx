@@ -5,8 +5,9 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
-// import {initSchoolAnalysisAction} from '../reducers/schoolAnalysis/actions';//TODO: 这里已经修改为reportDS了
-import {CommonErrorView, CommonLoadingView} from '../common/ErrorView';
+import {initReportDSAction} from '../reducers/reportDS/actions';
+import CommonErrorView from '../common/ErrorView';
+import CommonLoadingView from '../common/LoadingView';
 
 /*
 设计：
@@ -15,14 +16,14 @@ import {CommonErrorView, CommonLoadingView} from '../common/ErrorView';
  */
 
 class ClassReport extends React.Component {
-    // static need = [
-    //     initSchoolAnalysisAction
-    // ]
+    static need = [
+        initReportDSAction
+    ]
 
     componentDidMount() {
         if (this.props.haveInit) return;
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
-        this.props.initSchoolAnalysis(params);
+        this.props.initReportDS(params);
     }
 
     render() {
@@ -43,20 +44,12 @@ function mapStateToProps(state) {
         isLoading: state.global.isLoading,
         ifError: state.global.ifError,
 
-        haveInit: state.schoolAnalysis.haveInit,
-        examInfo: state.schoolAnalysis.examInfo,
-        examStudentsInfo: state.schoolAnalysis.examStudentsInfo,
-        examPapersInfo: state.schoolAnalysis.examPapersInfo,
-        examClassesInfo: state.schoolAnalysis.examClassesInfo,
-        studentsGroupByClass: state.schoolAnalysis.studentsGroupByClass,
-        allStudentsPaperMap: state.schoolAnalysis.allStudentsPaperMap,
-        headers: state.schoolAnalysis.headers,
-        levels: state.schoolAnalysis.levels
+        reportDS: state.reportDS
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        initSchoolAnalysis : bindActionCreators(initSchoolAnalysisAction, dispatch)
+        initReportDS : bindActionCreators(initReportDSAction, dispatch)
     }
 }

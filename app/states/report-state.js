@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-02 16:36:20
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-02 17:16:18
+* @Last Modified time: 2016-08-03 15:31:49
 */
 
 'use strict';
@@ -18,7 +18,11 @@ var InitialState = Record({
     examClassesInfo: Map({}),
     studentsGroupByClass: Map({}),
     allStudentsPaperMap: Map({}),
-    headers: List([])
+    headers: List([]),
+    levels: Map({}),
+    levelBuffers: List([]),
+
+    forseUpdate: false //TODO：这个需要fix
 });
 
 export default InitialState;

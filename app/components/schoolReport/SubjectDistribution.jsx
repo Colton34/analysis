@@ -152,7 +152,7 @@ class LevelInfo extends React.Component {
     }
 }
 
-const SubjectDistribution = ({reportDS, schoolAnalysis}) => {
+const SubjectDistribution = ({reportDS}) => {
     var examInfo = reportDS.examInfo.toJS(),
         examStudentsInfo = reportDS.examStudentsInfo.toJS(),
         examPapersInfo = reportDS.examPapersInfo.toJS(),
@@ -160,7 +160,7 @@ const SubjectDistribution = ({reportDS, schoolAnalysis}) => {
         studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
         allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(),
         headers = reportDS.headers.toJS(),
-        levels = schoolAnalysis.levels.toJS();
+        levels = reportDS.levels.toJS();
     //算法数据结构：
     var levLastIndex = _.size(levels) - 1;
 

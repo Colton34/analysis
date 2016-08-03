@@ -23,8 +23,7 @@ import SubjectPerformance from '../components/schoolReport/SubjectPerformance';
 import GroupAnalysis from '../components/schoolReport/GroupAnalysis';
 import StudentPerformance from '../components/schoolReport/StudentPerformance/StudentPerformance';;
 
-import {initSchoolAnalysisAction, initSchoolAnalysisPartAction, changeLevelAction} from '../reducers/schoolAnalysis/actions';
-import {initReportDSAction} from '../reducers/reportDS/actions';
+import {initReportDSAction, changeLevelAction, updateLevelBuffersAction} from '../reducers/reportDS/actions';
 import {initParams} from '../lib/util';
 import {SUBJECTS_WEIGHT as subjectWeight, COLORS_MAP as colorsMap, BACKGROUND_COLOR} from '../lib/constants';
 import Spinkit from '../common/Spinkit';
@@ -51,48 +50,34 @@ class NavHeader extends React.Component {
 }
 
 //TODO:重构成ContentView的组织方式
-//Note: reportDS被init了，但是schoolReport没有被init。但是schoolReport被init了reportDS一定是被init的了。考虑不放在api中，而是放在自己的声明周期中--自己container的数据在自己的生命周期中init
 class SchoolReport extends React.Component {
     static need = [
-        initSchoolAnalysisAction
+        initReportDSAction
     ];
 
     componentDidMount() {
-        if(this.props.reportDS.haveInit && this.props.schoolAnalysis.haveInit) return;
+        if(this.props.reportDS.haveInit) return;
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
-        console.log('reportDS.haveInit = ', this.props.reportDS.haveInit, '  schoolAnalysis.haveInit = ', this.props.schoolAnalysis.haveInit);
-        debugger;
-        if(!this.props.reportDS.haveInit && !this.props.schoolAnalysis.haveInit) {
-            console.log('1');
-            debugger;
-            return this.props.initSchoolAnalysis(params);
-        }
-        debugger;
-        if(this.props.reportDS.haveInit && !this.props.schoolAnalysis.haveInit) return this.props.initSchoolAnalysisPart(params);
-        debugger;
         this.props.initReportDS(params);
-        debugger;
     }
 
     render() {
-        console.log('6');
-        console.log('schoolAnalysis render');
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) return (<CommonErrorView />);
         var grade = this.props.location.query ? this.props.location.query.grade : '';
         //TOOD:Header那里为什么传入params和location？？？重构
         return (
             <div>
-                {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || (!this.props.reportDS.haveInit || !this.props.schoolAnalysis.haveInit)) ? <CommonLoadingView /> : (
+                {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <CommonLoadingView /> : (
                     <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: BACKGROUND_COLOR, zIndex: 0}}>
                         <NavHeader examInfo={this.props.reportDS.examInfo} examId={examid} grade={grade} />
                         <Header examInfo={this.props.reportDS.examInfo} />
                         <FullScoreTrend reportDS={this.props.reportDS} />
-                        <ScoreDistribution reportDS={this.props.reportDS} schoolAnalysis={this.props.schoolAnalysis} changeLevels={this.props.changeLevels} />
-                        <SubjectDistribution reportDS={this.props.reportDS} schoolAnalysis={this.props.schoolAnalysis} />
-                        <ClassPerformance reportDS={this.props.reportDS} schoolAnalysis={this.props.schoolAnalysis} />
+                        <ScoreDistribution reportDS={this.props.reportDS} changeLevels={this.props.changeLevels} />
+                        <SubjectDistribution reportDS={this.props.reportDS} />
+                        <ClassPerformance reportDS={this.props.reportDS} />
                         <SubjectPerformance reportDS={this.props.reportDS} />
-                        <GroupAnalysis reportDS={this.props.reportDS} schoolAnalysis={this.props.schoolAnalysis} />
+                        <GroupAnalysis reportDS={this.props.reportDS} updateLevelBuffers={this.props.updateLevelBuffers} />
                         <StudentPerformance reportDS={this.props.reportDS} />
                     </div>
                 ))}
@@ -105,17 +90,15 @@ function mapStateToProps(state) {
     return {
         ifError: state.global.ifError,
         isLoading: state.global.isLoading,
-        reportDS: state.reportDS,
-        schoolAnalysis: state.schoolAnalysis
+        reportDS: state.reportDS
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        initSchoolAnalysis: bindActionCreators(initSchoolAnalysisAction, dispatch),
-        initSchoolAnalysisPart: bindActionCreators(initSchoolAnalysisPartAction, dispatch),
         initReportDS: bindActionCreators(initReportDSAction, dispatch),
-        changeLevels: bindActionCreators(changeLevelAction, dispatch)
+        changeLevels: bindActionCreators(changeLevelAction, dispatch),
+        updateLevelBuffers: bindActionCreators(updateLevelBuffersAction, dispatch)
     }
 }
 
