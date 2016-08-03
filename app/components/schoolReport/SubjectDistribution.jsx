@@ -53,7 +53,7 @@ class InfoBlock extends React.Component {
 
     render() {
         var {disData, studentsGroupByClass} = this.props;
-        
+
         //var disDataSize = _.size(disData);
         var studentGroupSize = _.size(studentsGroupByClass);
         return (
@@ -150,12 +150,17 @@ class LevelInfo extends React.Component {
             </div>
         )
     }
-
-
-
 }
-const SubjectDistribution = ({examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, levels, headers}) => {
 
+const SubjectDistribution = ({reportDS, schoolAnalysis}) => {
+    var examInfo = reportDS.examInfo.toJS(),
+        examStudentsInfo = reportDS.examStudentsInfo.toJS(),
+        examPapersInfo = reportDS.examPapersInfo.toJS(),
+        examClassesInfo = reportDS.examClassesInfo.toJS(),
+        studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
+        allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(),
+        headers = reportDS.headers.toJS(),
+        levels = schoolAnalysis.levels.toJS();
     //算法数据结构：
     var levLastIndex = _.size(levels) - 1;
 

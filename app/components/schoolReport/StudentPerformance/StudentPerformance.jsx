@@ -173,9 +173,12 @@ class StudentPerformanceTable extends React.Component {
 }
 
 
-const StudentPerformance = ({examInfo, examStudentsInfo, allStudentsPaperMap, headers}) => {
+const StudentPerformance = ({reportDS}) => {
     //算法数据结构：
-
+    var examInfo = reportDS.examInfo.toJS(),
+        examStudentsInfo = reportDS.examStudentsInfo.toJS(),
+        allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(),
+        headers = reportDS.headers.toJS();
     //自定义Module数据结构：
     var topStudents = _.reverse(_.takeRight(examStudentsInfo, 10));
     var lowStudents = _.reverse(_.take(examStudentsInfo, 10));

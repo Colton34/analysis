@@ -70,6 +70,7 @@ class Dashboard extends React.Component {
             loading: false
         }
     }
+
     componentDidMount() {
         if (this.props.dashboard.haveInit) return;
 
@@ -110,6 +111,8 @@ class Dashboard extends React.Component {
         })
     }
     render() {
+        console.log('dashboard render');
+
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
         var schoolReport = (Map.isMap(this.props.dashboard.schoolReport)) ? this.props.dashboard.schoolReport.toJS() : this.props.dashboard.schoolReport;

@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
-import {initSchoolAnalysisAction} from '../reducers/schoolAnalysis/actions';
+// import {initSchoolAnalysisAction} from '../reducers/schoolAnalysis/actions';//TODO: 这里已经修改为reportDS了
 import {CommonErrorView, CommonLoadingView} from '../common/ErrorView';
 
 /*
@@ -15,9 +15,9 @@ import {CommonErrorView, CommonLoadingView} from '../common/ErrorView';
  */
 
 class ClassReport extends React.Component {
-    static need = [
-        initSchoolAnalysisAction
-    ]
+    // static need = [
+    //     initSchoolAnalysisAction
+    // ]
 
     componentDidMount() {
         if (this.props.haveInit) return;

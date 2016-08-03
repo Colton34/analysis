@@ -210,10 +210,12 @@ class GroupAnalysis extends React.Component {
 
     render() {
 //Props数据结构：
-        var {examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers} = this.props;
-
-        levelBuffers = (List.isList(levelBuffers)) ? levelBuffers.toJS() : levelBuffers;
-        if((!levelBuffers || _.size(levelBuffers) == 0)) return (<div></div>)
+        var {reportDS, schoolAnalysis} = this.props;
+        var examInfo = reportDS.examInfo.toJS(),
+            examStudentsInfo = reportDS.examStudentsInfo.toJS(),
+            studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
+            levels = schoolAnalysis.levels.toJS(),
+            levelBuffers = schoolAnalysis.levelBuffers.toJS();
 //算法数据结构：
         var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers);
 
@@ -353,7 +355,7 @@ class GroupAnalysis extends React.Component {
                         </div>
                     )
                 }
-                
+
                 <Dialog levels={levels} levelBuffers={levelBuffers} updateLevelBuffers={this.props.updateLevelBuffers} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }/>
             </div>
         )

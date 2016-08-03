@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:02:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-19 10:02:57
+* @Last Modified time: 2016-08-03 13:54:25
 */
 
 'use strict';
@@ -12,18 +12,20 @@ import { routerReducer as routing } from 'react-router-redux';
 
 import app from './global-app';
 import home from './home';
+import rankReport from './rankReport';
 import dashboard from './dashboard';
 import schoolAnalysis from './schoolAnalysis';
 import customAnalysis from './customAnalysis';
-import rankReport from './rankReport';
+import reportDS from './reportDS';
 
 var rootReducer = combineReducers({
-    app,
+    global: app,
     home,
     dashboard,
+    reportDS,
+    rankReport,
     schoolAnalysis,
     customAnalysis,
-    rankReport,
     routing
 });
 

@@ -51,7 +51,7 @@ class Dialog extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        dialog: state.app.dialog
+        dialog: state.global.dialog
     }
 }
 

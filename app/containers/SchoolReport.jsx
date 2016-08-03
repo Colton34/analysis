@@ -8,11 +8,12 @@
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Map, List} from 'immutable';
 import { Link } from 'react-router';
 
+import CommonErrorView from '../common/ErrorView';
+import CommonLoadingView from '../common/LoadingView';
 import Header from '../components/schoolReport/Header';
 import FullScoreTrend from '../components/schoolReport/FullScoreTrend';
 import ScoreDistribution from '../components/schoolReport/ScoreDistribution';
@@ -22,7 +23,8 @@ import SubjectPerformance from '../components/schoolReport/SubjectPerformance';
 import GroupAnalysis from '../components/schoolReport/GroupAnalysis';
 import StudentPerformance from '../components/schoolReport/StudentPerformance/StudentPerformance';;
 
-import {initSchoolAnalysisAction, changeLevelAction} from '../reducers/schoolAnalysis/actions';
+import {initSchoolAnalysisAction, initSchoolAnalysisPartAction, changeLevelAction} from '../reducers/schoolAnalysis/actions';
+import {initReportDSAction} from '../reducers/reportDS/actions';
 import {initParams} from '../lib/util';
 import {SUBJECTS_WEIGHT as subjectWeight, COLORS_MAP as colorsMap, BACKGROUND_COLOR} from '../lib/constants';
 import Spinkit from '../common/Spinkit';
@@ -35,12 +37,12 @@ class NavHeader extends React.Component {
     render() {
         var {examId, grade} = this.props;
         var queries = grade ? {examid: examId, grade: grade} : {examid: examId}
+        var examInfo = this.props.examInfo.toJS();
         return (
             <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: colorsMap.C12 }}>
                 <Link to={{ pathname: '/dashboard',  query: queries}} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
                 <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}>
-                  {/*  <a style={{ color: '#b4b4b4' }} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> */}
-                    <Link to={{ pathname: '/dashboard',  query: queries}} style={{color: '#b4b4b4'}}>{this.props.examInfo.name}</Link>
+                    <Link to={{ pathname: '/dashboard',  query: queries}} style={{color: '#b4b4b4'}}>{examInfo.name}</Link>
                     <span><i className='icon-right-open-2'></i>校级分析报告</span>
                 </span>
             </div>
@@ -48,86 +50,52 @@ class NavHeader extends React.Component {
     }
 }
 
+//TODO:重构成ContentView的组织方式
+//Note: reportDS被init了，但是schoolReport没有被init。但是schoolReport被init了reportDS一定是被init的了。考虑不放在api中，而是放在自己的声明周期中--自己container的数据在自己的生命周期中init
 class SchoolReport extends React.Component {
     static need = [
         initSchoolAnalysisAction
     ];
 
     componentDidMount() {
-        if (this.props.haveInit) return;
+        if(this.props.reportDS.haveInit && this.props.schoolAnalysis.haveInit) return;
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
-        this.props.initSchoolAnalysis(params);
+        console.log('reportDS.haveInit = ', this.props.reportDS.haveInit, '  schoolAnalysis.haveInit = ', this.props.schoolAnalysis.haveInit);
+        debugger;
+        if(!this.props.reportDS.haveInit && !this.props.schoolAnalysis.haveInit) {
+            console.log('1');
+            debugger;
+            return this.props.initSchoolAnalysis(params);
+        }
+        debugger;
+        if(this.props.reportDS.haveInit && !this.props.schoolAnalysis.haveInit) return this.props.initSchoolAnalysisPart(params);
+        debugger;
+        this.props.initReportDS(params);
+        debugger;
     }
 
     render() {
-        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, headers, levels} = this.props;
-
-        examInfo = (Map.isMap(examInfo)) ? examInfo.toJS() : examInfo;
-        examStudentsInfo = (List.isList(examStudentsInfo)) ? examStudentsInfo.toJS() : examStudentsInfo;
-        examPapersInfo = (Map.isMap(examPapersInfo)) ? examPapersInfo.toJS() : examPapersInfo;
-        examClassesInfo = (Map.isMap(examClassesInfo)) ? examClassesInfo.toJS() : examClassesInfo;
-        studentsGroupByClass = (Map.isMap(studentsGroupByClass)) ? studentsGroupByClass.toJS() : studentsGroupByClass;
-        allStudentsPaperMap = (Map.isMap(allStudentsPaperMap)) ? allStudentsPaperMap.toJS() : allStudentsPaperMap;
-        headers = (List.isList(headers)) ? headers.toJS() : headers;
-        levels = (Map.isMap(levels)) ? levels.toJS() : levels;
-
+        console.log('6');
+        console.log('schoolAnalysis render');
         var examid = this.props.location.query ? this.props.location.query.examid : '';
+        if(!examid) return (<CommonErrorView />);
         var grade = this.props.location.query ? this.props.location.query.grade : '';
-        if (!examid) return;
-
-        if((!examInfo || _.size(examInfo) == 0) || (!examStudentsInfo || examStudentsInfo.length == 0) ||
-            (!examPapersInfo || _.size(examPapersInfo) == 0) || (!examClassesInfo || _.size(examClassesInfo) == 0) ||
-            (!studentsGroupByClass || _.size(studentsGroupByClass) == 0) || (!allStudentsPaperMap || _.size(allStudentsPaperMap) == 0) ||
-             (!headers || _.size(headers) == 0) || (!levels || _.size(levels) == 0))
-             return (
-                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
-                    <Spinkit/>
-                 </div>
-             )
+        //TOOD:Header那里为什么传入params和location？？？重构
         return (
-            <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: BACKGROUND_COLOR, zIndex: 0}}>
-                <NavHeader examInfo={examInfo} examId={examid} grade={grade}/>
-                <Header examInfo = {examInfo} params={this.props.params} location={this.props.location} />
-                <FullScoreTrend examInfo = {examInfo} examStudentsInfo = {examStudentsInfo} />
-                <ScoreDistribution
-                    examInfo = {examInfo}
-                    examStudentsInfo = {examStudentsInfo}
-                    examClassesInfo = {examClassesInfo}
-                    studentsGroupByClass = {studentsGroupByClass}
-                    levels = {levels}
-                    changeLevels = {this.props.changeLevels} />
-                <SubjectDistribution
-                    examInfo = {examInfo}
-                    examStudentsInfo = {examStudentsInfo}
-                    examPapersInfo = {examPapersInfo}
-                    examClassesInfo = {examClassesInfo}
-                    studentsGroupByClass = {studentsGroupByClass}
-                    allStudentsPaperMap = {allStudentsPaperMap}
-                    levels = {levels}
-                    headers = {headers}/>
-                <ClassPerformance
-                    examInfo = {examInfo}
-                    examStudentsInfo = {examStudentsInfo}
-                    examPapersInfo = {examPapersInfo}
-                    examClassesInfo = {examClassesInfo}
-                    studentsGroupByClass = {studentsGroupByClass}
-                    levels = {levels}
-                    headers = {headers} />
-                <SubjectPerformance
-                    examStudentsInfo={examStudentsInfo}
-                    examPapersInfo={examPapersInfo}
-                    allStudentsPaperMap={allStudentsPaperMap}
-                    headers={headers} />
-                <GroupAnalysis
-                    examInfo={examInfo}
-                    examStudentsInfo={examStudentsInfo}
-                    studentsGroupByClass={studentsGroupByClass}
-                    levels={levels} />
-                <StudentPerformance
-                    examInfo={examInfo}
-                    examStudentsInfo={examStudentsInfo}
-                    allStudentsPaperMap={allStudentsPaperMap}
-                    headers={headers} />
+            <div>
+                {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || (!this.props.reportDS.haveInit || !this.props.schoolAnalysis.haveInit)) ? <CommonLoadingView /> : (
+                    <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: BACKGROUND_COLOR, zIndex: 0}}>
+                        <NavHeader examInfo={this.props.reportDS.examInfo} examId={examid} grade={grade} />
+                        <Header examInfo={this.props.reportDS.examInfo} />
+                        <FullScoreTrend reportDS={this.props.reportDS} />
+                        <ScoreDistribution reportDS={this.props.reportDS} schoolAnalysis={this.props.schoolAnalysis} changeLevels={this.props.changeLevels} />
+                        <SubjectDistribution reportDS={this.props.reportDS} schoolAnalysis={this.props.schoolAnalysis} />
+                        <ClassPerformance reportDS={this.props.reportDS} schoolAnalysis={this.props.schoolAnalysis} />
+                        <SubjectPerformance reportDS={this.props.reportDS} />
+                        <GroupAnalysis reportDS={this.props.reportDS} schoolAnalysis={this.props.schoolAnalysis} />
+                        <StudentPerformance reportDS={this.props.reportDS} />
+                    </div>
+                ))}
             </div>
         )
     }
@@ -135,22 +103,18 @@ class SchoolReport extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        haveInit: state.schoolAnalysis.haveInit,
-        examInfo: state.schoolAnalysis.examInfo,
-        examStudentsInfo: state.schoolAnalysis.examStudentsInfo,
-        examPapersInfo: state.schoolAnalysis.examPapersInfo,
-        examClassesInfo: state.schoolAnalysis.examClassesInfo,
-        studentsGroupByClass: state.schoolAnalysis.studentsGroupByClass,
-        allStudentsPaperMap: state.schoolAnalysis.allStudentsPaperMap,
-        headers: state.schoolAnalysis.headers,
-        levels: state.schoolAnalysis.levels,
-        forseUpdate: state.schoolAnalysis.forseUpdate
+        ifError: state.global.ifError,
+        isLoading: state.global.isLoading,
+        reportDS: state.reportDS,
+        schoolAnalysis: state.schoolAnalysis
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         initSchoolAnalysis: bindActionCreators(initSchoolAnalysisAction, dispatch),
+        initSchoolAnalysisPart: bindActionCreators(initSchoolAnalysisPartAction, dispatch),
+        initReportDS: bindActionCreators(initReportDSAction, dispatch),
         changeLevels: bindActionCreators(changeLevelAction, dispatch)
     }
 }
@@ -194,3 +158,56 @@ var defaultLevelInfo = [
 
 
  */
+
+
+
+/*
+
+
+        examInfo = (Map.isMap(examInfo)) ? examInfo.toJS() : examInfo;
+        examStudentsInfo = (List.isList(examStudentsInfo)) ? examStudentsInfo.toJS() : examStudentsInfo;
+        examPapersInfo = (Map.isMap(examPapersInfo)) ? examPapersInfo.toJS() : examPapersInfo;
+        examClassesInfo = (Map.isMap(examClassesInfo)) ? examClassesInfo.toJS() : examClassesInfo;
+        studentsGroupByClass = (Map.isMap(studentsGroupByClass)) ? studentsGroupByClass.toJS() : studentsGroupByClass;
+        allStudentsPaperMap = (Map.isMap(allStudentsPaperMap)) ? allStudentsPaperMap.toJS() : allStudentsPaperMap;
+        headers = (List.isList(headers)) ? headers.toJS() : headers;
+        levels = (Map.isMap(levels)) ? levels.toJS() : levels;
+
+        var examid = this.props.location.query ? this.props.location.query.examid : '';
+        var grade = this.props.location.query ? this.props.location.query.grade : '';
+        if (!examid) return;
+
+        if((!examInfo || _.size(examInfo) == 0) || (!examStudentsInfo || examStudentsInfo.length == 0) ||
+            (!examPapersInfo || _.size(examPapersInfo) == 0) || (!examClassesInfo || _.size(examClassesInfo) == 0) ||
+            (!studentsGroupByClass || _.size(studentsGroupByClass) == 0) || (!allStudentsPaperMap || _.size(allStudentsPaperMap) == 0) ||
+             (!headers || _.size(headers) == 0) || (!levels || _.size(levels) == 0))
+             return (
+                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
+                    <Spinkit/>
+                 </div>
+             )
+
+
+        var examid = this.props.location.query ? this.props.location.query.examid : '';
+        var grade = this.props.location.query ? this.props.location.query.grade : '';
+
+        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, headers} = this.props.reportDS;
+        var {levels} = this.props.schoolAnalysis;
+
+
+ */
+
+// function mapStateToProps(state) {
+//     return {
+//         haveInit: state.schoolAnalysis.haveInit,
+//         examInfo: state.schoolAnalysis.examInfo,
+//         examStudentsInfo: state.schoolAnalysis.examStudentsInfo,
+//         examPapersInfo: state.schoolAnalysis.examPapersInfo,
+//         examClassesInfo: state.schoolAnalysis.examClassesInfo,
+//         studentsGroupByClass: state.schoolAnalysis.studentsGroupByClass,
+//         allStudentsPaperMap: state.schoolAnalysis.allStudentsPaperMap,
+//         headers: state.schoolAnalysis.headers,
+//         levels: state.schoolAnalysis.levels,
+//         forseUpdate: state.schoolAnalysis.forseUpdate
+//     }
+// }

@@ -1,24 +1,31 @@
+import _ from 'lodash';
 import React from 'react';
 import ReactHighcharts from 'react-highcharts';
-import _ from 'lodash';
+import {Table as BootTable} from 'react-bootstrap';
 
+//Component
+import TableView from './TableView';
 import Table from '../../common/Table';
 import DropdownList from '../../common/DropdownList';
 
+//Util
 import {makeSegments, makeFactor, makeSegmentsCount} from '../../api/exam';
-import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
+
+//Style
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
-import TableView from './TableView';
-import {Table as BootTable} from 'react-bootstrap';
 
+//Constant
+import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
+
+//Global variable
 var localStyle = {
      lengthControl: {
         overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'
     }
 }
-const AverageTable = ({tableHeaderData, tableData}) => {
 
+const AverageTable = ({tableHeaderData, tableData}) => {
     return (
         <BootTable  bordered hover responsive style={{marginBottom: 0}}>
             <tbody>
@@ -69,18 +76,19 @@ const AverageTable = ({tableHeaderData, tableData}) => {
  * props:
  * totalScoreLevel: 分档信息
  */
-    class ClassPerformance extends React.Component {
 
+
+class ClassPerformance extends React.Component {
     constructor(props) {
         super(props);
-
-        var {studentsGroupByClass, examInfo} = this.props;
+        // var {studentsGroupByClass, examInfo} = this.props;
+        var studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), examInfo = this.props.reportDS.examInfo.toJS();
+        debugger;
         var classList = _.map(_.keys(studentsGroupByClass), (className) => {
             return {key: className, value: examInfo.gradeName+className+'班'};
         });
 
         this.classList = classList;
-
         this.state = {
             currentClasses: _.take(this.classList, 2)
         }
@@ -99,15 +107,8 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                 currentClasses: _.without(currentClasses, classItem)
             });
         }
-
-
-        // if(!lineChartMockData[chosenClass]) return ;
-        // var obj = {};
-        // obj.name = chosenClass;
-        // obj.data = lineChartMockData[chosenClass];
-        // lineChartRenderData = [].concat([lineChartRenderData[1], obj]);
-        // this.forceUpdate();
     }
+
     // 根据数值返回要显示的颜色,传给TableView组件
     colorCallback(value) {
         if (!_.isNumber(value) || isNaN(value))
@@ -119,7 +120,27 @@ const AverageTable = ({tableHeaderData, tableData}) => {
     }
     render() {
 //Props数据结构：
-        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, levels, headers} = this.props;
+        // var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, levels, headers} = this.props;
+/*
+
+                    examInfo = {examInfo}
+                    examStudentsInfo = {examStudentsInfo}
+                    examPapersInfo = {examPapersInfo}
+                    examClassesInfo = {examClassesInfo}
+                    studentsGroupByClass = {studentsGroupByClass}
+                    levels = {levels}
+                    headers = {headers}
+
+
+ */
+        var {reportDS, schoolAnalysis} = this.props;
+        var examInfo = reportDS.examInfo.toJS(),
+            examStudentsInfo = reportDS.examStudentsInfo.toJS(),
+            examPapersInfo = reportDS.examPapersInfo.toJS(),
+            examClassesInfo = reportDS.examClassesInfo.toJS(),
+            studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
+            headers = reportDS.headers.toJS(),
+            levels = schoolAnalysis.levels.toJS();
 //算法数据结构：
 
 // var lineChartRenderData = [{
@@ -130,6 +151,8 @@ const AverageTable = ({tableHeaderData, tableData}) => {
 //                 data: [11.2, 9.6, 19.5, 85.5, 21.8, 12.5, 87.5, 78.5, 33.3, 8.3, 23.9, 5.6]
 //             }];
         var headerInfo = theClassExamHeader(studentsGroupByClass);
+        console.log(this.state.currentClasses);
+        debugger;
         var {xAxons, yAxonses} = theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, this.state.currentClasses);
         var subjectMeanInfo = makeClassExamMeanInfo(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo, studentsGroupByClass);
         var meanTableBodyData = theClassExamMeanTable(examInfo, subjectMeanInfo, headers);
@@ -301,6 +324,7 @@ function theClassExamChart(examInfo, examStudentsInfo, examClassesInfo, currentC
 
 //只有班级没有全校！！！
     var yAxonses = _.map(currentClasses, (classItem) => {
+        if(!classItem) console.log('就是这里');
         var students = examStudentsGroupByClass[classItem.key];
         var yAxons = makeSegmentsCount(students, segments);
         return {

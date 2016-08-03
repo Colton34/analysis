@@ -5,7 +5,8 @@ import ReactHighcharts from 'react-highcharts';
 import { COLORS_MAP as colorsMap, B03, C04, C07, C12, C14 } from '../../lib/constants';
 import {makeSegments, makeSegmentsCount} from '../../api/exam';
 
-const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
+const FullScoreTrend = ({reportDS}) => {
+    var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS();
 //算法数据结构：
     var result = theTotalScoreTrenderChart(examInfo, examStudentsInfo);
 
@@ -80,21 +81,6 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
     }
     return (
         <div id='fullScoreTrend' style={{padding: '30px 0 30px 30px', borderRadius: 2, backgroundColor: '#fff', position: 'relative', marginBottom: 20}}>
-            {/**
-                <div style={{ borderBottom: '3px solid #C9CAFD', width: '100%', height: 30 }}></div>
-            <div className={schoolReportStyles['section-title']} style={{ position: 'absolute', left: '50%', marginLeft: -120, textAlign: 'center', top: 20, backgroundColor: '#fff', fontSize: 20, width: 200 }}>
-                总分分布趋势
-            </div>
-            <div className={styles['school-report-content']} style={{fontSize: 14, lineHeight: '22px'}}>
-                <p style={{ marginTop: 40 }}>总学生总分趋势的分布图：是这次考试检测全校学生学生综合水平状况的一个基本表现特征。</p>
-                <p>总分分布曲线图如下：</p>
-                <ReactHighcharts config={config} style={{ margin: '0 auto', marginTop: 40 }}></ReactHighcharts>
-                <div style={{ width: 760, minHeight: 90, backgroundColor: '#e9f7f0', margin: '0 auto', marginTop: 20}} className={styles['tips']}>
-                    <p style={{ marginBottom: 20 }}>对于这次考试: </p>
-                    <p>从总分分布曲线图可以看出，这次考试学生总分的分布情况，直观的反映了本次学生考试分数集中的区间，注意这些现象，有意识的调整教学。</p>
-                </div>
-            </div>
-             */}
              <div style={{marginBottom: 30}}>
                 <span style={{border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left'}}></span>
                 <span style={{fontSize: 18, color: C12, marginRight: 20}}>总分分布趋势</span> <span className={schoolReportStyles['title-desc']}>学生总分分布趋势，可反映本次考试全校学生的综合学习水平</span>
@@ -107,7 +93,6 @@ const FullScoreTrend = ({examInfo, examStudentsInfo}) => {
         </div>
     )
 }
-
 
 export default FullScoreTrend;
 

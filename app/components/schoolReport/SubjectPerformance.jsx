@@ -261,7 +261,21 @@ class SubjectPerformance extends React.Component {
     }
     render() {
 //Props数据结构：
-        var {examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers} = this.props;
+
+/*
+
+                    examStudentsInfo={examStudentsInfo}
+                    examPapersInfo={examPapersInfo}
+                    allStudentsPaperMap={allStudentsPaperMap}
+                    headers={headers}
+
+ */
+
+        var {reportDS} = this.props;
+        var examStudentsInfo = reportDS.examStudentsInfo.toJS(),
+            examPapersInfo = reportDS.examPapersInfo.toJS(),
+            allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(),
+            headers = reportDS.headers.toJS();
 //算法数据结构：
         //TODO：很明显，levelPercentages不影响 subjectExamTable，只会影响subjectLevelExamTable，所以最后还是抽出去
         var subjectExamTableData = theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers);

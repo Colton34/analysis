@@ -1,22 +1,30 @@
+//Third library
+import _ from 'lodash';
 import React from 'react';
-import style from '../../common/common.css';
-import schoolReportStyles from './schoolReport.css';
-import ReactHighcharts from 'react-highcharts';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import ReactHighcharts from 'react-highcharts';
 import { Modal, Table as BootTable} from 'react-bootstrap';
-import _ from 'lodash';
-
-import {showDialog, hideDialog} from '../../reducers/global-app/actions';//TODO: 设计思路？？？
-import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07, BACKGROUND_COLOR} from '../../lib/constants';
-
-import {makeSegmentsCount} from '../../api/exam';
-
-import DropdownList from '../../common/DropdownList';
-import TableView from './TableView';
 var {Header, Title, Body, Footer} = Modal;
 
+//Action
+import {showDialog, hideDialog} from '../../reducers/global-app/actions';//TODO: 设计思路？？？
 
+//Style
+import style from '../../common/common.css';
+import schoolReportStyles from './schoolReport.css';
+
+//Components
+import TableView from './TableView';
+import DropdownList from '../../common/DropdownList';
+
+//Util
+import {makeSegmentsCount} from '../../api/exam';
+
+//Constant
+import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07, BACKGROUND_COLOR} from '../../lib/constants';
+
+//Global variable
 let localStyle = {
     dialogInput: {width: 100,height: 34, border: '1px solid #e7e7e7', borderRadius: 2, paddingLeft: 12, margin: '0 10px 0 0'},
     btn: {lineHeight: '32px', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',color: '#6a6a6a', margin: '0 6px'},
@@ -431,10 +439,25 @@ class Dialog extends React.Component {
  * totalScoreLevel: 对象数组, 包含默认的全校分档信息(分数线、上线率、人数)
  * classLevelInfo: 全校各班级的分档数据, 假数据用tableData替代
  */
+
+/*
+
+                    examInfo = {examInfo}
+                    examStudentsInfo = {examStudentsInfo}
+                    examClassesInfo = {examClassesInfo}
+                    studentsGroupByClass = {studentsGroupByClass}
+
+                    levels = {levels}
+
+                    changeLevels = {this.props.changeLevels}
+
+ */
+
 class ScoreDistribution extends React.Component {
     constructor(props) {
         super(props);
-        var {studentsGroupByClass, examInfo} = this.props;
+        // var {studentsGroupByClass, examInfo} = this.props;
+        var studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), examInfo = this.props.reportDS.examInfo.toJS();
         var classList = _.map(_.keys(studentsGroupByClass), (className) => {
             return {key: className, value: examInfo.gradeName+className+'班'};
         });
@@ -463,9 +486,15 @@ class ScoreDistribution extends React.Component {
 
     render() {
     //Props数据结构：
-        var {examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, changeLevels} = this.props;
+        // var {examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, changeLevels} = this.props;
+        var examInfo = this.props.reportDS.examInfo.toJS(),
+            examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS(),
+            examClassesInfo = this.props.reportDS.examClassesInfo.toJS(),
+            studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(),
+            levels = this.props.schoolAnalysis.levels.toJS(),
+            {changeLevels} = this.props;
 
-        //算法数据结构
+    //算法数据结构
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
         var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
         var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels);

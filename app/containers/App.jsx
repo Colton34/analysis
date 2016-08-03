@@ -52,7 +52,7 @@ class App extends React.Component {
     }
     render() {
         var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
-        
+
         var currentPath = this.props.location.pathname;
         return (
             <div id='appComp' style={_.assign({}, {backgroundColor: BACKGROUND_COLOR},(currentPath === '/' ? {}: {paddingBottom: 30}))} className={commonStyle['common-font']}>
@@ -64,10 +64,10 @@ class App extends React.Component {
     }
 
 }
- 
+
 function mapStateToProps(state) {
     return {
-        user: state.app.user
+        user: state.global.user
     }
 }
 
@@ -75,7 +75,7 @@ function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators(alterCommentDialogStatus, dispatch)
     }
-    
+
 }
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 // export default connect(mapStateToProps)(Radium(App)); -- 或者这么写

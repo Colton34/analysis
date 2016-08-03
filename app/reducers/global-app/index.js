@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-11 19:19:03
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-02 15:45:34
+* @Last Modified time: 2016-08-03 14:39:20
 */
 
 'use strict';
@@ -38,8 +38,11 @@ export default function reducer(state, action) {
         case HIDE_ERROR:
             return state.set('ifError', false);
         case LOADING_START:
+            console.log('5 -- 关键，在这之前不能进入到content veiw里');
             return state.set('isLoading', true);
         case LOADING_DONE:
+            console.log('yes, loading done');
+            debugger;
             return state.set('isLoading', false);
 
         case INIT_USER_ME_SUCCESS:

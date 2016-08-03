@@ -264,7 +264,7 @@ function mapStateToProps(state) {
         resultSet: state.customAnalysis.resultSet,
         analysisName: state.customAnalysis.analysisName,
         status: state.customAnalysis.status,
-        user: state.app.user
+        user: state.global.user
     }
 }
 

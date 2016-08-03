@@ -3,7 +3,7 @@
 * As seen in: https://github.com/caljrimmer/isomorphic-redux-app
 */
 
-import {REQUEST_SUFFIX, SUCCESS_SUFFIX, FAILURE_SUFFIX, LOADING_START, LOADING_DONE, THROW_ERROR} from '../lib/constants';
+import {REQUEST_SUFFIX, SUCCESS_SUFFIX, FAILURE_SUFFIX, LOADING_START, LOADING_DONE, THROW_ERROR, HIDE_ERROR} from '../lib/constants';
 
 export default function promiseMiddleware() {
   return next => action => {
@@ -15,9 +15,10 @@ export default function promiseMiddleware() {
     const SUCCESS = type + SUCCESS_SUFFIX;
     const FAILURE = type + FAILURE_SUFFIX;
     next([{ ...rest, type: REQUEST }, {type: LOADING_START}]);
+    console.log('4--关键');
     return promise
       .then(res => {
-        next([{ ...rest, res, type: SUCCESS }, {type: LOADING_DONE}]);
+        next([{ ...rest, res, type: SUCCESS }, {type: LOADING_DONE}, {type: HIDE_ERROR}]);
         return true;
       })
       .catch(error => {
