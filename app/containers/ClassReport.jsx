@@ -42,7 +42,6 @@ class ContentComponent extends React.Component {
 
     render() {
         var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
-        console.log(JSON.stringify(this.props.reportDS));
         return (
             <div>
                 <ReportNavHeader />
@@ -51,8 +50,6 @@ class ContentComponent extends React.Component {
         );
     }
 }
-
-// const ContentView = connect(mapStateToProps, mapDispatchToProps)(ContentComponent);
 
 class ClassReport extends React.Component {
     static need = [
@@ -92,12 +89,3 @@ function mapDispatchToProps(dispatch) {
         initReportDS : bindActionCreators(initReportDSAction, dispatch)
     }
 }
-
-/*
-
-                {(this.props.ifError) ? <CommonErrorView /> : (this.props.isLoading ? <CommonLoadingView /> : (
-                    <ReportNavHeader />
-                    (isSchoolManagerOrGradeManager) ? <TabNav changeClass={this.changeClass.bind(this)} /> : ''
-                ))}
-
- */
