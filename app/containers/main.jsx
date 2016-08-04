@@ -10,7 +10,7 @@ class Main extends React.Component {
     render() {
         return (
             <div>
-                <Link to='/class/report'>点我</Link>
+                <Link to={{pathname: '/class/report', query: {examid: '23040', grade: '初二'}}}>点我</Link>
             </div>
         );
     }

@@ -37,11 +37,11 @@ class ContentComponent extends React.Component {
         };
     }
 
-    // componentDidMount() {
-    //     if (this.props.haveInit) return;
-    //     var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
-    //     this.props.initReportDS(params);
-    // }
+    componentDidMount() {
+        if (this.props.haveInit) return;
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
+        this.props.initReportDS(params);
+    }
 
     changeClass(type) {
         console.log('type == ', type);
@@ -68,7 +68,7 @@ class ClassReport extends React.Component {
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : (this.props.isLoading ? <CommonLoadingView /> : (
-                    <ContentView />
+                    <ContentView params={this.props.params} location={this.props.location} />
                 ))}
             </div>
         );

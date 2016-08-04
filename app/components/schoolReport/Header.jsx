@@ -71,11 +71,9 @@ class NavBar extends React.Component {
 
     componentDidMount() {
         var navBarTop = document.getElementById('navBar').offsetTop;
-        debugger;
         var scrollTopList = [];
         _.forEach(modules, (module, index) => {
             scrollTopList.push(document.getElementById(module.id).offsetTop)
-            debugger;
         })
         var $body = $('body');
         this.scrollHandlerRef = this.scrollHandler.bind(this, navBarTop, scrollTopList);
