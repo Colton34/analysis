@@ -26,21 +26,11 @@ import {initParams} from '../lib/util';
 
  */
 class ContentComponent extends React.Component {
-    // static need = [
-    //     initReportDSAction
-    // ]
-
     constructor(props) {
         super(props);
         this.state = {
             reportType: 'multi'
         };
-    }
-
-    componentDidMount() {
-        if (this.props.haveInit) return;
-        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
-        this.props.initReportDS(params);
     }
 
     changeClass(type) {
@@ -52,6 +42,7 @@ class ContentComponent extends React.Component {
 
     render() {
         var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
+        console.log(JSON.stringify(this.props.reportDS));
         return (
             <div>
                 <ReportNavHeader />
@@ -61,21 +52,31 @@ class ContentComponent extends React.Component {
     }
 }
 
-const ContentView = connect(mapStateToProps, mapDispatchToProps)(ContentComponent);
+// const ContentView = connect(mapStateToProps, mapDispatchToProps)(ContentComponent);
 
 class ClassReport extends React.Component {
+    static need = [
+        initReportDSAction
+    ]
+
+    componentDidMount() {
+        if (this.props.reportDS.haveInit) return;
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
+        this.props.initReportDS(params);
+    }
+
     render() {
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : (this.props.isLoading ? <CommonLoadingView /> : (
-                    <ContentView params={this.props.params} location={this.props.location} />
+                    <ContentComponent reportDS={this.props.reportDS} user={this.props.user} />
                 ))}
             </div>
         );
     }
 }
 
-export default ClassReport;
+export default connect(mapStateToProps, mapDispatchToProps)(ClassReport);
 
 function mapStateToProps(state) {
     return {
