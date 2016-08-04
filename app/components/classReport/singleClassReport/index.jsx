@@ -4,6 +4,10 @@ import { connect } from 'react-redux';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
+import ClassNav from './ClassNav';
+import HeaderInfo from './HeaderInfo';
+import ModuleNav from './ModuleNav';
+
 class SingleClassReport extends React.Component {
     constructor(props) {
         super(props);
@@ -21,9 +25,10 @@ class SingleClassReport extends React.Component {
     render() {
         return (
             <div>
-                <button onClick={this.chooseClass.bind(this, 'two')}>切换</button>
                 <h3>SingleClassReport</h3>
-                <h3>{this.state.currentClass}</h3>
+                <ClassNav chooseClass={this.chooseClass.bind(this)} />
+                <HeaderInfo examInfo={this.props.reportDS.examInfo} />
+                <ModuleNav />
             </div>
         );
     }

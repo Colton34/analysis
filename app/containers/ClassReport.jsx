@@ -48,7 +48,7 @@ class ContentComponent extends React.Component {
             <div>
                 <ReportNavHeader />
                 {(isSchoolManagerOrGradeManager) ? <TabNav changeClassReport={this.changeClassReport.bind(this)} /> : ''}
-                {(this.state.reportType == 'multi') ? <MultiClassReport /> : <SingleClassReport />}
+                {(this.state.reportType == 'multi') ? <MultiClassReport /> : <SingleClassReport reportDS={this.props.reportDS} />}
             </div>
         );
     }
