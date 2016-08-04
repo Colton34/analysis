@@ -18,8 +18,8 @@ class TabNav extends React.Component {
     render() {
         return (
             <div>
-                <button onClick={this.props.changeClass.bind(null, 'multi')}>班级间报告</button>
-                <button onClick={this.props.changeClass.bind(null, 'single')}>班级个体报告</button>
+                <button onClick={this.props.changeClassReport.bind(null, 'multi')}>班级间报告</button>
+                <button onClick={this.props.changeClassReport.bind(null, 'single')}>班级个体报告</button>
             </div>
         );
     }

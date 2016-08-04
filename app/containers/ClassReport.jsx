@@ -9,6 +9,8 @@ import CommonErrorView from '../common/ErrorView';
 import CommonLoadingView from '../common/LoadingView';
 import ReportNavHeader from '../common/report/NavHeader';
 import TabNav from '../components/classReport/TabNav';
+import MultiClassReport from '../components/classReport/multiClassReport';
+import SingleClassReport from '../components/classReport/singleClassReport';
 
 import {initReportDSAction} from '../reducers/reportDS/actions';
 
@@ -33,7 +35,7 @@ class ContentComponent extends React.Component {
         };
     }
 
-    changeClass(type) {
+    changeClassReport(type) {
         console.log('type == ', type);
         this.setState({
             reportType: type
@@ -45,7 +47,8 @@ class ContentComponent extends React.Component {
         return (
             <div>
                 <ReportNavHeader />
-                {(isSchoolManagerOrGradeManager) ? <TabNav changeClass={this.changeClass.bind(this)} /> : ''}
+                {(isSchoolManagerOrGradeManager) ? <TabNav changeClassReport={this.changeClassReport.bind(this)} /> : ''}
+                {(this.state.reportType == 'multi') ? <MultiClassReport /> : <SingleClassReport />}
             </div>
         );
     }
