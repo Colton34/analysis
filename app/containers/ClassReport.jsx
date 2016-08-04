@@ -5,9 +5,15 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
-import {initReportDSAction} from '../reducers/reportDS/actions';
 import CommonErrorView from '../common/ErrorView';
 import CommonLoadingView from '../common/LoadingView';
+import ReportNavHeader from '../common/report/NavHeader';
+import TabNav from '../components/classReport/TabNav';
+
+import {initReportDSAction} from '../reducers/reportDS/actions';
+
+import {initParams} from '../lib/util';
+
 
 /*
 设计：
@@ -15,35 +21,67 @@ import CommonLoadingView from '../common/LoadingView';
     2.数据结构走schoolReprot--TODO:重构成report通用的
  */
 
-class ClassReport extends React.Component {
-    static need = [
-        initReportDSAction
-    ]
+/*
+设计：1.将className设置成SingleClassReport的state
 
-    componentDidMount() {
-        if (this.props.haveInit) return;
-        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
-        this.props.initReportDS(params);
+ */
+class ContentComponent extends React.Component {
+    // static need = [
+    //     initReportDSAction
+    // ]
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            reportType: 'multi'
+        };
     }
 
+    // componentDidMount() {
+    //     if (this.props.haveInit) return;
+    //     var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
+    //     this.props.initReportDS(params);
+    // }
+
+    changeClass(type) {
+        console.log('type == ', type);
+        this.setState({
+            reportType: type
+        })
+    }
+
+    render() {
+        var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
+        return (
+            <div>
+                <ReportNavHeader />
+                {(isSchoolManagerOrGradeManager) ? <TabNav changeClass={this.changeClass.bind(this)} /> : ''}
+            </div>
+        );
+    }
+}
+
+const ContentView = connect(mapStateToProps, mapDispatchToProps)(ContentComponent);
+
+class ClassReport extends React.Component {
     render() {
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : (this.props.isLoading ? <CommonLoadingView /> : (
-                    <h1>hi, I'm Class Report, 阿尼呀噻哟~~~</h1>
+                    <ContentView />
                 ))}
             </div>
         );
     }
 }
 
-export default connect(mapStateToProps)(ClassReport);
+export default ClassReport;
 
 function mapStateToProps(state) {
     return {
         isLoading: state.global.isLoading,
         ifError: state.global.ifError,
-
+        user: state.global.user,
         reportDS: state.reportDS
     }
 }
@@ -53,3 +91,12 @@ function mapDispatchToProps(dispatch) {
         initReportDS : bindActionCreators(initReportDSAction, dispatch)
     }
 }
+
+/*
+
+                {(this.props.ifError) ? <CommonErrorView /> : (this.props.isLoading ? <CommonLoadingView /> : (
+                    <ReportNavHeader />
+                    (isSchoolManagerOrGradeManager) ? <TabNav changeClass={this.changeClass.bind(this)} /> : ''
+                ))}
+
+ */
