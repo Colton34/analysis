@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-03 16:47:22
+* @Last Modified time: 2016-08-04 19:17:24
 */
 
 
@@ -234,7 +234,7 @@ export function initReportDS(params) {
             id: 'totalScore'
         });
         headers = _.concat(headers, restPapers);
-        var levels = makeDefaultLevles(examInfo, examStudentsInfo);
+        var levels = makeDefaultLevles(examInfo, examStudentsInfo);//TODO:只有当后端没有给--即之前没哟设置过--才在这里初始化
         var levelBuffers = _.map(levels, (value, key) => 5);
         return Promise.resolve({
             haveInit: true,

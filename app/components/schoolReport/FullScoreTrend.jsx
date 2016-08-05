@@ -54,11 +54,11 @@ const FullScoreTrend = ({reportDS}) => {
             }]
         },
         tooltip: {
-        backgroundColor:'#000',
-        borderColor:'#000',
-        style:{
-          color:'#fff'
-        },
+            backgroundColor:'#000',
+            borderColor:'#000',
+            style:{
+                color:'#fff'
+            },
             formatter: function(){
                  return (this.point.low>0?'(':'[')+this.point.low + '-' + this.point.high +']区间人数<br />'+ this.point.y +'人,占'
                  +Math.round(((this.point.y/examInfo.realStudentsCount)*100))+'%';

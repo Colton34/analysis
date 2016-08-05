@@ -863,7 +863,7 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
     result.totalSchool = {};
 
     _.each(countsGroupByLevel, (count, levelKey) => {
-        result.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount);
+        result.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount); //TODO:levels中的percentage就是累占比呀！
     });
 
     _.each(studentsGroupByClass, (studentsFromClass, className) => {
