@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-03 16:47:22
+* @Last Modified time: 2016-08-05 09:54:04
 */
 
 
@@ -46,6 +46,11 @@ export function initHomeData(params) {
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     })
+}
+
+
+export function saveData(params, dataObj) {
+
 }
 
 /**

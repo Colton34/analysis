@@ -23,7 +23,7 @@ import SubjectPerformance from '../components/schoolReport/SubjectPerformance';
 import GroupAnalysis from '../components/schoolReport/GroupAnalysis';
 import StudentPerformance from '../components/schoolReport/StudentPerformance/StudentPerformance';;
 
-import {initReportDSAction, changeLevelAction, updateLevelBuffersAction} from '../reducers/reportDS/actions';
+import {initReportDSAction, changeLevelAction, updateLevelBuffersAction, saveLevelAction, saveSubjectLevelAction, saveLevelBuffersAction} from '../reducers/reportDS/actions';
 import {initParams} from '../lib/util';
 import {SUBJECTS_WEIGHT as subjectWeight, COLORS_MAP as colorsMap, BACKGROUND_COLOR} from '../lib/constants';
 import Spinkit from '../common/Spinkit';
@@ -73,11 +73,11 @@ class SchoolReport extends React.Component {
                         <NavHeader examInfo={this.props.reportDS.examInfo} examId={examid} grade={grade} />
                         <Header examInfo={this.props.reportDS.examInfo} />
                         <FullScoreTrend reportDS={this.props.reportDS} />
-                        <ScoreDistribution reportDS={this.props.reportDS} changeLevels={this.props.changeLevels} />
-                        <SubjectDistribution reportDS={this.props.reportDS} />
+                        <ScoreDistribution reportDS={this.props.reportDS} changeLevels={this.props.changeLevels} saveLevel={this.props.saveLevel} />
+                        <SubjectDistribution reportDS={this.props.reportDS} saveSubjectLevel={this.props.saveSubjectLevel} />
                         <ClassPerformance reportDS={this.props.reportDS} />
                         <SubjectPerformance reportDS={this.props.reportDS} />
-                        <GroupAnalysis reportDS={this.props.reportDS} updateLevelBuffers={this.props.updateLevelBuffers} />
+                        <GroupAnalysis reportDS={this.props.reportDS} updateLevelBuffers={this.props.updateLevelBuffers} saveLevelBuffer={this.props.saveLevelBuffer} />
                         <StudentPerformance reportDS={this.props.reportDS} />
                     </div>
                 ))}
@@ -98,7 +98,10 @@ function mapDispatchToProps(dispatch) {
     return {
         initReportDS: bindActionCreators(initReportDSAction, dispatch),
         changeLevels: bindActionCreators(changeLevelAction, dispatch),
-        updateLevelBuffers: bindActionCreators(updateLevelBuffersAction, dispatch)
+        updateLevelBuffers: bindActionCreators(updateLevelBuffersAction, dispatch),
+        saveLevel: bindActionCreators(saveLevelAction, dispatch),
+        saveSubjectLevel: bindActionCreators(saveSubjectLevelAction, dispatch),
+        saveLevelBuffer: bindActionCreators(saveLevelBuffersAction, dispatch)
     }
 }
 

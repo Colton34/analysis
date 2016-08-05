@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-02 16:38:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-03 15:29:30
+* @Last Modified time: 2016-08-05 09:41:04
 */
 
 'use strict';
@@ -11,7 +11,10 @@ import {initReportDS} from '../../api/exam';
 import {
     INIT_REPORT_DS,
     CHANGE_LEVEL,
-    CHANGE_LEVEL_BUFFERS
+    CHANGE_LEVEL_BUFFERS,
+    SAVE_LEVLE,
+    SAVE_SUBJECT_LEVEL,
+    SAVE_LEVEL_BUFFER
 } from '../../lib/constants';
 
 export function initReportDSAction(params) {
@@ -31,6 +34,27 @@ export function changeLevelAction(levels) {
 export function updateLevelBuffersAction(levelBuffers) {
     return {
         type: CHANGE_LEVEL_BUFFERS,
+        levelBuffers: levelBuffers
+    }
+}
+
+export function saveLevelAction(levels) {
+    return {
+        type: SAVE_LEVLE,
+        levels: levels
+    }
+}
+
+export function saveSubjectLevelAction(subjectLevels) {
+    return {
+        type: SAVE_SUBJECT_LEVEL,
+        subjectLevels: subjectLevels
+    }
+}
+
+export function saveLevelBuffersAction(levelBuffers) {
+    return {
+        type: SAVE_LEVEL_BUFFER,
         levelBuffers: levelBuffers
     }
 }

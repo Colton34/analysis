@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-28 16:46:02
+* @Last Modified time: 2016-08-05 12:09:13
 */
 
 'use strict';
@@ -425,6 +425,41 @@ exports.initExam = function(req, res, next) {
         next();
     }).catch(function(err) {
         next(err);
+    });
+}
+
+/**
+ * 更新对应的实例的exam中对应的某一grade的levels等相关数据
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.updateExamLevels = function(req, res, next) {
+//post上来的是一个grade exam所对应的levels数据
+    req.checkBody('examId', '更新grade exam levels数据错误，无效的examId').notEmpty();
+    req.checkBody('gradeExamLevels', '更新grade exam levels数据错误，无效的gradeExamLevels').notEmpty();
+    if (req.validationErrors()) return next(req.validationErrors());
+
+    getUpdateGradeLevels(req.body.examId, req.body.gradeExamLevels).then(function(newBaseline) {
+        return updateNewBaseline(newBaseline);
+    }).then(function(msg) {
+        res.status(200).send('ok');
+    }).catch(function(err) {
+        next(err);
+    });
+}
+
+exports.updateCustomExamLevels = function(req, res, next) {
+//自定义中确定一个exam就对应个grade，所以不需要数组的形式，也就不需要查找，直接更新即可
+//需要组织成[levels]这样的key！！！
+    req.checkBody('examId', '更新grade exam levels数据错误，无效的examId').notEmpty();
+    req.checkBody('baseline', '更新custom exam levels数据错误，无效的baseline').notEmpty();
+    if (req.validationErrors()) return next(req.validationErrors());
+
+    peterFX.set(req.body.examId, {baseline: req.body.baseline}, function(err, result) {
+        if(err) return next(new errors.data.MongoDBError('updateCustomExamLevels Error: ', err));
+        res.status(200).send('ok');
     });
 }
 
@@ -1146,7 +1181,42 @@ function makeExamClassesInfo(examClassesInfo) {
     return _.keyBy(examClassesInfoArr, 'name');
 }
 
+/**
+ * 对某一个exam实例的baseline进行更新。因为一个exam实例有可能包含多个grade exam，所以需要找到真正的grade exam，对其更新，然后set exam的baseline
+ * @param  {[type]} examId          目标DB exam实例的id（短id，不带有一大串儿0）
+ * @param  {[type]} gradeExamLevels 目标exam实例的某一grade的levels数据
+ * @return {[type]}                 新的需要更新的exam的baseline
+ */
+function getUpdateGradeLevels(examId, gradeExamLevels) {
+    return when.promise(function(resolve, reject) {
+        peterHFS.get('@Exam.'+examId, function(err, exam) {
+            if(err) return reject(new errors.data.MongoDBError('getUpdateGradeLevels Mongo Error: ', err));
+            if(!exam['baseline']) return resolve([gradeExamLevels]);
+            var targetIndex = _.findIndex(exam['baseline'], (obj) => obj.grade == gradeExamLevels.grade);
+            if(targetIndex < 0) {
+                exam['baseline'].push(gradeExamLevels);
+                return resolve(exam['baseline']);
+            }
+            exam['baseline'].splice(targetIndex, 1, gradeExamLevels);
+            resolve(exam['baseline']);
+        })
+    });
+}
 
+/**
+ * 将给的newBaseline更新到对应的exam实例中
+ * @param  {[type]} examId        [description]
+ * @param  {[type]} newBaseline [description]
+ * @return {[type]}               [description]
+ */
+function updateNewBaseline(examId, newBaseline) {
+    return when.promise(function(resolve, reject) {
+        peterHFS.set('@Exam.'+examId, {baseline: newBaseline}, function(err, result) {
+            if(err) return reject(new errors.data.MongoDBError('updateNewBaseline Error: ', err));
+            resolve('ok');
+        });
+    });
+}
 
 
 //Note: (方案一) -- 性能不work

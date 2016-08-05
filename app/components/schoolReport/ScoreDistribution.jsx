@@ -274,6 +274,8 @@ class Dialog extends React.Component {
         }
 
         this.props.changeLevels(this.levels);
+        this.props.saveLevel(this.levels);
+
         this.props.onHide();
     }
 
@@ -606,7 +608,7 @@ class ScoreDistribution extends React.Component {
                         <span style={{ position: 'absolute', right: 30, top: 30 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } classList={_this.classList}/></span>
                     </div>
                     {/*--------------------------------  总分分档上线Dialog -------------------------------------*/}
-                    <Dialog changeLevels={changeLevels} levels={levels} show={_this.state.showDialog} onHide={_this.onHideDialog.bind(_this) } examInfo={examInfo} examStudentsInfo={examStudentsInfo} />
+                    <Dialog changeLevels={changeLevels} saveLevel={this.props.saveLevel} levels={levels} show={_this.state.showDialog} onHide={_this.onHideDialog.bind(_this) } examInfo={examInfo} examStudentsInfo={examStudentsInfo} />
             </div>
         </div>
         )

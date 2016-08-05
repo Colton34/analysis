@@ -9,14 +9,16 @@ export const LOADING_START = 'LOADING_START';
 export const THROW_ERROR = 'THROW_ERROR';
 export const HIDE_ERROR = 'HIDE_ERROR';
 
-
 //================== New ReportDS ========================
 export const INIT_REPORT_DS = 'INIT_REPORT_DS';
 export const INIT_REPORT_DS_REQUEST = 'INIT_REPORT_DS_REQUEST';
 export const INIT_REPORT_DS_SUCCESS = 'INIT_REPORT_DS_SUCCESS';
 export const INIT_REPORT_DS_FAILURE = 'INIT_REPORT_DS_FAILURE';
 
-
+//================= New Save ==============================
+export const SAVE_LEVLE = 'SAVE_LEVLE';
+export const SAVE_SUBJECT_LEVEL = 'SAVE_SUBJECT_LEVEL';
+export const SAVE_LEVEL_BUFFER = 'SAVE_LEVEL_BUFFER';
 
 //================= Global ===========================
 export const INIT_USER_ME = 'INIT_USER_ME';
