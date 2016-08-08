@@ -22,16 +22,23 @@ class SingleClassReport extends React.Component {
         })
     }
 
+//Note: 当前先打散，而没有再在结构上进行重组，后面结构化更清晰了会考虑进一步重组。
     render() {
         return (
             <div>
                 <h3>SingleClassReport</h3>
-                <ClassNav chooseClass={this.chooseClass.bind(this)} />
                 <HeaderInfo examInfo={this.props.reportDS.examInfo} />
                 <ModuleNav />
+                {/* ... */}
             </div>
         );
     }
 }
 
 export default SingleClassReport;
+
+
+//=================================================  分界线  =================================================
+
+
+/* <ClassNav chooseClass={this.chooseClass.bind(this)} />  -- 被砍掉 */

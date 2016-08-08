@@ -1,3 +1,5 @@
+//总分分档学生人数分布
+
 import _ from 'lodash';
 import React from 'react';
 
@@ -12,6 +14,12 @@ export default function LevelDistribution({reportDS, currentClass}) {
         levelTables[levelKey] = tableData;
     });
 }
+
+
+
+//=================================================  分界线  =================================================
+
+
 
 /**
  * 创建学科分析需要的info数据结构

@@ -1,8 +1,8 @@
-//历史表现比较。注意：这个还没有考虑好！！！
+//学科成绩等级的人数分布比例
 
 import React, { PropTypes } from 'react';
 
-export default function ImportStudentInfo() {
+export default function SubjectScoreLevelDistribution() {
 
 }
 

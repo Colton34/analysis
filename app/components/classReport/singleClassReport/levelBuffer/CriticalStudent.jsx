@@ -1,10 +1,9 @@
-//历史表现比较。注意：这个还没有考虑好！！！
+//临界生群体分析
 
 import React, { PropTypes } from 'react';
 
-export default function ImportStudentInfo() {
+export default  function CriticalStudent() {
 
 }
-
 
 //=================================================  分界线  =================================================

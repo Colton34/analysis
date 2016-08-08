@@ -1,3 +1,6 @@
+//总分分布趋势
+
+
 import React, { PropTypes } from 'react';
 import {makeSegments, makeSegmentsCount} from '../../../../api/exam';
 
@@ -6,6 +9,9 @@ export default function Trend({reportDS, currentClass}) {
     var DS = makeDS(examInfo, studentsGroupByClass, currentClass);
 }
 
+
+
+//=================================================  分界线  =================================================
 
 
 function makeDS(reportDS, studentsGroupByClass, currentClass) {

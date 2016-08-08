@@ -1,10 +1,9 @@
-//历史表现比较。注意：这个还没有考虑好！！！
+//学生学科水平分布
 
 import React, { PropTypes } from 'react';
 
-export default function ImportStudentInfo() {
+export default function SubjectStudentLevelDistirbution() {
 
 }
-
 
 //=================================================  分界线  =================================================

@@ -1,3 +1,5 @@
+//分档分数线文案（总分分布趋势下面的那一小块）
+
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 
@@ -12,3 +14,6 @@ export default function LevelGuide({reportDS, currentClass}) {
         </div>
     );
 }
+
+
+//=================================================  分界线  =================================================
