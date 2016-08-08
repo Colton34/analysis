@@ -1,4 +1,4 @@
-//学科平均分
+//学科平均分排名
 
 import React, { PropTypes } from 'react';
 
