@@ -5,12 +5,12 @@ import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
-
 class Main extends React.Component {
     render() {
         return (
             <div>
-                <Link to={{pathname: '/class/report', query: {examid: '23040', grade: '初二'}}}>点我</Link>
+                <Link to={{pathname: '/class/report', query: {examid: '23040', grade: '初二'}}}>【Mock】班级报告</Link>
+                <Link to={{pathname: '/home'}}>【正常】首页</Link>
             </div>
         );
     }
