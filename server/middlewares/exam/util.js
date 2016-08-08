@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 11:44:33
+* @Last Modified time: 2016-08-08 12:13:20
 */
 'use strict';
 var _ = require('lodash');
@@ -81,6 +81,8 @@ exports.generateExamInfo = function(examid, gradeName, schoolid) {
     })
 };
 
+exports.getGradeExamBaseline = getGradeExamBaseline;
+
 function getExamById(examid) {
     return when.promise(function(resolve, reject) {
         peterHFS.get('@Exam.'+examid, function(err, exam) {
@@ -101,12 +103,6 @@ function getGradeExamBaseline(examId, grade) {
     return when.promise(function(resolve, reject) {
         peterFX.query('@ExamBaseline', {examid: examId, grade: grade}, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('getGradeExamBaseline Mongo Error: ', err));
-
-console.log('获取baseline ================== examId = ', examId, '  grade = ', grade);
-console.log(results[0]);
-console.log('================');
-
-
             resolve(results[0]);
         });
     });

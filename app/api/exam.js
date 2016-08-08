@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 11:01:49
+* @Last Modified time: 2016-08-08 12:01:31
 */
 
 
@@ -51,7 +51,8 @@ export function initHomeData(params) {
 export function saveBaseline(params) {
 console.log('client save baseline');
 
-    var url = (params.grade) ? examPath + '/levels' : examPath + '/custom/levels';
+    var url = examPath + '/levels';
+    // var url = (params.grade) ? examPath + '/levels' : examPath + '/custom/levels';
     return params.request.put(url, {examId: params.examId, baseline: params.baseline});
 }
 

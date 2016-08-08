@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 11:37:13
+* @Last Modified time: 2016-08-08 12:26:38
 */
 
 'use strict';
@@ -309,8 +309,6 @@ exports.schoolAnalysis = function(req, res, next) {
         examScoreMap = req.classScoreMap,
         examScoreArr = req.orderedScoresArr;
 
-console.log('baselien : ', baseline);
-
     try {
         req.examInfo = formatExamInfo(exam);
         req.examPapersInfo = generateExamPapersInfo(exam);
@@ -342,26 +340,61 @@ exports.customSchoolAnalysis = function(req, res, next) {
     req.checkQuery('examid', '无效的examids').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
 
-    peterFX.get(req.query.examid, {isValid: true, owner: req.user.id}, function(err, exam) {
-        if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
-        if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
+    when.promise(function(resolve, reject) {
+        peterFX.get(req.query.examid, {isValid: true, owner: req.user.id}, function(err, exam) {
+            if(err) return reject(new errors.data.MongoDBError('get custom exam error: ', err));
+            if(!exam) return reject(new errors.data.MongoDBError('not found valid exam'));
 
-        try {
-            var examInfo = makeExamInfo(exam.info);
-            var examStudentsInfo = makeExamStudentsInfo(exam['[studentsInfo]']);
-            var examPapersInfo = makeExamPapersInfo(exam['[papersInfo]']);
-            var examClassesInfo = makeExamClassesInfo(exam['[classesInfo]']);
-            res.status(200).json({
-                examInfo: examInfo,
-                examStudentsInfo: examStudentsInfo,
-                examPapersInfo: examPapersInfo,
-                examClassesInfo: examClassesInfo
-            });
-        } catch(e) {
-            next(new errors.Error('server format custom analysis error: ', e));
-        }
+            try {
+                var examInfo = makeExamInfo(exam.info);
+                var examStudentsInfo = makeExamStudentsInfo(exam['[studentsInfo]']);
+                var examPapersInfo = makeExamPapersInfo(exam['[papersInfo]']);
+                var examClassesInfo = makeExamClassesInfo(exam['[classesInfo]']);
+                // res.status(200).json();
+                resolve({
+                    examInfo: examInfo,
+                    examStudentsInfo: examStudentsInfo,
+                    examPapersInfo: examPapersInfo,
+                    examClassesInfo: examClassesInfo
+                });
+            } catch(e) {
+                reject(new errors.Error('server format custom analysis error: ', e));
+            }
+        });
+    }).then(function(result) {
+        req.result = result;
+        return examUitls.getGradeExamBaseline(req.query.examid);//自定义分析肯定只有一个年级，所以可以不添加grade query condition。
+    }).then(function(baseline) {
+        req.result.baseline = baseline;
+        res.status(200).json(req.result);
+    }).catch(function(err) {
+        next(err);
     });
 }
+
+
+
+    // peterFX.get(req.query.examid, {isValid: true, owner: req.user.id}, function(err, exam) {
+    //     if(err) return next(new errors.data.MongoDBError('get custom exam error: ', err));
+    //     if(!exam) return next(new errors.data.MongoDBError('not found valid exam'));
+
+    //     try {
+    //         var examInfo = makeExamInfo(exam.info);
+    //         var examStudentsInfo = makeExamStudentsInfo(exam['[studentsInfo]']);
+    //         var examPapersInfo = makeExamPapersInfo(exam['[papersInfo]']);
+    //         var examClassesInfo = makeExamClassesInfo(exam['[classesInfo]']);
+    //         // res.status(200).json();
+    //         resolve({
+    //             examInfo: examInfo,
+    //             examStudentsInfo: examStudentsInfo,
+    //             examPapersInfo: examPapersInfo,
+    //             examClassesInfo: examClassesInfo
+    //         });
+    //     } catch(e) {
+    //         next(new errors.Error('server format custom analysis error: ', e));
+    //     }
+    // });
+
 
 /**
  * 创建自定义分析
@@ -449,33 +482,26 @@ exports.updateExamBaseline = function(req, res, next) {
     if (req.validationErrors()) return next(req.validationErrors());
     if(!req.body.baseline) return next(new errors.HttpStatusError(400, "更新grade exam levels数据错误，无效的baseline"));
 
-console.log('updateExamBaseline , examId=', req.body.examId);
-
-    //
-    // insertNewExamBaseline(req.body.examId, req.body.baseline)
     updateBaseline(req.body.examId, req.body.baseline).then(function(msg) {
-
-console.log('updateBaseline over ====');
-
         res.status(200).send('ok');
     }).catch(function(err) {
         next(err);
     });
 }
 
-exports.updateCustomExamLevels = function(req, res, next) {
-//自定义中确定一个exam就对应个grade，所以不需要数组的形式，也就不需要查找，直接更新即可
-//需要组织成[levels]这样的key！！！
-    req.checkBody('examId', '更新grade exam levels数据错误，无效的examId').notEmpty();
-    req.checkBody('baseline', '更新custom exam levels数据错误，无效的baseline').notEmpty();
-    if (req.validationErrors()) return next(req.validationErrors());
+// exports.updateCustomExamLevels = function(req, res, next) {
+// //自定义中确定一个exam就对应个grade，所以不需要数组的形式，也就不需要查找，直接更新即可
+// //需要组织成[levels]这样的key！！！
+//     req.checkBody('examId', '更新grade exam levels数据错误，无效的examId').notEmpty();
+//     if (req.validationErrors()) return next(req.validationErrors());
+//     if(!req.body.baseline) return next(new errors.HttpStatusError(400, "更新custom grade exam levels数据错误，无效的baseline"));
 
-//TODO:注意set是不是可以只set部分--还是部分会覆盖全部
-    peterFX.set(req.body.examId, {baseline: req.body.baseline}, function(err, result) {
-        if(err) return next(new errors.data.MongoDBError('updateCustomExamLevels Error: ', err));
-        res.status(200).send('ok');
-    });
-}
+// //TODO:注意set是不是可以只set部分--还是部分会覆盖全部
+//     peterFX.set(req.body.examId, {baseline: req.body.baseline}, function(err, result) {
+//         if(err) return next(new errors.data.MongoDBError('updateCustomExamLevels Error: ', err));
+//         res.status(200).send('ok');
+//     });
+// }
 
 /**
  * 获取当前登录用户所创建的分析--保证格式和获取阅卷的exam格式相同，从而方便下面一起被formated。
@@ -1218,7 +1244,6 @@ function insertNewExamBaseline(examId, targetBaseline) {
     return when.promise(function(resolve, reject) {
         peterFX.create('@ExamBaseline', targetBaseline, function(err, result) {
             if(err) return reject(new errors.data.MongoDBError('insertNewExamBaseline Mongo Error: ', err));
-            console.log('insertNewExamBaseline success : ', result);
             resolve(result);
         });
     });
@@ -1231,7 +1256,6 @@ function insertNewExamBaseline(examId, targetBaseline) {
  * @return {[type]}               [description]
  */
 function updateNewExamBaseline(targetObjId, newBaseline) {
-    console.log('updateNewExamBaseline !!!!!!!!!!!!!!!!!!!');
     return when.promise(function(resolve, reject) {
         peterFX.set(targetObjId, newBaseline, function(err, result) {
             if(err) return reject(new errors.data.MongoDBError('updateNewExamBaseline Error: ', err));
