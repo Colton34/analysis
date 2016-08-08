@@ -16,10 +16,7 @@ export const INIT_REPORT_DS_SUCCESS = 'INIT_REPORT_DS_SUCCESS';
 export const INIT_REPORT_DS_FAILURE = 'INIT_REPORT_DS_FAILURE';
 
 //================= New Save ==============================
-export const SAVE_LEVLE = 'SAVE_LEVLE';
-export const SAVE_SUBJECT_LEVEL = 'SAVE_SUBJECT_LEVEL';
-export const SAVE_LEVEL_BUFFER = 'SAVE_LEVEL_BUFFER';
-
+export const SAVE_BASELINE = 'SAVE_BASELINE';
 //================= Global ===========================
 export const INIT_USER_ME = 'INIT_USER_ME';
 export const INIT_USER_ME_SUCCESS = 'INIT_USER_ME_SUCCESS';

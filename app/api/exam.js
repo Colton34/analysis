@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-05 09:54:04
+* @Last Modified time: 2016-08-08 11:01:49
 */
 
 
@@ -48,9 +48,11 @@ export function initHomeData(params) {
     })
 }
 
+export function saveBaseline(params) {
+console.log('client save baseline');
 
-export function saveData(params, dataObj) {
-
+    var url = (params.grade) ? examPath + '/levels' : examPath + '/custom/levels';
+    return params.request.put(url, {examId: params.examId, baseline: params.baseline});
 }
 
 /**
@@ -214,10 +216,7 @@ export function initReportDS(params) {
     var levels;
 
     return params.request.get(url).then(function(res) {
-        var examInfo = res.data.examInfo;
-        var examStudentsInfo = res.data.examStudentsInfo;
-        var examPapersInfo = res.data.examPapersInfo;
-        var examClassesInfo = res.data.examClassesInfo;
+        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, baseline} = res.data;
         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
         var headers = [], restPapers = [];
@@ -239,8 +238,12 @@ export function initReportDS(params) {
             id: 'totalScore'
         });
         headers = _.concat(headers, restPapers);
-        var levels = makeDefaultLevles(examInfo, examStudentsInfo);
-        var levelBuffers = _.map(levels, (value, key) => 5);
+
+        var levels = (baseline && baseline['[levels]']) ? _.keyBy(baseline['[levels]'], 'key') : makeDefaultLevles(examInfo, examStudentsInfo);
+        var levelBuffers = (baseline && baseline['[levelBuffers]']) ? _.map(baseline['[levelBuffers]'], (obj) => obj.score) : _.map(levels, (value, key) => 5);
+//设计：虽然把subjectLevels挂到state树上--其实是借用reportDS来存储，在校级报告里不直接用，而是在其他报告中直接用，校级报告中等于多算一遍。这个设计可能需要重构。
+        var subjectLevels = (baseline && baseline['[subjectLevels]']) ? baseline['[subjectLevels]'] : undefined;
+
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
@@ -251,6 +254,7 @@ export function initReportDS(params) {
             allStudentsPaperMap: allStudentsPaperMap,
             headers: headers,
             levels: levels,
+            subjectLevels: subjectLevels,
             levelBuffers: levelBuffers
         });
     });
@@ -403,6 +407,19 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
         levObj.count = targetCount;
     });
     return levels;
+}
+
+        // levels: [
+        //     {
+        //         key: xxx,
+        //         score: xxx,
+        //         percentage: xxx,
+        //         count: xxx
+        //     },
+        //     ...
+        // ]
+function parseLevels(gradeLevels) {
+
 }
 
 

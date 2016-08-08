@@ -20,6 +20,7 @@ import DropdownList from '../../common/DropdownList';
 
 //Util
 import {makeSegmentsCount} from '../../api/exam';
+import {initParams} from '../../lib/util';
 
 //Constant
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07, BACKGROUND_COLOR} from '../../lib/constants';
@@ -274,7 +275,13 @@ class Dialog extends React.Component {
         }
 
         this.props.changeLevels(this.levels);
-        this.props.saveLevel(this.levels);
+        //当有levels变动则修改baseline；当有levelBuffer变动则修改baseline？能进入到这里就是有效的设置了，但是levelBuffer那里是否有valid的校验，否则一旦存储，以后获取的都是错的就会麻烦
+        //这里的grade走的是examInfo中的gradeName，而不是传递进来的url的query中的grade
+        //TODO:要保证格式同Schema的格式：'[levels]'等
+        var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
+        var params = initParams({ 'request': window.request, examId: this.props.examId, grade:this.props.grade, baseline: newBaseline });
+        debugger;
+        this.props.saveBaseline(params);
 
         this.props.onHide();
     }
@@ -491,9 +498,11 @@ class ScoreDistribution extends React.Component {
         var {reportDS, changeLevels} = this.props;
         var examInfo = reportDS.examInfo.toJS(),
             examStudentsInfo = reportDS.examStudentsInfo.toJS(),
+            examPapersInfo = reportDS.examPapersInfo.toJS(),
             examClassesInfo = reportDS.examClassesInfo.toJS(),
             studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
-            levels = reportDS.levels.toJS();
+            levels = reportDS.levels.toJS(),
+            levelBuffers = reportDS.levelBuffers.toJS();
 
     //算法数据结构
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
@@ -608,7 +617,7 @@ class ScoreDistribution extends React.Component {
                         <span style={{ position: 'absolute', right: 30, top: 30 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } classList={_this.classList}/></span>
                     </div>
                     {/*--------------------------------  总分分档上线Dialog -------------------------------------*/}
-                    <Dialog changeLevels={changeLevels} saveLevel={this.props.saveLevel} levels={levels} show={_this.state.showDialog} onHide={_this.onHideDialog.bind(_this) } examInfo={examInfo} examStudentsInfo={examStudentsInfo} />
+                    <Dialog examId={this.props.examId} grade={this.props.grade} levels={levels} levelBuffers={levelBuffers} examInfo={examInfo} examStudentsInfo={examStudentsInfo} examPapersInfo={examPapersInfo} changeLevels={changeLevels} saveBaseline={this.props.saveBaseline} show={_this.state.showDialog} onHide={_this.onHideDialog.bind(_this) }  />
             </div>
         </div>
         )
@@ -890,6 +899,118 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
 
     return levItem;
 }
+
+/**
+ *
+ * @param  {[type]} newLevels        [description]
+ * @param  {[type]} examStudentsInfo [description]
+ * @param  {[type]} examPapersInfo   [description]
+ * @param  {[type]} examFullMark     [description]
+ * @return {[type]}                  [description]
+{
+        grade: String,
+        [levels]: Object,
+        [subjectLevels]: Object,
+        [levelBuffers]: Object
+}
+ */
+
+/*
+
+    {
+        grade: xxx,
+        levels: [
+            {
+                key: xxx,
+                score: xxx,
+                percentage: xxx,
+                count: xxx
+            },
+            ...
+        ],
+        subjectLevels: [
+            {
+                levelKey:xxx,
+                values: [
+                    {
+                        id: xxx,
+                        mean: xxx,
+                        name: xxx
+                    },
+                    ...
+                ]
+            },
+            ...
+        ],
+        levelBuffers: [
+            {
+                key: xxx,
+                score: xxx
+            },
+            ...
+        ]
+    },
+
+ */
+
+function getNewBaseline(newLevels, examStudentsInfo, examPapersInfo, examId, examInfo, levelBuffers) {
+    //通过新的levels计算subjectMeans，levelBuffer不变
+    var result = {examid: examId, grade: examInfo.gradeName, '[levels]': [], '[subjectLevels]': [], '[levelBuffers]': []};
+    _.each(newLevels, (levObj, levelKey) => {
+        var subjectMean = makeLevelSubjectMean(levObj.score, examStudentsInfo, examPapersInfo, examInfo.fullMark);
+        var subjectLevels = _.values(subjectMean);
+        result['[subjectLevels]'].push({levelKey: levelKey, values: subjectLevels});
+        result['[levels]'].push({key: levelKey, score: levObj.score, percentage: levObj.percentage, count: levObj.count});
+        //如果是update那么可以考虑只put上去需要更新的数据--但是需要能区分到底是post还是put。理论上这里如果是put那么不需要put上去levelBuffers，因为这里并没有改变levelBuffers。
+        result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
+        //拼装 [levels]，[subjectLevels]和[levelBuffers]所对应的每一个实体，放入到相对应的数组中，最后返回gradeExamLevels
+    });
+    return result;
+}
+
+function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark) {
+    var result = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(levelScore));
+    var count = result.length;
+
+    var currentLowScore, currentHighScore;
+    currentLowScore = currentHighScore = _.round(levelScore);
+
+    while ((count < 25) && (currentLowScore >= 0) && (currentHighScore <= examFullMark)) {
+        currentLowScore = currentLowScore - 1;
+        currentHighScore = currentHighScore + 1;
+        var currentLowStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore));
+        var currentHighStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentHighScore));
+
+        var currentTargetCount = _.min([currentLowStudents.length, currentHighStudents.length]);
+        var currentTagretLowStudents = _.take(currentLowStudents, currentTargetCount);
+        var currentTargetHighStudents = _.take(currentHighStudents, currentTargetCount);
+        count += _.multiply(2, currentTargetCount);
+        result = _.concat(result, currentTagretLowStudents, currentTargetHighStudents);
+    }
+
+    //result即是最后获取到的满足分析条件的样本，根据此样本可以获取各个科目的平均分信息
+    return makeSubjectMean(result, examPapersInfo);
+}
+
+/**
+ * 返回所给学生各科成绩的平均分。注意这里没有没有包括总分(totalScore)的平均分信息
+ * @param  {[type]} students       [description]
+ * @param  {[type]} examPapersInfo [description]
+ * @return {[type]}                [description]
+ */
+function makeSubjectMean(students, examPapersInfo) {
+    var result = {};
+    _.each(_.groupBy(_.concat(..._.map(students, (student) => student.papers)), 'paperid'), (papers, pid) => {
+        var obj = {};
+        obj.mean = _.round(_.mean(_.map(papers, (paper) => paper.score)), 2);
+        obj.name = examPapersInfo[pid].subject; //TODO: 这里还是统一称作 'subject' 比较好
+        obj.id = pid;
+
+        result[pid] = obj;
+    });
+    return result;
+}
+
 
 /*
 

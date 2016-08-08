@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-02 16:38:11
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-05 09:50:57
+* @Last Modified time: 2016-08-08 11:07:30
 */
 
 'use strict';
@@ -15,10 +15,7 @@ var initialState = new InitialState;
 import {
     INIT_REPORT_DS_SUCCESS,
     CHANGE_LEVEL,
-    CHANGE_LEVEL_BUFFERS,
-    SAVE_LEVLE,
-    SAVE_SUBJECT_LEVEL,
-    SAVE_LEVEL_BUFFER
+    CHANGE_LEVEL_BUFFERS
 } from '../../lib/constants';
 
 import {Map, List} from 'immutable';
@@ -40,8 +37,6 @@ export default function reducer(state, action) {
             return state.set('levels', Map(action.levels)).set('levelBuffers', List(newLevelBuffers)).set('forseUpdate', !state.forseUpdate);
         case CHANGE_LEVEL_BUFFERS:
             return state.set('levelBuffers', List(action.levelBuffers));
-        case SAVE_LEVLE:
-
     }
     return state;
 }

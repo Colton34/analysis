@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-25 17:29:12
+* @Last Modified time: 2016-08-08 11:44:33
 */
 'use strict';
 var _ = require('lodash');
@@ -13,6 +13,7 @@ var config = require('../../config/env');
 var errors = require('common-errors');
 
 var peterHFS = require('peter').getManager('hfs');
+var peterFX = require('peter').getManager('fx');
 /**
  * 通过schoolid获取学校
  * @param  {[type]} schoolid [description]
@@ -71,8 +72,13 @@ exports.generateExamInfo = function(examid, gradeName, schoolid) {
 
         data.exam.grade = targetGrade;
         data.exam.fetchId = examid;
+
+//获取此grade exam对应的baseline
+        return getGradeExamBaseline(examid, targetGrade.name);
+    }).then(function(baseline) {
+        data.exam.baseline = baseline;
         return when.resolve(data.exam);
-    });
+    })
 };
 
 function getExamById(examid) {
@@ -80,6 +86,28 @@ function getExamById(examid) {
         peterHFS.get('@Exam.'+examid, function(err, exam) {
             if(err || !exam) return reject(new errors.data.MongDBError('find exam = '+ examid + 'Error: ', err));
             resolve(exam);
+        });
+    });
+}
+
+/**
+ * 获取examid和grade对应的gradeExam的baseline
+ * @param  {[type]} examId [description]
+ * @param  {[type]} grade  [description]
+ * @return {[type]}        [description]
+ */
+function getGradeExamBaseline(examId, grade) {
+    // var targetObjId = paddingObjectId(examId); 设计：都存储短id好了！
+    return when.promise(function(resolve, reject) {
+        peterFX.query('@ExamBaseline', {examid: examId, grade: grade}, function(err, results) {
+            if(err) return reject(new errors.data.MongoDBError('getGradeExamBaseline Mongo Error: ', err));
+
+console.log('获取baseline ================== examId = ', examId, '  grade = ', grade);
+console.log(results[0]);
+console.log('================');
+
+
+            resolve(results[0]);
         });
     });
 }
@@ -149,6 +177,7 @@ exports.generateExamScoresInfo = function(exam, auth) {
         exam.realClasses = _.keys(targetClassesScore);
 
         return when.resolve({
+            baseline: exam.baseline,
             classScoreMap: targetClassesScore,
             orderedScoresArr: orderedStudentScoreInfo
         });
@@ -217,5 +246,14 @@ function getAuthClasses(auth, gradeKey) {
     var groupManagersClasses = _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => obj.group);
     var subjectTeacherClasses = _.map(auth.gradeAuth[gradeKey].subjectTeachers, (obj) => obj.group);
     return _.union(groupManagersClasses, subjectTeacherClasses);
+}
+
+//将短exam id转换成标准的Mongo ObjectId
+function paddingObjectId(id) {
+    id = id.toString();
+    var idParts = id.split('.');
+    id = idParts[idParts.length - 1];
+    var oidPadding = '000000000000000000000000';
+    return oidPadding.slice(0, oidPadding.length-id.length) + id;
 }
 

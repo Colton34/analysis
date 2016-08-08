@@ -2,19 +2,17 @@
 * @Author: HellMagic
 * @Date:   2016-08-02 16:38:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-05 09:41:04
+* @Last Modified time: 2016-08-08 11:06:02
 */
 
 'use strict';
 
-import {initReportDS} from '../../api/exam';
+import {initReportDS, saveBaseline} from '../../api/exam';
 import {
     INIT_REPORT_DS,
     CHANGE_LEVEL,
     CHANGE_LEVEL_BUFFERS,
-    SAVE_LEVLE,
-    SAVE_SUBJECT_LEVEL,
-    SAVE_LEVEL_BUFFER
+    SAVE_BASELINE
 } from '../../lib/constants';
 
 export function initReportDSAction(params) {
@@ -38,23 +36,9 @@ export function updateLevelBuffersAction(levelBuffers) {
     }
 }
 
-export function saveLevelAction(levels) {
+export function saveBaselineAction(params) {
     return {
-        type: SAVE_LEVLE,
-        levels: levels
-    }
-}
-
-export function saveSubjectLevelAction(subjectLevels) {
-    return {
-        type: SAVE_SUBJECT_LEVEL,
-        subjectLevels: subjectLevels
-    }
-}
-
-export function saveLevelBuffersAction(levelBuffers) {
-    return {
-        type: SAVE_LEVEL_BUFFER,
-        levelBuffers: levelBuffers
+        type: SAVE_BASELINE,
+        promise: saveBaseline(params)
     }
 }

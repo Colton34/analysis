@@ -550,6 +550,7 @@ function filterMakeOrderedSubjectMean(headers, subjectsMean) {
 //  3.当遇到从n中取m（其中n > m）
 //  一定要保证每次取的人都是相同的（根据examStudentsInfo的顺序），这样每次计算的科目平局分才是相同的
 //  ，不断重复上述过程，直到满足样本数量
+//TODO: 抽离此方法
 function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark) {
     var result = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(levelScore));
     var count = result.length;
@@ -581,6 +582,7 @@ function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, exam
  * @param  {[type]} examPapersInfo [description]
  * @return {[type]}                [description]
  */
+//TODO: 抽离此方法
 function makeSubjectMean(students, examPapersInfo) {
     var result = {};
     _.each(_.groupBy(_.concat(..._.map(students, (student) => student.papers)), 'paperid'), (papers, pid) => {

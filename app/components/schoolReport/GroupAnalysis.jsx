@@ -17,6 +17,8 @@ import TableView from './TableView';
 
 var {Header, Title, Body, Footer} = Modal;
 
+import {initParams} from '../../lib/util';
+
 let localStyle = {
     btn: {lineHeight: '32px', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',color: '#6a6a6a', margin: '0 6px'}
 }
@@ -121,6 +123,12 @@ class Dialog extends React.Component {
         }
         //调用父类传递来的函数  this.props.updateLevelBuffers(this.levelBuffers)，从而更新父类
         this.props.updateLevelBuffers(this.levelBuffers);
+
+        var newBaseline = getNewBaseline(this.props.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.levelBuffers);
+        var params = initParams({ 'request': window.request, examId: this.props.examId, grade: this.props.grade, baseline: newBaseline });
+        debugger;
+        this.props.saveBaseline(params);
+
         this.props.onHide();
     }
 
@@ -212,6 +220,7 @@ class GroupAnalysis extends React.Component {
         var {reportDS} = this.props;
         var examInfo = reportDS.examInfo.toJS(),
             examStudentsInfo = reportDS.examStudentsInfo.toJS(),
+            examPapersInfo = reportDS.examPapersInfo.toJS(),
             studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
             levels = reportDS.levels.toJS(),
             levelBuffers = reportDS.levelBuffers.toJS();
@@ -354,7 +363,7 @@ class GroupAnalysis extends React.Component {
                     )
                 }
 
-                <Dialog levels={levels} levelBuffers={levelBuffers} updateLevelBuffers={this.props.updateLevelBuffers} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }/>
+                <Dialog examId={this.props.examId} grade={this.props.grade} levels={levels} levelBuffers={levelBuffers} examInfo={examInfo} examStudentsInfo={examStudentsInfo} examPapersInfo={examPapersInfo} updateLevelBuffers={this.props.updateLevelBuffers} saveBaseline={this.props.saveBaseline} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }/>
             </div>
         )
     }
@@ -432,6 +441,64 @@ function criticalStudentsDiscription(criticalLevelInfo) {
         result.low[levelKey] = low;
     });
     return result;//小值代表高档
+}
+
+//TODO:重构
+function getNewBaseline(levels, examStudentsInfo, examPapersInfo, examId, examInfo, levelBuffers) {
+    //通过新的levels计算subjectMeans，levelBuffer不变
+    var result = {examid: examId, grade: examInfo.gradeName, '[levels]': [], '[subjectLevels]': [], '[levelBuffers]': []};
+    _.each(levels, (levObj, levelKey) => {
+        var subjectMean = makeLevelSubjectMean(levObj.score, examStudentsInfo, examPapersInfo, examInfo.fullMark);
+        var subjectLevels = _.values(subjectMean);
+        result['[subjectLevels]'].push({levelKey: levelKey, values: subjectLevels});
+        result['[levels]'].push({key: levelKey, score: levObj.score, percentage: levObj.percentage, count: levObj.count});
+        result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
+        //拼装 [levels]，[subjectLevels]和[levelBuffers]所对应的每一个实体，放入到相对应的数组中，最后返回gradeExamLevels
+    });
+    return result;
+}
+
+function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark) {
+    var result = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(levelScore));
+    var count = result.length;
+
+    var currentLowScore, currentHighScore;
+    currentLowScore = currentHighScore = _.round(levelScore);
+
+    while ((count < 25) && (currentLowScore >= 0) && (currentHighScore <= examFullMark)) {
+        currentLowScore = currentLowScore - 1;
+        currentHighScore = currentHighScore + 1;
+        var currentLowStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore));
+        var currentHighStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentHighScore));
+
+        var currentTargetCount = _.min([currentLowStudents.length, currentHighStudents.length]);
+        var currentTagretLowStudents = _.take(currentLowStudents, currentTargetCount);
+        var currentTargetHighStudents = _.take(currentHighStudents, currentTargetCount);
+        count += _.multiply(2, currentTargetCount);
+        result = _.concat(result, currentTagretLowStudents, currentTargetHighStudents);
+    }
+
+    //result即是最后获取到的满足分析条件的样本，根据此样本可以获取各个科目的平均分信息
+    return makeSubjectMean(result, examPapersInfo);
+}
+
+/**
+ * 返回所给学生各科成绩的平均分。注意这里没有没有包括总分(totalScore)的平均分信息
+ * @param  {[type]} students       [description]
+ * @param  {[type]} examPapersInfo [description]
+ * @return {[type]}                [description]
+ */
+function makeSubjectMean(students, examPapersInfo) {
+    var result = {};
+    _.each(_.groupBy(_.concat(..._.map(students, (student) => student.papers)), 'paperid'), (papers, pid) => {
+        var obj = {};
+        obj.mean = _.round(_.mean(_.map(papers, (paper) => paper.score)), 2);
+        obj.name = examPapersInfo[pid].subject; //TODO: 这里还是统一称作 'subject' 比较好
+        obj.id = pid;
+
+        result[pid] = obj;
+    });
+    return result;
 }
 
 /*
