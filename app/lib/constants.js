@@ -17,6 +17,10 @@ export const INIT_REPORT_DS_FAILURE = 'INIT_REPORT_DS_FAILURE';
 
 //================= New Save ==============================
 export const SAVE_BASELINE = 'SAVE_BASELINE';
+
+//=============== New ClassReport =============
+export const CHANGE_CLASS = 'CHANGE_CLASS';
+
 //================= Global ===========================
 export const INIT_USER_ME = 'INIT_USER_ME';
 export const INIT_USER_ME_SUCCESS = 'INIT_USER_ME_SUCCESS';
@@ -151,3 +155,9 @@ export const C07 = '#BFBFBF';
 export const C09 = '#999999';
 export const C12 = '#333333';
 export const C14 = '#fdfdfd';
+
+
+//============================  Test ===============================
+export const TEST_CHANGE_ONE = 'TEST_CHANGE_ONE';
+export const TEST_CHANGE_TWO = 'TEST_CHANGE_TWO';
+

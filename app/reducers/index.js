@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:02:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-03 15:32:32
+* @Last Modified time: 2016-08-04 12:55:45
 */
 
 'use strict';
@@ -16,6 +16,9 @@ import rankReport from './rankReport';
 import dashboard from './dashboard';
 import customAnalysis from './customAnalysis';
 import reportDS from './reportDS';
+import classReport from './classReport';
+
+import {one, two} from './test';
 
 var rootReducer = combineReducers({
     global: app,
@@ -23,8 +26,14 @@ var rootReducer = combineReducers({
     dashboard,
     reportDS,
     rankReport,
+    classReport,
     customAnalysis,
-    routing
+    //设计成嵌套的reducer
+    test: combineReducers({
+        one,
+        two
+    }),
+    routing,
 });
 
 export default rootReducer;

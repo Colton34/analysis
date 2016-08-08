@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 12:26:38
+* @Last Modified time: 2016-08-08 12:34:06
 */
 
 'use strict';
@@ -44,9 +44,6 @@ exports.home = function(req, res, next) {
         var errorInfo = {};
         if(req.originalExams.length == 0) errorInfo.msg = '此学校没有考试';
         if(req.originalExams.length > 0 && formatedExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
-
-
-
 
         res.status(200).json({examList: formatedExams, errorInfo: errorInfo});
     }).catch(function(err) {

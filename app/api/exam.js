@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 12:01:31
+* @Last Modified time: 2016-08-08 12:38:24
 */
 
 
@@ -239,7 +239,6 @@ export function initReportDS(params) {
             id: 'totalScore'
         });
         headers = _.concat(headers, restPapers);
-
         var levels = (baseline && baseline['[levels]']) ? _.keyBy(baseline['[levels]'], 'key') : makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = (baseline && baseline['[levelBuffers]']) ? _.map(baseline['[levelBuffers]'], (obj) => obj.score) : _.map(levels, (value, key) => 5);
 //设计：虽然把subjectLevels挂到state树上--其实是借用reportDS来存储，在校级报告里不直接用，而是在其他报告中直接用，校级报告中等于多算一遍。这个设计可能需要重构。
@@ -409,58 +408,3 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
     });
     return levels;
 }
-
-        // levels: [
-        //     {
-        //         key: xxx,
-        //         score: xxx,
-        //         percentage: xxx,
-        //         count: xxx
-        //     },
-        //     ...
-        // ]
-function parseLevels(gradeLevels) {
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

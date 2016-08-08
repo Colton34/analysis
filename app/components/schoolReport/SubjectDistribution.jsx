@@ -223,20 +223,15 @@ const SubjectDistribution = ({reportDS}) => {
 //不会碰到从班级找paper时遇到因为“某班级没有考试某一科目那么就没有科目平均分的信息”的问题，但是因为走了"25算法"，此算法当遇到科目之间总分差距很大的时候，一样会导致求
 //不到某一科目的平均分。如果遇到这种情况则给出被过滤掉的科目的信息，让用户知道。
         var {subjectLevelInfo, subjectsMean} = makeSubjectLevelInfo(currentLevel.score, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examInfo.fullMark);
-
 //设计：通过headers和subjectMean得到orderdValidSubjectMean：即，通过headers是有序的，并且避免了因为特殊原因而没有求到某些科目平均分而导致不能接着计算的问题。
 //这些因为特殊原因出问题的科目记录下来给你给提示。
-
         var {validOrderedSubjectMean, unvalids} = filterMakeOrderedSubjectMean(headers, subjectsMean);
-
         //按行横向扫描的各行RowData
-        // var tableData = theSubjectLevelTable(subjectLevelInfo, subjectsMean, examInfo, headers);
         var tableData = theSubjectLevelTable(subjectLevelInfo, validOrderedSubjectMean, examInfo);
         /*
         disData: {
             <className> : {maxSubjects: [], minSubjects: []}
         }
-
          */
         var disData = theSubjectLevelDiscription(subjectLevelInfo, examPapersInfo);
         /*
@@ -359,8 +354,7 @@ class TextView extends React.Component {
  */
 function theSubjectLevelTable(subjectLevelInfo, validOrderedSubjectMean, examInfo) {
     //此档的内容
-    //这里面依然会有二连杀：即虽然上面已经避免了可能会因为paper mean的"25xx"算法而导致漏掉一些科目的平均分，但是当去求某一个班级的数据的时候依然要考虑此班级有可能
-    //没有考某一科目！！！
+    //这里面依然会有二连杀：即虽然上面已经避免了可能会因为paper mean的"25xx"算法而导致漏掉一些科目的平均分，但是当去求某一个班级的数据的时候依然要考虑此班级有可能没有考某一科目！！！
     var table = [];
     var titleHeader = _.map(validOrderedSubjectMean, (headerObj, index) => {
         return headerObj.subject + '(' + headerObj.mean + ')';
@@ -517,7 +511,6 @@ function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass
 
     _.each(studentsGroupByClass, (classStudents, className) => {
         var temp = {};
-        // var classTotalScoreMean = _.round(_.mean(_.map(classStudents, (student) => student.score)), 2);
         temp.totalScore = _.filter(classStudents, (student) => student.score > levelScore).length;
         //Note: 这里的算法没有问题：subjectsMean是全部有效的，而这里遍历的pid是跟着当前班级所考的科目走的
         _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
