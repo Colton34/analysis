@@ -1,3 +1,5 @@
+//“班级报告”和“班级间报告”的切换
+
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
