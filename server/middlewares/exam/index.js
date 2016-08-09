@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-09 19:38:24
+* @Last Modified time: 2016-08-09 21:39:43
 */
 
 'use strict';
@@ -1197,6 +1197,10 @@ function makeExamStudentsInfo(examStudentsInfo) {
     var result = _.map(examStudentsInfo, (studentItem) => {
         var studentObj = _.pick(studentItem, ['id', 'name', 'class', 'score', 'kaohao']);
         studentObj.papers = studentItem['[papers]'];
+        var targetQuestionScores = _.map(studentItem['[questionScores]'], (obj) => {
+            return {paperid: obj.paperid, scores: obj['[scores]']}
+        });
+        studentObj.questionScores = targetQuestionScores;//TODO:暂时没有answers
         return studentObj;
     });
     return result;
@@ -1210,7 +1214,7 @@ function makeExamStudentsInfo(examStudentsInfo) {
 function makeExamPapersInfo(examPapersInfo) {
     var examPapersInfoArr = _.map(examPapersInfo, (paperItem) => {
         var paperObj = _.pick(paperItem, ['id', 'paper', 'subject', 'fullMark', 'realStudentsCount', 'lostStudentsCount']);
-        paperObj = _.assign(paperObj, { realClasses: paperItem['[realClasses]'], lostClasses: paperItem['[lostClasses]']});
+        paperObj = _.assign(paperObj, { realClasses: paperItem['[realClasses]'], lostClasses: paperItem['[lostClasses]'], questions: paperItem['[questions]'] });
         var classCountsMap = {};
         _.each(paperItem['[class]'], (classCountItem) => {
             classCountsMap[classCountItem.name] = classCountItem.count;
