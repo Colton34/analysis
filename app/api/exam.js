@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 12:38:24
+* @Last Modified time: 2016-08-09 18:13:28
 */
 
 
@@ -142,6 +142,9 @@ export function initRankReportdData(params) {
                 score:
                 papers: [
                     {paperid: , score: }
+                ],
+                questionScores: [
+                    {paperid: , scores: [], answers: [] }
                 ]
             },
             ...
@@ -160,7 +163,8 @@ export function initRankReportdData(params) {
                 lostStudentsCount:
                 class: {
                     <className>: <此科目此班级参加考试的人数>
-                }
+                },
+                questions:
             },
             ...
         }

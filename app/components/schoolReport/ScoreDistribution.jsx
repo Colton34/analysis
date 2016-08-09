@@ -895,7 +895,8 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
     levItem.count = countsGroupByLevel[levelKey];
     //各档的累计人数等于=上一个高档次的累计人数+当前档次的人数（最高档的累计人数和人数是相等的）
     levItem.sumCount = _.sum(_.map(_.pickBy(countsGroupByLevel, (v, k) => k >= levelKey), (count) => count));
-    levItem.sumPercentage = _.round(_.multiply(_.divide(levItem.sumCount, baseCount), 100), 2);
+    levItem.sumPercentage = _.round(_.multiply(_.divide(levItem.sumCount, baseCount), 100), 2);//TODO:其实这里没必要再次计算百分比--因为levels里percetage
+                                                                                //就是sumPercentage！！！
 
     return levItem;
 }

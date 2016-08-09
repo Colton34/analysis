@@ -18,91 +18,79 @@ export default function LevelDistribution({reportDS, currentClass}) {
 
 
 //=================================================  分界线  =================================================
+//1.各个档次本班在全年级的排名
+//2.人数，累计人数，累计上线比
 
+function getTableData(totalScoreLevelInfoByClass) {
+    //直接从这里取需要的数据即可。
+}
 
+function getClassRankInfo(totalScoreLevelInfoByLevel, currentClass) {
+//totalScoreLevelInfo中的level都是和levels对应的--index小则对应低档次
+//从totalScoreLevelInfoByLevel的各个档次中排序得到排名
+    var result = {};
+    _.each(totalScoreLevelInfoByLevel, (infoArr, levelKey) => {
+        var targetIndex = _.findIndex(_.sortBy(infoArr, 'sumCount'), (obj) => obj.class == currentClass);
+        if(targetIndex < 0) return;//TODO:应该给Tip Error！-- 这也是需要改进的：清晰明了的错误提示
+        result[levelKey] = targetIndex + 1;
+    })
+}
 
 /**
- * 创建学科分析需要的info数据结构
- * @param  {[type]} levelScore           [description]
+ * 获取总分分档的info数据结构（info数据结构是一种具有典型格式的数据结构： {totalSchool: {...}, <className>: {...} } ）每一个key中的value对象中的key就是横向扫描
+ * 的属性，个数和顺序都一样！！！这里totalSchool和<className>其实就是列的key，所以info是一个二重的Map，按照需要的matrixTable创建，横向扫描，一重key是列的key，二
+ * 重key是行的key。列key没有顺序，行key有顺序。（比如如果是分档，则高档在前，依次排列，如果是科目，则语数外在前，按照subjectWeight排列）
+ * @param  {[type]} examInfo             [description]
  * @param  {[type]} examStudentsInfo     [description]
+ * @param  {[type]} examClassesInfo      [description]
  * @param  {[type]} studentsGroupByClass [description]
- * @param  {[type]} allStudentsPaperMap  [description]
- * @param  {[type]} examPapersInfo       [description]
- * @param  {[type]} examFullMark         [description]
- * @return {[type]}                      info格式的学科分析的数据结构
- * {
- *     totalSchool: {
- *         totalScore: <count>
- *         <pid>: <count>
+ * @param  {[type]} levels               [description]
+ * @return 这里横向轴是分档所以对象就是分档信息
+ *     {
+ *         totalSchool: {
  *
- *     },
- *     <className>: {
- *         totalScore: <count>
- *         <pid>: <count>
- *     },
- *     ...
+ *         },
+ *         <className>: {
+ *
+ *         }
  * }
  */
-function makeSubjectLevelInfo(levObj, allStudents, currentClassStudents, currentClass) {
-    var subjectsMean = levObj.subjects;
-    var subjectLevelInfo = {};
-    subjectLevelInfo.totalSchool = {};
-    subjectLevelInfo.totalSchool.totalScore = levObj.count;
-    _.each(subjectsMean, (subMean, pid) => {
-        if(pid == 'totalScore') return;
-        subjectLevelInfo.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score > subMean.mean).length;
+//resultByClass是totalScoreLevelInfo按照第一级是className（或'totalSchool'这个特殊的class key）作为key，第二级是levelKey，而resultByLevel的第一级是levelKey，第二级是className,
+//而且不包含totalSchool这个特殊的key
+function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels) {
+    var levelSegments = _.map(levels, (levObj) => levObj.score);
+    levelSegments.push(examInfo.fullMark);
+
+    var resultByClass = {}, resultByLevel = {};
+    var countsGroupByLevel = makeSegmentsCount(examStudentsInfo, levelSegments);
+    resultByClass.totalSchool = {};
+
+    _.each(countsGroupByLevel, (count, levelKey) => {
+        resultByClass.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount); //TODO:levels中的percentage就是累占比呀！
     });
-    var temp = {};
-    temp.totalScore = _.filter(classStudents, (student) => student.score > levelScore).length;
-    _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
-        temp[pid] = _.filter(papers, (paper) => paper.score > subjectsMean[pid].mean).length;
+
+    _.each(studentsGroupByClass, (studentsFromClass, className) => {
+        var classCountsGroupByLevel = makeSegmentsCount(studentsFromClass, levelSegments);
+        var temp = {};
+        _.each(classCountsGroupByLevel, (count, levelKey) => {
+            temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[className].realStudentsCount, className);
+            if(!resultByLevel[levelKey]) resultByLevel[levelKey] = [];
+            resultByLevel[levelKey].push(temp[levelKey]);
+        });
+        resultByClass[className] = temp;
     });
-    subjectLevelInfo[currentClass] = temp;
-    return subjectLevelInfo;
+
+    return resultByClass;
 }
 
-/**
- * 学科分档的表格
- * @param  {[type]} subjectLevelInfo [description]
- * @param  {[type]} subjectsMean    [description]
- * @param  {[type]} headers         [description]
- * @return {[type]}                 [description]
- */
-function makeTableData(subjectLevelInfo, validOrderedSubjectMean, gradeName) {
-    var table = [];
-    var titleHeader = _.map(validOrderedSubjectMean, (headerObj, index) => {
-        return headerObj.subject + '(' + headerObj.mean + ')';
-    });
-    titleHeader.unshift('班级');
+function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount, className) {
+    var levItem = {};
 
-    var totalSchoolObj = subjectLevelInfo.totalSchool;
-    var totalSchoolRow = _.map(validOrderedSubjectMean, (headerObj) => {
-        return totalSchoolObj[headerObj.id];
-    });
-    totalSchoolRow.unshift('全校');
-    table.push(totalSchoolRow);
+    levItem.count = countsGroupByLevel[levelKey];
+    levItem.sumCount = _.sum(_.map(_.pickBy(countsGroupByLevel, (v, k) => k >= levelKey), (count) => count));
+    levItem.sumPercentage = _.round(_.multiply(_.divide(levItem.sumCount, baseCount), 100), 2);
+    levItem.class = className;
 
-    var classRow = _.map(validOrderedSubjectMean, (headerObj) => {
-        return (_.isUndefined(subjectLevelObj[headerObj.id])) ? '无数据' : subjectLevelObj[headerObj.id];
-    });
-    classRow.unshift(gradeName + currentClass + '班');
-    table.push(classRow);
-
-    table.unshift(titleHeader);
-
-    return table;
+    return levItem;
 }
 
-//TODO:抽取出来，作为Common Report Util
-function filterMakeOrderedSubjectMean(headers, subjectsMean) {
-    //按照headers的顺序，返回有序的[{subject: , id(): , mean: }]
-    var valids = [], unvalids = [];
-    _.each(headers, (headerObj) => {
-        if(subjectsMean[headerObj.id]) {
-            valids.push({id: headerObj.id, subject: headerObj.subject, mean: subjectsMean[headerObj.id].mean});
-        } else {
-            unvalids.push({id: headerObj.id, subject: headerObj.subject, mean: subjectsMean[headerObj.id].mean});
-        }
-    });
-    return {validOrderedSubjectMean: valids, unvalids: unvalids};
-}
