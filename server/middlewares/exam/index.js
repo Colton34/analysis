@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 12:34:06
+* @Last Modified time: 2016-08-09 19:38:24
 */
 
 'use strict';
@@ -265,6 +265,9 @@ exports.customRankReport = function(req, res, next) {
                 score:
                 papers: [
                     {paperid: , score: }  Note: paperid是String id
+                ],
+                questionScores: [
+                    {paperid: , scores: [], answers: []}
                 ]
             },
             ...
@@ -283,7 +286,8 @@ exports.customRankReport = function(req, res, next) {
                 lostStudentsCount:
                 class: {
                     <className>: <此科目此班级参加考试的人数>
-                }
+                },
+                questions: []
             },
             ...
         }
@@ -298,14 +302,10 @@ exports.customRankReport = function(req, res, next) {
             }
         }
  */
-//TODO:修改schoolAnalysis的名字为reportDS的相关对应的名字。
-//TODO:在examInfo中添加exam的短id
 exports.schoolAnalysis = function(req, res, next) {
     var exam = req.exam,
-        baseline = req.baseline,
         examScoreMap = req.classScoreMap,
         examScoreArr = req.orderedScoresArr;
-
     try {
         req.examInfo = formatExamInfo(exam);
         req.examPapersInfo = generateExamPapersInfo(exam);
@@ -313,13 +313,12 @@ exports.schoolAnalysis = function(req, res, next) {
     } catch (e) {
         next(new errors.Error('schoolAnalysis 同步错误', e));
     }
-    generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo).then(function(examStudentsInfo) {
+    generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo, req.examPapersInfo).then(function(examStudentsInfo) { //这里需要多传递一个参数 req.examPapersInfo
         res.status(200).json({
             examInfo: req.examInfo,
             examPapersInfo: req.examPapersInfo,
             examClassesInfo: req.examClassesInfo,
-            examStudentsInfo: examStudentsInfo,
-            baseline: baseline
+            examStudentsInfo: examStudentsInfo
         });
     }).catch(function(err) {
         next(new errors.Error('schoolAnalysis Error', err));
@@ -1107,42 +1106,60 @@ function genearteExamClassInfo(exam) {
 }
 
 /**
- * 在examScoreArr的每个对象中添加papers属性信息: 一个数组，里面就是{id: <pid>, score: <分数>}
+ * 在examScoreArr的每个对象中添加papers属性信息: 一个数组，里面就是{id: <pid>, score: <分数>}，并且在examPapersInfo中添加paper的questions
  * @param  {[type]} exam            [description]
  * @param  {[type]} examScoreArr    [description]
  * @param  {[type]} examClassesInfo [description]
  * @return {[type]}                 [description]
  */
-
-function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo) {
-    return generateStudentsPaperInfo(exam).then(function(studentsPaperInfo) {
+function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo, examPapersInfo) {
+    return generateStudentsPaperAndQuestionInfo(exam, examPapersInfo).then(function(result) {
         //遍历examScoreArr是为了保证有序
+        var {studentsPaperInfo, studentQuestionsInfo} = result;
         _.each(examScoreArr, (scoreObj) => {
             scoreObj.papers = studentsPaperInfo[scoreObj.id];
+            scoreObj.questionScores = studentQuestionsInfo[scoreObj.id];
         });
         return when.resolve(examScoreArr);
     });
 }
 
 
-function generateStudentsPaperInfo(exam) {
-    //1.通过exam['[papers]']获取到各个paper的具体实例
-    //2.收集各个科目每个学生的成绩，打散组成perStudentPerPaper数组--这里好像没必要构成
-    //totalScore。
-    //3.构成 studentsPaperInfo
+function generateStudentsPaperAndQuestionInfo(exam, examPapersInfo) {
+    var studentPaperArr = [], studentQuestionMap = {};
     return getPaperInstanceByExam(exam).then(function(papers) {
-        var perStudentPerPaperArr = _.concat(..._.map(papers, (paper) => {
-            return _.map(paper['[students]'], (student, index) => {
-                // studentId: xxx, class_name: xxx, paperid: xxx, score: xxx
-                //注意：student.id是个什么样的id？后面studentsPaperInfo的key是
-                //student的短id
-                return {id: student.id, class_name: student.class, paperid: paper.id, score: student.score};
+        //修改examPapersInfo中的实体--添加questions数据
+        _.each(papers, (paperObj, index) => {
+            examPapersInfo[paperObj.id].questions = paperObj['[questions]'];
+            _.each(paperObj['[students]'], (student, index) => {
+                studentPaperArr.push({id: student.id, class_name: student.class, paperid: paperObj.id, score: student.score});
+                studentQuestionMap[student.id] = {paperid: paperObj.id, scores: paperObj.matrix[index]} //暂时可以先不添加： answers: paperObj.answers[index]
             });
-        }));
-        var studentsPaperInfo = _.groupBy(perStudentPerPaperArr, 'id');
-        return when.resolve(studentsPaperInfo);
+        });
+
+        var studentsPaperInfo = _.groupBy(studentPaperArr, 'id');
+        return when.resolve({studentsPaperInfo: studentsPaperInfo, studentQuestionsInfo: studentQuestionMap});
     });
 }
+
+// function generateStudentsPaperInfo(exam) {
+//     //1.通过exam['[papers]']获取到各个paper的具体实例
+//     //2.收集各个科目每个学生的成绩，打散组成perStudentPerPaper数组--这里好像没必要构成
+//     //totalScore。
+//     //3.构成 studentsPaperInfo
+//     return getPaperInstanceByExam(exam).then(function(papers) {
+//         var perStudentPerPaperArr = _.concat(..._.map(papers, (paper) => {
+//             return _.map(paper['[students]'], (student, index) => {
+//                 // studentId: xxx, class_name: xxx, paperid: xxx, score: xxx
+//                 //注意：student.id是个什么样的id？后面studentsPaperInfo的key是
+//                 //student的短id
+//                 return {id: student.id, class_name: student.class, paperid: paper.id, score: student.score};
+//             });
+//         }));
+//         var studentsPaperInfo = _.groupBy(perStudentPerPaperArr, 'id');
+//         return when.resolve(studentsPaperInfo);
+//     });
+// }
 
 function getPaperInstanceByExam(exam) {
     var papersPromise = _.map(exam['[papers]'], (paperObj) => {
