@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-02 16:36:20
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 10:07:55
+* @Last Modified time: 2016-08-10 11:53:20
 */
 
 'use strict';
@@ -26,7 +26,7 @@ var InitialState = Record({
     allStudentsPaperMap: Map({}),
     headers: List([]),
     levels: Map({}),
-    subjectLevels: List([]),
+    subjectLevels: Map({}),
     levelBuffers: List([]),
 
     forseUpdate: false //TODO：这个需要fix

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-09 18:13:28
+* @Last Modified time: 2016-08-10 12:15:46
 */
 
 
@@ -246,8 +246,7 @@ export function initReportDS(params) {
         var levels = (baseline && baseline['[levels]']) ? _.keyBy(baseline['[levels]'], 'key') : makeDefaultLevles(examInfo, examStudentsInfo);
         var levelBuffers = (baseline && baseline['[levelBuffers]']) ? _.map(baseline['[levelBuffers]'], (obj) => obj.score) : _.map(levels, (value, key) => 5);
 //设计：虽然把subjectLevels挂到state树上--其实是借用reportDS来存储，在校级报告里不直接用，而是在其他报告中直接用，校级报告中等于多算一遍。这个设计可能需要重构。
-        var subjectLevels = (baseline && baseline['[subjectLevels]']) ? baseline['[subjectLevels]'] : undefined;
-
+        var subjectLevels = (baseline && baseline['[subjectLevels]']) ? baseline['[subjectLevels]'] : makeDefaultSubjectLevels(levels, examStudentsInfo, examPapersInfo, examInfo.fullMark);
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
@@ -411,4 +410,67 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
         levObj.count = targetCount;
     });
     return levels;
+}
+
+//Note:在存储的时候因为是Map所以必须存储成数组，但是使用的时候一定是Map--即在state中的形式是Map
+function makeDefaultSubjectLevels(levels, examStudentsInfo, examPapersInfo, examFullMark) {
+    var result = {};
+    _.each(levels, (levObj, levelKey) => {
+        result[levelKey] = makeLevelSubjectMean(levObj.score, examStudentsInfo, examPapersInfo, examFullMark);
+    });
+    return result;
+}
+
+
+//计算每一档次各科的平均分
+//算法：获取所有考生基数中 总分**等于**此档分数线 的所有考生；如果这些考生的人数不足够样本数（当前是固定值25），则扩展1分（单位），再获取，注意：
+//  1.分数都四舍五入（包括分档线）
+//  2.一定要滑动窗口两边的数量是相同的，保证平均分不变（注意有“选择的某个分数上没有对应学生的情况”）
+//  3.当遇到从n中取m（其中n > m）
+//  一定要保证每次取的人都是相同的（根据examStudentsInfo的顺序），这样每次计算的科目平局分才是相同的
+//  ，不断重复上述过程，直到满足样本数量
+//TODO: 抽离此方法
+function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark) {
+    var result = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(levelScore));
+    var count = result.length;
+
+    var currentLowScore, currentHighScore;
+    currentLowScore = currentHighScore = _.round(levelScore);
+
+    while ((count < 25) && (currentLowScore >= 0) && (currentHighScore <= examFullMark)) {
+        currentLowScore = currentLowScore - 1;
+        currentHighScore = currentHighScore + 1;
+        var currentLowStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore));
+        var currentHighStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentHighScore));
+
+        var currentTargetCount = _.min([currentLowStudents.length, currentHighStudents.length]);
+        var currentTagretLowStudents = _.take(currentLowStudents, currentTargetCount);
+        var currentTargetHighStudents = _.take(currentHighStudents, currentTargetCount);
+        count += _.multiply(2, currentTargetCount);
+        result = _.concat(result, currentTagretLowStudents, currentTargetHighStudents);
+    }
+
+    //result即是最后获取到的满足分析条件的样本，根据此样本可以获取各个科目的平均分信息
+    return makeSubjectMean(result, examPapersInfo);
+}
+
+
+/**
+ * 返回所给学生各科成绩的平均分。注意这里没有没有包括总分(totalScore)的平均分信息
+ * @param  {[type]} students       [description]
+ * @param  {[type]} examPapersInfo [description]
+ * @return {[type]}                [description]
+ */
+//TODO: 抽离此方法
+function makeSubjectMean(students, examPapersInfo) {
+    var result = {};
+    _.each(_.groupBy(_.concat(..._.map(students, (student) => student.papers)), 'paperid'), (papers, pid) => {
+        var obj = {};
+        obj.mean = _.round(_.mean(_.map(papers, (paper) => paper.score)), 2);
+        obj.name = examPapersInfo[pid].subject; //TODO: 这里还是统一称作 'subject' 比较好
+        obj.id = pid;
+
+        result[pid] = obj;
+    });
+    return result;
 }

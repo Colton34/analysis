@@ -8,27 +8,39 @@ export default function SubjectLevelDisribution() {
 }
 
 //=================================================  分界线  =================================================
+
+// export default function SubjectLevelDisribution({reportDS, currentClass}) {
+//     var studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), levels = reportDS.levels.toJS(), subjecLevels = reportDS.subjectLevels.toJS(), headers = reportDS.headers.toJS(), gradeName = reportDS.examInfo.toJS().gradeName;
+//     var theDS = getDS(levels, subjecLevels, headers, gradeName, currentClass, studentsGroupByClass[currentClass], allStudentsPaperMap);
+// }
+
+
+
 //各个档次的table数据以及各个档次的文案数据
 
-function temp(levels, subjecLevels, headers, gradeName, currentClass) {
+function getDS(levels, subjecLevels, headers, gradeName, currentClass, classStudents, allStudentsPaperMap) {
     var result = {};
     _.each(levels, (levObj, levelKey) => {
-        var currentSubjectLevels = _.find(subjecLevels, (obj) => obj.levelKey == levelKey);
-        if(!currentSubjectLevels) return;
-        var currentSubjectLevelInfo = makeCurrentSubjectLevelInfo(currentSubjectLevels.values, levObj, currentClass);
-        var {validOrderedSubjectMean} = filterMakeOrderedSubjectMean(headers, subjectsMeanArr);
-        var tableData = getTableData(currentSubjectLevelInfo, validOrderedSubjectMean, gradeName, currentClass);
-        var bestAndWorst = getBestAndWorst(currentSubjectLevelInfo, currentClass, currentSubjectLevels.values);
-    })
+        var subjectLevelMeanInfo = subjecLevels[levelKey];   //_.find(subjecLevels, (obj) => obj.levelKey == levelKey);
+        if(!subjectLevelMeanInfo) return;
+
+        var currentSubjectLevelInfo = makeCurrentSubjectLevelInfo(subjectLevelMeanInfo, levObj, currentClass, classStudents, allStudentsPaperMap);
+        var {validOrderedSubjectMean} = filterMakeOrderedSubjectMean(headers, subjectLevelMeanInfo);
+        var tableDS = getTableDS(currentSubjectLevelInfo, validOrderedSubjectMean, gradeName, currentClass);
+        var bestAndWorst = getBestAndWorst(currentSubjectLevelInfo, currentClass, subjectLevelMeanInfo);
+        result[levelKey] = {tableDS: tableDS, bestAndWorst: bestAndWorst}
+    });
+    debugger;
+    return result;
 }
 
-function getBestAndWorst(currentSubjectLevelInfo, currentClass, currentSubjectLevels) {
-    var data = currentSubjectLevelInfo[currentClass], subjectLevelMap = _.keyBy(currentSubjectLevels, 'id');
+function getBestAndWorst(currentSubjectLevelInfo, currentClass, subjectLevelMeanInfo) {
+    var data = currentSubjectLevelInfo[currentClass];    //subjectLevelMap = _.keyBy(currentSubjectLevels, 'id');
     var best = {}, worst = {};
     _.each(data, (count, key) => {
         if(key == 'totalScore') return;
-        if(!best.pid || count > best.count) best = {pid: key, count: count, subject: subjectLevelMap[key]};
-        if(!worst.pid || count < worst.count) worst = {pid: key, count: count, subject: subjectLevelMap[key]};
+        if(!best.pid || count > best.count) best = {pid: key, count: count, subject: subjectLevelMeanInfo[key].name};
+        if(!worst.pid || count < worst.count) worst = {pid: key, count: count, subject: subjectLevelMeanInfo[key].name};
     });
     return {best: best, worst: worst};
 }
@@ -41,7 +53,7 @@ function getBestAndWorst(currentSubjectLevelInfo, currentClass, currentSubjectLe
  * @param  {[type]} headers         [description]
  * @return {[type]}                 [description]
  */
-function getTableData(subjectLevelInfo, validOrderedSubjectMean, gradeName, currentClass) {
+function getTableDS(subjectLevelInfo, validOrderedSubjectMean, gradeName, currentClass) {
     var table = [];
     var titleHeader = _.map(validOrderedSubjectMean, (headerObj, index) => {
         return headerObj.subject + '(' + headerObj.mean + ')';
@@ -56,7 +68,7 @@ function getTableData(subjectLevelInfo, validOrderedSubjectMean, gradeName, curr
     table.push(totalSchoolRow);
 
     var classRow = _.map(validOrderedSubjectMean, (headerObj) => {
-        return (_.isUndefined(subjectLevelObj[headerObj.id])) ? '无数据' : subjectLevelObj[headerObj.id];
+        return (_.isUndefined(subjectLevelInfo[headerObj.id])) ? '无数据' : subjectLevelInfo[headerObj.id];
     });
     classRow.unshift(gradeName + currentClass + '班');
     table.push(classRow);
@@ -84,34 +96,42 @@ function getTableData(subjectLevelInfo, validOrderedSubjectMean, gradeName, curr
  *     ...
  * }
  */
-function makeCurrentSubjectLevelInfo(currentSubjectLevels, levObj, currentClass) {
+function makeCurrentSubjectLevelInfo(subjectLevelMeanInfo, levObj, currentClass, classStudents, allStudentsPaperMap) {
     var currentSubjectLevelInfo = {};
     currentSubjectLevelInfo.totalSchool = {};
     currentSubjectLevelInfo.totalSchool.totalScore = levObj.count;
-    _.each(currentSubjectLevels, (subMeanInfo, index) => {
+    _.each(subjectLevelMeanInfo, (subMeanInfo, pid) => {
         // if(pid == 'totalScore') return; -- 没有totalScore
-        currentSubjectLevelInfo.totalSchool[subMeanInfo.id] = _.filter(allStudentsPaperMap[subMeanInfo.id], (paper) => paper.score > subMean.mean).length;
+        currentSubjectLevelInfo.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score > subMeanInfo.mean).length;
     });
     var temp = {};
-    temp.totalScore = _.filter(classStudents, (student) => student.score > levelScore).length;
+    temp.totalScore = _.filter(classStudents, (student) => student.score > levObj.score).length;
     _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
-        temp[pid] = _.filter(papers, (paper) => paper.score > currentSubjectLevels[pid].mean).length;
+        // debugger;
+        temp[pid] = _.filter(papers, (paper) => paper.score > subjectLevelMeanInfo[pid].mean).length;
     });
     currentSubjectLevelInfo[currentClass] = temp;
     return currentSubjectLevelInfo;
 }
 
 //TODO:抽取出来，作为Common Report Util
-function filterMakeOrderedSubjectMean(headers, subjectsMeanArr) {
+function filterMakeOrderedSubjectMean(headers, subjectLevelMeanInfo) {
     //按照headers的顺序，返回有序的[{subject: , id(): , mean: }]
-    var subMeanMap = _.keyBy(subjectsMeanArr, 'id');
     var valids = [], unvalids = [];
     _.each(headers, (headerObj) => {
-        if(subMeanMap[headerObj.id]) {
-            valids.push({id: headerObj.id, subject: headerObj.subject, mean: subMeanMap[headerObj.id].mean});
+        if(headerObj.id == 'totalScore') return;
+        if(subjectLevelMeanInfo[headerObj.id]) {
+            valids.push({id: headerObj.id, subject: headerObj.subject, mean: subjectLevelMeanInfo[headerObj.id].mean});
         } else {
-            unvalids.push({id: headerObj.id, subject: headerObj.subject, mean: subMeanMap[headerObj.id].mean});
+            unvalids.push({id: headerObj.id, subject: headerObj.subject, mean: subjectLevelMeanInfo[headerObj.id].mean});
         }
     });
     return {validOrderedSubjectMean: valids, unvalids: unvalids};
 }
+
+
+/*
+subjectLevels:
+    存储的是个array: [ { levelKey: xxx, values: {} } ]
+    state中是个Map: { <levelKey> : <values> }
+ */

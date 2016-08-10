@@ -959,8 +959,8 @@ function getNewBaseline(newLevels, examStudentsInfo, examPapersInfo, examId, exa
     var result = {examid: examId, grade: examInfo.gradeName, '[levels]': [], '[subjectLevels]': [], '[levelBuffers]': []};
     _.each(newLevels, (levObj, levelKey) => {
         var subjectMean = makeLevelSubjectMean(levObj.score, examStudentsInfo, examPapersInfo, examInfo.fullMark);
-        var subjectLevels = _.values(subjectMean);
-        result['[subjectLevels]'].push({levelKey: levelKey, values: subjectLevels});
+        // var subjectLevels = _.values(subjectMean);
+        result['[subjectLevels]'].push({levelKey: levelKey, values: subjectMean});
         result['[levels]'].push({key: levelKey, score: levObj.score, percentage: levObj.percentage, count: levObj.count});
         //如果是update那么可以考虑只put上去需要更新的数据--但是需要能区分到底是post还是put。理论上这里如果是put那么不需要put上去levelBuffers，因为这里并没有改变levelBuffers。
         result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
