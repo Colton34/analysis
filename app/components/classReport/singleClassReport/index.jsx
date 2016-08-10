@@ -5,8 +5,8 @@ import Radium from 'radium';
 import {Link} from 'react-router';
 
 import ClassNav from './ClassNav';
-import HeaderInfo from './HeaderInfo';
-import ModuleNav from './ModuleNav';
+import HeaderInfo from './Header/HeaderInfo';
+import ModuleNav from './Header/ModuleNav';
 
 class SingleClassReport extends React.Component {
     constructor(props) {
