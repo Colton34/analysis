@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-09 21:39:43
+* @Last Modified time: 2016-08-10 20:03:50
 */
 
 'use strict';
@@ -1133,7 +1133,8 @@ function generateStudentsPaperAndQuestionInfo(exam, examPapersInfo) {
             examPapersInfo[paperObj.id].questions = paperObj['[questions]'];
             _.each(paperObj['[students]'], (student, index) => {
                 studentPaperArr.push({id: student.id, class_name: student.class, paperid: paperObj.id, score: student.score});
-                studentQuestionMap[student.id] = {paperid: paperObj.id, scores: paperObj.matrix[index]} //暂时可以先不添加： answers: paperObj.answers[index]
+                if(!studentQuestionMap[student.id]) studentQuestionMap[student.id] = [];
+                studentQuestionMap[student.id].push({paperid: paperObj.id, scores: paperObj.matrix[index]}); //暂时可以先不添加： answers: paperObj.answers[index]
             });
         });
 
