@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import React from 'react';
+import {makeSegmentsCount} from '../../../api/exam';
 
 export default function LevelDistribution({reportDS, currentClass}) {
     var levels = reportDS.levels.toJS(), examInfo=reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), headers = reportDS.headers.toJS();
@@ -18,23 +19,18 @@ export default function LevelDistribution({reportDS, currentClass}) {
 
 
 //=================================================  分界线  =================================================
+// export default function LevelDistribution({reportDS, currentClass}) {
+//     var examInfo=reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS() , headers = reportDS.headers.toJS();
+//     var currentClassStudents = studentsGroupByClass[currentClass];
+//     var {totalScoreLevelInfoByClass, totalScoreLevelInfoByLevel} = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
+//     var headerData = getHeaderData(totalScoreLevelInfoByLevel, currentClass);
+//     debugger;
+//     var tableDS = getTableDS(totalScoreLevelInfoByClass, levels);
+// }
+
+
 //1.各个档次本班在全年级的排名
 //2.人数，累计人数，累计上线比
-
-function getTableData(totalScoreLevelInfoByClass) {
-    //直接从这里取需要的数据即可。
-}
-
-function getClassRankInfo(totalScoreLevelInfoByLevel, currentClass) {
-//totalScoreLevelInfo中的level都是和levels对应的--index小则对应低档次
-//从totalScoreLevelInfoByLevel的各个档次中排序得到排名
-    var result = {};
-    _.each(totalScoreLevelInfoByLevel, (infoArr, levelKey) => {
-        var targetIndex = _.findIndex(_.sortBy(infoArr, 'sumCount'), (obj) => obj.class == currentClass);
-        if(targetIndex < 0) return;//TODO:应该给Tip Error！-- 这也是需要改进的：清晰明了的错误提示
-        result[levelKey] = targetIndex + 1;
-    })
-}
 
 /**
  * 获取总分分档的info数据结构（info数据结构是一种具有典型格式的数据结构： {totalSchool: {...}, <className>: {...} } ）每一个key中的value对象中的key就是横向扫描
@@ -80,7 +76,7 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
         resultByClass[className] = temp;
     });
 
-    return resultByClass;
+    return {totalScoreLevelInfoByClass: resultByClass, totalScoreLevelInfoByLevel: resultByLevel};
 }
 
 function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount, className) {
@@ -92,5 +88,24 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount, className) {
     levItem.class = className;
 
     return levItem;
+}
+
+
+function getHeaderData(totalScoreLevelInfoByLevel, currentClass) {
+//totalScoreLevelInfo中的level都是和levels对应的--index小则对应低档次
+//从totalScoreLevelInfoByLevel的各个档次中排序得到排名
+    var result = [];
+    _.each(totalScoreLevelInfoByLevel, (infoArr, levelKey) => {
+        var targetIndex = _.findIndex(_.sortBy(infoArr, 'sumCount'), (obj) => obj.class == currentClass);
+        if(targetIndex < 0) return;//TODO:应该给Tip Error！-- 这也是需要改进的：清晰明了的错误提示
+        result.unshift('第'+(targetIndex + 1)+'名'); //使用unshift保证高档在前面
+    });
+    return result;
+}
+
+
+function getTableDS(totalScoreLevelInfoByClass, currentClass, levels) {
+    //Note: 直接从这里取需要的数据即可。只需要全校和本班的数据
+
 }
 
