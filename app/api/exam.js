@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-10 12:15:46
+* @Last Modified time: 2016-08-10 15:44:17
 */
 
 
@@ -161,7 +161,7 @@ export function initRankReportdData(params) {
                 lostClasses:
                 realStudentsCount:
                 lostStudentsCount:
-                class: {
+                classes: {
                     <className>: <此科目此班级参加考试的人数>
                 },
                 questions:

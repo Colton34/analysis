@@ -1,16 +1,24 @@
 //学科考试表现
-
+import _ from 'lodash';
 import React, { PropTypes } from 'react';
 
 
-export default function ExamPerformance(arguments) {
+export default function ExamPerformance({reportDS, currentClass}) {
 
 }
 
 
 //=================================================  分界线  =================================================
+
+// export default function ExamPerformance({reportDS, currentClass}) {
+//     var examPapersInfo = reportDS.examPapersInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), headers = reportDS.headers.toJS();
+//     var tableDS = getTableDS(examPapersInfo, examClassesInfo, studentsGroupByClass, headers, currentClass);
+//     debugger;
+// }
+
+
 //TODO:使用分析库重写。把所有通用的标准数据都列举一下。找到班级的实考人数和缺考人数
-function getTableData(examPapersInfo, headers, studentsGroupByClass, examClassesInfo, currentClass) {
+function getTableDS(examPapersInfo, examClassesInfo, studentsGroupByClass, headers, currentClass) {
     var table = [];
     var currentClassStudents = studentsGroupByClass[currentClass]; //相当于examStudentsInfo
     var currentStudentsPaperMap = _.groupBy(_.concat(..._.map(currentClassStudents, (student) => student.papers)), 'paperid');
@@ -35,8 +43,8 @@ function getTableData(examPapersInfo, headers, studentsGroupByClass, examClasses
         subjectRow.push(sqrt); //标准差
         subjectRow.push(_.round(_.divide(sqrt, mean), 2)); //差异系数: 标准差/平均分
         subjectRow.push(_.round(_.divide(mean, examPapersInfo[headerObj.id].fullMark), 2)); //难度
-        subjectRow.push(examClassesInfo[currentClass].realStudentsCount); //实考人数
-        subjectRow.push(examClassesInfo[currentClass].lostStudentsCount); //缺考人数
+        subjectRow.push(examPapersInfo[headerObj.id].classes[currentClass]); //实考人数
+        subjectRow.push(examClassesInfo[currentClass].students.length - examPapersInfo[headerObj.id].classes[currentClass]); //缺考人数
 
         table.push(subjectRow);
     });
