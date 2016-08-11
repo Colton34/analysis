@@ -16,7 +16,6 @@ import {initReportDSAction} from '../reducers/reportDS/actions';
 
 import {initParams} from '../lib/util';
 
-
 /*
 设计：
     1.一层一层往下拆分；遵从树状组织
@@ -31,7 +30,7 @@ class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            reportType: 'multi'
+            reportType: 'single'
         };
     }
 
@@ -48,7 +47,7 @@ class ContentComponent extends React.Component {
             <div>
                 <ReportNavHeader />
                 {(isSchoolManagerOrGradeManager) ? <TabNav changeClassReport={this.changeClassReport.bind(this)} /> : ''}
-                {(this.state.reportType == 'multi') ? <MultiClassReport /> : <SingleClassReport reportDS={this.props.reportDS} />}
+                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> : <SingleClassReport reportDS={this.props.reportDS} />}
             </div>
         );
     }
@@ -68,7 +67,7 @@ class ClassReport extends React.Component {
     render() {
         return (
             <div>
-                {(this.props.ifError) ? <CommonErrorView /> : (this.props.isLoading ? <CommonLoadingView /> : (
+                {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <CommonLoadingView /> : (
                     <ContentComponent reportDS={this.props.reportDS} user={this.props.user} />
                 ))}
             </div>

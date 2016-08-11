@@ -7,12 +7,22 @@ import {Link} from 'react-router';
 import ClassNav from './ClassNav';
 import HeaderInfo from './Header/HeaderInfo';
 import ModuleNav from './Header/ModuleNav';
+import TotalScoreTrend from './totalScore-trend';
+import TotalScoreLevelGuide from './totalScore-levelGuide';
+import TotalScoreLevelDistribution from './totalScore-levelDistribution';
+import SubjectDistributionScoreLevel from './subjectDistribution-ScoreLevel';
+import CriticalStudentDistribution from './CriticalStudentDistribution';
+import SubjectPerformanceExam from './SubjectExamPerformance/subjectPerformance-Exam';
+import SubjectDistributionScoreContriFactor from './SubjectExamPerformance/subjectDistribution-ScoreContriFactor';
+import SubjectDistributionStudentLevel from './SubjectExamPerformance/subjectDistribution-StudentLevel';
+import SubjectDistributionGroupLevel from './SubjectExamPerformance/subjectDistribution-GroupLevel';
+import SubjectPerformanceExamInspect from './SubjectInspectPerformance/subjectPerformance-ExamInspect';
 
 class SingleClassReport extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentClass: 'one'
+            currentClass: '1'
         }
     }
 
@@ -29,6 +39,17 @@ class SingleClassReport extends React.Component {
                 <h3>SingleClassReport</h3>
                 <HeaderInfo examInfo={this.props.reportDS.examInfo} />
                 <ModuleNav />
+                {/*<TotalScoreTrend reportDS={this.props.reportDS} currentClass={this.state.currentClass} /> */}
+                {/*<TotalScoreLevelGuide reportDS={this.props.reportDS} currentClass={this.state.currentClass} /> */}
+                {/*<TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                {/*<SubjectDistributionScoreLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                {/*<CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                {/*<SubjectPerformanceExam reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                {/*<SubjectDistributionScoreContriFactor reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                {/*<SubjectDistributionStudentLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                {/*<SubjectDistributionGroupLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                {/*<SubjectPerformanceExamInspect reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                <SubjectPerformanceExamInspect reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 {/* ... */}
             </div>
         );
