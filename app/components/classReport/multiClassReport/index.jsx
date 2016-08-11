@@ -5,6 +5,7 @@ import Radium from 'radium';
 import {Link} from 'react-router';
 
 import SubjectMeanRank from './SubjectMeanRank';
+import CustomScoreSegment from './CustomScoreSegment';
 
 class MultiClassReport extends React.Component {
     constructor(props) {
@@ -16,7 +17,8 @@ class MultiClassReport extends React.Component {
         return (
             <div>
                 <div><h3>MultiClassReport</h3></div>
-                <SubjectMeanRank reportDS={this.props.reportDS} />
+                {/*<SubjectMeanRank reportDS={this.props.reportDS} />*/}
+                <CustomScoreSegment reportDS={this.props.reportDS} />
             </div>
         );
     }
