@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-10 15:44:17
+* @Last Modified time: 2016-08-11 15:36:38
 */
 
 
@@ -224,6 +224,10 @@ export function initReportDS(params) {
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, baseline} = res.data;
         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
+        //TODO:打开；对paperStudents进行排序，这样到下面不用分别都再次排序了。
+        _.each(allStudentsPaperMap, (students, pid) => {
+            students = _.sortBy(students, 'score');
+        });
         var headers = [], restPapers = [];
         _.each(examPapersInfo, (paper, pid) => {
             var index = _.findIndex(subjectWeight, (s) => (s == paper.subject));
