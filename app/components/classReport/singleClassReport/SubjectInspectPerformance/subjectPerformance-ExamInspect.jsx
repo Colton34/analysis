@@ -18,10 +18,10 @@ export default function ExamInspectPerformance({reportDS, currentClass}) {
 
 function getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass) {
     var result = {}, currentClassStudents = studentsGroupByClass[currentClass];
-    var classStudentsPaperQuestionInfo = {};
-    _.each(currentClassStudents, (studentObj) => {
-        classStudentsPaperQuestionInfo[studentObj.id] = _.keyBy(studentObj.questionScores, 'paperid');
-    });
+    // var classStudentsPaperQuestionInfo = {};
+    // _.each(currentClassStudents, (studentObj) => {
+    //     classStudentsPaperQuestionInfo[studentObj.id] = _.keyBy(studentObj.questionScores, 'paperid');
+    // });
     var allStudentsPaperQuestionInfo = {};
     _.each(examStudentsInfo, (studentObj) => {
         allStudentsPaperQuestionInfo[studentObj.id] = _.keyBy(studentObj.questionScores, 'paperid');
@@ -29,7 +29,7 @@ function getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStuden
 
     //计算每个科目对应的数据
     _.each(examPapersInfo, (paperObj, pid) => {
-        var classQuestionScoreRates = getClassQuestionScoreRate(paperObj.questions, pid, studentsGroupByClass[currentClass], classStudentsPaperQuestionInfo);
+        var classQuestionScoreRates = getClassQuestionScoreRate(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass);
         var gradeQuestionSeparation = getGradeQuestionSeparation(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
         result[pid] = {
             classQuestionScoreRates: classQuestionScoreRates,
@@ -39,23 +39,24 @@ function getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStuden
     return result;
 }
 
-
-function getClassQuestionScoreRate(questions, pid, currentClassStudents, classStudentsPaperQuestionInfo) {
+//Warning:所有有关学科的计算都应该是先找到“真正考试了此学科的所有考生”，然后在筛选出“此班级的学生”
+function getClassQuestionScoreRate(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass) {
 //计算本班级的此道题目的得分率：
     //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分
+    var currentClassPaperStudents = _.filter(allStudentsPaperMap[pid], (studentObj) => studentObj['class_name'] == currentClass);
     return _.map(questions, (questionObj, index) => {
         //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
-        return _.round(_.divide(_.mean(_.map(currentClassStudents, (studentObj) => {
+        return _.round(_.divide(_.mean(_.map(currentClassPaperStudents, (studentObj) => {
             // debugger;
-            return classStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
+            return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
         })), questionObj.score), 2);
     });
 }
 
 //firstInput: 某一道题目得分  secondInput: 此道题目所属科目的成绩
 function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo) {
+    var paperStudents = allStudentsPaperMap[pid];
     return _.map(questions, (questionObj, index) => {
-        var paperStudents = allStudentsPaperMap[pid];
         var questionScores = _.map(paperStudents, (studentObj) => allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index]);
         var paperScores = _.map(paperStudents, (studentObj) => studentObj.score);
         return StatisticalLib.sampleCorrelation(questionScores, paperScores).toFixed(2);
