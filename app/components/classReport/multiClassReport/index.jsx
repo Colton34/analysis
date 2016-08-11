@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
+import SubjectMeanRank from './SubjectMeanRank';
+
 class MultiClassReport extends React.Component {
     constructor(props) {
       super(props);
@@ -12,7 +14,10 @@ class MultiClassReport extends React.Component {
 
     render() {
         return (
-            <div><h3>MultiClassReport</h3></div>
+            <div>
+                <div><h3>MultiClassReport</h3></div>
+                <SubjectMeanRank reportDS={this.props.reportDS} />
+            </div>
         );
     }
 }

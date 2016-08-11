@@ -17,6 +17,10 @@ import SubjectDistributionScoreContriFactor from './SubjectExamPerformance/subje
 import SubjectDistributionStudentLevel from './SubjectExamPerformance/subjectDistribution-StudentLevel';
 import SubjectDistributionGroupLevel from './SubjectExamPerformance/subjectDistribution-GroupLevel';
 import SubjectPerformanceExamInspect from './SubjectInspectPerformance/subjectPerformance-ExamInspect';
+import SubjectPerformanceQuestionTopic from './SubjectInspectPerformance/subjectPerformance-QuestionTopic';
+import SubjectPerformanceQuestionLevel from './SubjectInspectPerformance/subjectPerformance-QuestionLevel';
+import ImportStudentInfo from './ImportStudentInfo';
+import HistoryPerformance from './HistoryPerformance';
 
 class SingleClassReport extends React.Component {
     constructor(props) {
@@ -34,6 +38,9 @@ class SingleClassReport extends React.Component {
 
 //Note: 当前先打散，而没有再在结构上进行重组，后面结构化更清晰了会考虑进一步重组。
     render() {
+        var studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
+        var classStudents = getClassStudents(studentsGroupByClass, this.state.currentClass);
+        var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, this.state.currentClass);
         return (
             <div>
                 <h3>SingleClassReport</h3>
@@ -49,7 +56,10 @@ class SingleClassReport extends React.Component {
                 {/*<SubjectDistributionStudentLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectDistributionGroupLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectPerformanceExamInspect reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
-                <SubjectPerformanceExamInspect reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
+                {/*<SubjectPerformanceQuestionTopic reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                {/*<SubjectPerformanceQuestionLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />  TODO:未完 */}
+                {/*<ImportStudentInfo reportDS={this.props.reportDS} classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} currentClass={this.state.currentClass} />*/}
+                {/*<HistoryPerformance reportDS={this.props.reportDS} classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} /> 未完成  */}
                 {/* ... */}
             </div>
         );
@@ -60,6 +70,18 @@ export default SingleClassReport;
 
 
 //=================================================  分界线  =================================================
+//TODO:注意这里需要替换数据源！！！
+function getClassStudents(studentsGroupByClass, currentClass) {
+    return studentsGroupByClass[currentClass];
+}
 
+function getClassStudentsPaperMap(allStudentsPaperMap, currentClass) {
+    var result = {};
+    _.each(allStudentsPaperMap, (students, pid) => {
+        var classStudents = _.filter(students, (studentObj) => studentObj['class_name'] == currentClass);
+        if(classStudents || classStudents.length > 0) result[pid] = classStudents;
+    });
+    return result;
+}
 
 /* <ClassNav chooseClass={this.chooseClass.bind(this)} />  -- 被砍掉 */
