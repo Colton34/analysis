@@ -5,15 +5,16 @@ import Radium from 'radium';
 import {Link} from 'react-router';
 
 import Header from './Header';
-
-
-
-
-
-
-
-import TotalScoreTrend from './totalScore-trend';
+// import TotalScoreTrend from './totalScore-trend';
+import TotalScoreTrend from './TotalScoreTrend';
 import TotalScoreLevelGuide from './totalScore-levelGuide';
+
+
+
+
+
+
+
 import TotalScoreLevelDistribution from './totalScore-levelDistribution';
 import SubjectDistributionScoreLevel from './subjectDistribution-ScoreLevel';
 import CriticalStudentDistribution from './CriticalStudentDistribution';
@@ -43,15 +44,16 @@ class SingleClassReport extends React.Component {
 
 //Note: 当前先打散，而没有再在结构上进行重组，后面结构化更清晰了会考虑进一步重组。
     render() {
-        var studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
+        var studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS(), headers = this.props.reportDS.headers.toJS();
         var classStudents = getClassStudents(studentsGroupByClass, this.state.currentClass);
         var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, this.state.currentClass);
+        var classHeader = getClassHeaders(headers, classStudentsPaperMap);
+
         return (
             <div>
-                <h3>SingleClassReport</h3>
                 <Header examInfo={this.props.reportDS.examInfo} />
-                {/*<TotalScoreTrend reportDS={this.props.reportDS} currentClass={this.state.currentClass} /> */}
-                {/*<TotalScoreLevelGuide reportDS={this.props.reportDS} currentClass={this.state.currentClass} /> */}
+                <TotalScoreTrend reportDS={this.props.reportDS} classStudents={classStudents} />
+                <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} />
                 {/*<TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectDistributionScoreLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
@@ -84,6 +86,14 @@ function getClassStudentsPaperMap(allStudentsPaperMap, currentClass) {
     _.each(allStudentsPaperMap, (students, pid) => {
         var classStudents = _.filter(students, (studentObj) => studentObj['class_name'] == currentClass);
         if(classStudents || classStudents.length > 0) result[pid] = classStudents;
+    });
+    return result;
+}
+
+function getClassHeaders(headers, classStudentsPaperMap) {
+    var result = [];
+    _.each(headers, (headObj) => {
+        if(classStudentsPaperMap[headObj.id]) result.push(headObj);
     });
     return result;
 }

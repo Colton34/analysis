@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 import CommonErrorView from '../common/ErrorView';
 import CommonLoadingView from '../common/LoadingView';
 import ReportNavHeader from '../common/report/NavHeader';
-import TabNav from '../components/classReport/TabNav';
+import ReportTabNav from '../components/classReport/ReportTabNav';
 import MultiClassReport from '../components/classReport/multiClassReport';
 import SingleClassReport from '../components/classReport/singleClassReport';
 
@@ -50,7 +50,7 @@ class ContentComponent extends React.Component {
         return (
             <div>
                 <ReportNavHeader examName={examName} examid={this.props.examid} grade={this.props.grade} />
-                {(isSchoolManagerOrGradeManager) ? <TabNav changeClassReport={this.changeClassReport.bind(this)} /> : ''}
+                {(isSchoolManagerOrGradeManager) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} reportDS={this.props.reportDS} /> : ''}
                 {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> : <SingleClassReport reportDS={this.props.reportDS} />}
             </div>
         );
