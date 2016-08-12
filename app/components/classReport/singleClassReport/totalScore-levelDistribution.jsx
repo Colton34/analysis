@@ -2,18 +2,62 @@
 
 import _ from 'lodash';
 import React from 'react';
+
+import EnhanceTable from '../../../common/EnhanceTable';
+import TableView from '../../../common/TableView';
+
 import {makeSegmentsCount} from '../../../api/exam';
 
+import commonClass from '../../../common/common.css';
+import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap} from '../../../lib/constants';
+
+var FIELDNAMES_ENUM =  {count: '人数', 'sumCount': '累计人数', 'sumPercentage': '累计上线率'};
+
+const Card = ({title, desc, style}) => {
+    return (
+         <span style={_.assign({}, localStyle.card, style ? style : {})}>
+            <div style={{display: 'table-cell',width: 366,  height: 112, verticalAlign: 'middle', textAlign: 'center'}}>
+                <p style={_.assign({fontSize: 30, marginTop: 15})}>{title}</p>
+                <p style={{fontSize: 12}}>{desc}</p>
+            </div>
+        </span>
+    )
+}
+
+var localStyle = {
+    card: {
+        display: 'inline-block', width: 366, height: 112, lineHeight: '112px', border: '1px solid ' + colorsMap.C05, background: colorsMap.C02
+    }
+}
+
 export default function LevelDistribution({reportDS, currentClass}) {
-    var levels = reportDS.levels.toJS(), examInfo=reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), headers = reportDS.headers.toJS();
-    var currentClassStudents = studentsGroupByClass[currentClass];
-    var levelTables = {};
-    _.each(levels, (levObj, levelKey) => {
-        var subjectLevelInfo = makeSubjectLevelInfo(levObj, examStudentsInfo, currentClassStudents, currentClass);
-        var {validOrderedSubjectMean, unvalids} = filterMakeOrderedSubjectMean(headers, levObj.subjects);
-        var tableData = makeTableData(subjectLevelInfo, validOrderedSubjectMean, examInfo.gradeName);
-        levelTables[levelKey] = tableData;
-    });
+    var examInfo=reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS() , headers = reportDS.headers.toJS();
+
+    var {totalScoreLevelInfoByClass, totalScoreLevelInfoByLevel} = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, currentClass);
+    var headerDS = getHeaderDS(totalScoreLevelInfoByLevel, currentClass);
+    var tableHeaderDS = getTableHeaderDS(levels);
+    var tableBodyDS = getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, examInfo.gradeName);
+
+
+    var levelSize = _.size(levels);
+    return (
+        <div id='levelDistribution' className={commonClass['section']}>
+            <div>
+                <span className={commonClass['title-bar']}></span>
+                <span className={commonClass['title']}>总分分档学生人数分布</span>
+                <span className={commonClass['title-desc']}>总分分档上线学生人数分布，可得出班级在学业综合水平上的分层表现</span>
+            </div>
+            <div style={{marginTop: 30}}>
+                {
+                    _.range(_.size(headerDS)).map(num => {
+                        return <Card key={num} title={'第' + headerDS[num] + '名'} desc={numberMap[num + 1] + '档上线人数年级排名'} style={num !== levelSize -1 ? {marginRight: 20} : {}}/>
+                    })
+                }
+            </div>
+            <TableView id={'levelDistributionTable'} hover style={{marginTop: 30}}
+                    tableHeaders={tableHeaderDS} tableData={tableBodyDS} TableComponent={EnhanceTable} reserveRows={6}/>
+        </div>
+    )
 }
 
 
@@ -53,7 +97,7 @@ export default function LevelDistribution({reportDS, currentClass}) {
  */
 //resultByClass是totalScoreLevelInfo按照第一级是className（或'totalSchool'这个特殊的class key）作为key，第二级是levelKey，而resultByLevel的第一级是levelKey，第二级是className,
 //而且不包含totalSchool这个特殊的key
-function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels) {
+function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, currentClass) {
     var levelSegments = _.map(levels, (levObj) => levObj.score);
     levelSegments.push(examInfo.fullMark);
 
@@ -64,6 +108,16 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
     _.each(countsGroupByLevel, (count, levelKey) => {
         resultByClass.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount); //TODO:levels中的percentage就是累占比呀！
     });
+
+    // var classCountsGroupByLevel = makeSegmentsCount(classStudents, levelSegments);
+    // var temp = {};
+    // _.each(classCountsGroupByLevel, (count, levelKey) => {
+    //     temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[currentClass].realStudentsCount, currentClass);
+    //     if(!resultByLevel[levelKey]) resultByLevel[levelKey] = [];
+    //     resultByLevel[levelKey].push(temp[levelKey]);
+    // });
+    // resultByClass[currentClass] = temp;
+
 
     _.each(studentsGroupByClass, (studentsFromClass, className) => {
         var classCountsGroupByLevel = makeSegmentsCount(studentsFromClass, levelSegments);
@@ -90,22 +144,101 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount, className) {
     return levItem;
 }
 
-
-function getHeaderData(totalScoreLevelInfoByLevel, currentClass) {
-//totalScoreLevelInfo中的level都是和levels对应的--index小则对应低档次
-//从totalScoreLevelInfoByLevel的各个档次中排序得到排名
-    var result = [];
+function getHeaderDS(totalScoreLevelInfoByLevel, currentClass) {
+    var result = {};
     _.each(totalScoreLevelInfoByLevel, (infoArr, levelKey) => {
         var targetIndex = _.findIndex(_.sortBy(infoArr, 'sumCount'), (obj) => obj.class == currentClass);
         if(targetIndex < 0) return;//TODO:应该给Tip Error！-- 这也是需要改进的：清晰明了的错误提示
-        result.unshift('第'+(targetIndex + 1)+'名'); //使用unshift保证高档在前面
+        result[levelKey-0] = targetIndex;
     });
     return result;
 }
 
+// function getHeaderData(totalScoreLevelInfoByLevel, currentClass) {
+// //totalScoreLevelInfo中的level都是和levels对应的--index小则对应低档次
+// //从totalScoreLevelInfoByLevel的各个档次中排序得到排名
+//     var result = [];
+//     _.each(totalScoreLevelInfoByLevel, (infoArr, levelKey) => {
+//         var targetIndex = _.findIndex(_.sortBy(infoArr, 'sumCount'), (obj) => obj.class == currentClass);
+//         if(targetIndex < 0) return;//TODO:应该给Tip Error！-- 这也是需要改进的：清晰明了的错误提示
+//         result.unshift('第'+(targetIndex + 1)+'名'); //使用unshift保证高档在前面
+//     });
+//     return result;
+// }
 
-function getTableDS(totalScoreLevelInfoByClass, currentClass, levels) {
+
+
+
+
+
+
+// [
+//     [
+//         { "id": "class", "name": "班级", "rowSpan": 2 },
+//         { "colSpan": 3, "name": "一档", headerStyle: { textAlign: 'center' } },
+//         { "colSpan": 3, "name": "二档", headerStyle: { textAlign: 'center' } },
+//         { "colSpan": 3, "name": "三档", headerStyle: { textAlign: 'center' } }
+//     ],
+//     [
+//         { "id": "count_0", "name": "人数" },
+//         { "id": "sumCount_0", "name": "累计人数" },
+//         { "id": "sumPercentage_0", "name": "累计上线率" },
+//         { "id": "count_1", "name": "人数" },
+//         { "id": "sumCount_1", "name": "累计人数" },
+//         { "id": "sumPercentage_1", "name": "累计上线率" },
+//         { "id": "count_2", "name": "人数" },
+//         { "id": "sumCount_2", "name": "累计人数" },
+//         { "id": "sumPercentage_2", "name": "累计上线率" }
+//     ]
+// ]
+function getTableHeaderDS(levels) {
+    var levelValues = [], levelFields = [];
+    _.each(levels, (levObj, levelKey) => {
+        levelValues.push({"colSpan": 3, "name": numberMap[levelKey-0+1]+'档', headerStyle: { textAlign: 'center' } });
+        _.each(FIELDNAMES_ENUM, (fieldValue, fieldKey) => {
+            levelFields.push({'id': fieldKey+'_'+levelKey, name: fieldValue});
+        });
+    });
+    return {levelValues: levelValues, levelFields: levelFields};
+}
+
+
+// "count_0":151,
+// "sumCount_0":151,
+// "sumPercentage_0":14.97,
+//
+// "count_1":100,
+// "sumCount_1":251,
+// "sumPercentage_1":24.88,
+// "count_2":355,
+// "sumCount_2":606,
+// "sumPercentage_2":60.06,
+// "class":"全校",
+
+function getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, gradeName) {
     //Note: 直接从这里取需要的数据即可。只需要全校和本班的数据
+    //高档次是0
+    var totalSchoolInfo = totalScoreLevelInfoByClass.totalSchool, currentClassInfo = totalScoreLevelInfoByClass[currentClass];
+    var levelLastIndex = _.size(levels) - 1;
 
+    var tableBodyDS = [], totalSchoolDS = {}, classDS = {};
+    _.each(_.range(_.size(levels)), (index) => {
+        var tempValue = totalSchoolInfo[levelLastIndex-index];
+        _.each(FIELDNAMES_ENUM, (fieldValue, fieldKey) => {
+            totalSchoolDS[fieldKey+'_'+index] = tempValue[fieldKey];
+        });
+    });
+    totalSchoolDS['class'] = '全校';
+    tableBodyDS.push(totalSchoolDS);
+    _.each(_.range(_.size(levels)), (index) => {
+        var tempValue = currentClassInfo[levelLastIndex-index];
+        _.each(FIELDNAMES_ENUM, (fieldValue, fieldKey) => {
+            classDS[fieldKey+'_'+index] = tempValue[fieldKey];
+        });
+    });
+    classDS['class'] = gradeName+currentClass+'班';
+    tableBodyDS.push(classDS);
+
+    return tableBodyDS;
 }
 
