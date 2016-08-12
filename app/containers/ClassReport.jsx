@@ -26,11 +26,13 @@ import {initParams} from '../lib/util';
 设计：1.将className设置成SingleClassReport的state
 
  */
+
+
 class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            reportType: 'multi'
+            reportType: 'single'
         };
     }
 
@@ -43,9 +45,11 @@ class ContentComponent extends React.Component {
 
     render() {
         var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
+        var examName = this.props.reportDS.examInfo.toJS().name;
+
         return (
             <div>
-                <ReportNavHeader />
+                <ReportNavHeader examName={examName} examid={this.props.examid} grade={this.props.grade} />
                 {(isSchoolManagerOrGradeManager) ? <TabNav changeClassReport={this.changeClassReport.bind(this)} /> : ''}
                 {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> : <SingleClassReport reportDS={this.props.reportDS} />}
             </div>
@@ -65,10 +69,14 @@ class ClassReport extends React.Component {
     }
 
     render() {
+        var examid = this.props.location.query ? this.props.location.query.examid : '';
+        var grade = this.props.location.query ? this.props.location.query.grade : '';
+        if (!examid) return;
+
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <CommonLoadingView /> : (
-                    <ContentComponent reportDS={this.props.reportDS} user={this.props.user} />
+                    <ContentComponent reportDS={this.props.reportDS} user={this.props.user} examid={examid} grade={grade} />
                 ))}
             </div>
         );

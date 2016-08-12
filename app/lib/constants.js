@@ -120,6 +120,7 @@ export const INIT_RANKREPORT_SUCCESS = 'INIT_RANKREPORT_SUCCESS';
 
 //====================== color ==============================
 export const COLORS_MAP = {
+    A02 : '#EFF1F4',
     A11 : '#de5d44',
     A12 : '#40b1de',
     B03 : '#1daef8',
