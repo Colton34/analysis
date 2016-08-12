@@ -4,9 +4,14 @@ import { connect } from 'react-redux';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
-import ClassNav from './ClassNav';
-import HeaderInfo from './Header/HeaderInfo';
-import ModuleNav from './Header/ModuleNav';
+import Header from './Header';
+
+
+
+
+
+
+
 import TotalScoreTrend from './totalScore-trend';
 import TotalScoreLevelGuide from './totalScore-levelGuide';
 import TotalScoreLevelDistribution from './totalScore-levelDistribution';
@@ -44,8 +49,7 @@ class SingleClassReport extends React.Component {
         return (
             <div>
                 <h3>SingleClassReport</h3>
-                <HeaderInfo examInfo={this.props.reportDS.examInfo} />
-                <ModuleNav />
+                <Header examInfo={this.props.reportDS.examInfo} />
                 {/*<TotalScoreTrend reportDS={this.props.reportDS} currentClass={this.state.currentClass} /> */}
                 {/*<TotalScoreLevelGuide reportDS={this.props.reportDS} currentClass={this.state.currentClass} /> */}
                 {/*<TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
