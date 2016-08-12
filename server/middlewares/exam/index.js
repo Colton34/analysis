@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-10 20:03:50
+* @Last Modified time: 2016-08-12 10:10:46
 */
 
 'use strict';
@@ -1115,7 +1115,7 @@ function genearteExamClassInfo(exam) {
 function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo, examPapersInfo) {
     return generateStudentsPaperAndQuestionInfo(exam, examPapersInfo).then(function(result) {
         //遍历examScoreArr是为了保证有序
-        var {studentsPaperInfo, studentQuestionsInfo} = result;
+        var studentsPaperInfo = result.studentsPaperInfo, studentQuestionsInfo = result.studentQuestionsInfo;
         _.each(examScoreArr, (scoreObj) => {
             scoreObj.papers = studentsPaperInfo[scoreObj.id];
             scoreObj.questionScores = studentQuestionsInfo[scoreObj.id];
