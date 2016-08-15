@@ -4,7 +4,7 @@ import React from 'react';
 import StudentLevel from './subjectDistribution-StudentLevel';
 import SubjectPerformanceTable from './subjectPerformance-Exam';
 import ScoreContriFactor from './subjectDistribution-ScoreContriFactor';
-import SubjectScoreLevelDistribution from './subjectDistribution-GroupLevel';
+import SubjectDistributionGroupLevel from './subjectDistribution-GroupLevel';
 
 import commonClass from '../../../../common/common.css';
 
@@ -18,10 +18,7 @@ export default function SubjectPerformance({classStudents, classStudentsPaperMap
             <SubjectPerformanceTable classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={currentClass} reportDS={reportDS} />
             <ScoreContriFactor classStudents={classStudents} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={currentClass} reportDS={reportDS} />
             <StudentLevel classHeaders={classHeaders} reportDS={reportDS} classStudents={classStudents} currentClass={currentClass} />
-{/*
-
-            <SubjectScoreLevelDistribution/>
-*/}
+            <SubjectDistributionGroupLevel reportDS={reportDS} currentClass={currentClass} classStudentsPaperMap={classStudentsPaperMap} />
         </div>
     )
 }
