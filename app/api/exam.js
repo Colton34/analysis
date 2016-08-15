@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-11 15:36:38
+* @Last Modified time: 2016-08-15 10:44:32
 */
 
 
@@ -212,6 +212,11 @@ export function initRankReportdData(params) {
             }
         }
 */
+/*
+subjectLevels:
+    存储的是个array: [ { levelKey: xxx, values: {} } ]
+    state中是个Map: { <levelKey> : <values> }
+ */
 export function initReportDS(params) {
     var url = (params.grade) ? examPath + '/school/analysis?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/school/analysis?examid=' + params.examid;
 

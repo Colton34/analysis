@@ -8,15 +8,16 @@ import Header from './Header';
 // import TotalScoreTrend from './totalScore-trend';
 import TotalScoreTrend from './TotalScoreTrend';
 import TotalScoreLevelGuide from './totalScore-levelGuide';
-
-
-
-
-
-
-
 import TotalScoreLevelDistribution from './totalScore-levelDistribution';
+
+
+
+
+
+
+
 import SubjectDistributionScoreLevel from './subjectDistribution-ScoreLevel';
+
 import CriticalStudentDistribution from './CriticalStudentDistribution';
 import SubjectPerformanceExam from './SubjectExamPerformance/subjectPerformance-Exam';
 import SubjectDistributionScoreContriFactor from './SubjectExamPerformance/subjectDistribution-ScoreContriFactor';
@@ -47,7 +48,7 @@ class SingleClassReport extends React.Component {
         var studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS(), headers = this.props.reportDS.headers.toJS();
         var classStudents = getClassStudents(studentsGroupByClass, this.state.currentClass);
         var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, this.state.currentClass);
-        var classHeader = getClassHeaders(headers, classStudentsPaperMap);
+        var classHeaders = getClassHeaders(headers, classStudentsPaperMap);
 
         return (
             <div>
@@ -55,7 +56,7 @@ class SingleClassReport extends React.Component {
                 <TotalScoreTrend reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
-                {/*<SubjectDistributionScoreLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 {/*<CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectPerformanceExam reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectDistributionScoreContriFactor reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
