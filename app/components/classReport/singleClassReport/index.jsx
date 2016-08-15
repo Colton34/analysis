@@ -9,16 +9,16 @@ import Header from './Header';
 import TotalScoreTrend from './TotalScoreTrend';
 import TotalScoreLevelGuide from './totalScore-levelGuide';
 import TotalScoreLevelDistribution from './totalScore-levelDistribution';
-
-
-
-
-
-
-
 import SubjectDistributionScoreLevel from './subjectDistribution-ScoreLevel';
 
+
+
+
 import CriticalStudentDistribution from './CriticalStudentDistribution';
+
+
+
+
 import SubjectPerformanceExam from './SubjectExamPerformance/subjectPerformance-Exam';
 import SubjectDistributionScoreContriFactor from './SubjectExamPerformance/subjectDistribution-ScoreContriFactor';
 import SubjectDistributionStudentLevel from './SubjectExamPerformance/subjectDistribution-StudentLevel';
@@ -57,7 +57,7 @@ class SingleClassReport extends React.Component {
                 <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
-                {/*<CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+                <CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 {/*<SubjectPerformanceExam reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectDistributionScoreContriFactor reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectDistributionStudentLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}

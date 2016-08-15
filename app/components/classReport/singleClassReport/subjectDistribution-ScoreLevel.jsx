@@ -77,7 +77,6 @@ function getDS(levels, subjecLevels, classHeaders, gradeName, currentClass, clas
         var bestAndWorst = getBestAndWorst(currentSubjectLevelInfo, currentClass, subjectLevelMeanInfo);
         result[levelKey] = {tableDS: tableDS, bestAndWorst: bestAndWorst}
     });
-    debugger;
     return result;
 }
 
@@ -115,7 +114,6 @@ function getTableDS(subjectLevelInfo, validOrderedSubjectMean, gradeName, curren
     titleHeader.unshift('班级');
 
     var totalSchoolObj = subjectLevelInfo.totalSchool;
-    // debugger;
     var totalSchoolRow = _.map(validOrderedSubjectMean, (headerObj) => {
         return (_.isUndefined(totalSchoolObj[headerObj.id])) ? '无数据' : totalSchoolObj[headerObj.id];
     });

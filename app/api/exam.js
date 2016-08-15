@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-15 10:44:32
+* @Last Modified time: 2016-08-15 11:32:26
 */
 
 
@@ -302,6 +302,18 @@ export function makeSegmentsCount(students, segments) {
     //这里已经将 levelKey = -1 和 levelKey = segments.length-1 给过滤掉了
     var result = _.map(_.range(segments.length - 1), function(index) {
         return (groupStudentsBySegments[index]) ? groupStudentsBySegments[index].length : 0
+    });
+
+    return result;
+}
+
+export function makeSegmentsCountInfo(students, segments) {
+    var groupStudentsBySegments = _.groupBy(students, function(item) {
+        return findScoreSegmentIndex(segments, item.score);
+    });
+
+    var result = _.map(_.range(segments.length - 1), function(index) {
+        return (groupStudentsBySegments[index]) ? groupStudentsBySegments[index] : []
     });
 
     return result;
