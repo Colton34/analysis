@@ -1,33 +1,141 @@
 //学科得分贡献指数
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
+import ReactHighcharts from 'react-highcharts';
+
 import {makeFactor} from '../../../../api/exam';
 
-export default function SubjectContriFactor({reportDS, currentClass}) {
+import commonClass from '../../../../common/common.css';
+import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
+var config={
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: '(贡献指数)',
+        floating:true,
+        x:-358,
+        y:3,
+        style:{
+          "color": "#767676",
+           "fontSize": "12px"
+        }
+    },
+    yAxis: {
+      allowDecimals:true,//刻度允许小数
+      lineWidth:1,
+        gridLineDashStyle:'Dash',
+          gridLineColor:'#f2f2f3',
+        title: {
+            text: ''
+        },
+        plotLines: [{
+            value: 0,
+            width: 1,
+            color: '#f2f2f3'
+        }],
+    },
+    credits:{
+        enabled:false
+    },
+    plotOptions: {
+       column: {
+           pointWidth:16,//柱宽
+       }
+   },
+    legend:{
+        enabled:false,
+        align:'center',
+        verticalAlign:'top'
+    },
+    tooltip:{
+        enabled:false,
+        backgroundColor:'#000',
+        borderColor:'#000',
+        style:{
+            color:'#fff'
+        },
+        formatter: function(){
+            return this.series.name+':'+this.point.y
+        }
+    }
+};
+
+var localStyle = {
+    subjectCard: {width: 238, height: 112, border: '1px solid ' + colorsMap.C04, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', boxShadow: '0 3px 3px' + colorsMap.C03},
+    lengthControl: {
+        overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'
+    },
 }
+
+const SubjectConstrast = ({headerInfo}) => {
+    return (
+        <div style={{display: 'inline-block', width: 215, float: 'right', marginTop: 10}}>
+            <div style={{ display: 'table-row'}}>
+                <div style={localStyle.subjectCard}>
+                    <div style={_.assign({ fontSize: 30, color: colorsMap.B08, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.greater, '、')}>{_.join(headerInfo.greater, '、')}</div>
+                    <p style={{ fontSize: 12, marginBottom: 10 }}>班级优势学科</p>
+                </div>
+            </div>
+            <div style={{height: 20}}></div>
+            <div style={localStyle.subjectCard}>
+                <div style={_.assign({ fontSize: 30, color: colorsMap.B04, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.lesser, '、')}>{_.join(headerInfo.lesser, '、')}</div>
+                <p style={{fontSize: 12, marginBottom: 10}}>班级劣势学科</p>
+            </div>
+        </div>
+    )
+}
+
+export default function SubjectContriFactor({classStudents, classHeadersWithTotalScore, currentClass, reportDS}) {
+    var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS();
+    var {subjects, datas, headerInfo} = getDS(examInfo, examStudentsInfo, examPapersInfo, classStudents, classHeadersWithTotalScore, currentClass);
+    var finalData = formatData(datas);
+    config['xAxis'] = {tickWidth:'0px', categories: subjects};
+    config['series'] = [{name: '贡献指数', data: finalData}];
+    debugger;
+    return (
+        <div style={{marginTop: 30}}>
+            <div style={{marginBottom: 30}}>
+                <span className={commonClass['sub-title']}>学科得分贡献指数</span>
+                <span className={commonClass['title-desc']}>以学科得分率为基础，综合考虑了该学科对班级、学校综合水平的均衡性影响，借此分析学科对班级得分水平的教学贡献大小，指数值为正，是促进作用；为负，是拖后腿</span>
+            </div>
+            {/*-----------------柱形图----------------------- */}
+            <div style={{display: 'inline-block', width: 875, height: 290, position: 'relative'}}>
+              <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
+            </div>
+            {/*-----------------优势、劣势学科----------------------- */}
+            <SubjectConstrast headerInfo={headerInfo}/>
+        </div>
+    )
+}
+
+
 
 //=================================================  分界线  =================================================
-
-// export default function SubjectContriFactor({reportDS, currentClass}) {
-//     var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), headers = reportDS.headers.toJS();
-//     var theDS = getDS(examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, headers, currentClass);
-// }
-
-function getDS(examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, headers, currentClass) {
-    var subjectMeanInfo = makeClassExamMeanInfo(examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, currentClass);
-    var factorsTableData = theClassExamMeanFactorsTable(subjectMeanInfo, examInfo, studentsGroupByClass, headers, currentClass);
+function getDS(examInfo, examStudentsInfo, examPapersInfo, classStudents, classHeadersWithTotalScore, currentClass) {
+    var subjectMeanInfo = makeClassExamMeanInfo(examInfo, examStudentsInfo, examPapersInfo, classStudents, currentClass);
+    var factorsTableData = theClassExamMeanFactorsTable(subjectMeanInfo, examInfo, classHeadersWithTotalScore, currentClass);
+    var {currentClassSubjectFactors, bestSubject, worstSubject} = factorsTableData;
+    var subjects = _.map(currentClassSubjectFactors, (obj) => obj.subject);
+    var datas = _.map(currentClassSubjectFactors, (obj) => obj.factor);
+    var headerInfo = {greater: [bestSubject], lesser: [worstSubject]};
+    return {
+        subjects: subjects,
+        datas: datas,
+        headerInfo: headerInfo
+    };
 }
 
-function makeClassExamMeanInfo(examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, studentsGroupByClass, currentClass) {
+function makeClassExamMeanInfo(examInfo, examStudentsInfo, examPapersInfo, classStudents, currentClass) {
     var result = {};
-    result.totalSchool = makeOriginalSubjectInfoRow(examStudentsInfo, examPapersInfo, examInfo, examClassesInfo);
-    result[currentClass] = makeOriginalSubjectInfoRow(studentsGroupByClass[currentClass], examPapersInfo, examInfo, examClassesInfo);
+    result.totalSchool = makeOriginalSubjectInfoRow(examStudentsInfo, examPapersInfo, examInfo);
+    result[currentClass] = makeOriginalSubjectInfoRow(classStudents, examPapersInfo, examInfo);
     return result;
 }
 
 //一行的得分率！！！
-function makeOriginalSubjectInfoRow(students, examPapersInfo, examInfo, examClassesInfo) {
+function makeOriginalSubjectInfoRow(students, examPapersInfo, examInfo) {
     var result = {};
     result.totalScore = {};
 
@@ -53,13 +161,14 @@ function makeOriginalSubjectInfoRow(students, examPapersInfo, examInfo, examClas
  * TODO：但是当前要的是一个图表
  * //是平均得分率的小数表示的matrix
  * @param  {[type]} subjectMeanInfo [description]
- * @param  {[type]} headers         [description]
+ * @param  {[type]} classHeadersWithTotalScore         [description]
  * @return {[type]}                 [description]
  */
-function theClassExamMeanFactorsTable(subjectMeanInfo, examInfo, studentsGroupByClass, headers, currentClass) {
-    var orderSubjectNames = _.map(headers.slice(1), (obj) => obj.subject);
-
-    var originalMatrix = makeClassExamMeanOriginalMatirx(subjectMeanInfo, headers, currentClass);
+function theClassExamMeanFactorsTable(subjectMeanInfo, examInfo, classHeadersWithTotalScore, currentClass) {
+    var orderSubjectNames = _.map(_.slice(classHeadersWithTotalScore, 1), (obj) => obj.subject);
+    console.log('1');
+    debugger;
+    var originalMatrix = makeClassExamMeanOriginalMatirx(subjectMeanInfo, classHeadersWithTotalScore, currentClass);
     var currentClassFactors = makeFactor(originalMatrix)[0];//应该只剩下一行
     //这里对orderSubjectNames进行Map还是为了保证横轴是按照科目的名称进行排序显示的
     var currentClassSubjectFactors = _.map(orderSubjectNames, (subjectName, index) => {
@@ -75,13 +184,49 @@ function theClassExamMeanFactorsTable(subjectMeanInfo, examInfo, studentsGroupBy
     }
 }
 
-function makeClassExamMeanOriginalMatirx(subjectMeanInfo, headers, currentClass) {
+function makeClassExamMeanOriginalMatirx(subjectMeanInfo, classHeadersWithTotalScore, currentClass) {
     var matrix = [], subjectMenaObj = subjectMeanInfo[currentClass];
     var totalSchoolMeanObj = subjectMeanInfo.totalSchool;
 
-    matrix.push(_.map(headers, (headerObj) => totalSchoolMeanObj[headerObj.id].meanRate));
-    matrix.push(_.map(headers, (headerObj) => (subjectMenaObj[headerObj.id]) ? subjectMenaObj[headerObj.id].meanRate : '无数据'));
+    matrix.push(_.map(classHeadersWithTotalScore, (headerObj) => totalSchoolMeanObj[headerObj.id].meanRate));
+    matrix.push(_.map(classHeadersWithTotalScore, (headerObj) => (subjectMenaObj[headerObj.id]) ? subjectMenaObj[headerObj.id].meanRate : '无数据'));
 
     return matrix;
 }
 
+function formatData(datas) {
+//数据预处理
+    var findata=[];
+    for(let i=0;i<datas.length;i++){
+        if(datas[i]>=0){
+            findata[i]={
+                y:datas[i],
+                color:'#0099ff'
+            }
+        }else{
+            findata[i]={
+                y:datas[i],
+                color:'#bfbfbf'
+            }
+        }
+    }
+    return findata;
+}
+
+
+//==========================================  Mock Data ========================================
+
+// var headerInfo = {greater: ['英语'], lesser: ['语文']};
+// var datas=[0.1,-0.2,0.2,-0.3,0.4,-0.5,0.6,-0.2,0.1,-0.2];//mork数据
+
+// xAxis: {
+//       tickWidth:'0px',//不显示刻度
+//         categories: ['语文','数学','英语','政治','地理','历史','化学','物理','生物','语文'],
+// }
+// series: [
+//     {
+//         name:'贡献指数',
+//         //color:'#0099ff',
+//         data:findata,
+//     }
+// ],

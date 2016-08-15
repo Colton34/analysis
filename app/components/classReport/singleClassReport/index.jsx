@@ -10,19 +10,18 @@ import TotalScoreTrend from './TotalScoreTrend';
 import TotalScoreLevelGuide from './totalScore-levelGuide';
 import TotalScoreLevelDistribution from './totalScore-levelDistribution';
 import SubjectDistributionScoreLevel from './subjectDistribution-ScoreLevel';
-
-
-
-
 import CriticalStudentDistribution from './CriticalStudentDistribution';
 
 
 
+import SubjectPerformance from './SubjectExamPerformance';
+// import SubjectPerformanceExam from './SubjectExamPerformance/subjectPerformance-Exam';
+// import SubjectDistributionScoreContriFactor from './SubjectExamPerformance/subjectDistribution-ScoreContriFactor';
+// import SubjectDistributionStudentLevel from './SubjectExamPerformance/subjectDistribution-StudentLevel';
+// import SubjectDistributionGroupLevel from './SubjectExamPerformance/subjectDistribution-GroupLevel';
 
-import SubjectPerformanceExam from './SubjectExamPerformance/subjectPerformance-Exam';
-import SubjectDistributionScoreContriFactor from './SubjectExamPerformance/subjectDistribution-ScoreContriFactor';
-import SubjectDistributionStudentLevel from './SubjectExamPerformance/subjectDistribution-StudentLevel';
-import SubjectDistributionGroupLevel from './SubjectExamPerformance/subjectDistribution-GroupLevel';
+
+
 import SubjectPerformanceExamInspect from './SubjectInspectPerformance/subjectPerformance-ExamInspect';
 import SubjectPerformanceQuestionTopic from './SubjectInspectPerformance/subjectPerformance-QuestionTopic';
 import SubjectPerformanceQuestionLevel from './SubjectInspectPerformance/subjectPerformance-QuestionLevel';
@@ -49,6 +48,7 @@ class SingleClassReport extends React.Component {
         var classStudents = getClassStudents(studentsGroupByClass, this.state.currentClass);
         var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, this.state.currentClass);
         var classHeaders = getClassHeaders(headers, classStudentsPaperMap);
+        var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
 
         return (
             <div>
@@ -58,10 +58,12 @@ class SingleClassReport extends React.Component {
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
+                <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 {/*<SubjectPerformanceExam reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectDistributionScoreContriFactor reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectDistributionStudentLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectDistributionGroupLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
+
                 {/*<SubjectPerformanceExamInspect reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectPerformanceQuestionTopic reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectPerformanceQuestionLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />  TODO:未完 */}
@@ -93,11 +95,21 @@ function getClassStudentsPaperMap(allStudentsPaperMap, currentClass) {
 
 function getClassHeaders(headers, classStudentsPaperMap) {
     var result = [];
-    _.each(headers, (headObj) => {
-        if(classStudentsPaperMap[headObj.id]) result.push(headObj);
+    _.each(headers, (headerObj) => {
+        if(classStudentsPaperMap[headerObj.id]) result.push(headerObj);
     });
     return result;
 }
+
+function getClassHeadersWithTotalScore(headers, classStudentsPaperMap) {
+    var result = [];
+    _.each(headers, (headerObj) => {
+        if(classStudentsPaperMap[headerObj.id]) result.push(headerObj);
+    });
+    result.unshift(headers[0]);
+    return result;
+}
+
 
 /* <ClassNav chooseClass={this.chooseClass.bind(this)} />  -- 被砍掉 */
 
