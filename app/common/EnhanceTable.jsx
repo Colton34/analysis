@@ -94,10 +94,6 @@ class Table extends React.Component {
 
     }
     render() {
-
-console.log(this.state.showData);
-debugger;
-
         var headSeq = [];
         var {id, tableHeaders, data, bordered, striped, hover, headerStyle, options, tableSortable, style, canDownload} = this.props;
         bordered = bordered === undefined ? true : bordered;

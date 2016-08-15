@@ -99,3 +99,29 @@ function getClassHeaders(headers, classStudentsPaperMap) {
 }
 
 /* <ClassNav chooseClass={this.chooseClass.bind(this)} />  -- 被砍掉 */
+
+
+/*
+
+[
+    [
+        { "id": "class", "name": "班级", "rowSpan": 2 },
+        { "colSpan": 3, "name": "一档", headerStyle: { textAlign: 'center' } },
+        { "colSpan": 3, "name": "二档", headerStyle: { textAlign: 'center' } },
+        { "colSpan": 3, "name": "三档", headerStyle: { textAlign: 'center' } }
+    ],
+    [
+        { "id": "count_0", "name": "人数" },
+        { "id": "sumCount_0", "name": "累计人数" },
+        { "id": "sumPercentage_0", "name": "累计上线率" },
+        { "id": "count_1", "name": "人数" },
+        { "id": "sumCount_1", "name": "累计人数" },
+        { "id": "sumPercentage_1", "name": "累计上线率" },
+        { "id": "count_2", "name": "人数" },
+        { "id": "sumCount_2", "name": "累计人数" },
+        { "id": "sumPercentage_2", "name": "累计上线率" }
+    ]
+]
+
+
+ */

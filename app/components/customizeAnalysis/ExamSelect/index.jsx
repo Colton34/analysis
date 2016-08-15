@@ -169,7 +169,7 @@ class ExamSelect extends React.Component {
                 legalSQMs: legalSQMs,
                 sqmMap: sqmMap
             }, () => {
-                console.log('============== after set showDialog:' + this.state.showDialog);
+                console.log('');
             })
         }
         //在doMerge方法中调用this.props.onNextPage()
@@ -505,7 +505,7 @@ class ExamSelect extends React.Component {
                                             questionInfo.selected = true;
                                         isAllChecked &= questionInfo.selected;
                                     })
-                                    
+
                                     return (
                                         <div key={'qblock-' + index} className={ownClassNames['data-question-list']} data-paperId={paperId} >
                                             <div style={{ marginBottom: 20 }}>
