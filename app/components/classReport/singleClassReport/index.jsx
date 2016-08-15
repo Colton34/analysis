@@ -11,15 +11,7 @@ import TotalScoreLevelGuide from './totalScore-levelGuide';
 import TotalScoreLevelDistribution from './totalScore-levelDistribution';
 import SubjectDistributionScoreLevel from './subjectDistribution-ScoreLevel';
 import CriticalStudentDistribution from './CriticalStudentDistribution';
-
-
-
 import SubjectPerformance from './SubjectExamPerformance';
-// import SubjectPerformanceExam from './SubjectExamPerformance/subjectPerformance-Exam';
-// import SubjectDistributionScoreContriFactor from './SubjectExamPerformance/subjectDistribution-ScoreContriFactor';
-// import SubjectDistributionStudentLevel from './SubjectExamPerformance/subjectDistribution-StudentLevel';
-// import SubjectDistributionGroupLevel from './SubjectExamPerformance/subjectDistribution-GroupLevel';
-
 
 
 import SubjectPerformanceExamInspect from './SubjectInspectPerformance/subjectPerformance-ExamInspect';
@@ -59,15 +51,12 @@ class SingleClassReport extends React.Component {
                 <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
-                {/*<SubjectPerformanceExam reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
-                {/*<SubjectDistributionScoreContriFactor reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
-                {/*<SubjectDistributionStudentLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
-                {/*<SubjectDistributionGroupLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
 
                 {/*<SubjectPerformanceExamInspect reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectPerformanceQuestionTopic reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 {/*<SubjectPerformanceQuestionLevel reportDS={this.props.reportDS} currentClass={this.state.currentClass} />  TODO:未完 */}
-                {/*<ImportStudentInfo reportDS={this.props.reportDS} classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} currentClass={this.state.currentClass} />*/}
+
+                <ImportStudentInfo classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
                 {/*<HistoryPerformance reportDS={this.props.reportDS} classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} /> 未完成  */}
                 {/* ... */}
             </div>

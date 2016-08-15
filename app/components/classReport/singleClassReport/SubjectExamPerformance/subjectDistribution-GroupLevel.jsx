@@ -13,7 +13,6 @@ import commonClass from '../../../../common/common.css';
 export default function SubjectScoreLevelDistribution({reportDS, currentClass, classStudentsPaperMap}) {
     var examPapersInfo = reportDS.examPapersInfo.toJS(), headers = reportDS.headers.toJS();
     var tableDS = getTableDS(examPapersInfo, classStudentsPaperMap, headers, currentClass);
-    debugger;
 
     var gradeInfo = {0: {percentage: 0.85}, 1: {percentage: 0.7}, 2: {percentage: 0.6}};
     var tableHeaders = [[{id: 'subject', name: '学科成绩分类'}]];
