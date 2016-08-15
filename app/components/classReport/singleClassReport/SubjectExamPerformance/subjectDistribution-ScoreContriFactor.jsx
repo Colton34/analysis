@@ -93,7 +93,6 @@ export default function SubjectContriFactor({classStudents, classHeadersWithTota
     var finalData = formatData(datas);
     config['xAxis'] = {tickWidth:'0px', categories: subjects};
     config['series'] = [{name: '贡献指数', data: finalData}];
-    debugger;
     return (
         <div style={{marginTop: 30}}>
             <div style={{marginBottom: 30}}>
@@ -166,8 +165,6 @@ function makeOriginalSubjectInfoRow(students, examPapersInfo, examInfo) {
  */
 function theClassExamMeanFactorsTable(subjectMeanInfo, examInfo, classHeadersWithTotalScore, currentClass) {
     var orderSubjectNames = _.map(_.slice(classHeadersWithTotalScore, 1), (obj) => obj.subject);
-    console.log('1');
-    debugger;
     var originalMatrix = makeClassExamMeanOriginalMatirx(subjectMeanInfo, classHeadersWithTotalScore, currentClass);
     var currentClassFactors = makeFactor(originalMatrix)[0];//应该只剩下一行
     //这里对orderSubjectNames进行Map还是为了保证横轴是按照科目的名称进行排序显示的

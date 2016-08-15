@@ -2,27 +2,57 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 
-export default function SubjectStudentLevelDistirbution({reportDS, currentClass}) {
+import EnhanceTable from '../../../../common/EnhanceTable';
+import TableView from '../../../../common/TableView';
 
+import commonClass from '../../../../common/common.css';
+import {NUMBER_MAP as numberMap} from '../../../../lib/constants';
+
+export default function SubjectStudentLevelDistirbution({classHeaders, reportDS, classStudents, currentClass}) {
+
+    var examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
+    var tableDS = getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, classHeaders, currentClass);
+
+    var tableHeaders = [[{id: 'subject', name: '学科'}]];
+    var headers = _.range(10).map(num=> {
+        return {id: num, name: '第' + numberMap[num+1] + '组人数'};
+    });
+    tableHeaders[0] = tableHeaders[0].concat(headers);
+
+    var tableData = _.map(tableDS, (rowData, index) => {
+        var obj = {};
+        obj.subject = rowData[0];
+        _.each(_.range(10), num=> {
+            obj[num] = {};
+            obj[num]['value'] = rowData[num+1].length;
+            obj[num]['overlayData'] = {};
+            obj[num]['overlayData'].title = '学生名单';
+            obj[num]['overlayData'].content = getStudentNames(rowData[num+1], classStudents);
+        })
+        return obj;
+    });
+
+    return (
+        <div>
+            <div style={{marginBottom: 30}}>
+                <span className={commonClass['sub-title']}>学生学科水平分布</span>
+                <span className={commonClass['title-desc']}>按成绩高低将学生等分为10组（第1组成绩最高，第10组成绩最低）。高分段学生密度越大，表现有优势，低分段学生密度越大，则需要在教学中注意帮助这部分学生突破。</span>
+            </div>
+            <TableView tableHeaders={tableHeaders} tableData={tableData} TableComponent={EnhanceTable}/>
+        </div>
+    )
 }
 
 //=================================================  分界线  =================================================
-
-// export default function SubjectStudentLevelDistirbution({reportDS, currentClass}) {
-//     var examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), headers = reportDS.headers.toJS();
-//     var tableDS = getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, currentClass);
-//     debugger;
-// }
-
-function getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, currentClass) {
+function getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, classHeaders, currentClass) {
 //每一行需要的原数据是“当前学科” “本班学生” “成绩正序排名”
     var tableData = [];
-    _.each(headers, (headerObj) => {
-        if(headerObj.id == 'totalScore') return; //没有总分的数据
+    _.each(classHeaders, (headerObj) => {
+        // if(headerObj.id == 'totalScore') return; //没有总分的数据
         var subjectStudents = allStudentsPaperMap[headerObj.id];
         var groupStudentsInfo = makeGroupStudentsInfo(subjectStudents);
         var rowData = _.map(groupStudentsInfo, (obj) => {
-            var currentSubjectGroupStudentCount = (obj.classStudents[currentClass]) ? obj.classStudents[currentClass].length : 0;
+            var currentSubjectGroupStudentCount = (obj.classStudents[currentClass]) ? obj.classStudents[currentClass] : [];
             return currentSubjectGroupStudentCount;
         });
         rowData.unshift(headerObj.subject);
@@ -33,8 +63,9 @@ function getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, heade
 
 //除了总分外还要分不同的学科。需要所有学生各科的成绩
 //拿到这个数据结构然后在从里面筛选出属于此班级的数据
+//区分总分“人群”和单科“人群”
 function makeGroupStudentsInfo(students, groupLength=10) {
-    students = _.orderBy(students, ['score'], ['desc']);//保证高分段在前
+    students = _.reverse(students);//保证高分段在前
     var result = {}, flagCount = students.length, totalStudentCount = students.length;
     _.each(_.range(groupLength), function(index) {
         var groupCount = (index == groupLength-1) ? flagCount : (_.ceil(_.divide(totalStudentCount, groupLength)));
@@ -46,4 +77,9 @@ function makeGroupStudentsInfo(students, groupLength=10) {
         result[index] = { groupCount: groupCount, classStudents: groupStudentsGroupByClass, flagCount: flagCount };
     });
     return result;
+}
+
+function getStudentNames(students, classStudents) {
+    var studentIds = _.map(students, (sObj) => sObj.id);
+    return _.join(_.map(_.filter(classStudents, (sObj) => _.includes(studentIds, sObj.id)), (stuObj) => stuObj.name), '，');
 }

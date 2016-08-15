@@ -17,8 +17,9 @@ export default function SubjectPerformance({classStudents, classStudentsPaperMap
 
             <SubjectPerformanceTable classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={currentClass} reportDS={reportDS} />
             <ScoreContriFactor classStudents={classStudents} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={currentClass} reportDS={reportDS} />
+            <StudentLevel classHeaders={classHeaders} reportDS={reportDS} classStudents={classStudents} currentClass={currentClass} />
 {/*
-            <StudentLevel/>
+
             <SubjectScoreLevelDistribution/>
 */}
         </div>
