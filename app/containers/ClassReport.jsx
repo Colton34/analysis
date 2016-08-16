@@ -32,7 +32,7 @@ class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            reportType: 'single'
+            reportType: 'multi'
         };
     }
 
