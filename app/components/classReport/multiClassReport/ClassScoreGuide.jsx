@@ -18,10 +18,6 @@ export default function ClassScoreGuide({reportDS}) {
 
     var tableHeaders = getTableHeaderDS(subjectNames);
     var tableBodyDS = getTableBodyDS(classNames, examPapersInfo, allStudentsPaperMap, studentsGroupByClass, headers, columnIndicatorFunMap);
-
-    debugger;
-
-
     return (
         <div id='classScoreGuide' className={commonClass['section']}>
             <div>
@@ -53,7 +49,6 @@ function getTableHeaderDS(subjectNames) {
         })
     });
     return tableHeaders;
-    // return {tableHeaders: tableHeaders, tableSubHeads: tableSubHeads}
 }
 
 function getTableBodyDS(classNames, examPapersInfo, allStudentsPaperMap, studentsGroupByClass, headers, columnIndicatorFunMap) {
@@ -67,38 +62,6 @@ function getTableBodyDS(classNames, examPapersInfo, allStudentsPaperMap, student
         return obj;
     });
 }
-
-/*
-
-    var value;
-    return _.map(classHeaders, (headerObj, index) => {
-        var obj = {};
-        var paperScores = _.map(classStudentsPaperMap[headerObj.id], (paper) => paper.score);
-        _.each(columnIndicatorFunMap, (fun, key) => {
-            value = fun({paperScores: paperScores, examClassesInfo: examClassesInfo, currentClass: currentClass, examPapersInfo: examPapersInfo, headerObj: headerObj});
-            obj[key] = (key == '缺考人数') ? {value: value, overlayData: {title: '学生名单', content: getLostStudentNames(examClassesInfo, classStudentsPaperMap, headerObj, currentClass, classStudents)}} : value;
-        });
-        return obj;
-    });
-
-
-
-var classes = ['初一1班', '初一2班', '初一3班', '初一4班', '初一5班'];
-var tableData = [];
-_.forEach(classes, (className, index) => {
-    var obj = {};
-    obj.class = className;
-    _.forEach(subjects, subject=> {
-        _.forEach(tableSubHeads, subHead => {
-            obj[subject+'_'+subHead] = parseInt(Math.random() * 50);
-        })
-    })
-    tableData.push(obj);
-});
-
- */
-
-
 
 function getMaxScore({paperScores}) {
     return _.max(paperScores);//最高分

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-15 18:14:09
+* @Last Modified time: 2016-08-16 12:03:04
 */
 
 
@@ -240,7 +240,8 @@ export function initReportDS(params) {
                 headers.push({
                     index: index,
                     subject: paper.subject,
-                    id: pid
+                    id: pid,
+                    fullMark: paper.fullMark
                 });
             } else {
                 restPapers.push({id: pid, subject: paper.subject});

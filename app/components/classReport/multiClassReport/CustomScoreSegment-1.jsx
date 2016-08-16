@@ -4,10 +4,6 @@ import React, { PropTypes } from 'react';
 
 import {makeSegmentsCount} from '../../../api/exam';
 
-// export default function CustomScoreSegment({reportDS}) {
-
-// }
-
 class CustomScoreSegment extends React.Component {
     constructor(props) {
         super(props);
