@@ -20,7 +20,7 @@ class MultiClassReport extends React.Component {
         return (
             <div>
                 <Header examInfo={this.props.reportDS.examInfo} />
-                {/*<SubjectMeanRank reportDS={this.props.reportDS} />*/}
+                <SubjectMeanRank reportDS={this.props.reportDS} />
                 {/*<CustomScoreSegment reportDS={this.props.reportDS} />*/}
                 {/*<SubjectSmallScore reportDS={this.props.reportDS} />*/}
                 {/*<CustomScoreLevel reportDS={this.props.reportDS} />*/}
