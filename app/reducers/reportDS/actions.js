@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-02 16:38:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 11:06:02
+* @Last Modified time: 2016-08-16 21:08:12
 */
 
 'use strict';
@@ -12,7 +12,8 @@ import {
     INIT_REPORT_DS,
     CHANGE_LEVEL,
     CHANGE_LEVEL_BUFFERS,
-    SAVE_BASELINE
+    SAVE_BASELINE,
+    CHANGE_EXAMS
 } from '../../lib/constants';
 
 export function initReportDSAction(params) {
@@ -41,4 +42,8 @@ export function saveBaselineAction(params) {
         type: SAVE_BASELINE,
         promise: saveBaseline(params)
     }
+}
+
+export function changeExamsAction(examids) {
+
 }

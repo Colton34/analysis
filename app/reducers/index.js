@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:02:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-04 12:55:45
+* @Last Modified time: 2016-08-17 11:01:16
 */
 
 'use strict';
@@ -17,6 +17,7 @@ import dashboard from './dashboard';
 import customAnalysis from './customAnalysis';
 import reportDS from './reportDS';
 import classReport from './classReport';
+import examsCache from './examsCache';
 
 import {one, two} from './test';
 
@@ -28,6 +29,7 @@ var rootReducer = combineReducers({
     rankReport,
     classReport,
     customAnalysis,
+    examsCache,
     //设计成嵌套的reducer
     test: combineReducers({
         one,

@@ -9,19 +9,8 @@ export default function ExamInspectPerformance({reportDS, currentClass}) {
 
 
 //=================================================  分界线  =================================================
-
-// export default function ExamInspectPerformance({reportDS, currentClass}) {
-//     var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
-//     var theDS = getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass);
-//     debugger;
-// }
-
 function getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass) {
     var result = {}, currentClassStudents = studentsGroupByClass[currentClass];
-    // var classStudentsPaperQuestionInfo = {};
-    // _.each(currentClassStudents, (studentObj) => {
-    //     classStudentsPaperQuestionInfo[studentObj.id] = _.keyBy(studentObj.questionScores, 'paperid');
-    // });
     var allStudentsPaperQuestionInfo = {};
     _.each(examStudentsInfo, (studentObj) => {
         allStudentsPaperQuestionInfo[studentObj.id] = _.keyBy(studentObj.questionScores, 'paperid');
@@ -47,7 +36,6 @@ function getClassQuestionScoreRate(questions, pid, allStudentsPaperMap, allStude
     return _.map(questions, (questionObj, index) => {
         //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
         return _.round(_.divide(_.mean(_.map(currentClassPaperStudents, (studentObj) => {
-            // debugger;
             return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
         })), questionObj.score), 2);
     });

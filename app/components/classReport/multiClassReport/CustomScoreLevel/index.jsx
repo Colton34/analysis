@@ -12,19 +12,14 @@ import {makeSegmentsCount} from '../../../../api/exam';
 
 import commonClass from '../../../../common/common.css';
 import {LETTER_MAP as letterMap, COLORS_MAP as colorsMap} from '../../../../lib/constants';
-/**----------------------mock data------------------------------ */
-var examPapersInfo = { "103865-25": { "lostClasses": ["1", "2", "3", "4", "5", "6", "7", "8"], "classes": { "9": 41, "10": 57, "11": 55, "12": 56, "13": 53, "14": 51, "15": 55, "16": 48, "17": 57, "18": 34, "19": 31, "20": 58 }, "realClasses": ["9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"], "subject": "数学", "paper": "574c593a0000052e5bf8ef53", "lostStudentsCount": 83, "realStudentsCount": 596, "id": "103865-25", "fullMark": 150 }, "103863-25": { "lostClasses": ["9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"], "classes": { "1": 35, "2": 48, "3": 54, "4": 50, "5": 55, "6": 55, "7": 56, "8": 47 }, "realClasses": ["1", "2", "3", "4", "5", "6", "7", "8"], "subject": "数学", "paper": "574c593a0000052e5bf8ef54", "lostStudentsCount": 122, "realStudentsCount": 400, "id": "103863-25", "fullMark": 150 }, "103861-25": { "lostClasses": [], "classes": { "1": 39, "2": 48, "3": 54, "4": 49, "5": 56, "6": 54, "7": 56, "8": 47, "9": 41, "10": 58, "11": 55, "12": 56, "13": 53, "14": 52, "15": 55, "16": 48, "17": 58, "18": 36, "19": 31, "20": 57 }, "realClasses": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"], "subject": "语文", "paper": "574a29970000052e5bf81a2e", "lostStudentsCount": 198, "realStudentsCount": 1003, "id": "103861-25", "fullMark": 150 }, "103862-25": { "lostClasses": [], "classes": { "1": 35, "2": 47, "3": 54, "4": 48, "5": 55, "6": 55, "7": 56, "8": 47, "9": 41, "10": 57, "11": 55, "12": 55, "13": 52, "14": 48, "15": 53, "16": 48, "17": 56, "18": 31, "19": 26, "20": 54 }, "realClasses": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"], "subject": "英语", "paper": "574d53800000052e5bf94209", "lostStudentsCount": 228, "realStudentsCount": 973, "id": "103862-25", "fullMark": 150 }, "103864-25": { "lostClasses": ["9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"], "classes": { "1": 34, "2": 46, "3": 54, "4": 50, "5": 55, "6": 53, "7": 56, "8": 47 }, "realClasses": ["1", "2", "3", "4", "5", "6", "7", "8"], "subject": "文综", "paper": "574c64740000052e5bf8f055", "lostStudentsCount": 127, "realStudentsCount": 395, "id": "103864-25", "fullMark": 300 }, "103866-25": { "lostClasses": ["1", "2", "3", "4", "5", "6", "7", "8"], "classes": { "9": 41, "10": 57, "11": 55, "12": 55, "13": 52, "14": 48, "15": 52, "16": 48, "17": 56, "18": 33, "19": 30, "20": 54 }, "realClasses": ["9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"], "subject": "理综", "paper": "574c54be0000052e5bf8ec53", "lostStudentsCount": 98, "realStudentsCount": 581, "id": "103866-25", "fullMark": 300 } }
-
-var subjects = [{value: '语文'}, {value: '数学'}, {value: '英语'}];
-
-var classes = ['初一1班', '初一2班', '初一3班', '初一4班', '初一5班'];
-
-/**----------------------mock data end------------------------------ */
 
 class CustomScoreLevel extends React.Component {
     constructor(props) {
         super(props);
+        var headers = this.props.reportDS.headers.toJS();
+        this.formatedSubjects = getFormatedSubjects(headers);
         this.state = {
+            currentSubject: this.formatedSubjects[0], //subject
             showDialog: false,
             levelPercentages: [0, 60, 70, 85, 100]
         }
@@ -38,14 +33,10 @@ class CustomScoreLevel extends React.Component {
     }
 
     render() {
-//         var tableRenderData = composeData(this.state.levelPercentages);
-// debugger;
+        var examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS(), headers = this.props.reportDS.headers.toJS(), gradeName = this.props.reportDS.examInfo.toJS().gradeName;
+        var theDS = getDS(examPapersInfo, allStudentsPaperMap, headers, gradeName, this.state.levelPercentages);
 
-
-    var examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS(), headers = this.props.reportDS.headers.toJS(), gradeName = this.props.reportDS.examInfo.toJS().gradeName;
-    var theDS = getDS(examPapersInfo, allStudentsPaperMap, headers, gradeName, this.state.levelPercentages);
-    var {tableHeaders, tableBodyData} = getFormatedData(theDS);
-debugger;
+    var {tableHeaders, tableBodyData} = getFormatedData(theDS[this.state.currentSubject.id]);
 
         return (
             <div id='customScoreLevel' className={commonClass['section']} >
@@ -54,7 +45,7 @@ debugger;
                     <span className={commonClass['title']}>自定义成绩等级的人数比例对比</span>
                     <span className={commonClass['title-desc']}></span>
 
-                    <DropdownList list={subjects} style={{position: 'absolute', top: 0, right: 214,zIndex:100}}/>
+                    <DropdownList list={this.formatedSubjects} style={{position: 'absolute', top: 0, right: 214,zIndex:100}}/>
                     <Dialog levelPercentages={this.state.levelPercentages} updateGrades={this.updateLevelPercentages.bind(this) } examPapersInfo={examPapersInfo} />
                 </div>
               <div style={{marginTop: 30}}>
@@ -96,31 +87,6 @@ function getTableBodyData(bodyDS) {
     })
 }
 
-// function composeData(levelPercentages) {
-//     var tableHeaders = [[{id: 'class', name: '班级'}]];
-//     var levels = levelPercentages.slice(1, levelPercentages.length -1)
-//     var levelLen = levels.length;
-//     _.forEachRight(_.range(levelLen + 1), num => {
-//         var obj = {};
-//         var levelLetter = letterMap[levelLen - num];
-//         obj.id = levelLetter;
-//         obj.name = num ===  0? levelLetter + '等(' + levels[num] / 100+ '以下)' : levelLetter + '等(' + levels[num -1] / 100 + ')';
-//         tableHeaders[0].push(obj);
-//     })
-
-//     var tableData = [];
-//     _.forEach(classes, (className, index) => {
-//         var obj = {};
-//         obj.class = className;
-//         _.forEach(_.range(levelLen + 1), num => {
-//             var levelLetter = letterMap[num];
-//             obj[levelLetter] = parseInt(Math.random() * 20);
-
-//         })
-//         tableData.push(obj);
-//     })
-//     return {tableHeaders: tableHeaders, tableData: tableData};
-// }
 export default CustomScoreLevel;
 
 //=================================================  分界线  =================================================
@@ -155,10 +121,17 @@ function getDS(examPapersInfo, allStudentsPaperMap, headers, gradeName, levelPce
         result[paperObj.id] = matrix;
     });
 
-    return matrix;
+    return result;
 }
 
 // 各个学科的总分；然后四个档次的百分比，得出分段区间  fullMark: 100%  A: 85%  b: 70%  c: 60%  D: 0%
 function makeSubjectLevelSegments(paperFullMark, levelPcentages) {
     return _.map(levelPcentages, (levelPercentage) => _.round(_.multiply(_.divide(levelPercentage, 100), paperFullMark), 2));
+}
+
+
+function getFormatedSubjects(headers) {
+    return _.map(_.slice(headers, 1), (headerObj) => {
+        return {value: headerObj.subject, totalScore: headerObj.fullMark, fullMark: headerObj.fullMark, id: headerObj.id} //TODO:这个命名有问题，需要改！
+    })
 }

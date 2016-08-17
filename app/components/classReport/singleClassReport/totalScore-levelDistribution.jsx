@@ -63,16 +63,6 @@ export default function LevelDistribution({reportDS, currentClass}) {
 
 
 //=================================================  分界线  =================================================
-// export default function LevelDistribution({reportDS, currentClass}) {
-//     var examInfo=reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS() , headers = reportDS.headers.toJS();
-//     var currentClassStudents = studentsGroupByClass[currentClass];
-//     var {totalScoreLevelInfoByClass, totalScoreLevelInfoByLevel} = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
-//     var headerData = getHeaderData(totalScoreLevelInfoByLevel, currentClass);
-//     debugger;
-//     var tableDS = getTableDS(totalScoreLevelInfoByClass, levels);
-// }
-
-
 //1.各个档次本班在全年级的排名
 //2.人数，累计人数，累计上线比
 
@@ -109,16 +99,6 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
         resultByClass.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount); //TODO:levels中的percentage就是累占比呀！
     });
 
-    // var classCountsGroupByLevel = makeSegmentsCount(classStudents, levelSegments);
-    // var temp = {};
-    // _.each(classCountsGroupByLevel, (count, levelKey) => {
-    //     temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[currentClass].realStudentsCount, currentClass);
-    //     if(!resultByLevel[levelKey]) resultByLevel[levelKey] = [];
-    //     resultByLevel[levelKey].push(temp[levelKey]);
-    // });
-    // resultByClass[currentClass] = temp;
-
-
     _.each(studentsGroupByClass, (studentsFromClass, className) => {
         var classCountsGroupByLevel = makeSegmentsCount(studentsFromClass, levelSegments);
         var temp = {};
@@ -154,43 +134,7 @@ function getHeaderDS(totalScoreLevelInfoByLevel, currentClass) {
     return result;
 }
 
-// function getHeaderData(totalScoreLevelInfoByLevel, currentClass) {
-// //totalScoreLevelInfo中的level都是和levels对应的--index小则对应低档次
-// //从totalScoreLevelInfoByLevel的各个档次中排序得到排名
-//     var result = [];
-//     _.each(totalScoreLevelInfoByLevel, (infoArr, levelKey) => {
-//         var targetIndex = _.findIndex(_.sortBy(infoArr, 'sumCount'), (obj) => obj.class == currentClass);
-//         if(targetIndex < 0) return;//TODO:应该给Tip Error！-- 这也是需要改进的：清晰明了的错误提示
-//         result.unshift('第'+(targetIndex + 1)+'名'); //使用unshift保证高档在前面
-//     });
-//     return result;
-// }
 
-
-
-
-
-
-
-// [
-//     [
-//         { "id": "class", "name": "班级", "rowSpan": 2 },
-//         { "colSpan": 3, "name": "一档", headerStyle: { textAlign: 'center' } },
-//         { "colSpan": 3, "name": "二档", headerStyle: { textAlign: 'center' } },
-//         { "colSpan": 3, "name": "三档", headerStyle: { textAlign: 'center' } }
-//     ],
-//     [
-//         { "id": "count_0", "name": "人数" },
-//         { "id": "sumCount_0", "name": "累计人数" },
-//         { "id": "sumPercentage_0", "name": "累计上线率" },
-//         { "id": "count_1", "name": "人数" },
-//         { "id": "sumCount_1", "name": "累计人数" },
-//         { "id": "sumPercentage_1", "name": "累计上线率" },
-//         { "id": "count_2", "name": "人数" },
-//         { "id": "sumCount_2", "name": "累计人数" },
-//         { "id": "sumPercentage_2", "name": "累计上线率" }
-//     ]
-// ]
 function getTableHeaderDS(levels) {
     var levelValues = [], levelFields = [];
     _.each(levels, (levObj, levelKey) => {
@@ -201,19 +145,6 @@ function getTableHeaderDS(levels) {
     });
     return {levelValues: levelValues, levelFields: levelFields};
 }
-
-
-// "count_0":151,
-// "sumCount_0":151,
-// "sumPercentage_0":14.97,
-//
-// "count_1":100,
-// "sumCount_1":251,
-// "sumPercentage_1":24.88,
-// "count_2":355,
-// "sumCount_2":606,
-// "sumPercentage_2":60.06,
-// "class":"全校",
 
 function getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, gradeName) {
     //Note: 直接从这里取需要的数据即可。只需要全校和本班的数据
@@ -242,3 +173,38 @@ function getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, gradeN
     return tableBodyDS;
 }
 
+
+//============  Mock Data
+
+// [
+//     [
+//         { "id": "class", "name": "班级", "rowSpan": 2 },
+//         { "colSpan": 3, "name": "一档", headerStyle: { textAlign: 'center' } },
+//         { "colSpan": 3, "name": "二档", headerStyle: { textAlign: 'center' } },
+//         { "colSpan": 3, "name": "三档", headerStyle: { textAlign: 'center' } }
+//     ],
+//     [
+//         { "id": "count_0", "name": "人数" },
+//         { "id": "sumCount_0", "name": "累计人数" },
+//         { "id": "sumPercentage_0", "name": "累计上线率" },
+//         { "id": "count_1", "name": "人数" },
+//         { "id": "sumCount_1", "name": "累计人数" },
+//         { "id": "sumPercentage_1", "name": "累计上线率" },
+//         { "id": "count_2", "name": "人数" },
+//         { "id": "sumCount_2", "name": "累计人数" },
+//         { "id": "sumPercentage_2", "name": "累计上线率" }
+//     ]
+// ]
+
+
+// "count_0":151,
+// "sumCount_0":151,
+// "sumPercentage_0":14.97,
+//
+// "count_1":100,
+// "sumCount_1":251,
+// "sumPercentage_1":24.88,
+// "count_2":355,
+// "sumCount_2":606,
+// "sumPercentage_2":60.06,
+// "class":"全校",

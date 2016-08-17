@@ -2,14 +2,88 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 
-export default function SubjectSmallScore({reportDS}) {
-    var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), gradeName = reportDS.examInfo.toJS().gradeName;
-    var theDS = getDS(examPapersInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, gradeName);
-    debugger;
+import commonClass from '../../../common/common.css';
+import TableView from '../../../common/TableView';
+import EnhanceTable from '../../../common/EnhanceTable';
+
+/**----------------------------mock data ---------------------------- */
+// var tableHeaders = [[{id: 'tihao', name: '题目'}, {id: 'avg', name: '年级平均得分率'}]];
+// var classList = [{value:'初一1班'}, {value:'初一2班'}, {value:'初一3班'}, {value:'初一4班'}, {value:'初一5班'}];
+// _.forEach(classList, classObj => {
+//     var obj = {};
+//     obj.id = classObj.value;
+//     obj.name = classObj.value;
+//     tableHeaders[0].push(obj);
+// })
+// var tableData = [];
+// var tihaoList = ['T1', 'T2', 'T3', 'T4', 'T5'];
+// _.forEach(tihaoList, tihao => {
+//     var obj = {};
+//     obj.tihao = tihao;
+//     _.forEach(tableHeaders[0].slice(1), header => {
+//         obj[header.id] = parseInt(Math.random() * 20);
+//     })
+//     tableData.push(obj);
+// })
+
+/**----------------------------mock data end---------------------------- */
+
+class SubjectSmallScore extends React.Component {
+    constructor(props) {
+      super(props);
+        var examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS(), examClassesInfo = this.props.reportDS.examClassesInfo.toJS(), studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS(), gradeName = this.props.reportDS.examInfo.toJS().gradeName, headers = this.props.reportDS.headers.toJS();
+        this.formatedSubjects = getFormatedSubjects(headers);
+        var theDS = getDS(examPapersInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, gradeName);
+        this.theDS = theDS;
+        this.state = {
+            currentSubject: this.formatedSubjects[0]
+        }
+    }
+
+    render() {
+        var {tableHeaders, tableBodyData} = getFormatedData(this.theDS[this.state.currentSubject.id]);
+        return (
+            <div id='subjectSmallScore' className={commonClass['section']}>
+                <div style={{marginBottom: 30}}>
+                    <span className={commonClass['title-bar']}></span>
+                    <span className={commonClass['title']}>学科小分得分率对比</span>
+                    <span className={commonClass['title-desc']}></span>
+                </div>
+                <TableView id='smallScoreTable' tableData={tableBodyData} tableHeaders={tableHeaders} TableComponent={EnhanceTable} options={{canDownload:true}}/>
+            </div>
+        );
+    }
 }
 
-
+export default SubjectSmallScore;
 //=================================================  分界线  =================================================
+function getFormatedData(theDS) {
+    var tableHeaders = getFormatedTableHeaders(theDS[0]);
+    var tableBodyData = getFormatedBodyData(tableHeaders[0], _.slice(theDS, 1));
+    return {
+        tableHeaders: tableHeaders,
+        tableBodyData: tableBodyData
+    }
+}
+
+function getFormatedTableHeaders(headerDS) {
+    return [_.map(headerDS, (v, i) => {
+        if(i == 0) return {id: 'tihao', name: '题目'};
+        if(i == 1) return {id: 'avg', name: '年级平均得分率'};
+        return {id: v, name: v}
+    })]
+}
+
+function getFormatedBodyData(headerData, bodyDS) {
+    return _.map(bodyDS, (rowData) => {
+        var obj = {};
+        _.each(headerData, (d, i) => {
+            obj[d.id] = rowData[i]
+        });
+        return obj;
+    })
+}
+
 //TODO: 设计--主客观题都走 分数 好了，而不再分客观题走数目--结果是一样的
 function getDS(examPapersInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, gradeName) {
     var allStudentsPaperQuestionInfo = {}, result = {}, tableDS, rowData;
@@ -48,7 +122,6 @@ function getTableHeader(allPaperStudents, examClassesInfo, gradeName) {
 
 function getOneQuestionScoreRate(questionObj, students, allStudentsPaperQuestionInfo, pid, index) {
     return _.round(_.divide(_.mean(_.map(students, (studentObj) => {
-        // debugger;
         return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
     })), questionObj.score), 2);
 }
@@ -62,6 +135,12 @@ function getClassesQuestionScoreRate(questionObj, allPaperStudents, allStudentsP
         result.push(getOneQuestionScoreRate(questionObj, classPaperStudents, allStudentsPaperQuestionInfo, pid, index));
     });
     return result;
+}
+
+function getFormatedSubjects(headers) {
+    return _.map(_.slice(headers, 1), (headerObj) => {
+        return {value: headerObj.subject, totalScore: headerObj.fullMark, fullMark: headerObj.fullMark, id: headerObj.id} //TODO:这个命名有问题，需要改！
+    })
 }
 
 

@@ -7,15 +7,8 @@ import {Link} from 'react-router';
 import Header from './Header';
 import SubjectMeanRank from './SubjectMeanRank';
 import ClassScoreGuide from './ClassScoreGuide';
-import CustomScoreSegment from './CustomScoreSegment';
-
-
-
-
 import CustomScoreLevel from './CustomScoreLevel';
-
-
-
+import CustomScoreSegment from './CustomScoreSegment';
 
 import SubjectSmallScore from './SubjectSmallScore';
 
@@ -33,7 +26,7 @@ class MultiClassReport extends React.Component {
                 <ClassScoreGuide reportDS={this.props.reportDS} />
                 <CustomScoreLevel reportDS={this.props.reportDS} />
                 <CustomScoreSegment reportDS={this.props.reportDS} />
-                {/*<SubjectSmallScore reportDS={this.props.reportDS} />*/}
+                <SubjectSmallScore reportDS={this.props.reportDS} />
             </div>
         );
     }

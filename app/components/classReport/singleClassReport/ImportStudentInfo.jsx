@@ -11,13 +11,10 @@ import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 export default function ImportStudentInfo({classStudents, classHeadersWithTotalScore, classStudentsPaperMap}) {
     var {betterTableDS, worseTableDS} = getDS(classStudents, classStudentsPaperMap, classHeadersWithTotalScore);
     var tableHeaders = [[{id: 'name', name: '姓名'}]];
-    // debugger;
     _.each(classHeadersWithTotalScore, (headerObj) => {
         tableHeaders[0].push({id: headerObj.subject, name: headerObj.subject + '排名'})
     });
-    // debugger;
     var betterTableData = getTableData(betterTableDS, classHeadersWithTotalScore), worseTableData = getTableData(worseTableDS, classHeadersWithTotalScore);
-    debugger;
     return (
         <div id='studentInfo' className={commonClass['section']}>
                 <span className={commonClass['title-bar']}></span>
@@ -60,7 +57,6 @@ function getDS(classStudents, classStudentsPaperMap, classHeadersWithTotalScore)
 }
 
 function getTableData(tableDS, classHeadersWithTotalScore) {
-    // debugger;
     return _.map(tableDS, (rowData) => {
         var obj = {};
         _.each(rowData, (d, i) => {

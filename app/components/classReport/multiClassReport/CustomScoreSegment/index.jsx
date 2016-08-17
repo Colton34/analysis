@@ -48,7 +48,7 @@ class CustomScoreSegment extends React.Component {
     render() {
         var {chartDS, tableDS, segments} = getDS(this.state.currentSubject, this.state.currentScoreStep, this.state.currentClasses, this.examPapersInfo, this.allStudentsPaperMap, this.gradeName);
         var formatedDS = getformatedDS(segments, tableDS);
-        // debugger;
+
         var formatedClassList = getFormatedClassList(this.examPapersInfo[this.state.currentSubject.id].realClasses, this.gradeName); //这场考试下面的班级
         var formatedSubjects = this.formatedSubjects;
 

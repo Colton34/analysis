@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:02:04
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-04 12:56:50
+* @Last Modified time: 2016-08-17 08:36:31
 */
 
 'use strict';
@@ -14,6 +14,7 @@ import reportDS from './report-state';
 import rankReportState from './rank-report-state';
 import classReportState from './class-report-state';
 import customAnalysisState from './custom-analysis-state';
+import examsCacheState from './exams-cache-state';
 
 import {initOne, initTwo} from './test-state';
 
@@ -25,6 +26,7 @@ var _initState = {
     rankReport: new rankReportState,
     classReport: new classReportState,
     customAnalysis: new customAnalysisState,
+    examsCache: new examsCacheState,
     //设计成使用嵌套的reducer
     test: {
         one: initOne,

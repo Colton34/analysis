@@ -14,12 +14,14 @@ export const INIT_REPORT_DS = 'INIT_REPORT_DS';
 export const INIT_REPORT_DS_REQUEST = 'INIT_REPORT_DS_REQUEST';
 export const INIT_REPORT_DS_SUCCESS = 'INIT_REPORT_DS_SUCCESS';
 export const INIT_REPORT_DS_FAILURE = 'INIT_REPORT_DS_FAILURE';
-
 //================= New Save ==============================
 export const SAVE_BASELINE = 'SAVE_BASELINE';
 
 //=============== New ClassReport =============
 export const CHANGE_CLASS = 'CHANGE_CLASS';
+
+//================= New ExamsCache ===================
+export const GET_MORE_EXAMS = 'GET_MORE_EXAMS';
 
 //================= Global ===========================
 export const INIT_USER_ME = 'INIT_USER_ME';

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-16 12:03:04
+* @Last Modified time: 2016-08-17 08:46:43
 */
 
 
@@ -360,6 +360,13 @@ export function fetchPaper(params) {
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     });
+}
+
+export function getMoreExams(params) {
+    var url = '';
+    return params.request.post(url, {examIds: params.examIds}).then(function(res) {
+        return Promise.resolve(res.data);
+    })
 }
 
 
