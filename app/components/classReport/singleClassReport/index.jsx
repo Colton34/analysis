@@ -44,7 +44,7 @@ class SingleClassReport extends React.Component {
 
         return (
             <div>
-                <Header examInfo={this.props.reportDS.examInfo} />
+{/*                <Header examInfo={this.props.reportDS.examInfo} />
                 <TotalScoreTrend reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
@@ -52,7 +52,9 @@ class SingleClassReport extends React.Component {
                 <CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <ImportStudentInfo classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
-                {/*<HistoryPerformance reportDS={this.props.reportDS} classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} /> 未完成  */}
+*/}
+
+                <HistoryPerformance currentClass={this.state.currentClass} />
                 {/* ... */}
             </div>
         );
