@@ -9,12 +9,6 @@ import {initExamCacheAction, getMoreExamsAction} from '../../../reducers/examsCa
 
 // import {List} from 'immutable';
 
-// export default function HistoryPerformance({reportDS, classStudents, classStudentsPaperMap}) {
-//     var examStudentsInfo = reportDS.examStudentsInfo.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), headers = reportDS.headers.toJS();
-//     var result = getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, classStudentsPaperMap, headers);
-//     debugger;
-// }
-
 /*
 设计：
 examCache持有examList
@@ -30,28 +24,7 @@ examCache持有examList
 0.要有cache
 1.组件DisMount里去获取 默认的数据：三次 连续的 同等性质的 考试的数据
 2.每次切换考试:
-
-
-
  */
-
-
-// class  extends React.Component {
-//     constructor(props) {
-//         super(props);
-//         //根据当前班级从examList中过滤出d
-//         this.state = {
-//             currentExamList: []
-//         }
-//     }
-
-//     render() {
-//         return (
-//             <div></div>
-//         );
-//     }
-// }
-
 
 function HistoryContent({examList, examsInfoCache, currentExamIds}) {//这里examList就是跟着currentClass走的
     examList = examList.toJS(), examsInfoCache = examsInfoCache.toJS();
@@ -107,10 +80,6 @@ class HistoryPerformance extends React.Component {
     render() {
         //isLoading:需要异步获取数据  ifBlankPage:已经拿到数据但是没有东西可以展示  content:有数据展示
         var isLoading = false, ifBlankPage = false;
-
-// console.log(this.props.currentClass);
-// debugger;
-
 
         if(!this.props.haveInit) {
             //还没有初始化
@@ -218,27 +187,6 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
     return result;
 }
 
+function getExamSubjectRank() {
 
-
-/*
-
-
-
-
-
-        var ifCache = false;
-
-        if(!this.props.haveInit) {
-            ifCache = true;
-        } else {
-            var examsInfoCache = this.props.examsInfoCache.toJS();
-            var cacheIds = _.map(examsInfoCache, (obj) => obj.id);//此处id是长id还是短id？怎么获取examsList--并且是跟着当前班级的权限走的，即：只获取此班级-- 班主任 --- 所参与的考试--这个在home的地方应该就有权限控制
-            ifCache = _.every(this.state.currentExamIds, (examid) => _.includes(cacheIds, examid));
-        }
-
-        ifCache = (ifCache && (this.state.currentExamIds.length > 0)); //必须至少有两个需要显示，所以有此条件判断~
-        var examsInfoList = _.map(this.state.currentExamIds, (examid) => {
-            return _.find(examsInfoCache, (obj) => obj.id == examid);
-        });
-
- */
+}

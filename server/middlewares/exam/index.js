@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-19 16:23:35
+* @Last Modified time: 2016-08-19 18:19:06
 */
 
 'use strict';
@@ -68,12 +68,13 @@ exports.home = function(req, res, next) {
 
     var auth = req.user.auth;
     var gradeAuth = auth.gradeAuth;
-    var ifShowSchoolReport = (auth.isSchoolManager || (_.isBoolean(gradeAuth[exam.grade.name]) && gradeAuth[exam.grade.name]));
+    var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
+    var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
     try {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
         var schoolReportResult = (ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
-        var classReportResult = classReport(exam, examScoreArr, examScoreMap);
+        var classReportResult = (ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;
         // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
 
         res.status(200).json({
@@ -86,6 +87,14 @@ exports.home = function(req, res, next) {
     } catch (e) {
         next(new errors.Error('format dashboard error : ', e));
     }
+}
+
+function ifAtLeastGradeManager(auth, gradeAuth, exam) {
+    return (auth.isSchoolManager || (_.isBoolean(gradeAuth[exam.grade.name]) && gradeAuth[exam.grade.name]));
+}
+
+function ifAtLeastGroupManager(auth, gradeAuth, exam) {
+    return (ifAtLeastGradeManager(auth, gradeAuth, exam)) && (gradeAuth[exam.grade.name].groupManagers && gradeAuth[exam.grade.name].groupManagers.length > 0);
 }
 
 /**
