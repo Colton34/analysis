@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-19 15:37:16
+* @Last Modified time: 2016-08-19 16:23:35
 */
 
 'use strict';
@@ -585,9 +585,9 @@ function getClassRecentExamsList(classAllExamList) {
     });
 }
 
-function getDefaultExamsInfoObjs(classAllExamList) {
+function getDefaultExamsInfoObjs(classRecentExamsList) {
     //Note: 找出连续的，3个，同等性质的考试；没有则随便选取最近的三个；还不行，有多少则给多少
-    var allExamIds = _.map(classAllExamList, (obj) => '@Exam.' + obj.id);
+    var allExamIds = _.map(classRecentExamsList, (obj) => '@Exam.' + obj.id);
     var examsPromise = _.map(allExamIds, (eid) => {
         return when.promise((resolve, reject) => {
             peterHFS.get(eid, (err, exam) => {
@@ -602,14 +602,14 @@ function getDefaultExamsInfoObjs(classAllExamList) {
         while(!ifFind && index < examObjs.length) {
             var exam = examObjs[index];
             if(!temp[exam.type]) temp[exam.type] = [];
-            temp[exam.type].push(classAllExamList[index]);
+            temp[exam.type].push(classRecentExamsList[index]);
             if(temp[exam.type].length == 3) ifFind = true;
             index++;
         }
         var defaultExamObjs;
         defaultExamObjs = _.find(temp, (examArr, examType) => examArr.length == 3);  //这里考试已经按照时间排过序了
         if(!defaultExamObjs) {
-            defaultExamObjs = (classAllExamList.length >= 3) ? _.take(classAllExamList, 3) : classAllExamList;
+            defaultExamObjs = (classRecentExamsList.length >= 3) ? _.take(classRecentExamsList, 3) : classRecentExamsList;
         }
         return when.resolve(defaultExamObjs);
     });
@@ -618,11 +618,28 @@ function getDefaultExamsInfoObjs(classAllExamList) {
 //设计Note：当前设计没必要此方法了--原设计是获取某个班级的考试列表(examList--auth, valid, currentClass)很容易！！！获取examInfoCache不容易，所以通过getMoreExams来获取examList中有但是examsInfoCache没有的exam--但是，要想获取某个班级的考试列表，也需要计算大量的数据结构--其实就是
 //examInfoCache用到的数据结构--这样一来，既然大家成本都一样，所以这两者之间就没有cache的意义了。但是cache还是有必要的---在前面一层--即对examList（也包括examInfoCache）进行cache，但是当前没有”获取更多“或者其他起到筛选（避免一次获取太多性能太差--并且没必要一次获取全部）的方式，所以当前
 //获取的方式是：按照时间就近排序，获取此班级所参与的5场除了自定义以外的类型的考试
-// exports.getMoreExams = function(req, res, next) {
+exports.getMoreExams = function(req, res, next) {
+    req.checkQuery('examids', '获取更多examInfo错误，无效的examids').notEmpty();
+    req.checkQuery('grade', '获取更多examInfo错误，无效的grade').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
 
-// }
+    var grade = decodeURI(req.query.grade);
+    var examids = JSON.parse(req.query.examids);
+    var mockExamObjs = _.map(examids, (id) => {
+        return {
+            id: id
+        }
+    });
+    var examInfoPromises = _.map(mockExamObjs, (examObj) => {
+        return getExamInfo(examObj, grade, req.user);
+    });
 
-
+    when.all(examInfoPromises).then(function(results) {
+        res.status(200).json(results);
+    }).catch(function(err) {
+        next(err);
+    })
+}
 
 
 // exports.updateCustomExamLevels = function(req, res, next) {

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-19 13:11:01
+* @Last Modified time: 2016-08-19 16:28:42
 */
 
 
@@ -365,36 +365,20 @@ export function fetchPaper(params) {
 //Note: 历史分析的examList不带有自定义的！！！所以自定义的进来也走相同的逻辑没有问题。。。。吧？
 export function initExamCache(params) {
     var url = examPath + '/init/examcache?schoolId='+ params.schoolId +'&grade='+ params.grade +'&currentClass=' + params.currentClass;
-    // debugger;
+
     return params.request.get(url).then(function(res) {
         debugger;
         return Promise.resolve(res.data);
     });
-
-
-
-
-    //TODO:在后端计算的这个examList就是跟着权限走的！！！参数中带有currentClass
-    // return Promise.resolve({
-    //     examList: [{id:'123', name: 'liu'}, {id: '321', name: 'cong'}],
-    //     examsInfoCache: [{examid:'123', name: 'liu'}, {examid: '321', name: 'juan'}]
-    // })
-
-    // return params.request.get(url).then(function(res) {
-    //     return Promise.resolve(res.data);
-    // });
 }
 
 export function getMoreExams(params) {
-    var url = '';
+    var ids = JSON.stringify(params.examids);
+    var url = examPath + '/get/more?examids=' + ids +'&grade=' + params.grade;
 
-    return Promise.resolve([
-        {name: 'hell'}, {name: 'magic'}
-    ]);
-    //TODO:下面的语法可能不正确--但是应该使用get，通过query的方式传递需要获取的exams
-    // return params.request.get({path: url, query: {examIds: params.examIds}}).then(function(res) {
-    //     return Promise.resolve(res.data);
-    // })
+    return params.request.get(url).then(function(res) {
+        return Promise.resolve(res.data);
+    });
 }
 
 
