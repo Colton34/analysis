@@ -3,8 +3,22 @@ import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import StatisticalLib from 'simple-statistics';
 
-export default function ExamInspectPerformance({reportDS, currentClass}) {
+class ExamInspectPerformance extends React.Component {
+    constructor(props) {
+        super(props);
+        //构建数据结构
+        var {reportDS, currentClass} = this.props;
+        var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
+        var theDS = getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass);
+        debugger;
+    }
 
+    render() {
+        //随着state的当前变量进行展示
+        return (
+            <div></div>
+        );
+    }
 }
 
 

@@ -11,7 +11,7 @@ import commonClass from '../../../common/common.css';
 var COLOR_CONSTANT = ['#0099ff', '#33cc33', '#33cccc'];
 
 export default  function CriticalStudent({reportDS, currentClass}) {
-    var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS(), levelBuffers = reportDS.levelBuffers.toJS();
+    var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), levelBuffers = reportDS.levelBuffers.toJS();
     var {xAxis, criticalStudentInfo} = getDS(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers, currentClass);
     var chartDS = getChartDS(criticalStudentInfo);
     var levelBufferInfo = getLevelBufferInfo(levelBuffers, levels);
@@ -101,11 +101,6 @@ export default  function CriticalStudent({reportDS, currentClass}) {
 }
 
 //=================================================  分界线  =================================================
-
-// export default  function CriticalStudent({reportDS, currentClass}) {
-//     var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS(), levelBuffers = reportDS.levelBuffers.toJS();
-//     var theDS = getDS(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers, currentClass);
-// }
 
 function getDS(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers, currentClass) {
     var xAxis = makeChartXAxis(levels);

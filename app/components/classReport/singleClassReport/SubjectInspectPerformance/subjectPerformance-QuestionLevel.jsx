@@ -50,7 +50,7 @@ function getQuestionScoreRate(questions, pid, students, allStudentsPaperQuestion
     });
 }
 
-//TODO: 怎么分组？？？
+//TODO: 怎么分组？？？--（得分率最高-得分率最低）/ 5
 function getQuestionLevelGroup(gradeQuestionScoreRates, questions) {
 
 }
