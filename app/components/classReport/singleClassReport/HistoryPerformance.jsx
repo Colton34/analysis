@@ -79,6 +79,7 @@ class HistoryPerformance extends React.Component {
             // console.log('初始化：examList和examInfoCache');
             // debugger;
             // params.examIds = [];
+            params.schoolId = this.props.user.schoolId;
             params.grade = this.props.grade;
             params.currentClass = this.props.currentClass;
             this.props.initExamCache(params);
@@ -152,6 +153,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(HistoryPerformance);
 
 function mapStateToProps(state, ownProps) {
     return {
+        user: ownProps.user,
         currentClass: ownProps.currentClass,
         haveInit: state.examsCache.haveInit,
         examList: state.examsCache.examList,

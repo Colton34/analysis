@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import {Link} from 'react-router';
+import {Map} from 'immutable';
 
 import CommonErrorView from '../common/ErrorView';
 import CommonLoadingView from '../common/LoadingView';
@@ -46,12 +47,13 @@ class ContentComponent extends React.Component {
     render() {
         var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
         var examName = this.props.reportDS.examInfo.toJS().name;
+        var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
 
         return (
             <div>
                 <ReportNavHeader examName={examName} examid={this.props.examid} grade={this.props.grade} />
                 {(isSchoolManagerOrGradeManager) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} reportDS={this.props.reportDS} /> : ''}
-                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> : <SingleClassReport reportDS={this.props.reportDS} grade={this.props.grade} />}
+                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> : <SingleClassReport reportDS={this.props.reportDS} user={user} grade={this.props.grade} />}
             </div>
         );
     }

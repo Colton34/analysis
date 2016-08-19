@@ -54,7 +54,7 @@ class SingleClassReport extends React.Component {
                 <ImportStudentInfo classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
 */}
 
-                <HistoryPerformance grade={this.props.grade} currentClass={this.state.currentClass} />
+                <HistoryPerformance user={this.props.user} grade={this.props.grade} currentClass={this.state.currentClass} />
                 {/* ... */}
             </div>
         );

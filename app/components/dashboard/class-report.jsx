@@ -22,7 +22,6 @@ class ClassReport extends React.Component {
         var {data} = this.props;
         var classNames = _.map(data['top5ClassesMean'], (obj) => obj.name);
         var theMeans = _.map(data['top5ClassesMean'], (obj) => obj.mean);
-debugger;
 
       var average=data.gradeMean;
       var config = {

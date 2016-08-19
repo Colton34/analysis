@@ -2,7 +2,7 @@
  * @Author: HellMagic
  * @Date:   2016-04-30 11:14:17
  * @Last Modified by:   HellMagic
- * @Last Modified time: 2016-08-18 11:21:20
+ * @Last Modified time: 2016-08-19 12:08:42
  */
 
 'use strict';
@@ -32,7 +32,7 @@ router.put('/custom/analysis', exam.inValidCustomAnalysis);
 router.put('/levels', exam.updateExamBaseline);
 
 router.get('/init/examcache', exam.initExamCache);
-router.get('/get/more', exam.getMoreExams);
+// router.get('/get/more', exam.getMoreExams);
 // router.put('/custom/levels', exam.updateCustomExamLevels);
 
 module.exports = router;
