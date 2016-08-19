@@ -13,7 +13,6 @@ import SubjectDistributionScoreLevel from './subjectDistribution-ScoreLevel';
 import CriticalStudentDistribution from './CriticalStudentDistribution';
 import SubjectPerformance from './SubjectExamPerformance';
 
-
 import SubjectPerformanceExamInspect from './SubjectInspectPerformance/subjectPerformance-ExamInspect';
 import SubjectPerformanceQuestionTopic from './SubjectInspectPerformance/subjectPerformance-QuestionTopic';
 import SubjectPerformanceQuestionLevel from './SubjectInspectPerformance/subjectPerformance-QuestionLevel';
@@ -28,6 +27,7 @@ class SingleClassReport extends React.Component {
         }
     }
 
+    //TODO:能选择哪些班级是跟着这个用户的权限走的！！！
     chooseClass(className) {
         this.setState({
             currentClass: className
@@ -54,7 +54,7 @@ class SingleClassReport extends React.Component {
                 <ImportStudentInfo classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
 */}
 
-                <HistoryPerformance currentClass={this.state.currentClass} />
+                <HistoryPerformance grade={this.props.grade} currentClass={this.state.currentClass} />
                 {/* ... */}
             </div>
         );

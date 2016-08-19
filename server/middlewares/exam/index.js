@@ -2,12 +2,13 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-12 10:10:46
+* @Last Modified time: 2016-08-18 18:25:34
 */
 
 'use strict';
 
 var _ = require('lodash');
+var co = require('co');
 var when = require('when');
 var moment = require('moment');
 require('moment/locale/zh-cn');
@@ -485,6 +486,211 @@ exports.updateExamBaseline = function(req, res, next) {
     });
 }
 
+//TODO:
+/*
+return:
+{
+    examList: [{id:'123', name: 'liu'}, {id: '321', name: 'cong'}],
+    examsInfoCache: [{examid:'123', name: 'liu'}, {examid: '321', name: 'juan'}]
+}
+examList是当前用户所管辖的班级下的所有考试
+
+
+ */
+
+
+
+exports.initExamCache = function(req, res, next) {
+    req.checkQuery('grade', '初始化examCache错误，无效的grade').notEmpty();
+    req.checkQuery('currentClass', '初始化examCache错误，无效的currentClass').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    var grade = decodeURI(req.query.grade), currentClass = req.query.currentClass;
+    co(function *(){
+        var school = yield examUitls.getSchoolById(req.user.schoolId);
+console.log('1, school.name = ', school.name);
+
+        var originalExams = yield examUitls.getExamsBySchool(school);
+console.log('originalExams.length = ', originalExams.length);
+
+
+        var validExams = _.filter(originalExams, (examObj) => examObj['[papers]'].length > 0);
+console.log('validExams.length = ', validExams.length);
+
+
+        var formatedExams = formatExams(validExams);
+console.log('formatedExams.length = ', formatedExams.length);
+
+
+        formatedExams = _.concat(..._.map(formatedExams, (obj) => obj.values));
+        formatedExams = _.filter(formatedExams, (obj) => obj.grade == grade);
+console.log('== formatedExams.length = ', formatedExams.length);
+
+
+        //TODO:将formatedExams转换成纯array--按照时间排序
+        //从formatedExams中选出此班级最近的5此考试
+        var results = [], obj = {index: 0};
+        while(results.length < 5) {
+console.log('results.length == ' + results.length, '   index = ', obj.index);
+            var v = yield getOneExamInfo(formatedExams[obj.index], grade, req.user);
+            obj.index = obj.index + 1;
+            if(isCurrentClassExam(v, currentClass)) results.push(v);
+        }
+console.log('results.length = ', results.length);
+
+        var examCache = getExamCache(results);
+console.log('成功返回');
+
+        res.status(200).json(examCache);
+    }).catch(function(err) {
+        next(err);
+    });
+}
+
+function getOneExamInfo(exam, grade, user) {
+    var temp = {};
+
+console.log('exam.examid == ', exam.examid);
+
+    var objectId = _.split(exam.examid, '_')[0];
+    var shortExamid = objectId.slice(_.findIndex(objectId, (c) => c !== '0'));
+
+console.log('shortExamid = ', shortExamid);
+console.log('grade = ', grade, '   schoolId = ', user.schoolId);
+
+    return examUitls.generateExamInfo(shortExamid, grade, user.schoolId).then(function(exam) {
+        temp.exam = exam;
+        return examUitls.generateExamScoresInfo(temp.exam, user.auth);
+    }).then(function(result) {
+        temp = _.assign(temp, result);
+
+        var exam = temp.exam,
+            examScoreMap = temp.classScoreMap,
+            examScoreArr = temp.orderedScoresArr;
+        try {
+            temp.examInfo = formatExamInfo(exam);
+            temp.examPapersInfo = generateExamPapersInfo(exam);
+            temp.examClassesInfo = genearteExamClassInfo(exam);
+            return generateExamStudentsInfo(exam, examScoreArr, temp.examClassesInfo, temp.examPapersInfo);
+        } catch (e) {
+            return when.reject(new errors.Error('获取一场考试信息失败', e));
+        }
+    }).then(function(examStudentsInfo) {
+        return when.resolve({
+            examid: exam._id,
+            examInfo: temp.examInfo,
+            examPapersInfo: temp.examPapersInfo,
+            examClassesInfo: temp.examClassesInfo,
+            examStudentsInfo: examStudentsInfo
+        })
+    });
+}
+
+function isCurrentClassExam(result, currentClass) {
+    return _.includes(result.examInfo.realClasses, currentClass);
+}
+
+function getExamCache(results) {
+    var examList = [], examsInfoCache = [];
+    _.each(results, (obj) => {
+        examList.push({id: obj.examid, name: obj.examInfo.name});
+        examsInfoCache.push(obj);
+    });
+
+    return {
+        examList: examList,
+        examsInfoCache: examsInfoCache  //{id: , name: }
+    }
+}
+
+// exports.initExamCache = function(req, res, next) {
+//     req.checkQuery('grade', '初始化examCache错误，无效的grade').notEmpty();
+//     req.checkQuery('currentClass', '初始化examCache错误，无效的currentClass').notEmpty();
+//     if(req.validationErrors()) return next(req.validationErrors());
+
+//     // var examList = getExamList();
+//     // var examsInfoCache = getExamsInfoCache();
+
+//     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
+//         return examUitls.getExamsBySchool(school); //这个数据一定要保证都是正常的阅卷exam.
+//     }).then(function(originalExams) {
+//         var validExams = _.filter(originalExams, (examObj) => examObj['[papers]'].length > 0);
+//         var formatedExams = formatExams(validExams);
+// //从formatedExams
+// //5场考试--1.select的长度  2.对比的意义
+//         //因为默认是连续，同等性质的 3 场考试--就先默认连续。。。。
+//         // var filterFiveExams =
+//         var {examsInfoList, examList} = getExamCache(formatedExams, decodeURI(req.query.grade), req.query.currentClass);
+
+
+
+
+// console.log('one exam =========');
+// console.log(originalExams[0]);
+//         // return when.resolve('ok');
+//         var validExams = filterExamList(originalExams);//originalExams已经确定是同一个年级了是么？
+
+//         res.status(200).json({
+//             examList: 'ok',
+//             examsInfoCache: 'ok'
+//         })
+
+
+//     });
+
+// }
+
+
+// function getExamCache(originalFormatedExams, grade, currentClass) {
+//     //1.目标：从originalFormatedExams中拿到5个此班级参与的考试数据
+//         //算法：按照时间依次从originalFormatedExams中获取5个信息，知道满足此班级参与的exam信息够5个
+
+// //自定义分析那里没有，所以暂时不考虑grade的问题，过~
+
+// }
+
+// function getVaildFiveExamInfo(firstValues) {
+
+
+
+
+
+//     return when.promise(function(resolve, reject) {
+//         while(firstValues.length < 5) {
+//             getMoreOneExamInfo(exam, grade, user).then(function(v) {
+//                 firstValues.push(v);
+//             });
+//         }
+//         resolve(firstValues);
+//     })
+
+//     while(firstValues.length < 5) {
+
+//     }
+//     return getFirstFive().then(function(results) {
+//         if(ifFive) return when.resolve(results);
+
+//     })
+// }
+
+
+
+// function getExamList(user, currentClass) {
+
+// }
+
+// //1.匹配班级   2.必须是阅卷考试
+// function filterExamList(originalExams) {
+
+// }
+
+exports.getMoreExams = function(req, res, next) {
+
+}
+
+
+
+
 // exports.updateCustomExamLevels = function(req, res, next) {
 // //自定义中确定一个exam就对应个grade，所以不需要数组的形式，也就不需要查找，直接更新即可
 // //需要组织成[levels]这样的key！！！
@@ -571,6 +777,7 @@ function formatExams(exams) {
             _.each(value.papersMap, function(papers, gradeKey) {
                 var obj = {};
                 obj.examName = (justOneGrade) ? value.exam.name : value.exam.name + "(年级：" + gradeKey + ")";
+                obj.examid = value.exam._id + '_' + gradeKey;
                 obj.grade = gradeKey;
                 obj.id = key;
                 obj.time = moment(value.exam['event_time']).valueOf();
@@ -1166,7 +1373,7 @@ function getPaperInstanceByExam(exam) {
     var papersPromise = _.map(exam['[papers]'], (paperObj) => {
         return when.promise(function(resolve, reject) {
             peterHFS.get(paperObj.paper, function(err, paper) {
-                if(err) return reject(new errors.Data.MongDBError('find paper: ' + paperId + '  Error', err));
+                if(err) return reject(new errors.Data.MongoDBError('find paper: ' + paperId + '  Error', err));
                 resolve(paper);
             });
         });

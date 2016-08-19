@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-08 12:13:20
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-08-18 18:19:15
 */
 'use strict';
 var _ = require('lodash');
@@ -86,7 +86,7 @@ exports.getGradeExamBaseline = getGradeExamBaseline;
 function getExamById(examid) {
     return when.promise(function(resolve, reject) {
         peterHFS.get('@Exam.'+examid, function(err, exam) {
-            if(err || !exam) return reject(new errors.data.MongDBError('find exam = '+ examid + 'Error: ', err));
+            if(err || !exam) return reject(new errors.data.MongoDBError('find exam = '+ examid + 'Error: ', err));
             resolve(exam);
         });
     });

@@ -35,8 +35,27 @@ examCache持有examList
 
  */
 
-function HistoryContent({examList, examsInfoCache, currentExamIds}) {
+
+// class  extends React.Component {
+//     constructor(props) {
+//         super(props);
+//         //根据当前班级从examList中过滤出d
+//         this.state = {
+//             currentExamList: []
+//         }
+//     }
+
+//     render() {
+//         return (
+//             <div></div>
+//         );
+//     }
+// }
+
+
+function HistoryContent({examList, examsInfoCache, currentExamIds}) {//这里examList就是跟着currentClass走的
     examList = examList.toJS(), examsInfoCache = examsInfoCache.toJS();
+    //根据currentExamIds和examsInfoCache得到要显示对比的考试。examList用来填充选择考试的下拉框
     return (
         <div>
             <h1>Yes, Cached: {examsInfoCache.length}</h1>
@@ -59,7 +78,8 @@ class HistoryPerformance extends React.Component {
         if(!this.props.haveInit) {
             // console.log('初始化：examList和examInfoCache');
             // debugger;
-            params.examIds = [];
+            // params.examIds = [];
+            params.grade = this.props.grade;
             params.currentClass = this.props.currentClass;
             this.props.initExamCache(params);
         }
