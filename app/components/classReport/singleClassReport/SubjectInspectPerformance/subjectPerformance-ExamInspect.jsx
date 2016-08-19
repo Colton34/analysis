@@ -16,7 +16,7 @@ class ExamInspectPerformance extends React.Component {
     render() {
         //随着state的当前变量进行展示
         return (
-            <div></div>
+            <div>学科内部表现：ExamInspect</div>
         );
     }
 }

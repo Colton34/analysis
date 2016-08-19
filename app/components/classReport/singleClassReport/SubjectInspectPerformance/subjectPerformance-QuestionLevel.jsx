@@ -1,9 +1,99 @@
 //试题难度题组表现
-
+import _ from 'lodash';
 import React, { PropTypes } from 'react';
+import ECharts from 'react-echarts';
+import ReactHighcharts from 'react-highcharts';
+
+import commonClass from '../../../../common/common.css';
+import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
 export default function QuestionLevel({reportDS, currentClass}) {
+  var option = {
+    tooltip: {},
+    legend: {
+        data: ['年级平均得分率', '班级平均得分率'],
+        right:25,
+        top:25,
+        orient:'vertical',
+        textStyle:{
+          color:'#6a6a6a'
+        },
+    },
+    radar: {
+        indicator: [
+           { name: '最难题组', max:150},
+           { name: '最难题组', max: 150},
+           { name: '最难题组', max: 150},
+           { name: '最难题组', max: 150},
+           { name: '最难题组', max: 150}
+        ],
+        radius:150,
+        splitNumber:3,//刻度数目
+        axisTick:{show:false},//刻度
+        axisLabel:{show:false},//刻度数字
+        splitArea: {
+                areaStyle: {
+                    color: ['#fff',
+                    '#fff', '#fff',
+                    '#fff', '#fff'],
+                    shadowColor: 'rgba(0, 0, 0, 0.3)',
+                    shadowBlur: 0
+                }
+            },
+            name: {
+           textStyle: {
+               color: '#6a6a6a'
+           }
+       },
+            splitLine: {//分割线颜色
+            lineStyle: {
+                color: '#f2f2f3'
+            },
+          },
+            axisLine: {
+           lineStyle: {
+               color: '#f2f2f3'
+           }
+       }
 
+
+    },
+    series: [{
+        name: '班级vs年级',
+        type: 'radar',
+        //areaStyle: {normal: {}},
+        color:['#0099ff','#cccccc'],
+        data : [
+            {
+                value : [30, 50,60, 80, 100],
+                name : '班级平均得分率'
+            },
+             {
+                value : [50, 140, 80, 31, 42],
+                name : '年级平均得分率'
+            }
+        ]
+    }]
+};
+
+var subjectPerformance={
+  high:'较难题组',
+  low:'较易题组'
+};
+    return (
+        <div style={{marginRight: 20, display: 'inline-block'}}>
+            <div style={{marginBottom: 18}}>
+                <span className={commonClass['sub-title']}>试题难度题组表现</span>
+                <span className={commonClass['title-desc']}>我们把这次考试的所有题目按照难度分成了5个题组</span>
+            </div>
+            <div style={{width: 560, height: 465, border: '1px solid' + colorsMap.C05, borderRadius: 2}}>
+                {/**放置highcharts图 */}
+            <ECharts option={option} style={{height:400}}></ECharts>
+            <p style={{fontSize: 12, marginTop: 0,marginLeft:15,marginRight:15}}><span style={{color: colorsMap.B08}}>*</span>
+            本次考试中，班级整体在{subjectPerformance.high}表现很好，而{subjectPerformance.low}表现不好，请结合班级实际情况，关注重点，在下一次考试中，提高班级整体水平</p>
+            </div>
+        </div>
+    )
 }
 
 

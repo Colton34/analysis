@@ -12,10 +12,16 @@ import TotalScoreLevelDistribution from './totalScore-levelDistribution';
 import SubjectDistributionScoreLevel from './subjectDistribution-ScoreLevel';
 import CriticalStudentDistribution from './CriticalStudentDistribution';
 import SubjectPerformance from './SubjectExamPerformance';
+import SubjectInspectPerformance from './SubjectInspectPerformance';
 
-import SubjectPerformanceExamInspect from './SubjectInspectPerformance/subjectPerformance-ExamInspect';
-import SubjectPerformanceQuestionTopic from './SubjectInspectPerformance/subjectPerformance-QuestionTopic';
-import SubjectPerformanceQuestionLevel from './SubjectInspectPerformance/subjectPerformance-QuestionLevel';
+
+// import SubjectPerformanceExamInspect from './SubjectInspectPerformance/subjectPerformance-ExamInspect';
+// import SubjectPerformanceQuestionTopic from './SubjectInspectPerformance/subjectPerformance-QuestionTopic';
+// import SubjectPerformanceQuestionLevel from './SubjectInspectPerformance/subjectPerformance-QuestionLevel';
+
+
+
+
 import ImportStudentInfo from './ImportStudentInfo';
 import HistoryPerformance from './HistoryPerformance';
 
@@ -44,18 +50,16 @@ class SingleClassReport extends React.Component {
 
         return (
             <div>
-{/*                <Header examInfo={this.props.reportDS.examInfo} />
+                <Header examInfo={this.props.reportDS.examInfo} />
                 <TotalScoreTrend reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
+                <SubjectInspectPerformance reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <ImportStudentInfo classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
                 <HistoryPerformance user={this.props.user} grade={this.props.grade} currentClass={this.state.currentClass} />
-*/}
-                <CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
-                {/* ... */}
             </div>
         );
     }

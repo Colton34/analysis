@@ -187,6 +187,7 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
     return result;
 }
 
+//根据计算得到的标准分进行排名：
 function getExamSubjectRank() {
 
 }

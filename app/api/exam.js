@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-19 16:28:42
+* @Last Modified time: 2016-08-19 18:32:27
 */
 
 
@@ -367,7 +367,6 @@ export function initExamCache(params) {
     var url = examPath + '/init/examcache?schoolId='+ params.schoolId +'&grade='+ params.grade +'&currentClass=' + params.currentClass;
 
     return params.request.get(url).then(function(res) {
-        debugger;
         return Promise.resolve(res.data);
     });
 }

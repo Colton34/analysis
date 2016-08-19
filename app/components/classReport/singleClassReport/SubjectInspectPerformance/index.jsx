@@ -3,7 +3,7 @@ import React from 'react';
 
 import DropdownList from '../../../../common/DropdownList';
 import ExamInspect from './subjectPerformance-ExamInspect';
-import QuestionTopic from './subjectPerformance-QuestionTopic';
+// import QuestionTopic from './subjectPerformance-QuestionTopic';
 import QuestionLevel from './subjectPerformance-QuestionLevel';
 import QuestionAbility from './subjectPerformance-QuestionAbility';
 
@@ -30,8 +30,8 @@ export default function SubjectInspectPerformance() {
                 <Card title={questionPerformance.good.join(' ')} titleStyle={{color: colorsMap.B04}} desc={'表现较好的题目'} style={{marginRight: 20}}/>
                 <Card title={questionPerformance.bad.join(' ')} titleStyle={{color: colorsMap.B08}} desc={'表现较不足的题目'}/>
             </div>
-{/*            <ExamInspect/>
-            <QuestionTopic/>  */}
+            <ExamInspect/>
+            {/* <QuestionTopic/>  */}
             <div style={{marginTop: 30}}>
                 <QuestionLevel/>
                 <QuestionAbility/>
