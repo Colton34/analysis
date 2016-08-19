@@ -114,14 +114,14 @@ class Dashboard extends React.Component {
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
         var schoolReport = (Map.isMap(this.props.dashboard.schoolReport)) ? this.props.dashboard.schoolReport.toJS() : this.props.dashboard.schoolReport;
-        // var classScoreReport = (Map.isMap(this.props.dashboard.classScoreReport)) ? this.props.dashboard.classScoreReport.toJS() : this.props.dashboard.classScoreReport;
+        var classReport = (Map.isMap(this.props.dashboard.classReport)) ? this.props.dashboard.classReport.toJS() : this.props.dashboard.classReport;
 
         // var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) return;
         var grade = this.props.location.query.grade || '';
         if (this.state.loading)
-            //(!levelScoreReport || _.size(levelScoreReport) == 0) || (!classScoreReport || _.size(classScoreReport) == 0)
+            //(!levelScoreReport || _.size(levelScoreReport) == 0) || (!classReport || _.size(classReport) == 0)
             return (
                 <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
                     <Spinkit/>
@@ -161,7 +161,7 @@ class Dashboard extends React.Component {
                                 </div>
                                 {/* */}
                                 <div className='row' style={{ marginTop: 20 }}>
-                                    <ClassReport />
+                                    {(classReport && _.size(classReport) > 0) ? <ClassReport data={classReport} grade={grade} examid={examid} /> : ''}
                                     <LevelReport />
                                     <SubjectReport />
                                 </div>
