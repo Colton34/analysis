@@ -49,11 +49,12 @@ class SingleClassReport extends React.Component {
         var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
 
         var {currentClass} = this.state;
+        var {changeLevels, saveBaseline, examid, grade} = this.props;
         return (
             <div>
                 <Header examInfo={this.props.reportDS.examInfo} currentClass={currentClass}/>
                 <TotalScoreTrend reportDS={this.props.reportDS} classStudents={classStudents} />
-                <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} />
+                <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} changeLevels={changeLevels} saveBaseline={saveBaseline} examid={examid} grade={grade}/>
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />

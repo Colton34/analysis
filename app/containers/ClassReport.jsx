@@ -13,7 +13,7 @@ import ReportTabNav from '../components/classReport/ReportTabNav';
 import MultiClassReport from '../components/classReport/multiClassReport';
 import SingleClassReport from '../components/classReport/singleClassReport';
 
-import {initReportDSAction} from '../reducers/reportDS/actions';
+import {initReportDSAction, changeLevelAction, saveBaselineAction} from '../reducers/reportDS/actions';
 
 import {initParams} from '../lib/util';
 
@@ -55,7 +55,10 @@ class ContentComponent extends React.Component {
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}}>
                 <ReportNavHeader examName={examName} examid={this.props.examid} grade={this.props.grade} />
                 {(isSchoolManagerOrGradeManager) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} reportDS={this.props.reportDS} /> : ''}
-                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> : <SingleClassReport reportDS={this.props.reportDS} user={user} grade={this.props.grade} />}
+                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> 
+                    : <SingleClassReport 
+                        reportDS={this.props.reportDS} user={user} grade={this.props.grade} examid={this.props.examid}
+                        changeLevels={this.props.changeLevels} saveBaseline={this.props.saveBaseline}/>}
             </div>
         );
     }
@@ -80,7 +83,7 @@ class ClassReport extends React.Component {
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <CommonLoadingView /> : (
-                    <ContentComponent reportDS={this.props.reportDS} user={this.props.user} examid={examid} grade={grade} />
+                    <ContentComponent reportDS={this.props.reportDS} user={this.props.user} examid={examid} grade={grade} changeLevels={this.props.changeLevels} saveBaseline={this.props.saveBaseline}/>
                 ))}
             </div>
         );
@@ -100,7 +103,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        initReportDS : bindActionCreators(initReportDSAction, dispatch)
+        initReportDS : bindActionCreators(initReportDSAction, dispatch),
+        changeLevels: bindActionCreators(changeLevelAction, dispatch),
+        saveBaseline: bindActionCreators(saveBaselineAction, dispatch)
     }
 }
 
