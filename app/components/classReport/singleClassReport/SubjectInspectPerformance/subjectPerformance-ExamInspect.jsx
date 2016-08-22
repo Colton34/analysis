@@ -16,33 +16,37 @@ class ExamInspectPerformance extends React.Component {
     render() {
         //随着state的当前变量进行展示
         return (
-            <div>学科内部表现：ExamInspect</div>
+            <div>
+                <h4>学科内部表现：ExamInspect</h4>
+            </div>
         );
     }
 }
-
+export default ExamInspectPerformance;
 
 //=================================================  分界线  =================================================
+//Note: 题目贡献指数 = 班级此道题目平均得分率 - 全校此道题目平均得分率。指数值为正，是促进作用；为负，是拖后腿。
 function getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass) {
     var result = {}, currentClassStudents = studentsGroupByClass[currentClass];
     var allStudentsPaperQuestionInfo = {};
     _.each(examStudentsInfo, (studentObj) => {
         allStudentsPaperQuestionInfo[studentObj.id] = _.keyBy(studentObj.questionScores, 'paperid');
     });
-
     //计算每个科目对应的数据
     _.each(examPapersInfo, (paperObj, pid) => {
         var classQuestionScoreRates = getClassQuestionScoreRate(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass);
+        var gradeQuestionScoreRates = getGradeQuestionScoreRate(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
+        var questionContriFactors = _.map(classQuestionScoreRates, (x, i) => _.round(_.subtract(x, gradeQuestionScoreRates[i]), 2));
         var gradeQuestionSeparation = getGradeQuestionSeparation(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
         result[pid] = {
-            classQuestionScoreRates: classQuestionScoreRates,
-            gradeQuestionSeparation: gradeQuestionSeparation
+            questionContriFactors: questionContriFactors,
+            questionSeparation: gradeQuestionSeparation
         };
     });
     return result;
 }
 
-//Warning:所有有关学科的计算都应该是先找到“真正考试了此学科的所有考生”，然后在筛选出“此班级的学生”
+//Warning:所有有关学科的计算都应该是先找到“真正考试了此学科的所有考生”，然后再筛选出“此班级的学生”
 function getClassQuestionScoreRate(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass) {
 //计算本班级的此道题目的得分率：
     //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分
@@ -50,6 +54,18 @@ function getClassQuestionScoreRate(questions, pid, allStudentsPaperMap, allStude
     return _.map(questions, (questionObj, index) => {
         //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
         return _.round(_.divide(_.mean(_.map(currentClassPaperStudents, (studentObj) => {
+            return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
+        })), questionObj.score), 2);
+    });
+}
+
+function getGradeQuestionScoreRate(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo) {
+//计算本班级的此道题目的得分率：
+    //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分
+    var gradePaperStudents = allStudentsPaperMap[pid];
+    return _.map(questions, (questionObj, index) => {
+        //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
+        return _.round(_.divide(_.mean(_.map(gradePaperStudents, (studentObj) => {
             return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
         })), questionObj.score), 2);
     });

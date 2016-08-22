@@ -3,9 +3,9 @@ import React from 'react';
 
 import DropdownList from '../../../../common/DropdownList';
 import ExamInspect from './subjectPerformance-ExamInspect';
-// import QuestionTopic from './subjectPerformance-QuestionTopic';
 import QuestionLevel from './subjectPerformance-QuestionLevel';
 import QuestionAbility from './subjectPerformance-QuestionAbility';
+// import QuestionTopic from './subjectPerformance-QuestionTopic';
 
 import commonClass from '../../../../common/common.css';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
@@ -13,7 +13,7 @@ import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 var subjects = [{value:'语文'},{value:'数学'}, {value:'物理'}, {value:'英语'}];
 var questionPerformance = {good: ['T1', 'T2', 'T5', 'T9'], bad: ['T10', 'T12', 'T13']};
 
-export default function SubjectInspectPerformance() {
+export default function SubjectInspectPerformance({reportDS, currentClass}) {
     return (
         <div id='subjectInspectPerformance' className={commonClass['section']}>
             <div style={{ marginBottom: 30 ,position:'relative'}}>
@@ -30,11 +30,11 @@ export default function SubjectInspectPerformance() {
                 <Card title={questionPerformance.good.join(' ')} titleStyle={{color: colorsMap.B04}} desc={'表现较好的题目'} style={{marginRight: 20}}/>
                 <Card title={questionPerformance.bad.join(' ')} titleStyle={{color: colorsMap.B08}} desc={'表现较不足的题目'}/>
             </div>
-            <ExamInspect/>
+            <ExamInspect reportDS={reportDS} currentClass={currentClass} />
             {/* <QuestionTopic/>  */}
             <div style={{marginTop: 30}}>
-                <QuestionLevel/>
-                <QuestionAbility/>
+                <QuestionLevel />
+                <QuestionAbility />
             </div>
         </div>
     )
