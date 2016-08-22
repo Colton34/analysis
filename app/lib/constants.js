@@ -133,6 +133,7 @@ export const COLORS_MAP = {
     B06 : '#f7be38',
     B07 : '#f6953d',
     B08 : '#ee6b52',
+    B10 : '#c5e9f8',
     B12 : '#e0f4fc',
     C02:  '#FAFAFA',
     C03 : '#f2f2f2',
