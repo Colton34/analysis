@@ -40,7 +40,7 @@ class SegmentDetailChart extends React.Component {
             })
         }
         //遍历this.state.seriesShow 添加颜色属性
-            _.range(_.size(this.state.seriesShow)).map((num)=>{return this.state.seriesShow[num].color=colors[num]});
+            _.range(_.size(this.state.seriesShow)).map((num)=>{return this.state.seriesShow[num].color=colorList[num]});
     }
     render() {
         var {chartData, classList} = this.props;
