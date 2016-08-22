@@ -27,7 +27,7 @@ export default function Trend({reportDS, classStudents}) {
             <div className={singleClassReportStyle['analysis-conclusion']}>
                 <div>分析诊断：</div>
                 {/**------------------------- todo: 根据计算结果来确定显示的结论语句------------------------- */}
-                <div>以班级总分平均分来衡量，这次考试本班高于平均分的学生人数较多，相应高分段的学生人数密度来的较大，而低分段学生的成绩拉扯班级平均分较为显著，请班主任多关注底端的学生。鼓励他们提高总分水平，极有利于提高本班总平均分水平。</div>
+                <div>{skewnessInfo}</div>
             </div>
         </div>
     )
