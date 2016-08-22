@@ -33,7 +33,8 @@ class SubjectLevelDisribution extends React.Component {
         var levelLastIndex = _.size(this.levels) - 1;
         var currentLevelDS = this.theDS[(levelLastIndex - activeTab)];
         var tableDS = currentLevelDS.tableDS;
-        var subjectDS = getSubjectDS(currentLevelDS.bestAndWorst);
+        var countSubjectDS = getSubjectDS(currentLevelDS.bestAndWorst);
+        var percentageSubjectDS = currentLevelDS.percentageSubjectDS; //TODO:新增，需要响应的文案
 
         return (
             <div id='scoreLevel' className={commonClass['section']}>
@@ -56,7 +57,7 @@ class SubjectLevelDisribution extends React.Component {
                 </div>
                 {/** *************表格***********/}
                 <TableView tableData={tableDS}/>
-                <p style={{fontSize: 12, marginTop: 15}}><span style={{color: colorsMap.B08}}>*</span>本次班级学生总分达到{numberMap[activeTab]}档上线水平这一点上，本班{subjectDS.high}学科表现较好，{subjectDS.low}学科表现相对不足</p>
+                <p style={{fontSize: 12, marginTop: 15}}><span style={{color: colorsMap.B08}}>*</span>本次班级学生总分达到{numberMap[activeTab]}档上线水平这一点上，本班{countSubjectDS.high}学科表现较好，{countSubjectDS.low}学科表现相对不足</p>
             </div>
         )
     }
@@ -75,7 +76,8 @@ function getDS(levels, subjecLevels, classHeaders, gradeName, currentClass, clas
         var {validOrderedSubjectMean} = filterMakeOrderedSubjectMean(classHeaders, subjectLevelMeanInfo);
         var tableDS = getTableDS(currentSubjectLevelInfo, validOrderedSubjectMean, gradeName, currentClass);
         var bestAndWorst = getBestAndWorst(currentSubjectLevelInfo, currentClass, subjectLevelMeanInfo);
-        result[levelKey] = {tableDS: tableDS, bestAndWorst: bestAndWorst}
+        var percentageSubjectDS = getPercentageBetterAndWorse(currentSubjectLevelInfo, currentClass, subjectLevelMeanInfo);
+        result[levelKey] = {tableDS: tableDS, bestAndWorst: bestAndWorst, percentageSubjectDS: percentageSubjectDS}
     });
     return result;
 }
@@ -91,11 +93,23 @@ function getBestAndWorst(currentSubjectLevelInfo, currentClass, subjectLevelMean
     return {best: best, worst: worst};
 }
 
-
 function getSubjectDS(bestAndWorst) {
     return {
         high: bestAndWorst.best.subject,
         low: bestAndWorst.worst.subject
+    }
+}
+
+function getPercentageBetterAndWorse(currentSubjectLevelInfo, currentClass, subjectLevelMeanInfo) {
+    var temp = [], classSubjectCounts = currentSubjectLevelInfo[currentClass], schoolSubjectCounts = currentSubjectLevelInfo['totalSchool'];
+    _.each(classSubjectCounts, (count, pid) => {
+        if(pid == 'totalScore') return;
+        if(_.isNumber(count) && _.isNumber(schoolSubjectCounts[pid])) temp.push({value: _.round(_.multiply(_.divide(count, schoolSubjectCounts[pid]), 100), 2), subject: subjectLevelMeanInfo[pid].name});
+    });
+    temp = _.sortBy(temp, 'value');
+    return {
+        high: _.last(temp).subject,
+        low: _.first(temp).subject
     }
 }
 
@@ -113,23 +127,34 @@ function getTableDS(subjectLevelInfo, validOrderedSubjectMean, gradeName, curren
     });
     titleHeader.unshift('班级');
 
+   var currentClassObj = subjectLevelInfo[currentClass];
+    var currentClassCountRow = _.map(validOrderedSubjectMean, (headerObj) => {
+        return (_.isUndefined(currentClassObj[headerObj.id])) ? '无数据' : currentClassObj[headerObj.id];
+    });
+    // currentClassCountRow.unshift(gradeName + currentClass + '班');
+    currentClassCountRow.unshift('本班上线人数');
+    table.push(currentClassCountRow);
+
     var totalSchoolObj = subjectLevelInfo.totalSchool;
     var totalSchoolRow = _.map(validOrderedSubjectMean, (headerObj) => {
         return (_.isUndefined(totalSchoolObj[headerObj.id])) ? '无数据' : totalSchoolObj[headerObj.id];
     });
-    totalSchoolRow.unshift('全校');
+    totalSchoolRow.unshift('全年级上线人数');
     table.push(totalSchoolRow);
 
-    var currentClassObj = subjectLevelInfo[currentClass];
-    var currentClassRow = _.map(validOrderedSubjectMean, (headerObj) => {
-        return (_.isUndefined(currentClassObj[headerObj.id])) ? '无数据' : currentClassObj[headerObj.id];
-    });
-    currentClassRow.unshift(gradeName + currentClass + '班');
-    table.push(currentClassRow);
+    var currentClassPercentageRow = getCurrentClassPercentageRow(currentClassCountRow, totalSchoolRow);
+    currentClassPercentageRow.unshift('本班/全年级');
 
     table.unshift(titleHeader);
 
     return table;
+}
+
+function getCurrentClassPercentageRow(currentClassCountRow, totalSchoolRow) {
+    var classCounts = _.slice(currentClassCountRow, 1), totalCounts = _.slice(totalSchoolRow, 1);
+    return _.map(classCounts, (classCount, index) => {
+        return (_.isNumber(classCount) && _.isNumber(totalCounts[index])) ? (_.round(_.multiply(_.divide(classCount, totalCounts[index]), 100), 2))+'%' : '无数据';
+    });
 }
 
 /**
