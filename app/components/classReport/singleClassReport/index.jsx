@@ -13,7 +13,7 @@ import SubjectDistributionScoreLevel from './subjectDistribution-ScoreLevel';
 import CriticalStudentDistribution from './CriticalStudentDistribution';
 import SubjectPerformance from './SubjectExamPerformance';
 import SubjectInspectPerformance from './SubjectInspectPerformance';
-
+import Wishes from './Wishes';
 
 // import SubjectPerformanceExamInspect from './SubjectInspectPerformance/subjectPerformance-ExamInspect';
 // import SubjectPerformanceQuestionTopic from './SubjectInspectPerformance/subjectPerformance-QuestionTopic';
@@ -62,6 +62,7 @@ class SingleClassReport extends React.Component {
                 {/*<SubjectInspectPerformance reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 <ImportStudentInfo reportDS={reportDS.toJS()} currentClass={currentClass} classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
                 <HistoryPerformance user={this.props.user} grade={this.props.grade} currentClass={this.state.currentClass} />
+                <Wishes />
             </div>
         );
     }
