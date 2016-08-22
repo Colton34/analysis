@@ -12,6 +12,7 @@ export default function SubjectStudentLevelDistirbution({classHeaders, reportDS,
 
     var examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
     var tableDS = getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, classHeaders, currentClass);
+    var summaryInfo = getSummaryInfo(tableDS);
 
     var tableHeaders = [[{id: 'subject', name: '学科'}]];
     var headers = _.range(10).map(num=> {
@@ -55,6 +56,7 @@ function getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, class
             var currentSubjectGroupStudentCount = (obj.classStudents[currentClass]) ? obj.classStudents[currentClass] : [];
             return currentSubjectGroupStudentCount;
         });
+        rowData = _.reverse(rowData);//高分组在前面
         rowData.unshift(headerObj.subject);
         tableData.push(rowData);
     });
@@ -83,3 +85,31 @@ function getStudentNames(students, classStudents) {
     var studentIds = _.map(students, (sObj) => sObj.id);
     return _.join(_.map(_.filter(classStudents, (sObj) => _.includes(studentIds, sObj.id)), (stuObj) => stuObj.name), '，');
 }
+
+function getSummaryInfo(tableDS) {
+    //1，2，3为高分组，7，8，9为低分组
+    //计算各科的高分组人数和低分组人数，分别对两个组的数目排序
+    if(tableDS.length == 1) return '只有一个学科，没有可比性';
+    var temp = _.map(tableDS, (row) => {
+        return {
+            subject: row[0],
+            high: _.sum(_.map(_.take(row, 3), (arr) => arr.length)),
+            low: _.sum(_.map(_.takeRight(row, 3), (arr) => arr.length))
+        }
+    });
+    var tempSortByHigh = _.sortBy(temp, 'high');
+    var tempSortByLow = _.sortBy(temp, 'low');
+    var highSubject = _.last(tempSortByHigh).subject, lowSubject = _.last(tempSortByLow).subject;
+    if(highSubject == lowSubject) {
+        return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，' + highSubject + ' 学科高分段人数和低分段人数相同，表现两极分化。';
+    } else if((_.first(tempSortByHigh).high == _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low == _.last(tempSortByLow).low)) {
+        return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数和低分段人数相同，表现两极分化。';
+    } else if((_.first(tempSortByHigh).high != _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low == _.last(tempSortByLow).low)) {
+        return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知， ' + highSubject + ' 学科高分段人数较多，班级各学科低分段人数相当。';
+    } else if((_.first(tempSortByHigh).high == _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low != _.last(tempSortByLow).low)) {
+        return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数相当，' + lowSubject + ' 学科低分段人数较多。';
+    } else {
+        return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知， ' + highSubject + ' 学科高分段人数较多，' + lowSubject + ' 学科低分段人数较少。';
+    }
+}
+
