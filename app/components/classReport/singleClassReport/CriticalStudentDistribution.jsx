@@ -11,9 +11,17 @@ import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import singleClassReportStyle from './singleClassReport.css';
 var COLOR_CONSTANT = ['#0099ff', '#33cc33', '#33cccc'];
 
-export default  function CriticalStudent({reportDS, currentClass}) {
-    var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), levelBuffers = reportDS.levelBuffers.toJS();
-    var {xAxis, criticalStudentInfo} = getDS(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers, currentClass);
+//临界生的信息，临界生各学科平均分；分档线各学科分档分
+//TODO:当只有一个学科的时候，显示没有可比性
+
+export default  function CriticalStudent({classStudents, reportDS}) {
+    var examInfo = reportDS.examInfo.toJS(), levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), levelBuffers = reportDS.levelBuffers.toJS();
+
+    var {xAxis, criticalStudentInfo} = getDS(classStudents, examInfo, levels, levelBuffers);
+    var tableDS = getTableDS(xAxis, criticalStudentInfo, levels, subjectLevels);
+    var summaryInfo = getSummaryInfo(tableDS);
+
+//TODO:废弃！！！
     var chartDS = getChartDS(criticalStudentInfo);
     var levelBufferInfo = getLevelBufferInfo(levelBuffers, levels);
 
@@ -111,9 +119,9 @@ export default  function CriticalStudent({reportDS, currentClass}) {
 
 //=================================================  分界线  =================================================
 
-function getDS(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers, currentClass) {
+function getDS(classStudents, examInfo, levels, levelBuffers) {
     var xAxis = makeChartXAxis(levels);
-    var criticalStudentInfo = makeCriticalStudentsInfo(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers, currentClass);
+    var criticalStudentInfo = makeCriticalStudentsInfo(classStudents, examInfo, levels, levelBuffers);
     return {
         xAxis: xAxis,
         criticalStudentInfo: criticalStudentInfo
@@ -150,13 +158,13 @@ function makeChartXAxis(levels) {
     });
 }
 
-function makeCriticalStudentsInfo(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers, currentClass) {
-    var criticalLevelInfo = {}, currentClassStudents = studentsGroupByClass[currentClass];
+function makeCriticalStudentsInfo(classStudents, examInfo, levels, levelBuffers) {
+    var criticalLevelInfo = {};
     _.each(_.range(_.size(levels)), (index) => {
         criticalLevelInfo[index] = [];
     });
     var segments = makeCriticalSegments(levelBuffers, levels);
-    var classCountsInfoArr = makeSegmentsCountInfo(studentsGroupByClass[currentClass], segments);
+    var classCountsInfoArr = makeSegmentsCountInfo(classStudents, segments);
     var classRow = _.filter(classCountsInfoArr, (countInfo, index) => (index % 2 == 0));//从低到高
     classRow = _.reverse(classRow); //从高到底
 
@@ -175,3 +183,81 @@ function makeCriticalSegments(levelBuffers, levels) {
     });
     return result;
 }
+
+/*
+每一档：
+{
+    levelTitle: <String>
+    studentNames: ['xxx', 'xxx', ...],
+    criticalMeans: [xx, xx, ..]
+    levelScores: [xx, xxx, ...]
+    subjectNames: [xx, xx, xx...]
+}
+*/
+function getTableDS(xAxis, criticalStudentInfo, levels, subjectLevels) {
+    //criticalStudentsInfo和xAxis是反转后的数据，subjectLevels和levels没有反转
+    var levelLastIndex = _.size(criticalStudentInfo) - 1;
+    return _.map(xAxis, (levelName, index) => {
+        var obj = {};
+        obj.levelTitle = levelName;
+        var criticalStudents = criticalStudentInfo[index];
+        obj.studentNames = _.map(criticalStudents, (obj) => obj.name);
+        var criticalTotalScoreMean = (criticalStudents.length == 0) ? 0 : _.round(_.mean(_.map(criticalStudents, (obj) => obj.score)), 2);
+        var criticalMeans = [];
+        criticalMeans.push(criticalTotalScoreMean);
+        var subjectLevelInfo = subjectLevels[levelLastIndex - index];
+        var subjectNames = _.map(subjectLevelInfo, (subjectInfoObj, paperId) => subjectInfoObj.name);
+        subjectNames.unshift('总分');
+        obj.subjectNames = subjectNames;
+        var criticalSubjectMeans = getCriticalSubjectMeans(criticalStudents, subjectLevelInfo);
+        criticalMeans = _.concat(criticalMeans, criticalSubjectMeans);
+        var levelScores = [];
+        levelScores.push(levels[levelLastIndex - index].score);
+        levelScores = _.concat(levelScores, _.map(subjectLevelInfo, (subjectInfoObj, paperId) => subjectInfoObj.mean));
+        obj.criticalMeans = criticalMeans;
+        obj.levelScores = levelScores;
+        return obj;
+    })
+}
+
+function getCriticalSubjectMeans(criticalStudents, subjectLevelInfo) {
+    if(criticalStudents.length == 0) return _.map(subjectLevelInfo, (subjectInfoObj, paperId) => 0);
+    return _.map(subjectLevelInfo, (subjectInfoObj, paperId) => {
+        var criticalSubjectScores = _.map(criticalStudents, (stuObj) => {
+            var targetPaper = _.find(stuObj.papers, (obj) => obj.paperid == paperId);
+            return targetPaper.score;
+        });
+        return _.round(_.mean(criticalSubjectScores), 2);
+    });
+}
+
+function getSummaryInfo(tableDS) {
+//每一档次：
+//  obj.criticalMeans, levelScores, subjectNames -- 去掉'总分' -- 如果只有一个学科则显示没有可以比性--返回一个String，而不是一个obj {better: , worse: }
+    return _.map(tableDS, (obj, index) => {
+        //如果有两个以上的科目则返回obj={better: , worse: }，否则只有一个科目则返回String:没有可比性
+        var criticalMeans = _.slice(obj.criticalMeans, 1), levelScores = _.slice(obj.levelScores, 1), subjectNames = _.slice(obj.subjectNames, 1);
+        if(subjectNames.length <= 1) return '只有一个学科没有可比性';
+        var temp = _.map(subjectNames, (sname, index) => {
+            return {
+                diff: _.round(_.divide(criticalMeans[index], levelScores[index]), 2),
+                subject: sname
+            }
+        });
+        temp = _.sortBy(temp, 'diff');
+        return {
+            better: _.last(temp).subject,
+            worse: _.first(temp).subject
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
+

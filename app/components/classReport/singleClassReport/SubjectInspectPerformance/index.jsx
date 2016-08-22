@@ -3,9 +3,9 @@ import React from 'react';
 
 import DropdownList from '../../../../common/DropdownList';
 import ExamInspect from './subjectPerformance-ExamInspect';
-// import QuestionTopic from './subjectPerformance-QuestionTopic';
 import QuestionLevel from './subjectPerformance-QuestionLevel';
 import QuestionAbility from './subjectPerformance-QuestionAbility';
+// import QuestionTopic from './subjectPerformance-QuestionTopic';
 
 import commonClass from '../../../../common/common.css';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
@@ -14,7 +14,7 @@ var subjects = [{value:'语文'},{value:'数学'}, {value:'物理'}, {value:'英
 var questionPerformance = {good: ['T1', 'T2', 'T5', 'T9'], bad: ['T10', 'T12', 'T13']};
 var sub='语文';//替换为当前科目
 
-export default function SubjectInspectPerformance() {
+export default function SubjectInspectPerformance({reportDS, currentClass}) {
     return (
         <div id='subjectInspectPerformance' className={commonClass['section']}>
             <div style={{ marginBottom: 30 ,position:'relative'}}>
@@ -38,13 +38,14 @@ export default function SubjectInspectPerformance() {
                 <li style={{paddingLeft:0,fontSize:'14px',color:'#6a6a6a'}}>红色柱形图表示题目表现不足，该题目本班的得分率低于全年级的平均得分率。图形高度表示低于的大小.</li>
               </ul>
             </div>
-            <ExamInspect/>
+             <ExamInspect reportDS={reportDS} currentClass={currentClass} />
+
             {/* <QuestionTopic/>  */}
 
           
             <div style={{marginTop: 30}}>
-                <QuestionLevel/>
-                <QuestionAbility/>
+                <QuestionLevel />
+                <QuestionAbility />
             </div>
         </div>
     )

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-19 18:32:27
+* @Last Modified time: 2016-08-22 11:30:53
 */
 
 
@@ -312,7 +312,6 @@ export function makeSegmentsCountInfo(students, segments) {
     var groupStudentsBySegments = _.groupBy(students, function(item) {
         return findScoreSegmentIndex(segments, item.score);
     });
-
     var result = _.map(_.range(segments.length - 1), function(index) {
         return (groupStudentsBySegments[index]) ? groupStudentsBySegments[index] : []
     });
