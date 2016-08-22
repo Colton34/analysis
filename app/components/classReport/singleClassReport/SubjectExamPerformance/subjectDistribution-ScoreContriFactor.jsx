@@ -62,6 +62,7 @@ var config={
     }
 };
 
+
 var localStyle = {
     subjectCard: {width: 238, height: 112, border: '1px solid ' + colorsMap.C04, borderRadius: 2, display: 'table-cell', verticalAlign: 'middle', textAlign: 'center', boxShadow: '0 3px 3px' + colorsMap.C03},
     lengthControl: {
@@ -69,23 +70,25 @@ var localStyle = {
     },
 }
 
-const SubjectConstrast = ({headerInfo}) => {
-    return (
-        <div style={{display: 'inline-block', width: 215, float: 'right', marginTop: 10}}>
-            <div style={{ display: 'table-row'}}>
-                <div style={localStyle.subjectCard}>
-                    <div style={_.assign({ fontSize: 30, color: colorsMap.B08, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.greater, '、')}>{_.join(headerInfo.greater, '、')}</div>
-                    <p style={{ fontSize: 12, marginBottom: 10 }}>班级优势学科</p>
-                </div>
-            </div>
-            <div style={{height: 20}}></div>
-            <div style={localStyle.subjectCard}>
-                <div style={_.assign({ fontSize: 30, color: colorsMap.B04, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.lesser, '、')}>{_.join(headerInfo.lesser, '、')}</div>
-                <p style={{fontSize: 12, marginBottom: 10}}>班级劣势学科</p>
-            </div>
-        </div>
-    )
-}
+
+// const SubjectConstrast = ({headerInfo}) => {
+//     return (
+//         <div style={{display: 'inline-block', width: 215, float: 'right', marginTop: 10}}>
+//             <div style={{ display: 'table-row'}}>
+//                 <div style={localStyle.subjectCard}>
+//                     <div style={_.assign({ fontSize: 30, color: colorsMap.B08, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.greater, '、')}>{_.join(headerInfo.greater, '、')}</div>
+//                     <p style={{ fontSize: 12, marginBottom: 10 }}>班级优势学科</p>
+//                 </div>
+//             </div>
+//             <div style={{height: 20}}></div>
+//             <div style={localStyle.subjectCard}>
+//                 <div style={_.assign({ fontSize: 30, color: colorsMap.B04, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.lesser, '、')}>{_.join(headerInfo.lesser, '、')}</div>
+//                 <p style={{fontSize: 12, marginBottom: 10}}>班级劣势学科</p>
+//             </div>
+//         </div>
+//     )
+// }
+
 
 export default function SubjectContriFactor({classStudents, classHeadersWithTotalScore, currentClass, reportDS}) {
     var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS();
@@ -100,11 +103,20 @@ export default function SubjectContriFactor({classStudents, classHeadersWithTota
                 <span className={commonClass['title-desc']}>以学科得分率为基础，综合考虑了该学科对班级、学校综合水平的均衡性影响，借此分析学科对班级得分水平的教学贡献大小，指数值为正，是促进作用；为负，是拖后腿</span>
             </div>
             {/*-----------------柱形图----------------------- */}
-            <div style={{display: 'inline-block', width: 875, height: 290, position: 'relative'}}>
+            <div style={{display: 'inline-block', width: 1140, height: 290, position: 'relative'}}>
               <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
             </div>
             {/*-----------------优势、劣势学科----------------------- */}
-            <SubjectConstrast headerInfo={headerInfo}/>
+
+          
+
+            {/*}<SubjectConstrast headerInfo={headerInfo}/>*/}
+            <div style={{width:'100%',height:'90px',backgroundColor:colorsMap.B12,marginTop:'30px',paddingLeft:'30px',paddingTop:'25px',border:'1px solid #e7e7e7'}}>
+              <span >分析诊断：<br />根据上图各学科的得分率贡献指数的大小，可知本班级{headerInfo.greater}学科表现对班级总分水平有较大的教学推进作用，
+                而{headerInfo.lesser}学科表现对班级总分水平有较大的牵扯现象</span>
+            </div>
+
+
         </div>
     )
 }
