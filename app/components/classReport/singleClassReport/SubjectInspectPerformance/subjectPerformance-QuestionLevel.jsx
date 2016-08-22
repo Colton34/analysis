@@ -8,78 +8,83 @@ import commonClass from '../../../../common/common.css';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
 export default function QuestionLevel({reportDS, currentClass}) {
-  var option = {
-    tooltip: {},
-    legend: {
-        data: ['年级平均得分率', '班级平均得分率'],
-        right:25,
-        top:25,
-        orient:'vertical',
-        textStyle:{
-          color:'#6a6a6a'
+    var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
+    var theDS = getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass);
+debugger;
+
+    var option = {
+        tooltip: {},
+        legend: {
+            data: ['年级平均得分率', '班级平均得分率'],
+            right:25,
+            top:25,
+            orient:'vertical',
+            textStyle:{
+              color:'#6a6a6a'
+            },
         },
-    },
-    radar: {
-        indicator: [
-           { name: '最难题组', max:150},
-           { name: '最难题组', max: 150},
-           { name: '最难题组', max: 150},
-           { name: '最难题组', max: 150},
-           { name: '最难题组', max: 150}
-        ],
-        radius:150,
-        splitNumber:3,//刻度数目
-        axisTick:{show:false},//刻度
-        axisLabel:{show:false},//刻度数字
-        splitArea: {
-                areaStyle: {
-                    color: ['#fff',
-                    '#fff', '#fff',
-                    '#fff', '#fff'],
-                    shadowColor: 'rgba(0, 0, 0, 0.3)',
-                    shadowBlur: 0
+        radar: {
+            indicator: [
+               { name: '最难题组', max:150},
+               { name: '最难题组', max: 150},
+               { name: '最难题组', max: 150},
+               { name: '最难题组', max: 150},
+               { name: '最难题组', max: 150}
+            ],
+            radius:150,
+            splitNumber:3,//刻度数目
+            axisTick:{show:false},//刻度
+            axisLabel:{show:false},//刻度数字
+            splitArea: {
+                    areaStyle: {
+                        color: ['#fff',
+                        '#fff', '#fff',
+                        '#fff', '#fff'],
+                        shadowColor: 'rgba(0, 0, 0, 0.3)',
+                        shadowBlur: 0
+                    }
+                },
+                name: {
+               textStyle: {
+                   color: '#6a6a6a'
+               }
+           },
+                splitLine: {//分割线颜色
+                lineStyle: {
+                    color: '#f2f2f3'
+                },
+              },
+                axisLine: {
+               lineStyle: {
+                   color: '#f2f2f3'
+               }
+           }
+
+
+        },
+        series: [{
+            name: '班级vs年级',
+            type: 'radar',
+            //areaStyle: {normal: {}},
+            color:['#0099ff','#cccccc'],
+            data : [
+                {
+                    value : [30, 50,60, 80, 100],
+                    name : '班级平均得分率'
+                },
+                 {
+                    value : [50, 140, 80, 31, 42],
+                    name : '年级平均得分率'
                 }
-            },
-            name: {
-           textStyle: {
-               color: '#6a6a6a'
-           }
-       },
-            splitLine: {//分割线颜色
-            lineStyle: {
-                color: '#f2f2f3'
-            },
-          },
-            axisLine: {
-           lineStyle: {
-               color: '#f2f2f3'
-           }
-       }
+            ]
+        }]
+    };
 
+    var subjectPerformance={
+      high:'较难题组',
+      low:'较易题组'
+    };
 
-    },
-    series: [{
-        name: '班级vs年级',
-        type: 'radar',
-        //areaStyle: {normal: {}},
-        color:['#0099ff','#cccccc'],
-        data : [
-            {
-                value : [30, 50,60, 80, 100],
-                name : '班级平均得分率'
-            },
-             {
-                value : [50, 140, 80, 31, 42],
-                name : '年级平均得分率'
-            }
-        ]
-    }]
-};
-
-var subjectPerformance={
-  high:'较难题组',
-  low:'较易题组'
-};
     return (
         <div style={{marginRight: 20, display: 'inline-block'}}>
             <div style={{marginBottom: 18}}>
@@ -116,14 +121,10 @@ function getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStuden
         var currentClassPaperStudents = _.filter(gradePaperStudents, (studentObj) => studentObj['class_name'] == currentClass);
 
         var gradeQuestionScoreRates = getQuestionScoreRate(paperObj.questions, pid, gradePaperStudents, allStudentsPaperQuestionInfo);
-        var questionLevelGroup = getQuestionLevelGroup(paperObj.questions, gradeQuestionScoreRates);//怎么分五组？某一类型题组上的得分率
-
         var classQuestionScoreRates = getQuestionScoreRate(paperObj.questions, pid, currentClassPaperStudents, allStudentsPaperQuestionInfo);
 
-        result[pid] = {
-            classQuestionScoreRates: classQuestionScoreRates,
-            gradeQuestionScoreRates: gradeQuestionScoreRates
-        };
+        var gradeQuestionLevelGroup = getGradeQuestionLevelGroup(paperObj.questions, gradeQuestionScoreRates);//怎么分五组？某一类型题组上的得分率
+        result[pid] = getQuestionLevelGroupMeanRate(gradeQuestionLevelGroup, classQuestionScoreRates, paperObj.questions);
     });
     return result;
 }
@@ -134,13 +135,62 @@ function getQuestionScoreRate(questions, pid, students, allStudentsPaperQuestion
     return _.map(questions, (questionObj, index) => {
         //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
         return _.round(_.divide(_.mean(_.map(students, (studentObj) => {
-            // debugger;
             return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
         })), questionObj.score), 2);
     });
 }
 
 //TODO: 怎么分组？？？--（得分率最高-得分率最低）/ 5
-function getQuestionLevelGroup(gradeQuestionScoreRates, questions) {
+function getGradeQuestionLevelGroup(questions, gradeQuestionScoreRates) {
+    var temp = _.map(questions, (obj, index) => {
+        return {
+            name: obj.name,
+            score: obj.score,
+            gradeRate: gradeQuestionScoreRates[index],
+            qid: obj.qid
+        }
+    });
+    temp = _.sortBy(temp, 'gradeRate');
 
+    var segments = getStepSegments(temp);
+    // 0.3, 0.4, 0.5, 0.6, 0.7, 0.8
+    var gradeQuestionLevelGroup = {};
+    _.each(_.range(segments.length-1), (index) => {
+        var targets = _.filter(temp, (obj) => (index == 0) ? (segments[index] <= obj.gradeRate && obj.gradeRate <= segments[index+1]) : (segments[index] < obj.gradeRate && obj.gradeRate <= segments[index+1]));
+        gradeQuestionLevelGroup[index] = targets;
+    });
+    return gradeQuestionLevelGroup;
+}
+
+function getQuestionLevelGroupMeanRate(gradeQuestionLevelGroup, classQuestionScoreRates, questions) {
+    var classQuestionLevelGroup = getClassQuestionLevelGroup(gradeQuestionLevelGroup, classQuestionScoreRates, questions);
+    var classQuestionLevelGroupMeanRate = _.map(classQuestionLevelGroup, (questionRateMap) => _.round(_.mean(_.values(questionRateMap)), 2));
+    var gradeQuestionLevelGroupMeanRate = _.map(gradeQuestionLevelGroup, (questionRateArr) => _.round(_.mean(_.map(questionRateArr, (obj) => obj.gradeRate)), 2));
+    return {
+        gradeQuestionLevelGroupMeanRate: gradeQuestionLevelGroupMeanRate,
+        classQuestionLevelGroupMeanRate: classQuestionLevelGroupMeanRate
+    }
+}
+
+function getClassQuestionLevelGroup(gradeQuestionLevelGroup, classQuestionScoreRates, questions) {
+    var classQuestionLevelGroup = {};
+    var classQuestionScoreRateMap = {};
+    _.each(questions, (obj, index) => classQuestionScoreRateMap[obj.qid] = classQuestionScoreRates[index]);
+    _.each(gradeQuestionLevelGroup, (objs, key) => {
+        var qids = _.map(objs, (obj) => obj.qid);
+        classQuestionLevelGroup[key] = _.pick(classQuestionScoreRateMap, qids);
+    });
+    return classQuestionLevelGroup;
+}
+
+function getStepSegments(gradeRateInfo) {
+    var step = _.round(_.divide(_.subtract(_.last(gradeRateInfo).gradeRate, _.first(gradeRateInfo).gradeRate), 5), 2);
+    var segments = [];
+    segments.push(_.first(gradeRateInfo).gradeRate);
+    _.each(_.range(4), (index) => {
+        var nextRate = _.round(_.sum([segments[index], step]), 2);
+        segments.push(nextRate);
+    });
+    segments.push(_.last(gradeRateInfo).gradeRate);
+    return segments;
 }

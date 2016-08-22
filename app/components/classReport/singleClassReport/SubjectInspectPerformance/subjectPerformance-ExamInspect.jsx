@@ -10,7 +10,6 @@ class ExamInspectPerformance extends React.Component {
         var {reportDS, currentClass} = this.props;
         var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
         var theDS = getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass);
-        debugger;
     }
 
     render() {
