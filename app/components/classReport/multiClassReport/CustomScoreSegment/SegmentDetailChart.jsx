@@ -27,6 +27,7 @@ class SegmentDetailChart extends React.Component {
     onSelectClass(item) {
         var {chartData} = this.props;
         var hasShown = _.find(this.state.seriesShow, {name: item.value});
+        var colorList = ['#0099ff','#33cccc','#33cc33','#ff9900','#ff6633'];
         //根据是否选中情况筛选
         if(hasShown) {
             this.setState({
@@ -38,18 +39,21 @@ class SegmentDetailChart extends React.Component {
                 seriesShow: this.state.seriesShow
             })
         }
-
+        //遍历this.state.seriesShow 添加颜色属性
+            _.range(_.size(this.state.seriesShow)).map((num)=>{return this.state.seriesShow[num].color=colors[num]});
     }
     render() {
         var {chartData, classList} = this.props;
         var {seriesShow} = this.state;
+        var chartWidth=(this.state.seriesShow.length)*(chartData.categories.length)>=50?((this.state.seriesShow.length)*(chartData.categories.length)*21)+60*(chartData.categories.length):1140;
         var config = {
             chart: {
-                type: 'column'
+                type: 'column',
+                width:chartWidth
             },
-            colors:['#0099ff','#33cccc','#33cc33','#ff9900','#ff6633','#6666cc'],
+            colors:['#0099ff','#33cccc','#33cc33','#ff9900','#ff6633'],
             title: {
-                text: '(人)',
+                text: '',
                 floating: true,
                 x: -510,
                 y: 43,
@@ -73,13 +77,25 @@ class SegmentDetailChart extends React.Component {
                 categories: chartData.categories,
             },
             yAxis: {
+                labels: {
+                  align: 'left',
+                  x: -10,
+                  y: -0
+                },
                 allowDecimals: true,//刻度允许小数
                 lineWidth: 1,
                 gridLineDashStyle: 'Dash',
                 gridLineColor: '#f2f2f3',
-                title: {
-                    text: ''
-                },
+                title:{
+                  text:'（人）',
+                  align:'high',
+                  rotation:360,
+                  margin:-50,
+                  style: {
+                      "color": "#767676",
+                      "fontSize": "12px"
+                 }
+           },
                 plotLines: [{
                     value: 0,
                     width: 1,
@@ -122,7 +138,9 @@ class SegmentDetailChart extends React.Component {
                         <DropdownList list={classList} isMultiChoice multiChoiceNum={5} style={{ display: 'inline-block', marginLeft: 10,position:'absolute',right:0,top:-3, zIndex:1 }} onClickDropdownList={this.onSelectClass.bind(this)}/>
                     </div>
                 </div>
+                <div style={{width:'1140px',height:'420px',overflow:'auto'}}>
                 <ReactHighcharts config={config} style={{ width: '100%', height: '400px' }}></ReactHighcharts>
+                </div>
             </div>
         )
     }
