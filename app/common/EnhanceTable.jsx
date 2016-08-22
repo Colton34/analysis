@@ -101,7 +101,7 @@ class Table extends React.Component {
             <div style={_.assign({}, {position: 'relative'}, style ? style : {})}>
                 {
                     options && options.canDownload ? (
-                        <div style={_.assign({},{position: 'absolute', right: 0, top: -55, width: 70, height: 30, lineHeight: '30px', textAlign: 'center', background: colorsMap.B03, color: '#fff', cursor: 'pointer'}, options.downLoadBtnStyle ? options.downLoadBtnStyle : {} )}
+                        <div style={_.assign({},{position: 'absolute', right: 0, top: -55, width: 70, height: 30, lineHeight: '30px', textAlign: 'center', background: colorsMap.B03, color: '#fff', cursor: 'pointer',borderRadius: 2}, options.downLoadBtnStyle ? options.downLoadBtnStyle : {} )}
                              onClick={this.downLoadTable.bind(this)}
                             >下载表格</div> ): ''
                 }

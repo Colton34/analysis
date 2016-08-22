@@ -8,7 +8,7 @@ import {makeSegmentsCount} from '../../../api/exam';
 export default function CustomScoreLevel({reportDS}) {
     var examPapersInfo = reportDS.examPapersInfo.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), headers = reportDS.headers.toJS(), gradeName = reportDS.examInfo.toJS().gradeName;
     var theDS = getDS(examPapersInfo, allStudentsPaperMap, headers, gradeName);
-    debugger;
+    //debugger;
 }
 
 //=================================================  分界线  =================================================

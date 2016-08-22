@@ -47,7 +47,7 @@ export default class LevelGuide extends React.Component  {
                 <div style={{ marginBottom: 20 }}>
                     <span className={commonClass['title-bar']}></span>
                     <span className={commonClass['title']}>分档分数线划定</span>
-                    <span onClick={this.onShowDialog.bind(this)} style={{ cursor: 'pointer', backgroundColor: colorsMap.B03, color: '#fff', textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', fontSize: 12, float: 'right' }}>
+                    <span onClick={this.onShowDialog.bind(this)} style={{ cursor: 'pointer', backgroundColor: colorsMap.B03, color: '#fff', textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', fontSize: 12, float: 'right',borderRadius:2 }}>
                         <i className='icon-cog-2' style={{ fontSize: 12 }}></i>
                         设置分档参数
                     </span>
@@ -77,13 +77,13 @@ export default class LevelGuide extends React.Component  {
                     。如需修改，{/**todo： 根据角色判断要不要显示分档设置按钮 */} 请点击右侧修改按钮修改。
 
                 </p>
-                <Dialog examId={examid} grade={grade} levels={levels} levelBuffers={levelBuffers} 
-                        examInfo={examInfo} examStudentsInfo={examStudentsInfo} examPapersInfo={examPapersInfo} 
+                <Dialog examId={examid} grade={grade} levels={levels} levelBuffers={levelBuffers}
+                        examInfo={examInfo} examStudentsInfo={examStudentsInfo} examPapersInfo={examPapersInfo}
                         changeLevels={changeLevels} saveBaseline={saveBaseline} show={this.state.showDialog} onHide={this.onHideDialog.bind(this) }  />
             </div>
         );
     }
-    
+
 }
 
 
@@ -161,7 +161,7 @@ class Dialog extends React.Component {
             })
             return;
         }
-        
+
         //保证层级是正确的
         var isValid = _.every(_.range(_.size(this.levels) - 1), (index) => {
             return this.levels[index+''].score < this.levels[(index+1)+''].score
