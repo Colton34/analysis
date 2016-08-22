@@ -68,14 +68,19 @@ class ModuleNav extends React.Component {
     }
 
     componentDidMount() {
-        // var navBarTop = document.getElementById('navBar').offsetTop;
-        // var scrollTopList = [];
-        // _.forEach(modules, (module, index) => {
-        //     scrollTopList.push(document.getElementById(module.id).offsetTop)
-        // })
-        // var $body = $('body');
-        // this.scrollHandlerRef = this.scrollHandler.bind(this, navBarTop, scrollTopList);
-        // window.addEventListener('scroll', this.scrollHandlerRef);
+        var navBarTop = document.getElementById('navBar').offsetTop;
+        var scrollTopList = [];
+        _.forEach(modules, (module, index) => {
+            var moduleEle = document.getElementById(module.id);  
+            if(!moduleEle) {
+                console.log(module.id + ' not found!');
+            } else {
+                scrollTopList.push(moduleEle.offsetTop)
+            }
+        })
+        var $body = $('body');
+        this.scrollHandlerRef = this.scrollHandler.bind(this, navBarTop, scrollTopList);
+        window.addEventListener('scroll', this.scrollHandlerRef);
 
     }
 
@@ -101,7 +106,7 @@ class ModuleNav extends React.Component {
         var {position} = this.state;
         return (
             <div id='navBar' style={_.assign({}, {zIndex: 100, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C04, backgroundColor: colorsMap.C02},
-                                    position === 'normal' ? {position:'absolute', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: '100%', borderBottom: '1px solid ' + colorsMap.C04})}>
+                                    position === 'normal' ? {position:'relative', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: '100%', borderBottom: '1px solid ' + colorsMap.C04})}>
                 <div style={_.assign(position !== 'normal' ? {position: 'absolute', left: '50%', marginLeft: -600} : {})}>
             {
                 modules.map((module, index) => {

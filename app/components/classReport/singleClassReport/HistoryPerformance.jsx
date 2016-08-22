@@ -30,7 +30,7 @@ function HistoryContent({examList, examsInfoCache, currentExamIds}) {//这里exa
     examList = examList.toJS(), examsInfoCache = examsInfoCache.toJS();
     //根据currentExamIds和examsInfoCache得到要显示对比的考试。examList用来填充选择考试的下拉框
     return (
-        <div>
+        <div id='historyPerformance'>
             <h1>Yes, Cached: {examsInfoCache.length}</h1>
         </div>
     )
