@@ -103,7 +103,7 @@ export default function SubjectContriFactor({classStudents, classHeadersWithTota
             <div style={{display: 'inline-block', width: 875, height: 290, position: 'relative'}}>
               <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
             </div>
-            {/*-----------------优势、劣势学科----------------------- */}
+            {/*-----------------优势、劣势学科 TODO: 如果headerInfo.greater和headerInfo.lesser相同那么就是只有一个学科没有可比性----------------------- */}
             <SubjectConstrast headerInfo={headerInfo}/>
         </div>
     )
