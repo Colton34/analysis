@@ -32,7 +32,7 @@ export default function SubjectStudentLevelDistirbution({classHeaders, reportDS,
         return obj;
     });
 
-
+var good='语文';var bad='数学';//假数据，最好和最坏学科
     return (
         <div>
             <div style={{marginBottom: 30,marginTop:30}}>

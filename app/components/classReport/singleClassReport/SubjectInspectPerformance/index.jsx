@@ -39,11 +39,9 @@ export default function SubjectInspectPerformance() {
               </ul>
             </div>
             <ExamInspect/>
-<<<<<<< Updated upstream
             {/* <QuestionTopic/>  */}
-=======
-             {/*}<QuestionTopic/>*/}
->>>>>>> Stashed changes
+
+          
             <div style={{marginTop: 30}}>
                 <QuestionLevel/>
                 <QuestionAbility/>

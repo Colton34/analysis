@@ -108,7 +108,7 @@ export default function SubjectContriFactor({classStudents, classHeadersWithTota
             </div>
             {/*-----------------优势、劣势学科----------------------- */}
 
-            <SubjectConstrast headerInfo={headerInfo}/>
+          
 
             {/*}<SubjectConstrast headerInfo={headerInfo}/>*/}
             <div style={{width:'100%',height:'90px',backgroundColor:colorsMap.B12,marginTop:'30px',paddingLeft:'30px',paddingTop:'25px',border:'1px solid #e7e7e7'}}>
