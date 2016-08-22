@@ -9,14 +9,15 @@ import TableView from '../../../common/TableView';
 import {makeSegmentsCount} from '../../../api/exam';
 
 import commonClass from '../../../common/common.css';
+import singleClassReportStyle from './singleClassReport.css';
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap} from '../../../lib/constants';
 
-var FIELDNAMES_ENUM =  {count: '人数', 'sumCount': '累计人数', 'sumPercentage': '累计上线率'};
+var FIELDNAMES_ENUM =  {count: '档内人数', 'sumCount': '累计人数', 'sumPercentage': '累计上线率'};
 
 const Card = ({title, desc, style}) => {
     return (
          <span style={_.assign({}, localStyle.card, style ? style : {})}>
-            <div style={{display: 'table-cell',width: 366,  height: 112, verticalAlign: 'middle', textAlign: 'center'}}>
+            <div style={{display: 'table-cell',width: 336,  height: 112, verticalAlign: 'middle', textAlign: 'center'}}>
                 <p style={_.assign({fontSize: 30, marginTop: 15})}>{title}</p>
                 <p style={{fontSize: 12}}>{desc}</p>
             </div>
@@ -26,9 +27,10 @@ const Card = ({title, desc, style}) => {
 
 var localStyle = {
     card: {
-        display: 'inline-block', width: 366, height: 112, lineHeight: '112px', border: '1px solid ' + colorsMap.C05, background: colorsMap.C02
+        display: 'inline-block', width: 336, height: 112, lineHeight: '112px', border: '1px solid ' + colorsMap.C05, background: colorsMap.C02
     }
 }
+
 
 export default function LevelDistribution({reportDS, currentClass}) {
     var examInfo=reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS() , headers = reportDS.headers.toJS();
@@ -38,7 +40,6 @@ export default function LevelDistribution({reportDS, currentClass}) {
     var tableHeaderDS = getTableHeaderDS(levels);
     var tableBodyDS = getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, examInfo.gradeName);
 
-
     var levelSize = _.size(levels);
     return (
         <div id='levelDistribution' className={commonClass['section']}>
@@ -47,15 +48,23 @@ export default function LevelDistribution({reportDS, currentClass}) {
                 <span className={commonClass['title']}>总分分档学生人数分布</span>
                 <span className={commonClass['title-desc']}>总分分档上线学生人数分布，可得出班级在学业综合水平上的分层表现</span>
             </div>
-            <div style={{marginTop: 30}}>
-                {
-                    _.range(_.size(headerDS)).map(num => {
-                        return <Card key={num} title={'第' + headerDS[num] + '名'} desc={numberMap[num + 1] + '档上线人数年级排名'} style={num !== levelSize -1 ? {marginRight: 20} : {}}/>
-                    })
-                }
-            </div>
             <TableView id={'levelDistributionTable'} hover style={{marginTop: 30}}
                     tableHeaders={tableHeaderDS} tableData={tableBodyDS} TableComponent={EnhanceTable} reserveRows={6}/>
+
+            <div className={singleClassReportStyle['analysis-conclusion']}>
+                <p>分析诊断：</p>
+                <p style={{marginBottom: 30}}>从上表中可以观察到班级各档线的学生上线人数分布情况，及与全年级整体上档情况的比较。对各班级各档上线人数多少进行班级间的排名，下面是班级在{_.join(_.range(levelSize).map(num => {return numberMap[num + 1]}), '、')}档上线人数的年级排名:</p>
+                <div style={{width: '100%', overflow: 'auto'}}>
+                    {/**---------------------------- TODO: 滚动条优化 -----------------------*/}
+                    <div style={{ width: levelSize <= 3 ? '100%' :levelSize * 336 + (levelSize - 1) * 20 }}>
+                        {
+                            _.range(_.size(headerDS)).map(num => {
+                                return <Card key={num} title={'第' + headerDS[num] + '名'} desc={numberMap[num + 1] + '档上线人数年级排名'} style={num !== levelSize - 1 ? { marginRight: 20 } : {}}/>
+                            })
+                        }
+                    </div>
+                </div>
+            </div> 
         </div>
     )
 }
@@ -140,9 +149,10 @@ function getTableHeaderDS(levels) {
     _.each(levels, (levObj, levelKey) => {
         levelValues.push({"colSpan": 3, "name": numberMap[levelKey-0+1]+'档', headerStyle: { textAlign: 'center' } });
         _.each(FIELDNAMES_ENUM, (fieldValue, fieldKey) => {
-            levelFields.push({'id': fieldKey+'_'+levelKey, name: fieldValue});
+            levelFields.push(_.assign({},{'id': fieldKey+'_'+levelKey, name: fieldValue}, fieldKey !== 'sumPercentage' ? {} : {dataFormat: percentageDataFormat}));
         });
     });
+     levelValues = [{rowSpan: 2, id: 'class', name: '班级'}].concat(levelValues);
     return {levelValues: levelValues, levelFields: levelFields};
 }
 
@@ -159,7 +169,7 @@ function getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, gradeN
             totalSchoolDS[fieldKey+'_'+index] = tempValue[fieldKey];
         });
     });
-    totalSchoolDS['class'] = '全校';
+    totalSchoolDS['class'] = '全年级上档人数';
     tableBodyDS.push(totalSchoolDS);
     _.each(_.range(_.size(levels)), (index) => {
         var tempValue = currentClassInfo[levelLastIndex-index];
@@ -167,12 +177,14 @@ function getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, gradeN
             classDS[fieldKey+'_'+index] = tempValue[fieldKey];
         });
     });
-    classDS['class'] = gradeName+currentClass+'班';
+    classDS['class'] = '本班上档人数';//gradeName+currentClass+'班';
     tableBodyDS.push(classDS);
-
     return tableBodyDS;
 }
 
+function percentageDataFormat(cellData, rowData) {
+    return cellData + '%';
+}
 
 //============  Mock Data
 
