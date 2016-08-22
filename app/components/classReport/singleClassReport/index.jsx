@@ -55,7 +55,7 @@ class SingleClassReport extends React.Component {
                 <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
-                <CriticalStudentDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
+                <CriticalStudentDistribution classStudents={classStudents} reportDS={this.props.reportDS} />
                 <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 {/*<SubjectInspectPerformance reportDS={this.props.reportDS} currentClass={this.state.currentClass} />*/}
                 <ImportStudentInfo classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
