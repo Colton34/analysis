@@ -5,8 +5,12 @@ import React, { PropTypes } from 'react';
 import TableView from '../../../common/TableView';
 
 import commonClass from '../../../common/common.css';
+import singleClassReportStyle from './singleClassReport.css';
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap} from '../../../lib/constants';
 
+/**-------------------------------mock data-------------------------------------------- */
+var subjectPerformance = {high: '语文', low: '政治'};
+/**-------------------------------mock data end-------------------------------------------- */
 class SubjectLevelDisribution extends React.Component {
     constructor(props) {
         super(props);
@@ -40,7 +44,7 @@ class SubjectLevelDisribution extends React.Component {
                 <div>
                     <span className={commonClass['title-bar']}></span>
                     <span className={commonClass['title']}>学科分档人数分布</span>
-                    <span className={commonClass['title-desc']}>运用大数据分析算法将总分到分档分数精准的分解到学科中，得出各学科的分档分数线及其分档上线人数分布，可反映出班级在学科的上线情况</span>
+                    <div className={commonClass['title-desc']} style={{marginTop: 10}}>运用大数据分析算法将总分分档分数精准地分解到学科中，得出各学科的分档分数线及其分档上线人数分布，可反映出班级在学科的上线情况。学科上线人数越多，该学科对学生总分上线提供了更大的可能性。</div>
                 </div>
                 {/****************** 切换标签 *************** */}
                 <div className='tab-ctn'>
@@ -56,7 +60,17 @@ class SubjectLevelDisribution extends React.Component {
                 </div>
                 {/** *************表格***********/}
                 <TableView tableData={tableDS}/>
-                <p style={{fontSize: 12, marginTop: 15}}><span style={{color: colorsMap.B08}}>*</span>本次班级学生总分达到{numberMap[activeTab]}档上线水平这一点上，本班{subjectDS.high}学科表现较好，{subjectDS.low}学科表现相对不足</p>
+                <div className={singleClassReportStyle['analysis-conclusion']}>
+                    <div>分析诊断：</div>
+                    <div style={{marginBottom: 20}}>
+                    {/**-------------------------------todo： 补充真实数据 --------------------------------------- */}
+                        从提供{numberMap[activeTab + 1]}档上线人数来看，本班{<span style={{color: colorsMap.B03}}>{subjectPerformance.high}</span>}学科表现较佳，{<span style={{color: colorsMap.B03}}>{subjectPerformance.low}</span>}表现不足。
+                        从学生上线人数占比（本班级/全年级）来看，{<span style={{color: colorsMap.B03}}>{subjectPerformance.high}</span>}学科表现不差，{<span style={{color: colorsMap.B03}}>{subjectPerformance.low}</span>}学科表现不足。
+                    </div>
+                    <div style={{fontSize: 12}}>查看班级学生上线人数与学生上线人数占比，分别从绝对数与相对数不同的方面反映出学科的贡献。仅看班级学生上线人数这个绝对数的表现，容易忽略全年级整体而言学科的表现情况，不够全面。</div>
+                </div>
+                
+
             </div>
         )
     }
