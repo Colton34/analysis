@@ -8,6 +8,7 @@ import TableView from '../../../../common/TableView';
 import commonClass from '../../../../common/common.css';
 import {NUMBER_MAP as numberMap} from '../../../../lib/constants';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
+import singleClassReportStyle from '../singleClassReport.css';
 export default function SubjectStudentLevelDistirbution({classHeaders, reportDS, classStudents, currentClass}) {
 
     var examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
@@ -40,9 +41,11 @@ var good='语文';var bad='数学';//假数据，最好和最坏学科
                 <span className={commonClass['title-desc']}>按成绩高低将学生等分为10组（第1组成绩最高，第10组成绩最低）。高分段学生密度越大，表现有优势，低分段学生密度越大，则需要在教学中注意帮助这部分学生突破。</span>
             </div>
             <TableView tableHeaders={tableHeaders} tableData={tableData} TableComponent={EnhanceTable}/>
-            <div style={{width:'100%',height:'90px',backgroundColor:colorsMap.B12,marginTop:'30px',paddingLeft:'30px',paddingTop:'25px',border:'1px solid #e7e7e7'}}>
-              <span >分析诊断：<br />根据上图各学科高分段（一，二，三组）学生人数和低分段（八，九，十）学生人数大小可知，<span style={{color:colorsMap.B03}}>{good}</span>学科高分段人数较多，<span style={{color:colorsMap.B03}}>{bad}</span>学科低分段人数较少</span>
+            <div className={singleClassReportStyle['analysis-conclusion']}>
+                  <div>分析诊断：</div>
+                  <div>根据上图各学科高分段（一，二，三组）学生人数和低分段（八，九，十）学生人数大小可知，<span style={{color:colorsMap.B03}}>{good}</span>学科高分段人数较多，<span style={{color:colorsMap.B03}}>{bad}</span>学科低分段人数较少</div>
             </div>
+
         </div>
     )
 }

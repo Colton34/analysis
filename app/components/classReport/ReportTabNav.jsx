@@ -31,8 +31,8 @@ class ReportTabNav extends React.Component {
 
         return (
             <div className={commonClass['section']} style={{zIndex: 3, position: 'relative', width: '100%', height: 60, padding: 0, display: 'inline-block'}}>
-                <span style={_.assign({}, localStyle.item, showMultiReport  ? {color: colorsMap.B03}: {})} onClick={this.onClickClassReportType.bind(this, 'multi')}>班级分析报告</span>
-                <span style={_.assign({}, localStyle.item, !showMultiReport ? {color: colorsMap.B03}: {})}>
+                <span style={_.assign({}, localStyle.item, showMultiReport  ? {color: colorsMap.B03,borderBottom:'2px solid rgb(29, 174, 248)'}: {})} onClick={this.onClickClassReportType.bind(this, 'multi')}>班级分析报告</span>
+                <span style={_.assign({}, localStyle.item, !showMultiReport ? {color: colorsMap.B03,borderBottom:'2px solid rgb(29, 174, 248)'}: {})}>
                     <DropdownList style={{position:'relative'}} list={this.classesList} surfaceBtnStyle={_.assign({ border: 'none'}, !showMultiReport ? {color: colorsMap.B03} : {color: colorsMap.C12})}
                                   onClickDropdownList={this.onClickClassReportType.bind(this)} coverAll
                                   />
@@ -43,7 +43,7 @@ class ReportTabNav extends React.Component {
 }
 
 var localStyle = {
-    item: {display: 'inline-block', height: 60, lineHeight: '60px', padding: '0 30px', float: 'left', cursor: 'pointer'}
+    item: {display: 'inline-block', height: 60, lineHeight: '60px', margin: '0 30px', float: 'left', cursor: 'pointer'}
 }
 export default ReportTabNav;
 

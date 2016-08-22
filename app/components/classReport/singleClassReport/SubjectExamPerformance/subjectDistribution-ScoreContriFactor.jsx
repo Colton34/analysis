@@ -7,6 +7,7 @@ import {makeFactor} from '../../../../api/exam';
 
 import commonClass from '../../../../common/common.css';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
+import singleClassReportStyle from '../singleClassReport.css';
 
 var config={
     chart: {
@@ -15,7 +16,7 @@ var config={
     title: {
         text: '(贡献指数)',
         floating:true,
-        x:-358,
+        x:-485,
         y:3,
         style:{
           "color": "#767676",
@@ -108,20 +109,15 @@ export default function SubjectContriFactor({classStudents, classHeadersWithTota
             </div>
             {/*-----------------优势、劣势学科----------------------- */}
 
-          
-
             {/*}<SubjectConstrast headerInfo={headerInfo}/>*/}
-            <div style={{width:'100%',height:'90px',backgroundColor:colorsMap.B12,marginTop:'30px',paddingLeft:'30px',paddingTop:'25px',border:'1px solid #e7e7e7'}}>
-              <span >分析诊断：<br />根据上图各学科的得分率贡献指数的大小，可知本班级{headerInfo.greater}学科表现对班级总分水平有较大的教学推进作用，
-                而{headerInfo.lesser}学科表现对班级总分水平有较大的牵扯现象</span>
+            <div className={singleClassReportStyle['analysis-conclusion']}>
+                <div>分析诊断：</div>
+                <div>根据上图各学科的得分率贡献指数的大小，可知本班级{headerInfo.greater}学科表现对班级总分水平有较大的教学推进作用，
+                  而{headerInfo.lesser}学科表现对班级总分水平有较大的牵扯现象</div>
             </div>
-
-
         </div>
     )
 }
-
-
 
 //=================================================  分界线  =================================================
 function getDS(examInfo, examStudentsInfo, examPapersInfo, classStudents, classHeadersWithTotalScore, currentClass) {
