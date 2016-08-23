@@ -32,12 +32,16 @@ class CustomScoreLevel extends React.Component {
         })
     }
 
+    onSelectSubject(subjectObj) {
+        this.setState({
+            currentSubject: subjectObj
+        })
+    }
     render() {
         var examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS(), headers = this.props.reportDS.headers.toJS(), gradeName = this.props.reportDS.examInfo.toJS().gradeName;
         var theDS = getDS(examPapersInfo, allStudentsPaperMap, headers, gradeName, this.state.levelPercentages);
 
-    var {tableHeaders, tableBodyData} = getFormatedData(theDS[this.state.currentSubject.id]);
-
+        var {tableHeaders, tableBodyData} = getFormatedData(theDS[this.state.currentSubject.id]);
         return (
             <div id='customScoreLevel' className={commonClass['section']} >
                 <div style={{ position: 'relative' }}>
@@ -45,7 +49,7 @@ class CustomScoreLevel extends React.Component {
                     <span className={commonClass['title']}>自定义成绩等级的人数比例对比</span>
                     <span className={commonClass['title-desc']}></span>
 
-                    <DropdownList list={this.formatedSubjects} style={{position: 'absolute', top: 0, right: 214,zIndex:100}}/>
+                    <DropdownList list={this.formatedSubjects} style={{position: 'absolute', top: 0, right: 214, zIndex: 1}} onClickDropdownList={this.onSelectSubject.bind(this)}/>
                     <Dialog levelPercentages={this.state.levelPercentages} updateGrades={this.updateLevelPercentages.bind(this) } examPapersInfo={examPapersInfo} />
                 </div>
               <div style={{marginTop: 30}}>
