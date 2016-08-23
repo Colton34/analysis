@@ -54,12 +54,12 @@ class SingleClassReport extends React.Component {
                 <TotalScoreTrend reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
-                <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
-                <CriticalStudentDistribution classStudents={classStudents} reportDS={this.props.reportDS} />
+                <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
+{/*}                <CriticalStudentDistribution classStudents={classStudents} reportDS={this.props.reportDS} />
                 <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <SubjectInspectPerformance reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <ImportStudentInfo classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
-                <HistoryPerformance user={this.props.user} grade={this.props.grade} currentClass={this.state.currentClass} />
+                <HistoryPerformance user={this.props.user} grade={this.props.grade} currentClass={this.state.currentClass} />   */}
             </div>
         );
     }

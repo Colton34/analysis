@@ -12,10 +12,10 @@ class SubjectLevelDisribution extends React.Component {
         super(props);
 
 //TODO:科目跟着这个班走！
-        var {classStudents, classStudentsPaperMap, classHeaders, currentClass, reportDS} = this.props;
+        var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = this.props;
         var levels = reportDS.levels.toJS(), subjecLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
         this.levels = levels;
-        var theDS = getDS(levels, subjecLevels, classHeaders, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
+        var theDS = getDS(levels, subjecLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
         this.theDS = theDS;
 
         this.state = {
@@ -66,14 +66,14 @@ export default SubjectLevelDisribution;
 
 //=================================================  分界线  =================================================
 //各个档次的table数据以及各个档次的文案数据
-function getDS(levels, subjecLevels, classHeaders, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
+function getDS(levels, subjecLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
     var result = {};
     _.each(levels, (levObj, levelKey) => {
         var subjectLevelMeanInfo = subjecLevels[levelKey];   //_.find(subjecLevels, (obj) => obj.levelKey == levelKey);
         if(!subjectLevelMeanInfo) return;
 
         var currentSubjectLevelInfo = makeCurrentSubjectLevelInfo(subjectLevelMeanInfo, levObj, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
-        var {validOrderedSubjectMean} = filterMakeOrderedSubjectMean(classHeaders, subjectLevelMeanInfo);
+        var {validOrderedSubjectMean} = filterMakeOrderedSubjectMean(levObj, classHeadersWithTotalScore, subjectLevelMeanInfo);
         var tableDS = getTableDS(currentSubjectLevelInfo, validOrderedSubjectMean, gradeName, currentClass);
         var bestAndWorst = getBestAndWorst(currentSubjectLevelInfo, currentClass, subjectLevelMeanInfo);
         var percentageSubjectDS = getPercentageBetterAndWorse(currentSubjectLevelInfo, currentClass, subjectLevelMeanInfo);
@@ -117,7 +117,7 @@ function getPercentageBetterAndWorse(currentSubjectLevelInfo, currentClass, subj
  * 学科分档的表格
  * @param  {[type]} subjectLevelInfo [description]
  * @param  {[type]} subjectsMean    [description]
- * @param  {[type]} classHeaders         [description]
+ * @param  {[type]} classHeadersWithTotalScore         [description]
  * @return {[type]}                 [description]
  */
 function getTableDS(subjectLevelInfo, validOrderedSubjectMean, gradeName, currentClass) {
@@ -192,10 +192,10 @@ function makeCurrentSubjectLevelInfo(subjectLevelMeanInfo, levObj, currentClass,
 }
 
 //TODO:抽取出来，作为Common Report Util
-function filterMakeOrderedSubjectMean(classHeaders, subjectLevelMeanInfo) {
+function filterMakeOrderedSubjectMean(levObj, classHeadersWithTotalScore, subjectLevelMeanInfo) {
     //按照headers的顺序，返回有序的[{subject: , id(): , mean: }]
     var valids = [], unvalids = [];
-    _.each(classHeaders, (headerObj) => {
+    _.each(classHeadersWithTotalScore, (headerObj) => {
         if(headerObj.id == 'totalScore') return;
         if(subjectLevelMeanInfo[headerObj.id]) {
             valids.push({id: headerObj.id, subject: headerObj.subject, mean: subjectLevelMeanInfo[headerObj.id].mean});
@@ -203,5 +203,6 @@ function filterMakeOrderedSubjectMean(classHeaders, subjectLevelMeanInfo) {
             unvalids.push({id: headerObj.id, subject: headerObj.subject, mean: subjectLevelMeanInfo[headerObj.id].mean});
         }
     });
+    valids.unshift({id: 'totalScore', subject: '总分', mean: levObj.score});
     return {validOrderedSubjectMean: valids, unvalids: unvalids};
 }
