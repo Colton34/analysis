@@ -57,6 +57,14 @@ var option = {
             }
         },
     },
+    textStyle:{
+             color:'#000'
+           },
+    tooltip: {
+                   formatter: function (param) {
+                       return param.data.number+'<br/>'+'区分度'+param.data.distinguish+'<br/>'+'年级平均得分率'+param.data.value[0]+'<br/>'+'班级平均得分率'+param.data.value[1];
+                   }
+               },
     series: [
         {
             type: 'candlestick',
