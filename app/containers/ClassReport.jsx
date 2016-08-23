@@ -53,7 +53,7 @@ class ContentComponent extends React.Component {
 
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                <ReportNavHeader examName={examName} examid={this.props.examid} grade={this.props.grade} />
+                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} />
                 {(isSchoolManagerOrGradeManager) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} reportDS={this.props.reportDS} /> : ''}
                 {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> 
                     : <SingleClassReport 
