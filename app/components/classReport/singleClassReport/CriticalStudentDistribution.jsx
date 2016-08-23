@@ -107,8 +107,8 @@ export default  function CriticalStudent({classStudents, reportDS}) {
             <span className={commonClass['title-desc']}>临界生是指总分数在各分数档线附近的学生群体。掌握他们的学科表现，分析他们的薄弱学科并帮助突破，对稳定他们的上线可能性有很大的帮助。</span>
             <p style={{fontSize:'14px',color:'#6a6a6a',paddingTop:20}}>下表是本次考试各档临界生人数情况以及临界生群体的总分及学科平均分的表现，这部分学生应给予更多的关注，对提高本班的上线率有显著的积极作用。红色数据表示低于学科分档线</p>
             {
-                tableRenderData.map(renderData => {
-                    return <EnhanceTable tableHeaders={renderData.tableHeaders} tableData={renderData.tableData} style={{marginTop: 20}}/>
+                tableRenderData.map((renderData, index) => {
+                    return <EnhanceTable key={index} tableHeaders={renderData.tableHeaders} tableData={renderData.tableData} style={{marginTop: 20}}/>
                 })
             }
           <div className={singleClassReportStyle['analysis-conclusion']}>
