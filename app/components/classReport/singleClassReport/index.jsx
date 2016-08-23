@@ -5,7 +5,6 @@ import Radium from 'radium';
 import {Link} from 'react-router';
 
 import Header from './Header';
-// import TotalScoreTrend from './totalScore-trend';
 import TotalScoreTrend from './TotalScoreTrend';
 import TotalScoreLevelGuide from './totalScore-levelGuide';
 import TotalScoreLevelDistribution from './totalScore-levelDistribution';
@@ -14,14 +13,18 @@ import CriticalStudentDistribution from './CriticalStudentDistribution';
 import SubjectPerformance from './SubjectExamPerformance';
 import SubjectInspectPerformance from './SubjectInspectPerformance';
 import Wishes from './Wishes';
+
 import ImportStudentInfo from './ImportStudentInfo';
 import HistoryPerformance from './HistoryPerformance/index';
 
 class SingleClassReport extends React.Component {
     constructor(props) {
         super(props);
+        var realClasses = this.props.reportDS.examInfo.toJS().realClasses;
+        this.authClasses = getAuthClasses(this.props.user.auth, this.props.grade, this.props.gradeName, realClasses);
+        debugger;
         this.state = {
-            currentClass: '1'
+            currentClass: this.authClasses[0].key
         }
     }
 
@@ -48,7 +51,7 @@ class SingleClassReport extends React.Component {
                 <TotalScoreTrend reportDS={this.props.reportDS} classStudents={classStudents} />
                 <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} changeLevels={changeLevels} saveBaseline={saveBaseline} examid={examid} grade={grade}/>
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
-                <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
+                <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <CriticalStudentDistribution classStudents={classStudents} reportDS={this.props.reportDS} />
                 <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <SubjectInspectPerformance reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
@@ -93,6 +96,35 @@ function getClassHeadersWithTotalScore(headers, classStudentsPaperMap) {
     });
     result.unshift(headers[0]);
     return result;
+}
+
+function getAuthClasses(auth, gradeKey, gradeName, realClasses) {
+    //获取此页面需要的auth classes
+    //如果是校级领导，年级主任，任意一门学科的学科组长，那么都将看到所有学生--因为这里涉及的自定义分析到选择学生页面没有学科的筛选了，就没办法和学科再联系一起了
+    if(gradeKey && (auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]))) {
+        return _.map(realClasses, (classKey) => {
+            return {
+                key: classKey,
+                value: gradeKey + classKey + '班'
+            }
+        })
+    }
+    //Note: 是自定义--不属于自己管理的年级。自定义可能是没有gradeKey传递--是undefined
+    if(!gradeKey || !auth.gradeAuth[gradeKey]) {
+        return _.map(realClasses, (classKey) => {
+            return {
+                key: classKey,
+                value: gradeName + classKey + '班'
+            }
+        })
+    }
+
+    return _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => {
+        return {
+            key: obj.group,
+            value: gradeKey + obj.group + '班'
+        }
+    });
 }
 
 

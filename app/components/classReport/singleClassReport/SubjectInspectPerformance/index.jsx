@@ -44,7 +44,7 @@ export default function SubjectInspectPerformance({reportDS, currentClass}) {
 
           
             <div style={{marginTop: 30}}>
-                <QuestionLevel />
+                <QuestionLevel reportDS={reportDS} currentClass={currentClass} />
                 <QuestionAbility />
             </div>
         </div>
