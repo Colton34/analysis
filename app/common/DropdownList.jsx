@@ -35,6 +35,8 @@ let localStyle = {
  * multiChoiceNum: 可选，多选的数量,
  * surfaceBtnStyle: 下拉列表对外按钮的样式,
  * coverAll: cover列表里是否包含全部候选（包括已选择的）, 默认为否;
+ * needRefresh：在componentWillReceiveProps时是否更新列表；
+ * dropdownListRefreshHandler： 更新props中的needRefresh字段的回调函数；
  */
 @Radium
 class DropdownList extends React.Component {
@@ -52,6 +54,29 @@ class DropdownList extends React.Component {
             current: this.props.isMultiChoice ? {value:'选择班级'} : this.props.list? this.props.list[0] : {value:'无数据'},
             coveredItems: this.props.isMultiChoice || this.props.coverAll? this.props.list :this.props.list.slice(1),
             selectedItems: this.props.list.slice(0, theDropCount)
+        }
+    }
+    componentWillReceiveProps(nextProps) {
+        if (!nextProps.needRefresh){
+            return;
+        } 
+             
+        this.multiChoiceNum = nextProps.multiChoiceNum ? nextProps.multiChoiceNum :nextProps.list.length;
+        var theDropCount = (nextProps.list.length >= 2) ? 2 : 1;
+        if (nextProps.isMultiChoice) {
+            _.each(_.range(theDropCount), index => { //默认选择前两个
+                nextProps.list[index].selected = true;
+            })
+        }
+        
+        this.setState({
+            active: false,
+            current: nextProps.isMultiChoice ? {value:'选择班级'} : nextProps.list? nextProps.list[0] : {value:'无数据'},
+            coveredItems: nextProps.isMultiChoice || nextProps.coverAll? nextProps.list :nextProps.list.slice(1),
+            selectedItems: nextProps.list.slice(0, theDropCount)
+        })
+        if (nextProps.dropdownListRefreshHandler){
+            nextProps.dropdownListRefreshHandler()
         }
     }
     handleBodyClick(event) {
