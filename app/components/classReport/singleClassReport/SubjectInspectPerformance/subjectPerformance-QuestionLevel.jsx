@@ -7,82 +7,81 @@ import ReactHighcharts from 'react-highcharts';
 import commonClass from '../../../../common/common.css';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
-export default function QuestionLevel({reportDS, currentClass}) {
-    var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
-    var theDS = getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass);
-
-    var option = {
-        tooltip: {},
-        legend: {
-            data: ['年级平均得分率', '班级平均得分率'],
-            right:25,
-            top:25,
-            orient:'vertical',
-            textStyle:{
-              color:'#6a6a6a'
-            },
+var option = {
+    tooltip: {},
+    legend: {
+        data: ['年级平均得分率', '班级平均得分率'],
+        right:25,
+        top:25,
+        orient:'vertical',
+        textStyle:{
+          color:'#6a6a6a'
         },
-        radar: {
-            indicator: [
-               { name: '最难题组', max:150},
-               { name: '最难题组', max: 150},
-               { name: '最难题组', max: 150},
-               { name: '最难题组', max: 150},
-               { name: '最难题组', max: 150}
-            ],
-            radius:150,
-            splitNumber:3,//刻度数目
-            axisTick:{show:false},//刻度
-            axisLabel:{show:false},//刻度数字
-            splitArea: {
-                    areaStyle: {
-                        color: ['#fff',
-                        '#fff', '#fff',
-                        '#fff', '#fff'],
-                        shadowColor: 'rgba(0, 0, 0, 0.3)',
-                        shadowBlur: 0
-                    }
-                },
-                name: {
-               textStyle: {
-                   color: '#6a6a6a'
-               }
-           },
-                splitLine: {//分割线颜色
-                lineStyle: {
-                    color: '#f2f2f3'
-                },
-              },
-                axisLine: {
-               lineStyle: {
-                   color: '#f2f2f3'
-               }
-           }
-
-
-        },
-        series: [{
-            name: '班级vs年级',
-            type: 'radar',
-            //areaStyle: {normal: {}},
-            color:['#0099ff','#cccccc'],
-            data : [
-                {
-                    value : [30, 50,60, 80, 100],
-                    name : '班级平均得分率'
-                },
-                 {
-                    value : [50, 140, 80, 31, 42],
-                    name : '年级平均得分率'
+    },
+    radar: {
+        indicator: [
+           { name: '容易题组', max:1},
+           { name: '较容易题组', max: 1},
+           { name: '中等题组', max: 1},
+           { name: '较难题组', max: 1},
+           { name: '最难题组', max: 1}
+        ],
+        radius:150,
+        splitNumber:3,//刻度数目
+        axisTick:{show:false},//刻度
+        axisLabel:{show:false},//刻度数字
+        splitArea: {
+                areaStyle: {
+                    color: ['#fff',
+                    '#fff', '#fff',
+                    '#fff', '#fff'],
+                    shadowColor: 'rgba(0, 0, 0, 0.3)',
+                    shadowBlur: 0
                 }
-            ]
-        }]
-    };
+            },
+            name: {
+           textStyle: {
+               color: '#6a6a6a'
+           }
+       },
+            splitLine: {//分割线颜色
+            lineStyle: {
+                color: '#f2f2f3'
+            },
+          },
+            axisLine: {
+           lineStyle: {
+               color: '#f2f2f3'
+           }
+       }
 
-    var subjectPerformance={
-      high:'较难题组',
-      low:'较易题组'
-    };
+
+    },
+    series: [{
+        name: '班级vs年级',
+        type: 'radar',
+        //areaStyle: {normal: {}},
+        color:['#0099ff','#cccccc']
+    }]
+};
+
+var subjectPerformance={
+    high:'较难题组',
+    low:'较易题组'
+};
+
+
+export default function QuestionLevel({classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate}) {
+    option.series[0].data = [
+        {
+            value: classQuestionLevelGroupMeanRate,
+            name: '班级平均得分率'
+        },
+        {
+            value: gradeQuestionLevelGroupMeanRate,
+            name: '年级平均得分率'
+        }
+    ];
 
     return (
         <div style={{marginRight: 20, display: 'inline-block'}}>
@@ -101,7 +100,7 @@ export default function QuestionLevel({reportDS, currentClass}) {
 }
 
 
-//=================================================  分界线  =================================================
+//=================================================  迁移分界线  =================================================
 //算法：
 //1.计算每一道题目的难度。
 //2.按照难度高低排序，分类出5个难度等级

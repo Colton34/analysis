@@ -76,7 +76,6 @@ var option = {
 export default function ExamInspectPerformance({best, worst}) {
     var {categoryData, values} = getChartDS(best, worst);
     option.xAxis.data = categoryData;
-    debugger;
     option.series[0].data = values;
     return (
         <div >
@@ -124,6 +123,89 @@ function getChartDS(best, worst) {
 }
 
 
+
+//=================================================  迁移分界线  =================================================
+function getExamInspectDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass) {
+    var result = {}, currentClassStudents = studentsGroupByClass[currentClass];
+    var allStudentsPaperQuestionInfo = {};
+    _.each(examStudentsInfo, (studentObj) => {
+        allStudentsPaperQuestionInfo[studentObj.id] = _.keyBy(studentObj.questionScores, 'paperid');
+    });
+    //计算每个科目对应的数据
+    _.each(examPapersInfo, (paperObj, pid) => {
+        var classQuestionScoreRates = getClassQuestionScoreRate(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass);
+        var gradeQuestionScoreRates = getGradeQuestionScoreRate(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
+        var questionContriFactors = _.map(classQuestionScoreRates, (x, i) => _.round(_.subtract(x, gradeQuestionScoreRates[i]), 2));
+        var gradeQuestionSeparation = getGradeQuestionSeparation(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
+        result[pid] = {
+            gradeQuestionScoreRates: gradeQuestionScoreRates,
+            classQuestionScoreRates: classQuestionScoreRates,
+            questionContriFactors: questionContriFactors,
+            questionSeparation: gradeQuestionSeparation
+        };
+    });
+    return result;
+}
+
+//Warning:所有有关学科的计算都应该是先找到“真正考试了此学科的所有考生”，然后再筛选出“此班级的学生”
+function getClassQuestionScoreRate(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass) {
+//计算本班级的此道题目的得分率：
+    //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分
+    var currentClassPaperStudents = _.filter(allStudentsPaperMap[pid], (studentObj) => studentObj['class_name'] == currentClass);
+    return _.map(questions, (questionObj, index) => {
+        //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
+        return _.round(_.divide(_.mean(_.map(currentClassPaperStudents, (studentObj) => {
+            return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
+        })), questionObj.score), 2);
+    });
+}
+
+function getGradeQuestionScoreRate(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo) {
+//计算本班级的此道题目的得分率：
+    //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分
+    var gradePaperStudents = allStudentsPaperMap[pid];
+    return _.map(questions, (questionObj, index) => {
+        //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
+        return _.round(_.divide(_.mean(_.map(gradePaperStudents, (studentObj) => {
+            return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
+        })), questionObj.score), 2);
+    });
+}
+
+//firstInput: 某一道题目得分  secondInput: 此道题目所属科目的成绩
+function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo) {
+    var paperStudents = allStudentsPaperMap[pid];
+    return _.map(questions, (questionObj, index) => {
+        var questionScores = _.map(paperStudents, (studentObj) => allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index]);
+        var paperScores = _.map(paperStudents, (studentObj) => studentObj.score);
+        return StatisticalLib.sampleCorrelation(questionScores, paperScores).toFixed(2);
+    });
+}
+
+function getBestAndWorstQuestions({gradeQuestionScoreRates, classQuestionScoreRates, questionContriFactors, questionSeparation, questions}) {
+    var temp = _.map(questions, (obj, i) => {
+        return {
+            name: obj.name,
+            gradeRate: gradeQuestionScoreRates[i],
+            classRate: classQuestionScoreRates[i],
+            factor: questionContriFactors[i],
+            separation: questionSeparation[i]
+        }
+    });
+    temp = _.sortBy(temp, 'factor');
+    if(temp.length >= 10) {
+        return {
+            best: _.takeRight(temp, 5),
+            worst: _.take(temp, 5)
+        }
+    } else {
+        var flag = _.ceil(_.divide(temp.length, 2));
+        return {
+            best: _.takeRight(temp, flag),
+            worst: _.take(temp, temp.length-flag)
+        }
+    }
+}
 
 
 
