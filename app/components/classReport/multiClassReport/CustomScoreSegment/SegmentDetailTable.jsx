@@ -7,13 +7,14 @@ import TableView from '../../../../common/TableView';
 /**
  * tableRenderData: 包含tableHeaders & 
  */
-export default function SegmentDetailChart({tableHeaders, tableData}) {
+export default function SegmentDetailTable({tableHeaders, tableData}) {
+    var tableHeaders = [tableHeaders];
     return (
         <div>
             <div className={commonClass['sub-title']} style={{margin: '27px 0 20px 0'}}>
                 各分数段详细人数
             </div>
-            <TableView id='segmentDetailChart' tableHeaders={tableHeaders} tableData={tableData} TableComponent = {EnhanceTable} options={{canDownload: true}}/>
+            <TableView id='segmentDetailTable' tableHeaders={tableHeaders} tableData={tableData} TableComponent = {EnhanceTable} options={{canDownload: true}}/>
         </div>
     )
 }

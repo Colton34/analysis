@@ -19,10 +19,26 @@ class SegmentDetailChart extends React.Component {
         }
     }
     componentWillReceiveProps(nextProps) {
-        var {chartData} = nextProps;
-        this.setState({
-            seriesShow: chartData.series.length >= 2? chartData.series.slice(0,2) : chartData.series.slice(0,1)
-        })
+        if (nextProps.needRefresh) {
+            var {chartData} = nextProps;
+            var classList = [];
+            _.forEach(chartData.series, item => {
+                classList.push({ value: item.name })
+            })
+            this.setState({
+                seriesShow: chartData.series.length >= 2 ? chartData.series.slice(0, 2) : chartData.series.slice(0, 1),
+                classList: classList
+            })
+        } else if (nextProps.chartData.series[0].data.length !== this.state.seriesShow[0].data.length){
+            var newSeriesShow = [];
+            var {seriesShow} = this.state;
+            _.forEach(seriesShow, seriesItem => {
+                newSeriesShow.push(_.find(nextProps.chartData.series, {name: seriesItem.name}));
+            })
+            this.setState({
+                seriesShow: newSeriesShow
+            })
+        }
     }
     onSelectClass(item) {
         var {chartData} = this.props;
@@ -43,7 +59,7 @@ class SegmentDetailChart extends React.Component {
             _.range(_.size(this.state.seriesShow)).map((num)=>{return this.state.seriesShow[num].color=colorList[num]});
     }
     render() {
-        var {chartData, classList} = this.props;
+        var {chartData, classList, needRefresh, dropdownListRefreshHandler} = this.props;
         var {seriesShow} = this.state;
         var chartWidth=(this.state.seriesShow.length)*(chartData.categories.length)>=50?((this.state.seriesShow.length)*(chartData.categories.length)*21)+60*(chartData.categories.length):1140;
         var config = {
@@ -135,7 +151,11 @@ class SegmentDetailChart extends React.Component {
                     各分数段详细人数
                     <div style={{ float: 'right' }}>
                         <span style={{ fontSize: 12 ,marginRight:'100px'}}>对比对象（最多5个）</span>
-                        <DropdownList list={classList} isMultiChoice multiChoiceNum={5} style={{ display: 'inline-block', marginLeft: 10,position:'absolute',right:0,top:-3, zIndex:1 }} onClickDropdownList={this.onSelectClass.bind(this)}/>
+                         <DropdownList list={classList} isMultiChoice multiChoiceNum={5}
+                                      style={{ display: 'inline-block', marginLeft: 10,position:'absolute',right:0,top:-3, zIndex:1 }}
+                                      onClickDropdownList={this.onSelectClass.bind(this)}
+                                      needRefresh={needRefresh}
+                                      dropdownListRefreshHandler={dropdownListRefreshHandler}/>
                     </div>
                 </div>
                 <div style={{width:'1140px',height:'420px',overflow:'auto'}}>

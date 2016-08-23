@@ -137,7 +137,7 @@ class Table extends React.Component {
                                                     className={commonClassName['table-unit']}
                                                     rowSpan={header.rowSpan ? header.rowSpan : 0}
                                                     colSpan={header.colSpan ? header.colSpan : 0}
-                                                    style={_.assign({}, { minWidth: 100, borderColor: colorsMap.C04, position: 'relative'}, headerCss, sortable ? {cursor: 'pointer'}: {}, bordered ? {}:{border: 'none'})}
+                                                    style={_.assign({}, { minWidth: 100, borderColor: colorsMap.C04, position: 'relative', whiteSpace: 'nowrap'}, headerCss, sortable ? {cursor: 'pointer'}: {}, bordered ? {}:{border: 'none'})}
                                                     onClick={this.onSortColumn.bind(this, sortable ? header.id : undefined)}
                                                     >
                                                     <span style={header.tipContent !== undefined ? {marginRight: 5} : {}}>{header.name}</span>
@@ -185,7 +185,7 @@ class Table extends React.Component {
                                                     className={commonClassName['table-unit']}
                                                     colSpan={rowData[id].colSpan ? rowData[id].colSpan : 0}
                                                     rowSpan={rowData[id].rowSpan ? rowData[id].rowSpan : 0}
-                                                    style={_.assign({}, { minWidth: 100, borderColor: colorsMap.C04 }, tdStyle, bordered ? {}:{border: 'none'}) }
+                                                    style={_.assign({}, { minWidth: 100, borderColor: colorsMap.C04, whiteSpace: 'nowrap'}, tdStyle, bordered ? {}:{border: 'none'}) }
                                                     >
                                                     {
                                                         rowData[id]['overlayData'] !== undefined ? (

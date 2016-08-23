@@ -108,7 +108,7 @@ class SchoolReportCard extends React.Component {
             }
         }
         return (
-            <div style={{ display: 'inline-block', height: 388, padding: '0 0 0 10px', cursor: 'pointer'}} onClick={this.toViewSchoolAnalysis.bind(this)} className='col-md-6'>
+            <div style={{ display: 'inline-block', height: 388, padding: '0 0 0 10px', cursor: 'pointer'}} onClick={this.toViewSchoolAnalysis.bind(this)} className='col-md-6 dashboard-card'>
                 <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
                     <CardHeader grade={grade} examid={examid} toViewSchoolAnalysis={this.toViewSchoolAnalysis.bind(this)}/>
                     {/*<div className={dashboardStyle['school-report-img']} style={{marginTop: 30}}></div>*/}
