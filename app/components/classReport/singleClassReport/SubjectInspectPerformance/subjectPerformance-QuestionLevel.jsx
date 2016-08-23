@@ -10,7 +10,6 @@ import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 export default function QuestionLevel({reportDS, currentClass}) {
     var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
     var theDS = getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass);
-debugger;
 
     var option = {
         tooltip: {},
