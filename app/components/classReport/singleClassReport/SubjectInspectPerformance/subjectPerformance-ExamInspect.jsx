@@ -2,6 +2,10 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import StatisticalLib from 'simple-statistics';
+import ECharts from 'react-echarts';
+import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
+//style
+import commonClass from '../../../../common/common.css';
 
 class ExamInspectPerformance extends React.Component {
     constructor(props) {
@@ -10,20 +14,97 @@ class ExamInspectPerformance extends React.Component {
         var {reportDS, currentClass} = this.props;
         var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
         var theDS = getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass);
-        debugger;
     }
-
     render() {
         //随着state的当前变量进行展示
-        return (
-            <div>
-                <h4>学科内部表现：ExamInspect</h4>
-            </div>
-        );
+        var categoryData = [0.1,0.2,0.4,0.6,0.8,0.8,0.9];
+        var values = [
+             [ 0.1,0.2,0.1,0.2],
+             [ 0.2,0.3, 0.2,0.3],
+             [0.1,0.5, 0.1,0.5],
+             [ 0.5,0.3,0.5,0.3],
+             [ 0.7,0.8,0.7,0.8],
+             [ 0.5,0.3,0.5,0.3],
+             [ 0.7,0.8,0.7,0.8],
+         ];
+
+        var option = {
+          //color:['#61a0a8', '#d48265'],
+            title: {
+                text: '',
+            },
+            xAxis: {
+              name:'(区分度)',
+              nameLocation:'end',
+              nameTextStyle:{
+                color:'#767676',
+                fontSize:12
+              },
+              type: 'category',
+              data: categoryData,
+                axisLine: {//轴线
+                  lineStyle:{
+                    color:'#c0d0e0',
+                  }
+                },
+                axisTick:{//刻度
+                  show:false,
+                },
+                splitLine: {//分割线
+                  show: true,
+                  lineStyle:{
+                    color:'#f2f2f2',
+                    type:'dashed'
+                  }
+                },
+            },
+            yAxis: {
+                // scale: false,//刻度是否从零开始
+                name:'(得分率)',
+                nameLocation:'end',
+                nameTextStyle:{
+                  color:'#767676',
+                  fontSize:12
+                },
+                axisLine: {//轴线
+                  lineStyle:{
+                    color:'#c0d0e0',
+                  }
+                },
+                axisTick:{//刻度
+                  show:false,
+                },
+                splitLine: {//分割线
+                  show: true,
+                  lineStyle:{
+                    color:'#f2f2f2',
+                    type:'dashed'
+                  }
+                },
+            },
+                series: [
+                {
+                    type: 'candlestick',
+                    data: values,
+                    itemStyle: {
+                        normal: {
+                        //  width:10,
+                            color: 'rgb(105, 193, 112)',
+                            color0: 'rgb(238, 107, 82)',
+                            borderColor: 'rgb(105, 193, 112)',
+                            borderColor0: 'rgb(238, 107, 82)'
+                }
+            }
+                }]
+};
+            return (
+              <div >
+                <ECharts option={option} style={{width:1340,height:400,position:'relative',left:-100,top:0}}></ECharts>
+                </div>
+            )
     }
 }
 export default ExamInspectPerformance;
-
 //=================================================  分界线  =================================================
 //Note: 题目贡献指数 = 班级此道题目平均得分率 - 全校此道题目平均得分率。指数值为正，是促进作用；为负，是拖后腿。
 function getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass) {
@@ -123,4 +204,3 @@ function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStud
 //         return spearation;
 //     });
 // }
-

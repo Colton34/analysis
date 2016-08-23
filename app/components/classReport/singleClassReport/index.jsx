@@ -14,16 +14,8 @@ import CriticalStudentDistribution from './CriticalStudentDistribution';
 import SubjectPerformance from './SubjectExamPerformance';
 import SubjectInspectPerformance from './SubjectInspectPerformance';
 import Wishes from './Wishes';
-
-// import SubjectPerformanceExamInspect from './SubjectInspectPerformance/subjectPerformance-ExamInspect';
-// import SubjectPerformanceQuestionTopic from './SubjectInspectPerformance/subjectPerformance-QuestionTopic';
-// import SubjectPerformanceQuestionLevel from './SubjectInspectPerformance/subjectPerformance-QuestionLevel';
-
-
-
-
 import ImportStudentInfo from './ImportStudentInfo';
-import HistoryPerformance from './HistoryPerformance';
+import HistoryPerformance from './HistoryPerformance/index';
 
 class SingleClassReport extends React.Component {
     constructor(props) {
