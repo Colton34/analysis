@@ -32,41 +32,61 @@ var localStyle = {
 }
 
 
-export default function LevelDistribution({reportDS, currentClass}) {
-    var examInfo=reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS() , headers = reportDS.headers.toJS();
+export default class LevelDistribution extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            mouseEnter: false
+        }
+    }
+    onMouseEnter() {
+        this.setState({
+            mouseEnter: true
+        })
+    }
+    onMouseLeave() {
+        this.setState({
+            mouseEnter: false
+        })
+    }
+    render() {
+        var {reportDS, currentClass} = this.props;
+        var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS(), headers = reportDS.headers.toJS();
 
-    var {totalScoreLevelInfoByClass, totalScoreLevelInfoByLevel} = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, currentClass);
-    var headerDS = getHeaderDS(totalScoreLevelInfoByLevel, currentClass); //{0:3, 1:5, 2:4}
-    var tableHeaderDS = getTableHeaderDS(levels);
-    var tableBodyDS = getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, examInfo.gradeName);
+        var {totalScoreLevelInfoByClass, totalScoreLevelInfoByLevel} = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, currentClass);
+        var headerDS = getHeaderDS(totalScoreLevelInfoByLevel, currentClass); //{0:3, 1:5, 2:4}
+        var tableHeaderDS = getTableHeaderDS(levels);
+        var tableBodyDS = getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, examInfo.gradeName);
 
-    var levelSize = _.size(levels);
-    return (
-        <div id='levelDistribution' className={commonClass['section']}>
-            <div>
-                <span className={commonClass['title-bar']}></span>
-                <span className={commonClass['title']}>总分分档学生人数分布</span>
-                <span className={commonClass['title-desc']}>总分分档上线学生人数分布，可得出班级在学业综合水平上的分层表现</span>
-            </div>
-            <TableView id={'levelDistributionTable'} hover style={{marginTop: 30}}
+        var levelSize = _.size(levels);
+        return (
+            <div id='levelDistribution' className={commonClass['section']}>
+                <div>
+                    <span className={commonClass['title-bar']}></span>
+                    <span className={commonClass['title']}>总分分档学生人数分布</span>
+                    <span className={commonClass['title-desc']}>总分分档上线学生人数分布，可得出班级在学业综合水平上的分层表现</span>
+                </div>
+                <TableView id={'levelDistributionTable'} hover style={{ marginTop: 30 }}
                     tableHeaders={tableHeaderDS} tableData={tableBodyDS} TableComponent={EnhanceTable} reserveRows={6}/>
 
-            <div className={singleClassReportStyle['analysis-conclusion']}>
-                <p>分析诊断：</p>
-                <p style={{marginBottom: 30}}>从上表中可以观察到班级各档线的学生上线人数分布情况，及与全年级整体上档情况的比较。对各班级各档上线人数多少进行班级间的排名，下面是班级在{_.join(_.range(levelSize).map(num => {return numberMap[num + 1]}), '、')}档上线人数的年级排名:</p>
-                <div style={{width: '100%', overflow: 'auto'}}>
-                    {/**---------------------------- TODO: 滚动条优化 -----------------------*/}
-                    <div style={{ width: levelSize <= 3 ? '100%' :levelSize * 336 + (levelSize - 1) * 20 }}>
-                        {
-                            _.range(_.size(headerDS)).map(num => {
-                                return <Card key={num} title={'第' + headerDS[num] + '名'} desc={numberMap[num + 1] + '档上线人数年级排名'} style={num !== levelSize - 1 ? { marginRight: 20 } : {}}/>
-                            })
-                        }
+                <div className={singleClassReportStyle['analysis-conclusion']}>
+                    <p>分析诊断：</p>
+                    <p style={{ marginBottom: 30 }}>从上表中可以观察到班级各档线的学生上线人数分布情况，及与全年级整体上档情况的比较。对各班级各档上线人数多少进行班级间的排名，下面是班级在{_.join(_.range(levelSize).map(num => { return numberMap[num + 1] }), '、') }档上线人数的年级排名: </p>
+                    <div style={_.assign({},{ width: '100%'}, this.state.mouseEnter ? {overflowX: 'scroll'} : {overflow: 'hidden'})} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
+                        {/**---------------------------- TODO: 滚动条优化 -----------------------*/}
+                        <div style={{ width: levelSize <= 3 ? '100%' : levelSize * 336 + (levelSize - 1) * 20 }}>
+                            {
+                                _.range(_.size(headerDS)).map(num => {
+                                    return <Card key={num} title={'第' + headerDS[num] + '名'} desc={numberMap[num + 1] + '档上线人数年级排名'} style={num !== levelSize - 1 ? { marginRight: 20 } : {}}/>
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
-            </div> 
-        </div>
-    )
+            </div>
+        )
+    }
+    
 }
 
 
