@@ -116,7 +116,7 @@ export default  function CriticalStudent({classStudents, reportDS}) {
                 {
                     summaryInfo.map((info, index) => {
                         return (
-                            <div style={{lineHeight: '1.5'}}>
+                            <div key={index} style={{lineHeight: '1.5'}}>
                                 对于班级的{numberMap[index + 1]}档临界生群体，
                                 {info.better ? <span>表现好的学科是<span style={{color: colorsMap.B03, margin: '0 5px'}}>{info.better}</span>，表现不好的学科是<span style={{color: colorsMap.B03, margin: '0 5px'}}>{info.worse}</span>。</span> : info}
                             </div>
