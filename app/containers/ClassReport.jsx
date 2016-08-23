@@ -52,7 +52,7 @@ class ContentComponent extends React.Component {
         var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
 
         return (
-            <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}}>
+            <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
                 <ReportNavHeader examName={examName} examid={this.props.examid} grade={this.props.grade} />
                 {(isSchoolManagerOrGradeManager) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} reportDS={this.props.reportDS} /> : ''}
                 {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> 
