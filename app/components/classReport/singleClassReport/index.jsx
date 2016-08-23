@@ -15,7 +15,8 @@ import SubjectInspectPerformance from './SubjectInspectPerformance';
 import Wishes from './Wishes';
 
 import ImportStudentInfo from './ImportStudentInfo';
-import HistoryPerformance from './HistoryPerformance/index';
+import HistoryPerformance from './HistoryPerformanceMe';
+// import HistoryPerformance from './HistoryPerformance/index';
 
 class SingleClassReport extends React.Component {
     constructor(props) {

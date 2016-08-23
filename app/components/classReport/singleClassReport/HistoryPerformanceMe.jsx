@@ -27,6 +27,7 @@ examCache持有examList
 
 function HistoryContent({examList, examsInfoCache, currentExamIds}) {//这里examList就是跟着currentClass走的
     examList = examList.toJS(), examsInfoCache = examsInfoCache.toJS();
+    debugger;
     //根据currentExamIds和examsInfoCache得到要显示对比的考试。examList用来填充选择考试的下拉框
     return (
         <div id='historyPerformance'>
