@@ -35,16 +35,20 @@ var localStyle = {
 export default class LevelDistribution extends React.Component {
     constructor(props) {
         super(props);
+        var levelSize = 
         this.state = {
-            mouseEnter: false
+            mouseEnter: false,
+            needScroll: _.size(this.props.reportDS.levels.toJS()) > 3 ? true: false
         }
     }
     onMouseEnter() {
+        if (!this.state.needScroll) return ;
         this.setState({
             mouseEnter: true
         })
     }
     onMouseLeave() {
+        if (!this.state.needScroll) return ;
         this.setState({
             mouseEnter: false
         })
@@ -73,7 +77,6 @@ export default class LevelDistribution extends React.Component {
                     <p>分析诊断：</p>
                     <p style={{ marginBottom: 30 }}>从上表中可以观察到班级各档线的学生上线人数分布情况，及与全年级整体上档情况的比较。对各班级各档上线人数多少进行班级间的排名，下面是班级在{_.join(_.range(levelSize).map(num => { return numberMap[num + 1] }), '、') }档上线人数的年级排名: </p>
                     <div style={_.assign({},{ width: '100%'}, this.state.mouseEnter ? {overflowX: 'scroll'} : {overflow: 'hidden'})} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
-                        {/**---------------------------- TODO: 滚动条优化 -----------------------*/}
                         <div style={{ width: levelSize <= 3 ? '100%' : levelSize * 336 + (levelSize - 1) * 20 }}>
                             {
                                 _.range(_.size(headerDS)).map(num => {
