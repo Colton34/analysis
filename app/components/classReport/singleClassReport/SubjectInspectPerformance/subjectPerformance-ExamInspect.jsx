@@ -1,113 +1,139 @@
 //学科考试内在表现
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
-import StatisticalLib from 'simple-statistics';
 import ECharts from 'react-echarts';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 //style
 import commonClass from '../../../../common/common.css';
-
-class ExamInspectPerformance extends React.Component {
-    constructor(props) {
-        super(props);
-        //构建数据结构
-        var {reportDS, currentClass} = this.props;
-        var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
-        var theDS = getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass);
-    }
-    render() {
-        //随着state的当前变量进行展示
-        var categoryData = [0.1,0.2,0.4,0.6,0.8,0.8,0.9];
-        var values = [
-             [ 0.1,0.2,0.1,0.2],
-             [ 0.2,0.3, 0.2,0.3],
-             [0.1,0.5, 0.1,0.5],
-             [ 0.5,0.3,0.5,0.3],
-             [ 0.7,0.8,0.7,0.8],
-             [ 0.5,0.3,0.5,0.3],
-             [ 0.7,0.8,0.7,0.8],
-         ];
-
-        var option = {
-          //color:['#61a0a8', '#d48265'],
-            title: {
-                text: '',
-            },
-            xAxis: {
-              name:'(区分度)',
-              nameLocation:'end',
-              nameTextStyle:{
-                color:'#767676',
-                fontSize:12
-              },
-              type: 'category',
-              data: categoryData,
-                axisLine: {//轴线
-                  lineStyle:{
-                    color:'#c0d0e0',
-                  }
-                },
-                axisTick:{//刻度
-                  show:false,
-                },
-                splitLine: {//分割线
-                  show: true,
-                  lineStyle:{
-                    color:'#f2f2f2',
-                    type:'dashed'
-                  }
-                },
-            },
-            yAxis: {
-                // scale: false,//刻度是否从零开始
-                name:'(得分率)',
-                nameLocation:'end',
-                nameTextStyle:{
-                  color:'#767676',
-                  fontSize:12
-                },
-                axisLine: {//轴线
-                  lineStyle:{
-                    color:'#c0d0e0',
-                  }
-                },
-                axisTick:{//刻度
-                  show:false,
-                },
-                splitLine: {//分割线
-                  show: true,
-                  lineStyle:{
-                    color:'#f2f2f2',
-                    type:'dashed'
-                  }
-                },
-            },
-                series: [
-                {
-                    type: 'candlestick',
-                    data: values,
-                    itemStyle: {
-                        normal: {
-                        //  width:10,
-                            color: 'rgb(105, 193, 112)',
-                            color0: 'rgb(238, 107, 82)',
-                            borderColor: 'rgb(105, 193, 112)',
-                            borderColor0: 'rgb(238, 107, 82)'
+var option = {
+    title: {
+        text: '',
+    },
+    xAxis: {
+        name:'(区分度)',
+        nameLocation:'end',
+        nameTextStyle:{
+            color:'#767676',
+            fontSize:12
+        },
+        type: 'category',
+        axisLine: {//轴线
+            lineStyle:{
+                color:'#c0d0e0',
+            }
+        },
+        axisTick:{//刻度
+            show:false,
+        },
+        splitLine: {//分割线
+            show: true,
+            lineStyle:{
+                color:'#f2f2f2',
+                type:'dashed'
+            }
+        },
+    },
+    yAxis: {
+        // scale: false,//刻度是否从零开始
+        name:'(得分率)',
+        nameLocation:'end',
+        nameTextStyle:{
+            color:'#767676',
+            fontSize:12
+        },
+        axisLine: {//轴线
+            lineStyle:{
+                color:'#c0d0e0',
+            }
+        },
+        axisTick:{//刻度
+            show:false,
+        },
+        splitLine: {//分割线
+            show: true,
+            lineStyle:{
+                color:'#f2f2f2',
+                type:'dashed'
+            }
+        },
+    },
+    textStyle:{
+             color:'#000'
+           },
+    tooltip: {
+                   formatter: function (param) {
+                       return param.data.number+'<br/>'+'区分度'+param.data.distinguish+'<br/>'+'年级平均得分率'+param.data.value[0]+'<br/>'+'班级平均得分率'+param.data.value[1];
+                   }
+               },
+    series: [
+        {
+            type: 'candlestick',
+            itemStyle: {
+                normal: {
+                //  width:10,
+                    color: 'rgb(105, 193, 112)',
+                    color0: 'rgb(238, 107, 82)',
+                    borderColor: 'rgb(105, 193, 112)',
+                    borderColor0: 'rgb(238, 107, 82)'
                 }
             }
-                }]
+        }
+    ]
 };
-            return (
-              <div >
-                <ECharts option={option} style={{width:1340,height:400,position:'relative',left:-100,top:0}}></ECharts>
-                </div>
-            )
+
+export default function ExamInspectPerformance({best, worst}) {
+    var {categoryData, values} = getChartDS(best, worst);
+    option.xAxis.data = categoryData;
+    option.series[0].data = values;
+    return (
+        <div >
+            <ECharts option={option} style={{width:1340,height:400,position:'relative',left:-100,top:0}}></ECharts>
+        </div>
+    )
+}
+
+/*
+
+{
+    name: obj.name,
+    gradeRate: gradeQuestionScoreRates[i],
+    classRate: classQuestionScoreRates[i],
+    factor: questionContriFactors[i],
+    separation: questionSeparation[i]
+}
+
+var values = [
+    {
+        value: [<年级平均得分率，班级平均得分率， 重复年级，重复班级>],
+        number: '',
+        distinguish:
+    },
+    ...
+]
+
+
+ */
+
+function getChartDS(best, worst) {
+    var temp = _.sortBy(_.concat(best, worst), 'separation');
+    var categoryData = _.map(temp, (obj) => obj.separation);
+    var values = _.map(temp, (obj) => {
+        return {
+            value: [obj.gradeRate, obj.classRate, obj.gradeRate, obj.classRate],
+            number: obj.name,
+            distinguish: obj.separation
+        }
+    });
+    return {
+        categoryData: categoryData,
+        values: values
     }
 }
-export default ExamInspectPerformance;
-//=================================================  分界线  =================================================
-//Note: 题目贡献指数 = 班级此道题目平均得分率 - 全校此道题目平均得分率。指数值为正，是促进作用；为负，是拖后腿。
-function getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass) {
+
+
+
+//=================================================  迁移分界线  =================================================
+function getExamInspectDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass) {
     var result = {}, currentClassStudents = studentsGroupByClass[currentClass];
     var allStudentsPaperQuestionInfo = {};
     _.each(examStudentsInfo, (studentObj) => {
@@ -120,6 +146,8 @@ function getDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStuden
         var questionContriFactors = _.map(classQuestionScoreRates, (x, i) => _.round(_.subtract(x, gradeQuestionScoreRates[i]), 2));
         var gradeQuestionSeparation = getGradeQuestionSeparation(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
         result[pid] = {
+            gradeQuestionScoreRates: gradeQuestionScoreRates,
+            classQuestionScoreRates: classQuestionScoreRates,
             questionContriFactors: questionContriFactors,
             questionSeparation: gradeQuestionSeparation
         };
@@ -162,8 +190,30 @@ function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStud
     });
 }
 
-
-
+function getBestAndWorstQuestions({gradeQuestionScoreRates, classQuestionScoreRates, questionContriFactors, questionSeparation, questions}) {
+    var temp = _.map(questions, (obj, i) => {
+        return {
+            name: obj.name,
+            gradeRate: gradeQuestionScoreRates[i],
+            classRate: classQuestionScoreRates[i],
+            factor: questionContriFactors[i],
+            separation: questionSeparation[i]
+        }
+    });
+    temp = _.sortBy(temp, 'factor');
+    if(temp.length >= 10) {
+        return {
+            best: _.takeRight(temp, 5),
+            worst: _.take(temp, 5)
+        }
+    } else {
+        var flag = _.ceil(_.divide(temp.length, 2));
+        return {
+            best: _.takeRight(temp, flag),
+            worst: _.take(temp, temp.length-flag)
+        }
+    }
+}
 
 
 

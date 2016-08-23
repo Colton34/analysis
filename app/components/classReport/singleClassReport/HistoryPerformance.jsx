@@ -1,4 +1,3 @@
-//历史表现比较。注意：这个还没有考虑好！！！
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';

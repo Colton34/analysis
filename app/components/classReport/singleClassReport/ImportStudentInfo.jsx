@@ -20,7 +20,7 @@ export default class ImportantStudentInfo extends React.Component  {
         var {reportDS} = this.props;
         var {allStudentsPaperMap, examPapersInfo, studentsGroupByClass} = reportDS;
         this.studentRankByClass = getStudentRankByClass(allStudentsPaperMap, studentsGroupByClass);
-    
+
         _.forEach(examPapersInfo, paperObj => {
             headerMapper[paperObj.id] = paperObj.subject;
         })
@@ -76,7 +76,7 @@ export default class ImportantStudentInfo extends React.Component  {
             </div>
         )
     }
-    
+
 }
 
 //=================================================  分界线  =================================================
@@ -174,7 +174,7 @@ function getRankCache(allStudentsPaperMap, studentsGroupByClass) {
         obj[paperId] =  _.groupBy(studentList, 'class_name');
         rankCache = _.assign({}, rankCache, obj);
     })
-    
+
     return rankCache;
 }
 
