@@ -14,7 +14,6 @@ export default function SubjectStudentLevelDistirbution({classHeaders, reportDS,
     var examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
     var tableDS = getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, classHeaders, currentClass);
     var summaryInfo = getSummaryInfo(tableDS);
-
     var tableHeaders = [[{id: 'subject', name: '学科'}]];
     var headers = _.range(10).map(num=> {
         return {id: num, name: '第' + numberMap[num+1] + '组人数'};
@@ -34,7 +33,6 @@ export default function SubjectStudentLevelDistirbution({classHeaders, reportDS,
         return obj;
     });
 
-var good='语文';var bad='数学';//假数据，最好和最坏学科
     return (
         <div>
             <div style={{marginBottom: 30,marginTop:30}}>
@@ -43,8 +41,8 @@ var good='语文';var bad='数学';//假数据，最好和最坏学科
             </div>
             <TableView tableHeaders={tableHeaders} tableData={tableData} TableComponent={EnhanceTable}/>
             <div className={singleClassReportStyle['analysis-conclusion']}>
-                  <div>分析诊断：</div>
-                  <div>根据上图各学科高分段（一，二，三组）学生人数和低分段（八，九，十）学生人数大小可知，<span style={{color:colorsMap.B03}}>{good}</span>学科高分段人数较多，<span style={{color:colorsMap.B03}}>{bad}</span>学科低分段人数较少</div>
+                  <div style={{lineHeight: 1.5}}>分析诊断：</div>
+                  <div style={{lineHeight: 1.5}}>{summaryInfo}</div>
             </div>
 
         </div>
@@ -108,15 +106,15 @@ function getSummaryInfo(tableDS) {
     var tempSortByLow = _.sortBy(temp, 'low');
     var highSubject = _.last(tempSortByHigh).subject, lowSubject = _.last(tempSortByLow).subject;
     if(highSubject == lowSubject) {
-        return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，' + highSubject + ' 学科高分段人数和低分段人数相同，表现两极分化。';
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject}</span> 学科高分段人数和低分段人数相同，表现两极分化。</span>;
     } else if((_.first(tempSortByHigh).high == _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low == _.last(tempSortByLow).low)) {
         return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数和低分段人数相同，表现两极分化。';
     } else if((_.first(tempSortByHigh).high != _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low == _.last(tempSortByLow).low)) {
-        return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知， ' + highSubject + ' 学科高分段人数较多，班级各学科低分段人数相当。';
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject}</span> 学科高分段人数较多，班级各学科低分段人数相当。</span>;
     } else if((_.first(tempSortByHigh).high == _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low != _.last(tempSortByLow).low)) {
-        return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数相当，' + lowSubject + ' 学科低分段人数较多。';
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数相当，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较多。</span>;
     } else {
-        return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知， ' + highSubject + ' 学科高分段人数较多，' + lowSubject + ' 学科低分段人数较少。';
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject} </span> 学科高分段人数较多，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较少。</span>;
     }
 }
 
