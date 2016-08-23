@@ -51,14 +51,14 @@ var config={
         verticalAlign:'top'
     },
     tooltip:{
-        enabled:false,
+        enabled:true,
         backgroundColor:'#000',
         borderColor:'#000',
         style:{
             color:'#fff'
         },
         formatter: function(){
-            return this.series.name+':'+this.point.y
+            return this.point.y
         }
     }
 };
