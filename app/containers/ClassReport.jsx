@@ -53,7 +53,7 @@ class ContentComponent extends React.Component {
             <div>
                 <ReportNavHeader examName={examName} examid={this.props.examid} grade={this.props.grade} />
                 {(isSchoolManagerOrGradeManager) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} reportDS={this.props.reportDS} /> : ''}
-                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> : <SingleClassReport reportDS={this.props.reportDS} user={user} grade={this.props.grade} />}
+                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> : <SingleClassReport reportDS={this.props.reportDS} user={user} grade={this.props.grade} gradeName={this.props.gradeName} />}
             </div>
         );
     }
@@ -72,13 +72,14 @@ class ClassReport extends React.Component {
 
     render() {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
-        var grade = this.props.location.query ? this.props.location.query.grade : '';
+        var grade = this.props.location.query ? this.props.location.query.grade : '';//Note: grade用来区分是否是自定义分析，类似于一个isCustom的布尔值，从而走不通的server route path，gradeName是一定有值的--用来做显示，表明年级值。
+        var gradeName = this.props.reportDS.examInfo.toJS().gradeName;
         if (!examid) return;
 
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <CommonLoadingView /> : (
-                    <ContentComponent reportDS={this.props.reportDS} user={this.props.user} examid={examid} grade={grade} />
+                    <ContentComponent reportDS={this.props.reportDS} user={this.props.user} examid={examid} grade={grade} gradeName={gradeName} />
                 ))}
             </div>
         );
