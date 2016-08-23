@@ -163,7 +163,7 @@ class Table extends React.Component {
                                             var tdStyle = {};
                                             if (this.columnStyles[id]) {
                                                 if (_.isFunction(this.columnStyles[id])) {
-                                                    tdStyle = this.columnStyles[id](rowData[id], rowData, trindex, tdindex);
+                                                    tdStyle = this.columnStyles[id](rowData[id], rowData, trindex, tdindex, id, this.state.showData);
                                                 } else {
                                                     tdStyle = this.columnStyles[id];
                                                 }
