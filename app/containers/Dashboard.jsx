@@ -118,7 +118,7 @@ class Dashboard extends React.Component {
 
         // var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
         var examid = this.props.location.query ? this.props.location.query.examid : '';
-        if(!examid) return;
+        if(!examid) location.href = '/';
         var grade = this.props.location.query.grade || '';
         if (this.state.loading)
             //(!levelScoreReport || _.size(levelScoreReport) == 0) || (!classReport || _.size(classReport) == 0)
