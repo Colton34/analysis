@@ -36,7 +36,7 @@ export default function LevelDistribution({reportDS, currentClass}) {
     var examInfo=reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examClassesInfo = reportDS.examClassesInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), levels = reportDS.levels.toJS() , headers = reportDS.headers.toJS();
 
     var {totalScoreLevelInfoByClass, totalScoreLevelInfoByLevel} = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, currentClass);
-    var headerDS = getHeaderDS(totalScoreLevelInfoByLevel, currentClass);
+    var headerDS = getHeaderDS(totalScoreLevelInfoByLevel, currentClass); //{0:3, 1:5, 2:4}
     var tableHeaderDS = getTableHeaderDS(levels);
     var tableBodyDS = getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, examInfo.gradeName);
 
