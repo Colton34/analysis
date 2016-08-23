@@ -10,6 +10,21 @@ import QuestionAbility from './subjectPerformance-QuestionAbility';
 import commonClass from '../../../../common/common.css';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
+const Card = ({title, desc, style, titleStyle}) => {
+    return (
+         <span style={_.assign({}, localStyle.card, style ? style : {})}>
+            <div style={{display: 'table-cell',width: 560,  height: 112, verticalAlign: 'middle', textAlign: 'center'}}>
+                <p style={_.assign({lineHeight: '40px', fontSize: 32, marginTop: 15, width: 560}, localStyle.lengthControl, titleStyle ? titleStyle : {})}
+                    title={title}
+                    >
+                    {title}
+                </p>
+                <p style={{fontSize: 12}}>{desc}</p>
+            </div>
+        </span>
+    )
+}
+
 class SubjectInspectPerformance extends React.Component {
     constructor(props) {
         super(props);
@@ -29,11 +44,15 @@ class SubjectInspectPerformance extends React.Component {
             currentSubject: this.subjects[0]
         }
     }
-
+    componentDidMount() {
+        var {reportDS, currentClass} = this.props;
+        var {currentSubject} = this.state;
+        var studentsGroupByClass = reportDS.studentsGroupByClass.toJS();
+        this.downloadData = getClassScoreTableData(currentSubject.key, currentClass, this.examPapersInfo, studentsGroupByClass);
+    }
     componentWillReceiveProps(nextProps) {
         //Note: nextProps是所有的都有还是只有改变的东西
         var {reportDS, currentClass, classHeaders} = nextProps;
-        debugger;
         var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
         this.examPapersInfo = examPapersInfo;
         this.theExamInspectDS = getExamInspectDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass);
@@ -50,13 +69,23 @@ class SubjectInspectPerformance extends React.Component {
     }
 
     onClickDropdownList(item) {
-        debugger;
         this.setState({
             currentSubject: item
         })
     }
 
-    render() {
+    onDownloadClassScoreTable() {
+        if (!this.downloadData)
+            return;
+        var {headerKeys, tableHeaders, tableData} = this.downloadData;
+        var url = '/api/v1/file/export/rank/report';
+        var inputKeys = "<input type='hidden' name='" + 'keys' + "' value='" + JSON.stringify(headerKeys) + "' />";
+        var inputNames = "<input type='hidden' name='" + 'names' + "' value='" + JSON.stringify(tableHeaders) + "' />";
+        var inputMatrix = "<input type='hidden' name='" + 'matrix' + "' value='" + JSON.stringify(tableData) + "' />";
+        $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + '</form>')
+            .appendTo('body').submit().remove();
+    }
+    render() { 
         var subjects = this.subjects;
         var currentSubject = this.state.currentSubject;
         var questions = this.examPapersInfo[currentSubject.key].questions;
@@ -77,7 +106,8 @@ class SubjectInspectPerformance extends React.Component {
                     <span className={commonClass['title']}>学科考试内在表现</span>
                     <span className={commonClass['title-desc']}>相对于本班的自身水平，学科有表现较好的试题和表现不足的试题</span>
 
-                    <span className={commonClass['button']} style={{width: 132, height: 34, lineHeight: '34px', background: colorsMap.B03, color: '#fff', borderRadius: 3, float:'right', cursor: 'pointer'}}>
+                    <span className={commonClass['button']} style={{width: 132, height: 34, lineHeight: '34px', background: colorsMap.B03, color: '#fff', borderRadius: 3, float:'right', cursor: 'pointer'}}
+                           onClick={this.onDownloadClassScoreTable.bind(this)}>
                         <i className='icon-download-1'></i>下载题目得分表
                     </span>
                     <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} style={{float: 'right', marginRight: 10,position:'absolute',right:'130px',top:'0px'}} list={subjects} surfaceBtnStyle={{width: 100, height: 34}}/>
@@ -118,21 +148,6 @@ class SubjectInspectPerformance extends React.Component {
 
 export default SubjectInspectPerformance;
 
-
-const Card = ({title, desc, style, titleStyle}) => {
-    return (
-         <span style={_.assign({}, localStyle.card, style ? style : {})}>
-            <div style={{display: 'table-cell',width: 560,  height: 112, verticalAlign: 'middle', textAlign: 'center'}}>
-                <p style={_.assign({lineHeight: '40px', fontSize: 32, marginTop: 15, width: 560}, localStyle.lengthControl, titleStyle ? titleStyle : {})}
-                    title={title}
-                    >
-                    {title}
-                </p>
-                <p style={{fontSize: 12}}>{desc}</p>
-            </div>
-        </span>
-    )
-}
 var localStyle = {
     card: {
         display: 'inline-block', width: 560, height: 112, lineHeight: '112px', border: '1px solid ' + colorsMap.C05, background: colorsMap.C02
@@ -318,4 +333,28 @@ function getStepSegments(gradeRateInfo) {
     });
     segments.push(_.last(gradeRateInfo).gradeRate);
     return segments;
+}
+
+function getClassScoreTableData(paperId, currentClass, examPapersInfo, studentsGroupByClass) {
+    var headerKeys = ['name', 'id'];
+    var tableHeaders = ['姓名', '考号'];
+    _.forEach(examPapersInfo[paperId].questions, questionInfo => {
+        headerKeys.push(questionInfo.qid);
+        tableHeaders.push(questionInfo.name);
+
+    })
+
+    var tableData = [];
+    _.forEach(studentsGroupByClass[currentClass], studentInfo => {
+        _.forEach(studentInfo.questionScores, paperScoreData => {
+            if (paperScoreData.paperid === paperId) {
+                var tableRow = [studentInfo.name, studentInfo.id];
+                _.forEach(paperScoreData.scores, score => {
+                    tableRow.push(score);
+                })
+                tableData.push(tableRow);
+            }
+        })
+    })
+    return {headerKeys, tableHeaders, tableData};
 }
