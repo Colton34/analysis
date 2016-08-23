@@ -22,7 +22,6 @@ class SingleClassReport extends React.Component {
         super(props);
         var realClasses = this.props.reportDS.examInfo.toJS().realClasses;
         this.authClasses = getAuthClasses(this.props.user.auth, this.props.grade, this.props.gradeName, realClasses);
-        debugger;
         this.state = {
             currentClass: this.authClasses[0].key
         }

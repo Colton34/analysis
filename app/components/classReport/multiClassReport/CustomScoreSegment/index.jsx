@@ -18,16 +18,14 @@ class CustomScoreSegment extends React.Component {
         this.gradeName = this.props.reportDS.examInfo.toJS().gradeName;
         var examClassesInfo = this.props.reportDS.examClassesInfo.toJS();
         var examClassKeys = _.keys(examClassesInfo);
-        var currentClasses = _.map(_.take(examClassKeys, 3), (k) => {
-            return {key: k, value: this.gradeName+k+'班'}
-        });
         var headers = this.props.reportDS.headers.toJS();
         this.formatedSubjects = getFormatedSubjects(headers);
         this.state = {
             currentSubject: this.formatedSubjects[0], //subject
             currentScoreStep: 10, //segment
-            currentClasses: currentClasses
         }
+        // 当科目变更时，segmentDetailChart的班级下拉菜单需要刷新:
+        this.dropdownListRefresh = false;
     }
 
     segmentInputBlur(event) {
@@ -40,18 +38,21 @@ class CustomScoreSegment extends React.Component {
     }
 
     onChooseSubject(item) {
+        this.dropdownListRefresh = true;
         this.setState({
             currentSubject: item
         })
     }
-
+    // 向子组件传递一个handler，以改变dropdownListRefresh的状态；
+    dropdownListRefreshHandler() {
+        this.dropdownListRefresh = false;
+    }
     render() {
-        var {chartDS, tableDS, segments} = getDS(this.state.currentSubject, this.state.currentScoreStep, this.state.currentClasses, this.examPapersInfo, this.allStudentsPaperMap, this.gradeName);
+        var {chartDS, tableDS, segments} = getDS(this.state.currentSubject, this.state.currentScoreStep, this.examPapersInfo, this.allStudentsPaperMap, this.gradeName);
         var formatedDS = getformatedDS(segments, tableDS);
 
         var formatedClassList = getFormatedClassList(this.examPapersInfo[this.state.currentSubject.id].realClasses, this.gradeName); //这场考试下面的班级
         var formatedSubjects = this.formatedSubjects;
-
         return (
             <div id='customScoreSegment' className={commonClass['section']}>
                 <div style={{marginBottom: 20}}>
@@ -61,15 +62,15 @@ class CustomScoreSegment extends React.Component {
                 </div>
                 <div style={{display: 'table-cell', paddingLeft: 18,verticalAlign: 'middle', width: 1200, height: 70, lineHeigth: 70, border: '1px solid ' + colorsMap.C05, background: colorsMap.C02, borderRadius: 3,position:'relative'}}>
                     您查看的科目为
-                    <DropdownList list={formatedSubjects} style={{margin: '0 10px', display: 'inline-block',position:'absolute',}}
+                    <DropdownList list={formatedSubjects} style={{margin: '0 10px', display: 'inline-block',position:'absolute'}}
                                 surfaceBtnStyle={{border: '1px solid ' + colorsMap.C08, color: colorsMap.C12}}
                                 onClickDropdownList={this.onChooseSubject.bind(this)}
                             />
                           <div style={{margin: '0 10px 0 110px', display: 'inline-block'}}>本科满分为{this.state.currentSubject.fullMark}分,您可以设置
                     <input defaultValue={this.state.currentScoreStep} onBlur={this.segmentInputBlur.bind(this)} style={{width: 70, height: 30, margin: '0 10px', paddingLeft: 10, border: '1px solid ' + colorsMap.C08}}/>为一个分数段，查看不同分数段的人数分布及详情</div>
                 </div>
-                <SegmentDetailChart chartData={formatedDS} classList={formatedClassList}/>
-                <SegmentDetailTable tableHeader={formatedDS.tableHeader} tableData={formatedDS.tableData}/>
+                <SegmentDetailChart chartData={formatedDS} classList={formatedClassList} needRefresh={this.dropdownListRefresh} dropdownListRefreshHandler={this.dropdownListRefreshHandler.bind(this)}/>
+                <SegmentDetailTable tableHeaders={formatedDS.tableHeader} tableData={formatedDS.tableData}/>
             </div>
         )
     }
@@ -77,7 +78,7 @@ class CustomScoreSegment extends React.Component {
 
 export default CustomScoreSegment;
 //=================================================  分界线  =================================================
-function getDS(currentSubject, currentScoreStep, currentClasses, examPapersInfo, allStudentsPaperMap, gradeName) {
+function getDS(currentSubject, currentScoreStep, examPapersInfo, allStudentsPaperMap, gradeName) {
     var chartDS = {}, tableDS = [];
     //通过currentScoreStep计算segments
     var segments = _.range(0, currentSubject.fullMark, currentScoreStep);
@@ -88,7 +89,7 @@ function getDS(currentSubject, currentScoreStep, currentClasses, examPapersInfo,
 //当前科目
     //所选择的班级，所划分的区间段
     var paperStudentsGroupByClass = _.groupBy(allStudentsPaperMap[currentSubject.id], 'class_name');
-    _.each(_.map(currentClasses, (cobj) => cobj.key), (className) => {
+    _.each(_.keys(paperStudentsGroupByClass), (className) => {
         var temp = makeSegmentsCount(paperStudentsGroupByClass[className], segments);
         temp = _.reverse(temp);
         temp.unshift(gradeName+className+'班');
