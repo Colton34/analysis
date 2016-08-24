@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-19 18:19:06
+* @Last Modified time: 2016-08-24 15:01:26
 */
 
 'use strict';
@@ -538,6 +538,7 @@ exports.initExamCache = function(req, res, next) {
         return when.all(examInfoPromises);
     }).then(function(initExamInfoCache) {
         result.examsInfoCache = initExamInfoCache;
+        result.currentClass = req.query.currentClass;
         res.status(200).json(result);
     }).catch(function(err) {
         next(err);
@@ -630,6 +631,7 @@ function getDefaultExamsInfoObjs(classRecentExamsList) {
 exports.getMoreExams = function(req, res, next) {
     req.checkQuery('examids', '获取更多examInfo错误，无效的examids').notEmpty();
     req.checkQuery('grade', '获取更多examInfo错误，无效的grade').notEmpty();
+    req.checkQuery('currentClass', '获取更多examInfo错误，无效的currentClass').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
 
     var grade = decodeURI(req.query.grade);
@@ -644,7 +646,10 @@ exports.getMoreExams = function(req, res, next) {
     });
 
     when.all(examInfoPromises).then(function(results) {
-        res.status(200).json(results);
+        res.status(200).json({
+            newExamsInfo: results,
+            currentClass: req.query.currentClass
+        });
     }).catch(function(err) {
         next(err);
     })

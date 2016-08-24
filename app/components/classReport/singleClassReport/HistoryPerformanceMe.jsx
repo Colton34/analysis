@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import StatisticalLib from 'simple-statistics';
 
-import {initExamCacheAction, getMoreExamsAction} from '../../../reducers/examsCache/actions';
+import {initExamCacheAction, getMoreExamsInfoAction} from '../../../reducers/examsCache/actions';
 
 // import {List} from 'immutable';
 
@@ -13,119 +13,181 @@ import {initExamCacheAction, getMoreExamsAction} from '../../../reducers/examsCa
 examCache持有examList
 
 
+        var isLoading = false, ifBlankPage = false;
+        if(!this.props.haveInit) {
+            isLoading = true;
+        } else {
+            var currentClassExamsInfo = this.props.examsInfoCache.get(this.props.currentClass);
+            if(!currentClassExamsInfo || currentClassExamsInfo.length == 0) {
+                ifBlankPage = true;
+            } else {
+                var examsInfoCache = this.props.examsInfoCache.toJS();
+                var cacheIds = _.map(examsInfoCache, (obj) => obj.examid);//此处id是长id还是短id？怎么获取examsListCache--并且是跟着当前班级的权限走的，即：只获取此班级-- 班主任 --- 所参与的考试--这个在home的地方应该就有权限控制
+                isLoading = !_.every(this.state.currentExams, (obj) => _.includes(cacheIds, obj.key));
+            }
+        }
+        var currentExams = this.state.currentExams;
 
+
+
+examInfoObj: {
+    examid: ,
+    examInfo:
+    examStudentsInfo:
+    examPapersInfo:
+    examClassesInfo:
+}
+
+examListObj: {
+    id: ,
+    name: ,
+    event_time:
+}
 
  */
 
-/*
-问题：提供不了服务端渲染了
-设计描述：
-0.要有cache
-1.组件DisMount里去获取 默认的数据：三次 连续的 同等性质的 考试的数据
-2.每次切换考试:
- */
+class HistoryContent extends React.Component {
+    constructor(props) {
+        super(props);
+        console.log('初始化此班级的default exams');
+        debugger;
+        var initExams = _.map(this.props.currentClassExamsInfoCache, (obj) => {
+            return {
+                key: obj.examid,
+                value: obj.examInfo.name
+            }
+        });
+        this.state = {
+            currentExams: initExams
+        }
+    }
 
-function HistoryContent({examList, examsInfoCache, currentExamIds}) {//这里examList就是跟着currentClass走的
-    examList = examList.toJS(), examsInfoCache = examsInfoCache.toJS();
-    debugger;
-    //根据currentExamIds和examsInfoCache得到要显示对比的考试。examList用来填充选择考试的下拉框
-    return (
-        <div id='historyPerformance'>
-            <h1>Yes, Cached: {examsInfoCache.length}</h1>
-        </div>
-    )
+    componentWillReceiveProps(nextProps) {
+        var initExams = _.map(nextProps.currentClassExamsInfoCache, (obj) => {
+            return {
+                key: obj.examid,
+                value: obj.examInfo.name
+            }
+        });
+        this.setState({
+            currentExams: initExams
+        });
+    }
+
+    onChangeExams(exams) {
+        if(isCurrentExamsNoChange(exams, this.state.currentExams)) return; //根本没有改变currentExams
+        this.setState({
+            currentExams: exams
+        });
+        if(isCurrentExamsInCache(exams, this.props.currentClassExamsInfoCache)) return; //虽然真正改变了currentExams但是命中缓存了
+        this.props.getMoreExamsInfo(); //没有命中缓存，需要getMoreExamsInfo
+    }
+
+    render() {
+        if(!isCurrentExamsInCache(this.state.currentExams, this.props.currentClassExamsInfoCache)) return (<div></div>);
+        console.log('一切数据都已ready，渲染');
+        console.log(this.props.currentClassExamsList);//暂时不叫做currentClassExamsListCache--因为没有cache的操作，等如果后期需要对exams "GetMore"的时候再使用”currentClassExamsListCache“这个名字
+        var currentExamsInfo = getCurrentExamsInfoFromCache(this.state.currentExams, this.props.currentClassExamsInfoCache);
+        debugger;
+
+//this.props.currentClassExamsList currentExamsInfo 去填充！！！
+
+        return (
+            <div></div>
+        );
+    }
+}
+
+function getCurrentExamsInfoFromCache(currentExams, examsInfoCache) {
+    var currentExamIds = _.map(currentExams, (obj) => obj.key);
+    return _.filter(examsInfoCache, (obj) => _.includes(currentExamIds, obj.examid));
+}
+
+function isCurrentExamsNoChange(newExams, oldExams) {
+    if(newExams.length != oldExams.length) return false;
+    var newExamIds = _.map(newExams, (obj) => obj.key);
+    var oldExamIds = _.map(oldExams, (obj) => obj.key);
+    return _.every(newExamIds, (id) => _.includes(oldExamIds, id));
+}
+
+function isCurrentExamsInCache(newExams, examsInfoCache) {
+    var newExamIds = _.map(newExams, (obj) => obj.key);
+    var cachedIds = _.map(examsInfoCache, (obj) => obj.examid);
+    return _.every(newExamIds, (id) => _.includes(cachedIds, id));
 }
 
 class HistoryPerformance extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            currentExamIds: []
-        }
     }
 
     componentDidMount() {
-        // if(this.props.haveInit) //表示examList是ok的
+console.log('componentDidMount');
+
+        if(!this.props.isLoading) return;
+console.log('componentDidMount 进行初始化')
+debugger;
         var params = {request: window.request};
+        params.schoolId = this.props.user.schoolId;
+        params.grade = this.props.grade;
+        params.currentClass = this.props.currentClass;
+        this.props.initExamCache(params);
+    }
 
-        if(!this.props.haveInit) {
-            // console.log('初始化：examList和examInfoCache');
-            // debugger;
-            // params.examIds = [];
-            params.schoolId = this.props.user.schoolId;
-            params.grade = this.props.grade;
-            params.currentClass = this.props.currentClass;
+    componentWillReceiveProps(nextProps) {
+        if(this.props.currentClass != nextProps.currentClass && !this.props.examsInfoCache.get(nextProps.currentClass) && !nextProps.isLoading) {//!nextProps.isLoading--因为对isLoading的修改也会触发componentWillReceiveProps
+console.log('切换班级了，并且此班级没有缓存过，去获取此班级数据');
+            var params = {request: window.request};
+            params.schoolId = nextProps.user.schoolId;
+            params.grade = nextProps.grade;
+            params.currentClass = nextProps.currentClass;
             this.props.initExamCache(params);
-        }
-
-        if(this.props.haveInit) {
-            var examsInfoCache = this.props.examsInfoCache.toJS();
-            var cacheIds = _.map(examsInfoCache, (obj) => obj.id);//此处id是长id还是短id？怎么获取examsList--并且是跟着当前班级的权限走的，即：只获取此班级-- 班主任 --- 所参与的考试--这个在home的地方应该就有权限控制
-            var ifCache = _.every(this.state.currentExamIds, (examid) => _.includes(cacheIds, examid));
-            if(!ifCache) {
-                var moreExamIds = _.difference(this.state.currentExamIds, cacheIds);
-                params.examIds = moreExamIds;
-                this.props.getMoreExams(params);
-            }
         }
     }
 
-    onChangeExams(examIds) {
-        if(examIdsNotChange(examIds, this.state.currentExamIds)) return;
-        this.setState({
-            currentExamIds: examIds
-        })
+    getMoreExamsInfo() {
+        var params = {request: window.request};
+        params.schoolId = this.props.user.schoolId;
+        params.grade = this.props.grade;
+        params.currentClass = this.props.currentClass;
+        this.props.getMoreExamsInfo(params);
     }
 
     render() {
-        //isLoading:需要异步获取数据  ifBlankPage:已经拿到数据但是没有东西可以展示  content:有数据展示
-        var isLoading = false, ifBlankPage = false;
 
-        if(!this.props.haveInit) {
-            //还没有初始化
-            // debugger;
-            isLoading = true;
-        } else {
-            //初始化了，是否有数据
-            if(this.props.examsInfoCache.size == 0) {
-                // debugger;
-                ifBlankPage = true;
-            } else {
-                //有数据，检查当前展示的是否都缓存下来了
-                // debugger;
-                var examsInfoCache = this.props.examsInfoCache.toJS();
-                var cacheIds = _.map(examsInfoCache, (obj) => obj.examid);//此处id是长id还是短id？怎么获取examsList--并且是跟着当前班级的权限走的，即：只获取此班级-- 班主任 --- 所参与的考试--这个在home的地方应该就有权限控制
-                isLoading = !_.every(this.state.currentExamIds, (examid) => _.includes(cacheIds, examid));
+        if(!this.props.isLoading) {
+            console.log(this.props.currentClass);
 
-                // debugger;
-                if(this.state.currentExamIds.length == 0 && examsInfoCache.length > 0) {//TODO: 一定保证如果有考试列表那么就不能一个都不选
-                    //只会出现在首次
-                    // debugger;
-                    this.setState({
-                        currentExamIds: _.map(examsInfoCache, (obj) => obj.examid)
-                    });
-                }
-            }
+            console.log(this.props.examsListCache);
+            console.log(this.props.examsListCache.get(this.props.currentClass));
+
+            console.log(this.props.examsInfoCache);
+            console.log(this.props.examsInfoCache.get(this.props.currentClass));
+
+            debugger;
         }
-        var currentExamIds = this.state.currentExamIds;
+
         return (
             <div>
                 {
-                    (isLoading) ? (<h1>isLoading</h1>) : ((ifBlankPage) ? (<h1>Blank Page</h1>) : (<HistoryContent examList={this.props.examList} examsInfoCache={this.props.examsInfoCache} currentExamIds={currentExamIds} />))
+                    (this.props.isLoading) ? (<h1>isLoading</h1>) : (<HistoryContent currentClassExamsList={this.props.examsListCache.get(this.props.currentClass)} currentClassExamsInfoCache={this.props.examsInfoCache.get(this.props.currentClass)} getMoreExamsInfo={this.getMoreExamsInfo.bind(this)} />)
                 }
             </div>
         );
     }
 }
 
+
+
 export default connect(mapStateToProps, mapDispatchToProps)(HistoryPerformance);
 
 function mapStateToProps(state, ownProps) {
     return {
         user: ownProps.user,
+        grade: ownProps.grade,
         currentClass: ownProps.currentClass,
-        haveInit: state.examsCache.haveInit,
-        examList: state.examsCache.examList,
+        isLoading: state.examsCache.isLoading,
+        examsListCache: state.examsCache.examsListCache,
         examsInfoCache: state.examsCache.examsInfoCache
     }
 }
@@ -133,7 +195,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         initExamCache: bindActionCreators(initExamCacheAction, dispatch),
-        getMoreExams: bindActionCreators(getMoreExamsAction, dispatch)
+        getMoreExamsInfo: bindActionCreators(getMoreExamsInfoAction, dispatch)
     }
 }
 
@@ -191,3 +253,25 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
 function getExamSubjectRank() {
 
 }
+
+
+                // debugger;
+                // if(this.state.currentExamIds.length == 0 && examsInfoCache.length > 0) {//TODO: 一定保证如果有考试列表那么就不能一个都不选
+                //     //只会出现在首次
+                //     // debugger;
+                //     this.setState({
+                //         currentExamIds: _.map(examsInfoCache, (obj) => obj.examid)
+                //     });
+                // }
+
+
+// function HistoryContent({examsListCache, examsInfoCache, currentExams}) {//这里examList就是跟着currentClass走的
+//     examsListCache = examsListCache.toJS(), examsInfoCache = examsInfoCache.toJS();
+//     debugger;
+//     //根据currentExamIds和examsInfoCache得到要显示对比的考试。examList用来填充选择考试的下拉框
+//     return (
+//         <div id='historyPerformance'>
+//             <h1>Yes, Cached: {examsInfoCache.length}</h1>
+//         </div>
+//     )
+// }

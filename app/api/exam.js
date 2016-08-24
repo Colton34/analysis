@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-22 11:30:53
+* @Last Modified time: 2016-08-24 15:07:37
 */
 
 
@@ -364,15 +364,15 @@ export function fetchPaper(params) {
 //Note: 历史分析的examList不带有自定义的！！！所以自定义的进来也走相同的逻辑没有问题。。。。吧？
 export function initExamCache(params) {
     var url = examPath + '/init/examcache?schoolId='+ params.schoolId +'&grade='+ params.grade +'&currentClass=' + params.currentClass;
-
+debugger;
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     });
 }
 
-export function getMoreExams(params) {
+export function getMoreExamsInfo(params) {
     var ids = JSON.stringify(params.examids);
-    var url = examPath + '/get/more?examids=' + ids +'&grade=' + params.grade;
+    var url = examPath + '/get/more?examids=' + ids +'&grade=' + params.grade + '&currentClass=' + params.currentClass;
 
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
