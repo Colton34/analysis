@@ -2,10 +2,29 @@ import _ from 'lodash';
 import React from 'react';
 
 import HeaderInfo from './HeaderInfo';
-import ModuleNav from './ModuleNav';
+import ModuleNav from '../../../../common/ModuleNav';
 
 import commonClass from '../../../../common/common.css';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
+
+var modules = [
+    {
+        name: '学科平均分排名',
+        id: 'subjectMeanRank'
+    }, {
+        name: '班级成绩概况',
+        id: 'classScoreGuide'
+    }, {
+        name: '自定义成绩登记的人数比例对比',
+        id: 'customScoreLevel'
+    }, {
+        name: '自定义分数段的人数分布',
+        id: 'customScoreSegment'
+    }, {
+        name: '学科小分得分率对比',
+        id: 'subjectSmallScore'
+    }
+];
 
 export default function ReportHeader({examInfo}) {
     var examInfo = examInfo.toJS();
@@ -17,7 +36,7 @@ export default function ReportHeader({examInfo}) {
             </div>
             <div style={{ position: 'relative', marginBottom: 20 }}>
                 <HeaderInfo examInfo={examInfo}/>
-                <ModuleNav/>
+                <ModuleNav modules={modules}/>
             </div>
         </div>
     )
