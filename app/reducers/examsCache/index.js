@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-17 08:36:54
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-24 14:58:41
+* @Last Modified time: 2016-08-24 16:22:13
 */
 
 'use strict';
@@ -29,15 +29,14 @@ export default function reducer(state, action) {
     switch(action.type) {
         case INIT_EXAMCACHE_REQUEST:
         case GET_MORE_EXAMS_INFO_REQUEST:
-            debugger;
             return state.set('isLoading', true);
         case INIT_EXAMCACHE_SUCCESS:
             var newClassExamsList = state.examsListCache.set(action.res.currentClass, action.res.examsList);
             var newClassExamsInfoCache = state.examsInfoCache.set(action.res.currentClass, action.res.examsInfoCache);
-            debugger;
             return state.set('examsListCache', newClassExamsList).set('examsInfoCache', newClassExamsInfoCache).set('isLoading', false);
         case GET_MORE_EXAMS_INFO_SUCCESS:
             var newExamsInfoCache = state.examsInfoCache.set(action.res.currentClass, _.concat(state.examsInfoCache.get(action.res.currentClass, action.res.newExamsInfo)));
+            debugger;
             return state.set('examsInfoCache', newExamsInfoCache).set('isLoading', false);
     }
     return state;

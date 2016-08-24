@@ -199,11 +199,6 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-function examIdsNotChange(newExamIds, oldExamIds) {
-    if(newExamIds.length !== oldExamIds.length) return false;
-    return _.every(newExamIds, (id) => _.includes(oldExamIds, id));
-}
-
 
 
 

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-17 08:36:41
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-24 14:39:33
+* @Last Modified time: 2016-08-24 16:21:12
 */
 
 'use strict';
@@ -11,8 +11,6 @@ import {INIT_EXAMCACHE, GET_MORE_EXAMS_INFO} from '../../lib/constants';
 import {initExamCache, getMoreExamsInfo} from '../../api/exam';
 
 export function initExamCacheAction(params) {
-console.log('初始化examCache和examList');
-debugger;
     return {
         type: INIT_EXAMCACHE,
         promise: initExamCache(params)
@@ -21,6 +19,7 @@ debugger;
 
 export function getMoreExamsInfoAction(params) {
 console.log('获取更多的exams');
+debugger;
     return {
         type: GET_MORE_EXAMS_INFO,
         promise: getMoreExamsInfo(params)
