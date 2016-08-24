@@ -27,6 +27,20 @@ const popoverFactory = ({title, content}) => {
     )
 }
 
+// 表格排序时的箭头样式
+const SortDirection = ({sortInfo, id}) => {
+    var sortInfo = sortInfo ? sortInfo : {};
+    return (
+        <span style={localStyle.sortDirection}>
+            <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.id !== id ? { visibility: 'visible', color: '#dcdcdc' } : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
+                <span className='caret' style={{ width: '100%' }} ></span>
+            </div>
+            <div className='dropdown' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.id !== id ? { visibility: 'visible', color: '#dcdcdc' } : sortInfo.order === 'desc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
+                <span className='caret' style={{ width: '100%' }}></span>
+            </div>
+        </span>
+    )
+}
 /**
  * props:
  * tableData: 渲染表格的数据
@@ -135,9 +149,9 @@ class Table extends React.Component {
                                             return (
                                                 <th key={'thead-th-' + thindex}
                                                     className={commonClassName['table-unit']}
-                                                    rowSpan={header.rowSpan ? header.rowSpan : 0}
-                                                    colSpan={header.colSpan ? header.colSpan : 0}
-                                                    style={_.assign({}, { minWidth: 100, borderColor: colorsMap.C04, position: 'relative', whiteSpace: 'nowrap'}, headerCss, sortable ? {cursor: 'pointer'}: {}, bordered ? {}:{border: 'none'})}
+                                                    rowSpan={header.rowSpan ? header.rowSpan : 1}
+                                                    colSpan={header.colSpan ? header.colSpan : 1}
+                                                    style={_.assign({}, { minWidth: 100, borderColor: colorsMap.C04, position: 'relative', whiteSpace: 'nowrap', fontWeight: 'normal'}, headerCss, sortable ? {cursor: 'pointer'}: {}, bordered ? {}:{border: 'none'})}
                                                     onClick={this.onSortColumn.bind(this, sortable ? header.id : undefined)}
                                                     >
                                                     <span style={header.tipContent !== undefined ? {marginRight: 5} : {}}>{header.name}</span>
@@ -183,8 +197,8 @@ class Table extends React.Component {
                                             return (
                                                 <td key={'tbody-td-' + tdindex}
                                                     className={commonClassName['table-unit']}
-                                                    colSpan={rowData[id].colSpan ? rowData[id].colSpan : 0}
-                                                    rowSpan={rowData[id].rowSpan ? rowData[id].rowSpan : 0}
+                                                    colSpan={rowData[id].colSpan ? rowData[id].colSpan : 1}
+                                                    rowSpan={rowData[id].rowSpan ? rowData[id].rowSpan : 1}
                                                     style={_.assign({}, { minWidth: 100, borderColor: colorsMap.C04, whiteSpace: 'nowrap'}, tdStyle, bordered ? {}:{border: 'none'}) }
                                                     >
                                                     {
@@ -1559,19 +1573,6 @@ class Table extends React.Component {
 
 export default Table;
 
-const SortDirection = ({sortInfo, id}) => {
-    var sortInfo = sortInfo ? sortInfo : {};
-    return (
-        <span style={localStyle.sortDirection}>
-            <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.id !== id ? { visibility: 'visible', color: '#dcdcdc' } : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
-                <span className='caret' style={{ width: '100%' }} ></span>
-            </div>
-            <div className='dropdown' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.id !== id ? { visibility: 'visible', color: '#dcdcdc' } : sortInfo.order === 'desc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
-                <span className='caret' style={{ width: '100%' }}></span>
-            </div>
-        </span>
-    )
-}
 
 let localStyle = {
     sortDirection: { width: 10, height: 20, position: 'absolute', top: '50%', right: '10%', marginTop: -14}

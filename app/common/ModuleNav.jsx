@@ -49,7 +49,6 @@ class ModuleNav extends React.Component {
     scrollHandler(navBarTop, scrollTopList, core) {
         var {modules} = this.props;
         var bodyTop = core === 'gecko' ? document.documentElement.scrollTop :  $('body').scrollTop();
-        console.log('navBarTop: ' + navBarTop + ', bodyTop:' + bodyTop);
         //判断何时吸顶
         if (navBarTop <= bodyTop) {
             if (this.state.position !== 'fixed') {
