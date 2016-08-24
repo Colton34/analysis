@@ -9,20 +9,20 @@ import commonClass from '../../../common/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import {downloadTable} from '../../../lib/util';
 
-var headerMapper = {
-    id: '学号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '年级排名', classRank: '班级排名', score: '分数'
-}
+
 
 export default class ImportantStudentInfo extends React.Component  {
     constructor(props) {
         super(props);
-
+        this.headerMapper = {id: '学号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '年级排名', classRank: '班级排名', score: '分数'};
+    }
+    componentDidMount() {
         var {reportDS} = this.props;
         var {allStudentsPaperMap, examPapersInfo, studentsGroupByClass} = reportDS;
         this.studentRankByClass = getStudentRankByClass(allStudentsPaperMap, studentsGroupByClass);
 
         _.forEach(examPapersInfo, paperObj => {
-            headerMapper[paperObj.id] = paperObj.subject;
+            this.headerMapper[paperObj.id] = paperObj.subject;
         })
         //获取 headSeq
         this.headSeq = ['id', 'name', 'score_totalScore', 'groupRank_totalScore', 'classRank_totalScore'];
@@ -33,14 +33,14 @@ export default class ImportantStudentInfo extends React.Component  {
         })
 
     }
-
     onDownloadScoreTable() {
         var {currentClass} = this.props;
+        if (!this.studentRankByClass[currentClass]) return;
         var headSelect = {};
         _.forEach(this.headSeq, head => {
             headSelect[head] = true;
         })
-        downloadTable(this.headSeq, headSelect, headerMapper, this.studentRankByClass[currentClass]);
+        downloadTable(this.headSeq, headSelect, this.headerMapper, this.studentRankByClass[currentClass]);
     }
 
     render() {
@@ -252,5 +252,8 @@ function getStudentRankByClass(allStudentsPaperMap, studentsGroupByClass) {
     var rankCache = getRankCache(allStudentsPaperMap, studentsGroupByClass);
     var studentInfos = generateStudentInfos(rankCache);
     var studentRankByClass = _.groupBy(studentInfos, 'class_name');
+    _.forEach(studentRankByClass, (studentList, className) => {
+        studentRankByClass[className] = _.orderBy(studentList, ['score_totalScore'], ['desc']);
+    })
     return studentRankByClass;
 }
