@@ -50,7 +50,8 @@ export default class ImportantStudentInfo extends React.Component  {
         _.each(classHeadersWithTotalScore, (headerObj) => {
             tableHeaders[0].push({ id: headerObj.subject, name: headerObj.subject + '排名' })
         });
-        var betterTableData = getTableData(betterTableDS, classHeadersWithTotalScore), worseTableData = getTableData(worseTableDS, classHeadersWithTotalScore);
+        var betterTableData = getTableData(betterTableDS, classHeadersWithTotalScore), 
+            worseTableData = getTableData(worseTableDS, classHeadersWithTotalScore);
         return (
             <div id='studentInfo' className={commonClass['section']}>
                 <span className={commonClass['title-bar']}></span>
@@ -98,8 +99,8 @@ function getDS(classStudents, classStudentsPaperMap, classHeadersWithTotalScore)
 function getTableData(tableDS, classHeadersWithTotalScore) {
     return _.map(tableDS, (rowData) => {
         var obj = {};
-        _.each(rowData, (d, i) => {
-            (i == 0) ? (obj.name = i) : (obj[classHeadersWithTotalScore[i-1].subject] = i);
+        _.each(rowData, (data, i) => {
+            (i == 0) ? (obj.name = data) : (obj[classHeadersWithTotalScore[i-1].subject] = data);
         });
         return obj;
     });
@@ -117,8 +118,7 @@ function getStudentSubjectRankInfo(students, classStudentsPaperMap, classHeaders
             var classPaperStudents = classStudentsPaperMap[headerObj.id];
             if(!classPaperStudents) return;
             var targetIndex = _.findIndex(classPaperStudents, (s) => s.id == studentObj.id);
-            var totalCount = classPaperStudents.length;
-            subjectScoreRanks.push((totalCount - targetIndex));
+            subjectScoreRanks.push(targetIndex + 1);
         });
         rowData = _.concat(rowData, subjectScoreRanks);
         rowData.unshift(studentObj.name);
