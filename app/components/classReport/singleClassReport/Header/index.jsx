@@ -26,7 +26,7 @@ var modules = [
         name: '临界生群体分析',
         id: 'criticalStudent'
     }, {
-        name: '学科考试表现',
+        name: '学科考试表现分析',
         id: 'subjectPerformance'
     }, {
         name: '学科考试内在表现',

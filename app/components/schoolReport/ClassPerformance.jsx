@@ -211,7 +211,7 @@ class ClassPerformance extends React.Component {
                     <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
                     <span style={{position: 'absolute', top: -22, right: 0}}>
                         <span style={{display: 'table-cell', paddingRight: 10}}>对比对象<span style={{fontSize: 12, color: colorsMap.C10}}>（最多选择5个）</span>:</span>
-                        <span style={{display: 'table-cell'}}><DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} classList={_this.classList} isMultiChoice={true} multiChoiceNum={5}/></span>
+                        <span style={{display: 'table-cell'}}><DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} list={_this.classList} isMultiChoice={true} multiChoiceNum={5}/></span>
                     </span>
                 </div>
                 <div style={{display: 'inline-block', width: 215, float: 'right', marginTop: 10}}>

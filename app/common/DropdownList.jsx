@@ -37,6 +37,7 @@ let localStyle = {
  * coverAll: cover列表里是否包含全部候选（包括已选择的）, 默认为否;
  * needRefresh：在componentWillReceiveProps时是否更新列表；
  * dropdownListRefreshHandler： 更新props中的needRefresh字段的回调函数；
+ * handleSelectedItems: 下拉菜单收缩时返回当前选中元素的回调函数；
  */
 @Radium
 class DropdownList extends React.Component {
@@ -84,6 +85,7 @@ class DropdownList extends React.Component {
             this.setState({
                 active: false
             })
+            this.props.handleSelectedItems && this.props.handleSelectedItems(this.state.selectedItems);
          }
     }
     componentDidMount() {
@@ -111,7 +113,7 @@ class DropdownList extends React.Component {
                 var {selectedItems} = this.state;
                 selectedItems.push(item);
                 this.setState({
-                    selectedItems: selectedItems//_.takeRight(selectedItems, this.multiChoiceNum)
+                    selectedItems: selectedItems
                 })
 
             }
