@@ -12,8 +12,8 @@ import InfoCards from './InfoCards';
 import TrendChart from './TrendChart';
 
 export default function Trend({reportDS, classStudents}) {
-    var examInfo = reportDS.examInfo.toJS(), examStudentsInfo=reportDS.examStudentsInfo.toJS();
-    var headerData = getHeaderData(examStudentsInfo);
+    var examInfo = reportDS.examInfo.toJS();//, examStudentsInfo=reportDS.examStudentsInfo.toJS();
+    var headerData = getHeaderData(classStudents);
     var chartDS = getChartDS(examInfo.fullMark, classStudents);
     var skewnessInfo = getSummaryInfo(classStudents);
     return (
@@ -35,10 +35,10 @@ export default function Trend({reportDS, classStudents}) {
 
 
 //=================================================  分界线  =================================================
-function getHeaderData(examStudentsInfo) {
-    var avgScore = _.round(_.mean(_.map(examStudentsInfo, (obj) => obj.score)), 2);
-    var maxScore = _.last(examStudentsInfo).score;
-    var minScore = _.first(examStudentsInfo).score;
+function getHeaderData(classStudents) {
+    var avgScore = _.round(_.mean(_.map(classStudents, (obj) => obj.score)), 2);
+    var maxScore = _.last(classStudents).score;
+    var minScore = _.first(classStudents).score;
     return {
         maxScore: maxScore,
         minScore: minScore,

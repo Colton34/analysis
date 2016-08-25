@@ -35,7 +35,7 @@ var localStyle = {
 export default class LevelDistribution extends React.Component {
     constructor(props) {
         super(props);
-        var levelSize = 
+        var levelSize =
         this.state = {
             mouseEnter: false,
             needScroll: _.size(this.props.reportDS.levels.toJS()) > 3 ? true: false
@@ -89,7 +89,7 @@ export default class LevelDistribution extends React.Component {
             </div>
         )
     }
-    
+
 }
 
 
@@ -157,11 +157,15 @@ function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount, className) {
 }
 
 function getHeaderDS(totalScoreLevelInfoByLevel, currentClass) {
-    var result = {};
+    var result = {}, levelLastIndex = _.size(totalScoreLevelInfoByLevel) - 1;
     _.each(totalScoreLevelInfoByLevel, (infoArr, levelKey) => {
-        var targetIndex = _.findIndex(_.sortBy(infoArr, 'sumCount'), (obj) => obj.class == currentClass);
+        var temp = _.sortBy(infoArr, 'count');//TODO:确认，是根据“count”而不是"sumCount"的比较！！！
+        var targetIndex = _.findIndex(temp, (obj) => obj.class == currentClass);
+        // debugger;
         if(targetIndex < 0) return;//TODO:应该给Tip Error！-- 这也是需要改进的：清晰明了的错误提示
-        result[levelKey-0] = targetIndex;
+        // result[levelKey-0] = targetIndex;
+        result[levelLastIndex - levelKey] = (temp.length - targetIndex);
+        // debugger;
     });
     return result;
 }

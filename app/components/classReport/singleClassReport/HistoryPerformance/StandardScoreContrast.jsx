@@ -85,10 +85,11 @@ export default function StandardScoreContrast({currentClassExamsZScore, categori
 }
 
 function getSeriesData(currentClassExamsZScore, categories) {
+    // debugger;
     var data, target, index = 0;
     return _.map(currentClassExamsZScore, (zObj, examid) => {
         data = _.map(categories, (obj) => {
-            target = _.find(zObj.examZScore, (zsObj) => zsObj.pid == obj.id);
+            target = _.find(zObj.examZScore, (zsObj) => zsObj.subject == obj.subject);
             return (target) ? parseFloat(target.zScore) : 'undefined'
         });
         var tempColor = chartColor[index % 5];

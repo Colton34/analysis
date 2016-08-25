@@ -110,11 +110,10 @@ function getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroup
             diff: temp[i]
         }
     });
-    // debugger;
     temp = _.sortBy(temp, 'diff');
+    debugger;
     var isAllGood = _.every(temp, (obj) => obj.diff >= 0);
     var isAllBad = _.every(temp, (obj) => obj.diff <= 0);
-// debugger;
     if(isAllGood) {
         return `本次考试中，班级整体没有明显表现不好的题组，表现最好的题组是${_.last(temp).name}，请总结经验继续保持`;
     } else if(isAllBad) {
