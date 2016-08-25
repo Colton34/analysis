@@ -85,9 +85,10 @@ class HistoryContent extends React.Component {
             }
         });
 
-        var currentExamsZScore = getCurrentExamsZScore(currentExamsInfo);
-        var currentClassExamsZScore = getCurrentClassExamsZScore(currentExamsZScore, this.props.currentClass);
+        var currentClassExamsZScore = getCurrentClassExamsZScore(currentExamsInfo, this.props.currentClass);
         var categories = getConfigCategories(currentClassExamsZScore);
+
+        var currentValidExamsZScore = getCurrentValidExamsZScore(currentExamsInfo, currentClass);//并且要求自己--currentClass--在这几场考试所考的科目是一样的！！！那么以什么标准为准呢？只能靠筛选--全部科目（不要取交集！！！不科学）
         debugger;
 
         return (
@@ -198,7 +199,11 @@ function isCurrentExamsInCache(newExams, examsInfoCache) {
 //z-score: (班级平均分-全校平均分)/标准差  标准差：各个班级平均分最为数组
 //当前每场考试下各个班级的ZScore
     //一场考试下面各个班级的ZScore信息--得出此场考试下，此班级各个科目的名次
-function getCurrentExamsZScore(currentExamsInfo) {
+
+//TODO:
+//设计：首先肯定是要计算本班的ZScoreInfo--因为要画第一个图。但是下面获取当前currentExams中哪几场考试的ZScore，要进行过滤：和当前班级 考试的班级相同，考试的科目也要相同 的几场考试
+
+function getCurrentClassExamsZScore(currentExamsInfo, currentClass) {
     var result = {};
     _.each(currentExamsInfo, (eObj) => {
         var studentsGroupByClass = _.groupBy(eObj.examStudentsInfo, 'class');
@@ -206,31 +211,76 @@ function getCurrentExamsZScore(currentExamsInfo) {
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(eObj.examStudentsInfo, (student) => student.papers)), 'paperid');
         // debugger;
         // debugger;
+        var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, className);
+        var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
         var headers = getHeaders(eObj.examPapersInfo);
         // debugger;
-        result[eObj.examid] = {};
-        var classStudentsPaperMap, classHeadersWithTotalScore;
-        _.each(studentsGroupByClass, (classStudents, className) => {
-            classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, className);
-            classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
-            var examZScore = getExamZScore(eObj.examStudentsInfo, classStudents, allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
-            result[eObj.examid][className] = {
-                examid: eObj.examid,
-                name: eObj.examInfo.name,
-                examZScore: examZScore
-            }
-        });
+        var examZScore = getExamZScore(eObj.examStudentsInfo, classStudents, allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
+        result[eObj.examid] = {
+            examid: eObj.examid,
+            name: eObj.examInfo.name,
+            examZScore: examZScore
+        }
     });
     return result;
 }
 
-function getCurrentClassExamsZScore(currentExamsZScore, currentClass) {
-    var result = {};
-    _.each(currentExamsZScore, (zObj, examid) => {
-        result[examid] = zObj[currentClass];
-    });
-    return result;
+/*
+排名：适用于期中考试，期末考试。关键在于”排名“是基于比较的，所以要保证”比较的基数“相同。
+选了4场考试：
+    1 A, B, C （总共：A, B, C, A`, C`）
+    2 A, B, C （总共：A, B, C）
+
+    3 B, C, D （总共：B, C, D, D`）
+    4 B, C, D （总共：B, C, D）
+
+选择内容多的展示？
+
+ */
+
+
+function getCurrentValidExamsZScore(currentExamsInfo, currentClass) {
+//0.这几场考试所考的科目都相同，参与的班级也都相同
+//1.每个班级都参与所有考试的所有科目
 }
+
+//TODO:设计
+// function getCurrentExamsZScore(currentExamsInfo) {
+//     var result = {};
+//     var validCurrentExamsInfo = getValidCurrentExamsInfo(currentExamsInfo);
+//     _.each(currentExamsInfo, (eObj) => {
+//         var studentsGroupByClass = _.groupBy(eObj.examStudentsInfo, 'class');
+//         // debugger;
+//         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(eObj.examStudentsInfo, (student) => student.papers)), 'paperid');
+//         // debugger;
+//         // debugger;
+//         var headers = getHeaders(eObj.examPapersInfo);
+//         // debugger;
+//         result[eObj.examid] = {};
+//         var classStudentsPaperMap, classHeadersWithTotalScore;
+//         _.each(studentsGroupByClass, (classStudents, className) => {
+//             classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, className);
+//             classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
+//             var examZScore = getExamZScore(eObj.examStudentsInfo, classStudents, allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
+//             result[eObj.examid][className] = {
+//                 examid: eObj.examid,
+//                 name: eObj.examInfo.name,
+//                 examZScore: examZScore
+//             }
+//         });
+//     });
+//     return result;
+// }
+
+
+
+// function getCurrentClassExamsZScore(currentExamsZScore, currentClass) {
+//     var result = {};
+//     _.each(currentExamsZScore, (zObj, examid) => {
+//         result[examid] = zObj[currentClass];
+//     });
+//     return result;
+// }
 
 function getClassExamsZScore(currentExamsInfo, currentClass) {
     var result = {};
@@ -301,6 +351,8 @@ function getClassHeadersWithTotalScore(headers, classStudentsPaperMap) {
 {pid: , subject: , zScore: }
 
  */
+
+
 function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore) {
     //观察一下classHeadersWithTotoalScore
     // debugger;
