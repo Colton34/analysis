@@ -15,7 +15,8 @@ import SubjectInspectPerformance from './SubjectInspectPerformance';
 import Wishes from './Wishes';
 
 import ImportStudentInfo from './ImportStudentInfo';
-import HistoryPerformance from './HistoryPerformance/index';
+// import HistoryPerformance from './HistoryPerformanceMe';
+import HistoryPerformance from './HistoryPerformance';
 
 class SingleClassReport extends React.Component {
     constructor(props) {
@@ -44,6 +45,7 @@ class SingleClassReport extends React.Component {
 
         var {currentClass} = this.state;
         var {reportDS, changeLevels, saveBaseline, examid, grade} = this.props;
+        var isCustomAnalysis = (reportDS.examInfo.toJS().from == '40');
         return (
             <div>
                 <Header examInfo={this.props.reportDS.examInfo} currentClass={currentClass}/>
@@ -55,7 +57,7 @@ class SingleClassReport extends React.Component {
                 <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <SubjectInspectPerformance reportDS={this.props.reportDS} currentClass={this.state.currentClass} classHeaders={classHeaders} />
                 <ImportStudentInfo reportDS={reportDS.toJS()} currentClass={currentClass} classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
-                <HistoryPerformance user={this.props.user} grade={this.props.grade} currentClass={this.state.currentClass} />
+                {(!isCustomAnalysis) ? (<HistoryPerformance user={this.props.user} grade={this.props.grade} currentClass={this.state.currentClass} />) : (<div></div>)}
                 <Wishes />
             </div>
         );

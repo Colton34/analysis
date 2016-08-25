@@ -21,10 +21,15 @@ export const SAVE_BASELINE = 'SAVE_BASELINE';
 export const CHANGE_CLASS = 'CHANGE_CLASS';
 
 //================= New ExamsCache ===================
+export const EXAMS_CACHE_IS_LOADING = 'EXAMS_CACHE_IS_LOADING';
+
 export const INIT_EXAMCACHE = 'INIT_EXAMCACHE';
+export const INIT_EXAMCACHE_REQUEST = 'INIT_EXAMCACHE_REQUEST';
 export const INIT_EXAMCACHE_SUCCESS = 'INIT_EXAMCACHE_SUCCESS';
-export const GET_MORE_EXAMS = 'GET_MORE_EXAMS';
-export const GET_MORE_EXAMS_SUCCESS = 'GET_MORE_EXAMS_SUCCESS';
+
+export const GET_MORE_EXAMS_INFO = 'GET_MORE_EXAMS_INFO';
+export const GET_MORE_EXAMS_INFO_REQUEST = 'GET_MORE_EXAMS_INFO_REQUEST';
+export const GET_MORE_EXAMS_INFO_SUCCESS = 'GET_MORE_EXAMS_INFO_SUCCESS';
 
 //================= Global ===========================
 export const INIT_USER_ME = 'INIT_USER_ME';
@@ -168,3 +173,4 @@ export const C14 = '#fdfdfd';
 export const TEST_CHANGE_ONE = 'TEST_CHANGE_ONE';
 export const TEST_CHANGE_TWO = 'TEST_CHANGE_TWO';
 
+export const CHART_COLOR = ['#0099ff','#33cccc','#33cc33','#ff9900','#ff6633'];
