@@ -89,7 +89,7 @@ class HistoryContent extends React.Component {
         var categories = getConfigCategories(currentClassExamsZScore);
 
         // var currentValidExamsZScore = getCurrentValidExamsZScore(currentExamsInfo, this.props.currentClass);//并且要求自己--currentClass--在这几场考试所考的科目是一样的！！！那么以什么标准为准呢？只能靠筛选--全部科目（不要取交集！！！不科学）
-        debugger;
+        // debugger;
 
         return (
             <div id='historyPerformance' className={commonClass['section']} style={{position: 'relative'}}>
