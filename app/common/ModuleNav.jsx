@@ -43,12 +43,11 @@ class ModuleNav extends React.Component {
             activeId: this.props.modules[0].id, //'totalScoreTrend',
             position: 'normal'
         }
-        this.core = ''; //浏览器内核
     }
 
     scrollHandler(navBarTop, scrollTopList, core) {
         var {modules} = this.props;
-        var bodyTop = core === 'gecko' ? document.documentElement.scrollTop :  $('body').scrollTop();
+        var bodyTop = document.documentElement.scrollTop || document.body.scrollTop;
         //判断何时吸顶
         if (navBarTop <= bodyTop) {
             if (this.state.position !== 'fixed') {
@@ -88,15 +87,8 @@ class ModuleNav extends React.Component {
                 scrollTopList.push(moduleEle.offsetTop)
             }
         })
-        var $body = $('body');
-        // 检测用户代理
-        var ua = navigator.userAgent;
-        if (/AppleWebKit\/(\S+)/.test(ua)) {
-            this.core = 'webkit';
-        } else if (/rv:([^\)]+)\) Gecko\/\d{8}/.test(ua)) {
-            this.core = 'gecko';
-        }
-        this.scrollHandlerRef = this.scrollHandler.bind(this, navBarTop, scrollTopList, this.core);
+        
+        this.scrollHandlerRef = this.scrollHandler.bind(this, navBarTop, scrollTopList);
         window.addEventListener('scroll', this.scrollHandlerRef);
 
     }
@@ -111,11 +103,14 @@ class ModuleNav extends React.Component {
         if (!id) {
             id = $target.parent('#nav-item').data('id');
         }
-        if (this.core === 'gecko') {
-            document.documentElement.scrollTop = $('#' + id).offset().top - 100;
-        } else {
-            $('body').scrollTop($('#' + id).offset().top - 100) // -100适当补回导航栏遮挡的部分
-        }
+        var moduleOffsetTop = $('#' + id).offset().top - 100;
+        document.documentElement.scrollTop = moduleOffsetTop;
+        document.body.scrollTop = moduleOffsetTop;
+        // if (this.core === 'gecko') {
+        //     document.documentElement.scrollTop = $('#' + id).offset().top - 100;
+        // } else {
+        //     $('body').scrollTop($('#' + id).offset().top - 100) // -100适当补回导航栏遮挡的部分
+        // }
         
         this.setState({
             activeId: id
