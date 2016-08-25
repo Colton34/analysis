@@ -111,6 +111,7 @@ function getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroup
         }
     });
     temp = _.sortBy(temp, 'diff');
+    debugger;
     var isAllGood = _.every(temp, (obj) => obj.diff >= 0);
     var isAllBad = _.every(temp, (obj) => obj.diff <= 0);
     if(isAllGood) {

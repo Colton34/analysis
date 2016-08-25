@@ -65,11 +65,14 @@ class HistoryContent extends React.Component {
     }
 
     onChangeExams(exams) {
+        debugger;
         if(isCurrentExamsNoChange(exams, this.state.currentExams)) return; //根本没有改变currentExams
+        debugger;
         this.setState({
             currentExams: exams
         });
         if(isCurrentExamsInCache(exams, this.props.currentClassExamsInfoCache)) return; //虽然真正改变了currentExams但是命中缓存了
+        debugger;
         this.props.getMoreExamsInfo(); //没有命中缓存，需要getMoreExamsInfo
     }
 
@@ -91,6 +94,8 @@ class HistoryContent extends React.Component {
         // var currentValidExamsZScore = getCurrentValidExamsZScore(currentExamsInfo, this.props.currentClass);//并且要求自己--currentClass--在这几场考试所考的科目是一样的！！！那么以什么标准为准呢？只能靠筛选--全部科目（不要取交集！！！不科学）
         // debugger;
 
+
+//TODO: onClickDropdownList={this.onChangeExams.bind(this)}
         return (
             <div id='historyPerformance' className={commonClass['section']} style={{position: 'relative'}}>
                 <div style={{marginBottom: 10}}>

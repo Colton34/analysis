@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-24 16:21:46
+* @Last Modified time: 2016-08-25 15:57:30
 */
 
 
@@ -372,9 +372,11 @@ export function initExamCache(params) {
 
 export function getMoreExamsInfo(params) {
     var ids = JSON.stringify(params.examids);
+    debugger;
     var url = examPath + '/get/more?examids=' + ids +'&grade=' + params.grade + '&currentClass=' + params.currentClass;
-
+debugger;
     return params.request.get(url).then(function(res) {
+        debugger;
         return Promise.resolve(res.data);
     });
 }
