@@ -8,9 +8,6 @@ import commonClass from '../../../common/common.css';
 import singleClassReportStyle from './singleClassReport.css';
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap} from '../../../lib/constants';
 
-/**-------------------------------mock data-------------------------------------------- */
-var subjectPerformance = {high: '语文', low: '政治'};
-/**-------------------------------mock data end-------------------------------------------- */
 class SubjectLevelDisribution extends React.Component {
     constructor(props) {
         super(props);
