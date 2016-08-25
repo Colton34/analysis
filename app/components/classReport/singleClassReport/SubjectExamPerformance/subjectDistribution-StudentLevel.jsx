@@ -24,10 +24,10 @@ export default function SubjectStudentLevelDistirbution({classHeaders, reportDS,
         obj.subject = rowData[0];
         _.forEach(_.range(10), num=> {
             obj[num] = {};
-            obj[num]['value'] = rowData[10 - num].length;
+            obj[num]['value'] = rowData[num+1].length;
             obj[num]['overlayData'] = {};
             obj[num]['overlayData'].title = '学生名单';
-            obj[num]['overlayData'].content = getStudentNames(rowData[10 - num], classStudents);
+            obj[num]['overlayData'].content = getStudentNames(rowData[num+1], classStudents);
         })
         return obj;
     });
@@ -59,18 +59,20 @@ function getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, class
             var currentSubjectGroupStudentCount = (obj.classStudents[currentClass]) ? obj.classStudents[currentClass] : [];
             return currentSubjectGroupStudentCount;
         });
-        rowData = _.reverse(rowData);//高分组在前面
         rowData.unshift(headerObj.subject);
         tableData.push(rowData);
     });
     return tableData;
 }
 
+
+
+//重写算法！！！注意reverse会修改原数据
+
 //除了总分外还要分不同的学科。需要所有学生各科的成绩
 //拿到这个数据结构然后在从里面筛选出属于此班级的数据
 //区分总分“人群”和单科“人群”
 function makeGroupStudentsInfo(students, groupLength=10) {
-    students = _.reverse(students);//保证高分段在前
     var result = {}, flagCount = students.length, totalStudentCount = students.length;
     _.each(_.range(groupLength), function(index) {
         var groupCount = (index == groupLength-1) ? flagCount : (_.ceil(_.divide(totalStudentCount, groupLength)));
