@@ -85,7 +85,7 @@ class SubjectInspectPerformance extends React.Component {
         $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + '</form>')
             .appendTo('body').submit().remove();
     }
-    render() { 
+    render() {
         var subjects = this.subjects;
         var currentSubject = this.state.currentSubject;
         var questions = this.examPapersInfo[currentSubject.key].questions;
@@ -312,6 +312,7 @@ function getQuestionLevelGroupMeanRate(gradeQuestionLevelGroup, classQuestionSco
     }
 }
 
+//注意：gradeQuestionLevelGroup是倒序的，最难在最前面
 function getClassQuestionLevelGroup(gradeQuestionLevelGroup, classQuestionScoreRates, questions) {
     var classQuestionLevelGroup = {};
     var classQuestionScoreRateMap = {};

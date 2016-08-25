@@ -7,6 +7,14 @@ import ReactHighcharts from 'react-highcharts';
 import commonClass from '../../../../common/common.css';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
+var questionLevelTitles = ['容易题组', '较容易题组', '中等题组', '较难题组', '最难题组'];
+var indicator = _.map(questionLevelTitles, (qt) => {
+    return {
+        name: qt,
+        max: 1
+    }
+});
+
 var option = {
     tooltip: {},
     legend: {
@@ -19,13 +27,7 @@ var option = {
         },
     },
     radar: {
-        indicator: [
-           { name: '容易题组', max:1},
-           { name: '较容易题组', max: 1},
-           { name: '中等题组', max: 1},
-           { name: '较难题组', max: 1},
-           { name: '最难题组', max: 1}
-        ],
+        indicator: indicator,
         radius:150,
         splitNumber:3,//刻度数目
         axisTick:{show:false},//刻度
@@ -65,13 +67,14 @@ var option = {
     }]
 };
 
-var subjectPerformance={
-    high:'较难题组',
-    low:'较易题组'
-};
+// var subjectPerformance={
+//     high:'较难题组',
+//     low:'较易题组'
+// };
 
 
 export default function QuestionLevel({classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate}) {
+    debugger;
     option.series[0].data = [
         {
             value: classQuestionLevelGroupMeanRate,
@@ -83,6 +86,9 @@ export default function QuestionLevel({classQuestionLevelGroupMeanRate, gradeQue
         }
     ];
 
+    var summaryInfo = getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate);
+    debugger;
+
     return (
         <div style={{marginRight: 20, display: 'inline-block'}}>
             <div style={{marginBottom: 18}}>
@@ -92,11 +98,32 @@ export default function QuestionLevel({classQuestionLevelGroupMeanRate, gradeQue
             <div style={{width: 560, height: 465, border: '1px solid' + colorsMap.C05, borderRadius: 2}}>
                 {/**放置highcharts图 */}
             <ECharts option={option} style={{height:400}}></ECharts>
-            <p style={{fontSize: 12, marginTop: 0,marginLeft:15,marginRight:15}}><span style={{color: colorsMap.B08}}>*</span>
-            本次考试中，班级整体在{subjectPerformance.high}表现很好，而{subjectPerformance.low}表现不好，请结合班级实际情况，关注重点，在下一次考试中，提高班级整体水平</p>
+            <p style={{fontSize: 12, marginTop: 0,marginLeft:15,marginRight:15}}><span style={{color: colorsMap.B08}}>*</span>{summaryInfo}</p>
             </div>
         </div>
     )
+}
+
+function getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate) {
+    var temp = _.map(classQuestionLevelGroupMeanRate, (classMeanRate, i) => (_.round(_.subtract(classMeanRate, gradeQuestionLevelGroupMeanRate[i]), 2)));
+    temp = _.map(_.reverse(questionLevelTitles), (qt, i) => {//因为计算难度分组的时候是最小的在最前面，最小=最难，所以最难在最前面，这里需要reverse一下
+        return {
+            name: qt,
+            diff: temp[i]
+        }
+    });
+    // debugger;
+    temp = _.sortBy(temp, 'diff');
+    var isAllGood = _.every(temp, (obj) => obj.diff >= 0);
+    var isAllBad = _.every(temp, (obj) => obj.diff <= 0);
+// debugger;
+    if(isAllGood) {
+        return `本次考试中，班级整体没有明显表现不好的题组，表现最好的题组是${_.last(temp).name}，请总结经验继续保持`;
+    } else if(isAllBad) {
+        return `本次考试中，班级整体在各个题组都表现不太理想，特别是在${_.first(temp).name}表现最为不好，请及时针对此类题组进行专项训练`;
+    } else {
+        return `本次考试中，班级整体在${_.last(temp).name}表现很好，但是在${_.first(temp).name}表现不好，请结合班级实际情况，关注重点，在下一次考试中，提高班级整体水平`;
+    }
 }
 
 
