@@ -614,7 +614,7 @@ class ScoreDistribution extends React.Component {
                         {/*--------------------------------  总分分档上线学生饼图 -------------------------------------*/}
                         <ReactHighcharts config={config} style={{ display: 'inline-block', width: 380, height: 240, border: '1px solid ' + colorsMap.C04 }}></ReactHighcharts>
                         {/*--------------------------------  饼图的select -------------------------------------*/}
-                        <span style={{ position: 'absolute', right: 30, top: 30 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } classList={_this.classList}/></span>
+                        <span style={{ position: 'absolute', right: 30, top: 30 }}><DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } list={_this.classList}/></span>
                     </div>
                     {/*--------------------------------  总分分档上线Dialog -------------------------------------*/}
                     <Dialog examId={this.props.examId} grade={this.props.grade} levels={levels} levelBuffers={levelBuffers} examInfo={examInfo} examStudentsInfo={examStudentsInfo} examPapersInfo={examPapersInfo} changeLevels={changeLevels} saveBaseline={this.props.saveBaseline} show={_this.state.showDialog} onHide={_this.onHideDialog.bind(_this) }  />
