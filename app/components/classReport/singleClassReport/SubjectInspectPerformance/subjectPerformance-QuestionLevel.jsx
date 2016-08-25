@@ -74,7 +74,6 @@ var option = {
 
 
 export default function QuestionLevel({classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate}) {
-    debugger;
     option.series[0].data = [
         {
             value: classQuestionLevelGroupMeanRate,
@@ -87,7 +86,6 @@ export default function QuestionLevel({classQuestionLevelGroupMeanRate, gradeQue
     ];
 
     var summaryInfo = getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate);
-    debugger;
 
     return (
         <div style={{marginRight: 20, display: 'inline-block'}}>
