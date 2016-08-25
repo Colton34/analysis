@@ -18,7 +18,7 @@ var indicator = _.map(questionLevelTitles, (qt) => {
 var option = {
     tooltip: {},
     legend: {
-        data: ['年级平均得分率', '班级平均得分率'],
+        data: ['班级平均得分率', '年级平均得分率'],
         right:25,
         top:25,
         orient:'vertical',
@@ -76,11 +76,11 @@ var option = {
 export default function QuestionLevel({classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate}) {
     option.series[0].data = [
         {
-            value: classQuestionLevelGroupMeanRate,
+            value: _.reverse(classQuestionLevelGroupMeanRate),
             name: '班级平均得分率'
         },
         {
-            value: gradeQuestionLevelGroupMeanRate,
+            value: _.reverse(gradeQuestionLevelGroupMeanRate),
             name: '年级平均得分率'
         }
     ];
@@ -104,14 +104,13 @@ export default function QuestionLevel({classQuestionLevelGroupMeanRate, gradeQue
 
 function getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate) {
     var temp = _.map(classQuestionLevelGroupMeanRate, (classMeanRate, i) => (_.round(_.subtract(classMeanRate, gradeQuestionLevelGroupMeanRate[i]), 2)));
-    temp = _.map(_.reverse(questionLevelTitles), (qt, i) => {//因为计算难度分组的时候是最小的在最前面，最小=最难，所以最难在最前面，这里需要reverse一下
+    temp = _.map(questionLevelTitles, (qt, i) => {
         return {
             name: qt,
             diff: temp[i]
         }
     });
     temp = _.sortBy(temp, 'diff');
-    debugger;
     var isAllGood = _.every(temp, (obj) => obj.diff >= 0);
     var isAllBad = _.every(temp, (obj) => obj.diff <= 0);
     if(isAllGood) {
