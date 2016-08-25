@@ -9,6 +9,45 @@ import _ from 'lodash';
 import dashboardStyle from './dashboard.css';
 import {COLORS_MAP as colorsMap} from '../../lib/constants';
 
+
+/**
+ * toViewAnalysis: 返回校级报告的函数
+ */
+class CardHeader extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            hoverLink: false
+        }
+    }
+
+    onHeaderMouseEnter() {
+        this.setState({
+            hoverLink: true
+        })
+    }
+    onHeaderMouseLeave() {
+        this.setState({
+            hoverLink: false
+        })
+    }
+
+    render() {
+        return (
+            <div onClick={this.props.toViewAnalysis}
+                onMouseEnter={this.onHeaderMouseEnter.bind(this)}
+                onMouseLeave={this.onHeaderMouseLeave.bind(this)}
+                style={_.assign({}, localStyles.linkHeader, this.state.hoverLink ? { color: '#27aef8' } : { color: '#333' }) }>
+                <div id='scoreRankHeader' style={_.assign({},{ height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' }, this.state.hoverLink ? { color: '#27aef8' } : { color: '#333' })}>
+                    <span style={{ color: '#333', fontSize: 16, marginRight: 10, color: 'inherit'}}>班级分析报告</span>
+                    <span style={{ color: '#333', fontSize: 12, color: 'inherit'}}>平均分TOP5</span>
+                    <span style={{ float: 'right', color: 'inherit' }}><i className='icon-right-open-2'></i></span>
+                </div>
+            </div>
+        )
+    }
+}
+
 class ClassReport extends React.Component {
     constructor(props) {
         super(props);
@@ -23,7 +62,7 @@ class ClassReport extends React.Component {
         var classNames = _.map(data['top5ClassesMean'], (obj) => obj.name);
         var theMeans = _.map(data['top5ClassesMean'], (obj) => obj.mean);
 
-      var average=data.gradeMean;
+      var average = data.gradeMean;
       var config = {
           chart: {
               type: 'column'
@@ -120,18 +159,19 @@ class ClassReport extends React.Component {
             onClick={this.viewClassReport.bind(this)}
             >
             <div style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
-                <div id='scoreRankHeader' style={{ height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer' }}>
-                    <span style={{ color: '#333', fontSize: 16, marginRight: 10 }}>班级分析报告</span>
-                    <span style={{ color: '#333', fontSize: 12 }}>平均分TOP5</span>
-                    <span style={{ float: 'right', color: '#bfbfbf' }}><i className='icon-right-open-2'></i></span>
-                </div>
-                <ReactHighcharts config={config} style={{ maxWidth: 330, maxHeight: 230}}></ReactHighcharts>
+                <CardHeader toViewAnalysis={this.viewClassReport.bind(this)} />
+                <ReactHighcharts config={config} style={{ maxWidth: 330, maxHeight: 230, marginTop: 20}}></ReactHighcharts>
             </div>
-            {/*<div className={dashboardStyle['class-report-img']}></div>*/}
         </div>
     )
     }
 
+}
+
+var localStyles = {
+     linkHeader: {
+        display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer'
+    }
 }
 
 export default Radium(ClassReport);
