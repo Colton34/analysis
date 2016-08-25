@@ -70,34 +70,15 @@ class SegmentDetailChart extends React.Component {
             colors:['#0099ff','#33cccc','#33cc33','#ff9900','#ff6633'],
             title: {
                 text: '',
-                floating: true,
-                x: -510,
-                y: 43,
-                style: {
-                    "color": "#767676",
-                    "fontSize": "12px"
-                }
             },
             subtitle: {
                 text: '',//'各分数段详细人数',
-                floating: true,
-                x: -500,
-                y: 20,
-                style: {
-                    "color": "#000",
-                    "fontSize": "16px"
-                }
             },
             xAxis: {
                 tickWidth: '0px',//不显示刻度
                 categories: chartData.categories,
             },
             yAxis: {
-                labels: {
-                  align: 'left',
-                  x: -10,
-                  y: -0
-                },
                 allowDecimals: true,//刻度允许小数
                 lineWidth: 1,
                 gridLineDashStyle: 'Dash',
@@ -106,7 +87,7 @@ class SegmentDetailChart extends React.Component {
                   text:'（人）',
                   align:'high',
                   rotation:360,
-                  margin:-50,
+                  offset:-20,
                   style: {
                       "color": "#767676",
                       "fontSize": "12px"
@@ -158,8 +139,8 @@ class SegmentDetailChart extends React.Component {
                                       dropdownListRefreshHandler={dropdownListRefreshHandler}/>
                     </div>
                 </div>
-                <div style={{width:'1140px',height:'420px',overflow:'auto'}}>
-                <ReactHighcharts config={config} style={{ width: '100%', height: '400px' }}></ReactHighcharts>
+                <div style={{width:'1140px',height:'420px',overflow:'auto',paddingLeft:10}}>
+                <ReactHighcharts config={config} style={{ width: '100%', height: '400px'}}></ReactHighcharts>
                 </div>
             </div>
         )

@@ -88,7 +88,7 @@ class ModuleNav extends React.Component {
         var moduleLen = modules.length;
         var {position} = this.state;
         return (
-            <div id='navBar' style={_.assign({}, {right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C04, backgroundColor: colorsMap.C02},
+            <div id='navBar' style={_.assign({}, {zIndex: 2, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C04, backgroundColor: colorsMap.C02},
                                     position === 'normal' ? {position:'relative', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: '100%', borderBottom: '1px solid ' + colorsMap.C04})}>
                 <div style={_.assign(position !== 'normal' ? {position: 'absolute', left: '50%', marginLeft: -600} : {})}>
                 {

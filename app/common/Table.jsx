@@ -59,11 +59,11 @@ const Table = ({tableData, tipConfig, colorCallback}) => {
         
         <BootTable bordered  hover responsive style={{marginBottom: 0}}>
             <tbody>
-                <tr style={{ backgroundColor: '#fafafa' }}>
+                <tr style={{ backgroundColor: '#fafafa'}}>
                     {
                         _.map(tableData[0], (th,index) => {
                             return (
-                                <th key={index} className={styles['table-unit']} style={{minWidth: 100, borderColor: colorsMap.C04}}>
+                                <th key={index} className={styles['table-unit']} style={{minWidth: 100, borderColor: colorsMap.C04, fontWeight: 'normal'}}>
                                 {
                                     tipConfig && tipNames.indexOf(th) !== -1 ? (
                                         <div>

@@ -26,7 +26,6 @@ export default function Trend({reportDS, classStudents}) {
             <TrendChart chartDS={chartDS} examInfo={examInfo} />
             <div className={singleClassReportStyle['analysis-conclusion']}>
                 <div>分析诊断：</div>
-                {/**------------------------- todo: 根据计算结果来确定显示的结论语句------------------------- */}
                 <div>{skewnessInfo}</div>
             </div>
         </div>

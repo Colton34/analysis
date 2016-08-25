@@ -47,14 +47,14 @@ export default class LevelGuide extends React.Component  {
                 <div style={{ marginBottom: 20 }}>
                     <span className={commonClass['title-bar']}></span>
                     <span className={commonClass['title']}>分档分数线划定</span>
-                    <span onClick={this.onShowDialog.bind(this)} style={{ cursor: 'pointer', backgroundColor: colorsMap.B03, color: '#fff', textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', fontSize: 12, float: 'right',borderRadius:2 }}>
+                    {/*<span onClick={this.onShowDialog.bind(this)} style={{ cursor: 'pointer', backgroundColor: colorsMap.B03, color: '#fff', textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', fontSize: 12, float: 'right',borderRadius:2 }}>
                         <i className='icon-cog-2' style={{ fontSize: 12 }}></i>
                         设置分档参数
                     </span>
-                    {/**todo: 根据角色显示不同的内容 */}
+                    todo: 根据角色显示不同的内容 */}
                     <div className={commonClass['title-desc']} style={{ marginTop: 10 }}>
                         将总分划线进行分档分析是常用的分析方法，特别适合高考、中考的模拟考试。即便是对日常其中期末考试，通过总分分档分析，也能考察高端学生综合水平的分布情况。
-                        {/**如果是班主任则多显示： 总分分数线应由学校统一设置，未设置前，由本分析系统默认设置。 */}
+                        总分分数线应由学校统一设置，未设置前，由本分析系统默认设置。
                     </div>
                 </div>
 
@@ -68,13 +68,13 @@ export default class LevelGuide extends React.Component  {
                             )
                         })
                     }
-                    。分别对应年级学生总数的前
-                    {
-                        _.map(levels, (levObj, levelKey) => {
-                            return levels[(levTotal - 1 - levelKey)].percentage + '%' + (levelKey == levTotal - 1 ? '' : '、')
-                        })
-                    }
-                    。如需修改，{/**todo： 根据角色判断要不要显示分档设置按钮 */} 请点击右侧修改按钮修改。
+                  {/*  // 。分别对应年级学生总数的前
+                    // {
+                    //     _.map(levels, (levObj, levelKey) => {
+                    //         return levels[(levTotal - 1 - levelKey)].percentage + '%' + (levelKey == levTotal - 1 ? '' : '、')
+                    //     })
+                    // }
+                    // 。如需修改，{/**todo： 根据角色判断要不要显示分档设置按钮  请点击右侧修改按钮修改。*/}
 
                 </p>
                 <Dialog examId={examid} grade={grade} levels={levels} levelBuffers={levelBuffers}
