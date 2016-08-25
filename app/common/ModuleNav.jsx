@@ -106,11 +106,6 @@ class ModuleNav extends React.Component {
         var moduleOffsetTop = $('#' + id).offset().top - 100;
         document.documentElement.scrollTop = moduleOffsetTop;
         document.body.scrollTop = moduleOffsetTop;
-        // if (this.core === 'gecko') {
-        //     document.documentElement.scrollTop = $('#' + id).offset().top - 100;
-        // } else {
-        //     $('body').scrollTop($('#' + id).offset().top - 100) // -100适当补回导航栏遮挡的部分
-        // }
         
         this.setState({
             activeId: id

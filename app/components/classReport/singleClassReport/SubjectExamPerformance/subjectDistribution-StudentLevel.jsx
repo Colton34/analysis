@@ -19,20 +19,18 @@ export default function SubjectStudentLevelDistirbution({classHeaders, reportDS,
         return {id: num, name: '第' + numberMap[num+1] + '组人数'};
     });
     tableHeaders[0] = tableHeaders[0].concat(headers);
-
     var tableData = _.map(tableDS, (rowData, index) => {
         var obj = {};
         obj.subject = rowData[0];
-        _.each(_.range(10), num=> {
+        _.forEach(_.range(10), num=> {
             obj[num] = {};
-            obj[num]['value'] = rowData[num+1].length;
+            obj[num]['value'] = rowData[10 - num].length;
             obj[num]['overlayData'] = {};
             obj[num]['overlayData'].title = '学生名单';
-            obj[num]['overlayData'].content = getStudentNames(rowData[num+1], classStudents);
+            obj[num]['overlayData'].content = getStudentNames(rowData[10 - num], classStudents);
         })
         return obj;
     });
-
     return (
         <div>
             <div style={{marginBottom: 30,marginTop:30}}>
