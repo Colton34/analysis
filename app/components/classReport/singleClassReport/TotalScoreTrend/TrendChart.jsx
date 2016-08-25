@@ -23,6 +23,7 @@ export default function TrendChart({chartDS, examInfo}) {
             categories: chartDS['x-axon']
         },
         yAxis: {
+            allowDecimals:false,//不允许为小数
             lineWidth: 1,
             gridLineDashStyle: 'Dash',
             gridLineColor: '#f2f2f3',
