@@ -44,20 +44,20 @@ class SingleClassReport extends React.Component {
         var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
 
         var {currentClass} = this.state;
-        var {reportDS, changeLevels, saveBaseline, examid, grade} = this.props;
+        var {reportDS, grade} = this.props;
         var isCustomAnalysis = (reportDS.examInfo.toJS().from == '40');
         return (
             <div>
                 <Header examInfo={this.props.reportDS.examInfo} currentClass={currentClass}/>
                 <TotalScoreTrend reportDS={this.props.reportDS} classStudents={classStudents} />
-                <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents} changeLevels={changeLevels} saveBaseline={saveBaseline} examid={examid} grade={grade}/>
+                <TotalScoreLevelGuide reportDS={this.props.reportDS} classStudents={classStudents}/>
                 <TotalScoreLevelDistribution reportDS={this.props.reportDS} currentClass={this.state.currentClass} />
                 <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <CriticalStudentDistribution classStudents={classStudents} reportDS={this.props.reportDS} />
                 <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={this.state.currentClass} reportDS={this.props.reportDS} />
                 <SubjectInspectPerformance reportDS={this.props.reportDS} currentClass={this.state.currentClass} classHeaders={classHeaders} />
                 <ImportStudentInfo reportDS={reportDS.toJS()} currentClass={currentClass} classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
-                {(!isCustomAnalysis) ? (<HistoryPerformance user={this.props.user} grade={this.props.grade} currentClass={this.state.currentClass} />) : (<div></div>)}
+                {(!isCustomAnalysis) ? (<HistoryPerformance user={this.props.user} grade={grade} currentClass={this.state.currentClass} />) : (<div></div>)}
                 <Wishes />
             </div>
         );
