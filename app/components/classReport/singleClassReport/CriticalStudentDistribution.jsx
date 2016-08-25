@@ -247,11 +247,15 @@ function getSummaryInfo(tableDS) {
 //  obj.criticalMeans, levelScores, subjectNames -- 去掉'总分' -- 如果只有一个学科则显示没有可以比性--返回一个String，而不是一个obj {better: , worse: }
     return _.map(tableDS, (obj, index) => {
         //如果有两个以上的科目则返回obj={better: , worse: }，否则只有一个科目则返回String:没有可比性
-        var criticalMeans = _.slice(obj.criticalMeans, 1), levelScores = _.slice(obj.levelScores, 1), subjectNames = _.slice(obj.subjectNames, 1);
-        if(subjectNames.length <= 1) return '只有一个学科没有可比性。';
+        var subjectNames = _.slice(obj.subjectNames, 1);
+        if (subjectNames.length <= 1) return '只有一个学科没有可比性。';
+        
+        var criticalMeans = _.slice(obj.criticalMeans, 1), 
+            levelScores = _.slice(obj.levelScores, 1); 
+
         var temp = _.map(subjectNames, (sname, index) => {
             return {
-                diff: _.round(_.divide(criticalMeans[index], levelScores[index]), 2),
+                diff: _.subtract(criticalMeans[index], levelScores[index]),
                 subject: sname
             }
         });
