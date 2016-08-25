@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
-* @Last Modified by:   liucong
-* @Last Modified time: 2016-08-18 18:19:15
+* @Last Modified by:   HellMagic
+* @Last Modified time: 2016-08-25 12:49:30
 */
 'use strict';
 var _ = require('lodash');
@@ -34,9 +34,7 @@ var getSchoolById = exports.getSchoolById = function(schoolid) {
  * @return {[type]}        [description]
  */
 exports.getExamsBySchool = function(school) {
-    var examPromises = _.map(school["[exams]"], function(item) {
-        return examPromise(item.id);
-    });
+    var examPromises = _.map(_.filter(school["[exams]"], (item) => (item.from != 40 && item.from != 20)), (obj) => examPromise(obj.id)); //既不是自定义又不是联考
     return when.all(examPromises);
 }
 
