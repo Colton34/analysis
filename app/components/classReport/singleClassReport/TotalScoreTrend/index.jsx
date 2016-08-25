@@ -19,8 +19,8 @@ export default function Trend({reportDS, classStudents}) {
     return (
         <div id='totalScoreTrend' className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
-            <span className={commonClass['title']}>总分分布趋势</span>
-            <span className={commonClass['title-desc']}>学生总分分布趋势，可反映本次考试班级学生的综合学习水平</span>
+            <span className={commonClass['title']}>总分分布</span>
+            <span className={commonClass['title-desc']}>学生总分分布，可反映本次考试班级学生的综合学业水平分布状况。</span>
 
             <InfoCards headerData={headerData}/>
             <TrendChart chartDS={chartDS} examInfo={examInfo} />
