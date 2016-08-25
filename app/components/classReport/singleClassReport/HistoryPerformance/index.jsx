@@ -88,7 +88,7 @@ class HistoryContent extends React.Component {
         var currentClassExamsZScore = getCurrentClassExamsZScore(currentExamsInfo, this.props.currentClass);
         var categories = getConfigCategories(currentClassExamsZScore);
 
-        var currentValidExamsZScore = getCurrentValidExamsZScore(currentExamsInfo, currentClass);//并且要求自己--currentClass--在这几场考试所考的科目是一样的！！！那么以什么标准为准呢？只能靠筛选--全部科目（不要取交集！！！不科学）
+        // var currentValidExamsZScore = getCurrentValidExamsZScore(currentExamsInfo, this.props.currentClass);//并且要求自己--currentClass--在这几场考试所考的科目是一样的！！！那么以什么标准为准呢？只能靠筛选--全部科目（不要取交集！！！不科学）
         debugger;
 
         return (
@@ -100,7 +100,7 @@ class HistoryContent extends React.Component {
                 </div>
                 <DropdownList list={currentExamsList} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
                 <StandardScoreContrast currentClassExamsZScore={currentClassExamsZScore} categories={categories} />
-                <RankRateContrast currentExamsZScore={currentExamsZScore} categories={categories} currentClass={this.props.currentClass} />
+                {/*<RankRateContrast currentExamsZScore={currentExamsZScore} categories={categories} currentClass={this.props.currentClass} />*/}
             </div>
         );
     }
@@ -211,11 +211,14 @@ function getCurrentClassExamsZScore(currentExamsInfo, currentClass) {
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(eObj.examStudentsInfo, (student) => student.papers)), 'paperid');
         // debugger;
         // debugger;
-        var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, className);
-        var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
         var headers = getHeaders(eObj.examPapersInfo);
+        var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, currentClass);
         // debugger;
-        var examZScore = getExamZScore(eObj.examStudentsInfo, classStudents, allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
+        var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
+        // debugger;
+        // debugger;
+        var examZScore = getExamZScore(eObj.examStudentsInfo, studentsGroupByClass[currentClass], allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
+        // debugger;
         result[eObj.examid] = {
             examid: eObj.examid,
             name: eObj.examInfo.name,
@@ -381,9 +384,9 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
     return result;
 }
 
-function getConfigCategories(currentExamsZScore) {
+function getConfigCategories(currentClassExamsZScore) {
     //取全集，按照sweight的顺序 pid subject zScore
-    var temp = _.unionBy(..._.map(currentExamsZScore, (zObj) => zObj.examZScore), (obj) => obj.pid);
+    var temp = _.unionBy(..._.map(currentClassExamsZScore, (zObj) => zObj.examZScore), (obj) => obj.pid);
     var results = [], theRest = [];
     _.each(temp, (obj) => {
         var index = _.findIndex(subjectWeight, (s) => (s == obj.subject));
