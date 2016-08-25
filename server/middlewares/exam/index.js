@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-24 15:01:26
+* @Last Modified time: 2016-08-25 12:05:59
 */
 
 'use strict';
@@ -76,7 +76,6 @@ exports.home = function(req, res, next) {
         var schoolReportResult = (ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
         var classReportResult = (ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;
         // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
-
         res.status(200).json({
             examInfoGuide: examInfoGuideResult,
             scoreRank: scoreRankResult,
@@ -94,7 +93,7 @@ function ifAtLeastGradeManager(auth, gradeAuth, exam) {
 }
 
 function ifAtLeastGroupManager(auth, gradeAuth, exam) {
-    return (ifAtLeastGradeManager(auth, gradeAuth, exam)) && (gradeAuth[exam.grade.name].groupManagers && gradeAuth[exam.grade.name].groupManagers.length > 0);
+    return (ifAtLeastGradeManager(auth, gradeAuth, exam)) || (gradeAuth[exam.grade.name].groupManagers && gradeAuth[exam.grade.name].groupManagers.length > 0);
 }
 
 /**
@@ -465,8 +464,12 @@ exports.initExam = function(req, res, next) {
     var grade = decodeURI(req.query.grade);
     examUitls.generateExamInfo(req.query.examid, grade, req.user.schoolId).then(function(exam) {
         req.exam = exam;
+console.log('initExam 1');
+
         return examUitls.generateExamScoresInfo(req.exam, req.user.auth);
     }).then(function(result) {
+console.log('initExam 2');
+
         req = _.assign(req, result);
         next();
     }).catch(function(err) {
