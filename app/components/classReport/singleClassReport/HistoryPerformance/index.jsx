@@ -19,8 +19,6 @@ import {
 class HistoryContent extends React.Component {
     constructor(props) {
         super(props);
-        console.log('初始化此班级的default exams');
-        // debugger;
         var initExams = _.map(this.props.currentClassExamsInfoCache, (obj) => {
             return {
                 key: obj.examid,
@@ -59,8 +57,7 @@ class HistoryContent extends React.Component {
 
     render() {
         if(!isCurrentExamsInCache(this.state.currentExams, this.props.currentClassExamsInfoCache)) return (<div></div>);
-        console.log('一切数据都已ready，渲染');
-        console.log(this.props.currentClassExamsList);//暂时不叫做currentClassExamsListCache--因为没有cache的操作，等如果后期需要对exams "GetMore"的时候再使用”currentClassExamsListCache“这个名字
+        //Note: 暂时不叫做currentClassExamsListCache--因为没有cache的操作，等如果后期需要对exams "GetMore"的时候再使用”currentClassExamsListCache“这个名字
         var currentExamsInfo = getCurrentExamsInfoFromCache(this.state.currentExams, this.props.currentClassExamsInfoCache);
         var currentExamsList = _.map(this.props.currentClassExamsList, (obj) => {
             return {
@@ -105,11 +102,7 @@ class HistoryPerformance extends React.Component {
     }
 
     componentDidMount() {
-console.log('componentDidMount');
-
         if(!this.props.isLoading) return;
-console.log('componentDidMount 进行初始化')
-// debugger;
         var params = {request: window.request};
         params.schoolId = this.props.user.schoolId;
         params.grade = this.props.grade;
@@ -118,8 +111,8 @@ console.log('componentDidMount 进行初始化')
     }
 
     componentWillReceiveProps(nextProps) {
-        if(this.props.currentClass != nextProps.currentClass && !this.props.examsInfoCache.get(nextProps.currentClass) && !nextProps.isLoading) {//!nextProps.isLoading--因为对isLoading的修改也会触发componentWillReceiveProps
-console.log('切换班级了，并且此班级没有缓存过，去获取此班级数据');
+        //Note: //!nextProps.isLoading--因为对isLoading的修改也会触发componentWillReceiveProps
+        if(this.props.currentClass != nextProps.currentClass && !this.props.examsInfoCache.get(nextProps.currentClass) && !nextProps.isLoading) {
             var params = {request: window.request};
             params.schoolId = nextProps.user.schoolId;
             params.grade = nextProps.grade;
@@ -129,9 +122,7 @@ console.log('切换班级了，并且此班级没有缓存过，去获取此班�
     }
 
     getMoreExamsInfo(examids) {
-        debugger;
         var params = {request: window.request};
-        // params.schoolId = this.props.user.schoolId;
         params.examids = examids;
         params.grade = this.props.grade;  //TODO: Just For Test '三年级';
         params.currentClass = this.props.currentClass;
@@ -148,8 +139,6 @@ console.log('切换班级了，并且此班级没有缓存过，去获取此班�
         );
     }
 }
-
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(HistoryPerformance);
 
@@ -242,43 +231,6 @@ function getCurrentValidExamsZScore(currentExamsInfo, currentClass) {
 //1.每个班级都参与所有考试的所有科目
 }
 
-//TODO:设计
-// function getCurrentExamsZScore(currentExamsInfo) {
-//     var result = {};
-//     var validCurrentExamsInfo = getValidCurrentExamsInfo(currentExamsInfo);
-//     _.each(currentExamsInfo, (eObj) => {
-//         var studentsGroupByClass = _.groupBy(eObj.examStudentsInfo, 'class');
-//         // debugger;
-//         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(eObj.examStudentsInfo, (student) => student.papers)), 'paperid');
-//         // debugger;
-//         // debugger;
-//         var headers = getHeaders(eObj.examPapersInfo);
-//         // debugger;
-//         result[eObj.examid] = {};
-//         var classStudentsPaperMap, classHeadersWithTotalScore;
-//         _.each(studentsGroupByClass, (classStudents, className) => {
-//             classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, className);
-//             classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
-//             var examZScore = getExamZScore(eObj.examStudentsInfo, classStudents, allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
-//             result[eObj.examid][className] = {
-//                 examid: eObj.examid,
-//                 name: eObj.examInfo.name,
-//                 examZScore: examZScore
-//             }
-//         });
-//     });
-//     return result;
-// }
-
-
-
-// function getCurrentClassExamsZScore(currentExamsZScore, currentClass) {
-//     var result = {};
-//     _.each(currentExamsZScore, (zObj, examid) => {
-//         result[examid] = zObj[currentClass];
-//     });
-//     return result;
-// }
 
 function getCurrentClassExamsZScore(currentExamsInfo, currentClass) {
     var result = {};
@@ -413,6 +365,44 @@ function getConfigCategories(currentClassExamsZScore) {
 function getExamSubjectRank() {
 
 }
+
+//TODO:设计
+// function getCurrentExamsZScore(currentExamsInfo) {
+//     var result = {};
+//     var validCurrentExamsInfo = getValidCurrentExamsInfo(currentExamsInfo);
+//     _.each(currentExamsInfo, (eObj) => {
+//         var studentsGroupByClass = _.groupBy(eObj.examStudentsInfo, 'class');
+//         // debugger;
+//         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(eObj.examStudentsInfo, (student) => student.papers)), 'paperid');
+//         // debugger;
+//         // debugger;
+//         var headers = getHeaders(eObj.examPapersInfo);
+//         // debugger;
+//         result[eObj.examid] = {};
+//         var classStudentsPaperMap, classHeadersWithTotalScore;
+//         _.each(studentsGroupByClass, (classStudents, className) => {
+//             classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, className);
+//             classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
+//             var examZScore = getExamZScore(eObj.examStudentsInfo, classStudents, allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
+//             result[eObj.examid][className] = {
+//                 examid: eObj.examid,
+//                 name: eObj.examInfo.name,
+//                 examZScore: examZScore
+//             }
+//         });
+//     });
+//     return result;
+// }
+
+
+
+// function getCurrentClassExamsZScore(currentExamsZScore, currentClass) {
+//     var result = {};
+//     _.each(currentExamsZScore, (zObj, examid) => {
+//         result[examid] = zObj[currentClass];
+//     });
+//     return result;
+// }
 
 
 //Just For Test::
