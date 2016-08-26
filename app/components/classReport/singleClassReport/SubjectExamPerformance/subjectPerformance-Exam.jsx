@@ -38,7 +38,8 @@ function getTableDS(examPapersInfo, examClassesInfo, classStudents, classHeaders
         var paperScores = _.map(classStudentsPaperMap[headerObj.id], (paper) => paper.score);
         _.each(columnIndicatorFunMap, (fun, key) => {
             value = fun({paperScores: paperScores, examClassesInfo: examClassesInfo, currentClass: currentClass, examPapersInfo: examPapersInfo, headerObj: headerObj});
-            obj[key] = (key == '缺考人数') ? {value: value, overlayData: {title: '学生名单', content: getLostStudentNames(examClassesInfo, classStudentsPaperMap, headerObj, currentClass, classStudents)}} : value;
+            //obj[key] = (key == '缺考人数') ? {value: value, overlayData: {title: '学生名单', content: getLostStudentNames(examClassesInfo, classStudentsPaperMap, headerObj, currentClass, classStudents)}} : value;
+            obj[key] = value;
         });
         return obj;
     });
