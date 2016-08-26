@@ -48,7 +48,7 @@ export function saveAs(uri) {
     }
 }
 
-export function downloadTable(headSeq, headSelect, headerMapper, renderRows) {
+export function downloadTable(headSeq, headSelect, headerMapper, renderRows, exportTableName) {
     var validColumnKeys = [], validColumnNames = [];
     _.each(headSeq, (headKey) => {
         if(headSelect[headKey]) {
@@ -67,6 +67,7 @@ export function downloadTable(headSeq, headSelect, headerMapper, renderRows) {
     var inputKeys = "<input type='hidden' name='" + 'keys' + "' value='" + JSON.stringify(validColumnKeys) + "' />";
     var inputNames = "<input type='hidden' name='" + 'names' + "' value='" + JSON.stringify(validColumnNames) + "' />";
     var inputMatrix = "<input type='hidden' name='" + 'matrix' + "' value='" + JSON.stringify(validStudentInfoMatrix) + "' />";
-    $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + '</form>')
+    var tableName = exportTableName ? "<input type='hidden' name='" + 'exportTableName' + "' value='" + exportTableName + "' />" : '';
+    $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + tableName + '</form>')
         .appendTo('body').submit().remove();
 }

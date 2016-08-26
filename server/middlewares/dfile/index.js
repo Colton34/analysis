@@ -261,7 +261,7 @@ exports.exportRankReport = function(req, res, next) {
         var keys = JSON.parse(req.body.keys);
         var names = JSON.parse(req.body.names);
         var matrix = JSON.parse(req.body.matrix);
-
+        var exportTableName = req.body.exportTableName ? req.body.exportTableName : '排行榜';
         var specification = {};
         _.each(keys, (k, i) => {
             specification[k] = {
@@ -281,17 +281,17 @@ exports.exportRankReport = function(req, res, next) {
         var report = excel.buildExport(
             [
                 {
-                    name: '排行榜',
+                    name: exportTableName,
                     specification: specification,
                     data: datas
                 }
             ]
         );
 
-        res.attachment('排行榜.xlsx');
+        res.attachment(exportTableName + '.xlsx');
         res.status(200).send(report);
     } catch(e) {
-        next(new errors.Error('生成排行榜文件错误', e));
+        next(new errors.Error('生成表格下载文件错误，表格名：' + exportTableName, e));
     }
 }
 
