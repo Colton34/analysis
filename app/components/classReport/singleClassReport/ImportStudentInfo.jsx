@@ -41,7 +41,7 @@ export default class ImportantStudentInfo extends React.Component  {
         _.forEach(this.headSeq, head => {
             headSelect[head] = true;
         })
-        downloadTable(this.headSeq, headSelect, this.headerMapper, this.studentRankByClass[currentClass]);
+        downloadTable(this.headSeq, headSelect, this.headerMapper, this.studentRankByClass[currentClass], '学生学科得分表');
     }
 
     render() {

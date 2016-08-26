@@ -82,7 +82,8 @@ class SubjectInspectPerformance extends React.Component {
         var inputKeys = "<input type='hidden' name='" + 'keys' + "' value='" + JSON.stringify(headerKeys) + "' />";
         var inputNames = "<input type='hidden' name='" + 'names' + "' value='" + JSON.stringify(tableHeaders) + "' />";
         var inputMatrix = "<input type='hidden' name='" + 'matrix' + "' value='" + JSON.stringify(tableData) + "' />";
-        $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + '</form>')
+        var tableName = "<input type='hidden' name='" + 'exportTableName' + "' value='题目得分表' />";
+        $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + tableName + '</form>')
             .appendTo('body').submit().remove();
     }
     render() {
