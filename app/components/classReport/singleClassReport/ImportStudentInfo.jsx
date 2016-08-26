@@ -16,23 +16,24 @@ export default class ImportantStudentInfo extends React.Component  {
         super(props);
         this.headerMapper = {id: '学号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '年级排名', classRank: '班级排名', score: '分数'};
     }
-    // componentDidMount() {
-    //     var {reportDS} = this.props;
-    //     var {allStudentsPaperMap, examPapersInfo, studentsGroupByClass} = reportDS;
-    //     this.studentRankByClass = getStudentRankByClass(allStudentsPaperMap, studentsGroupByClass);
+    componentDidMount() {
+        // 计算下载表格中的数据
+        var {reportDS} = this.props;
+        var {allStudentsPaperMap, examPapersInfo, studentsGroupByClass} = reportDS;
+        this.studentRankByClass = getStudentRankByClass(allStudentsPaperMap, studentsGroupByClass);
 
-    //     _.forEach(examPapersInfo, paperObj => {
-    //         this.headerMapper[paperObj.id] = paperObj.subject;
-    //     })
-    //     //获取 headSeq
-    //     this.headSeq = ['id', 'name', 'score_totalScore', 'groupRank_totalScore', 'classRank_totalScore'];
-    //     _.forEach(examPapersInfo, paperObj => {
-    //         _.forEach(['score', 'groupRank', 'classRank'], item => {
-    //             this.headSeq.push(item + '_' + paperObj.id)
-    //         })
-    //     })
+        _.forEach(examPapersInfo, paperObj => {
+            this.headerMapper[paperObj.id] = paperObj.subject;
+        })
+        //获取 headSeq
+        this.headSeq = ['id', 'name', 'score_totalScore', 'groupRank_totalScore', 'classRank_totalScore'];
+        _.forEach(examPapersInfo, paperObj => {
+            _.forEach(['score', 'groupRank', 'classRank'], item => {
+                this.headSeq.push(item + '_' + paperObj.id)
+            })
+        })
 
-    // }
+    }
     onDownloadScoreTable() {
         var {currentClass} = this.props;
         if (!this.studentRankByClass[currentClass]) return;
@@ -126,4 +127,105 @@ function getStudentSubjectRankInfo(students, classStudentsPaperMap, classHeaders
         tableDS.push(rowData);
     });
     return tableDS;
+}
+
+// 计算表格下载时需要的数据
+function getRankCache(allStudentsPaperMap, studentsGroupByClass) {
+    var rankCache = {};
+    rankCache.totalScore = {};
+    _.forEach(studentsGroupByClass, (studentList, className) => {
+        rankCache.totalScore[className] = [];
+        var students = rankCache.totalScore[className];
+        _.forEach(studentList, studentInfo => {
+            students.push(_.assign({ class_name: studentInfo.class }, _.omit(studentInfo, ['class', 'papers'])));
+        })
+    })
+
+    _.forEach(allStudentsPaperMap, (studentList, paperId) => {
+        var obj = {};
+        obj[paperId] =  _.groupBy(studentList, 'class_name');
+        rankCache = _.assign({}, rankCache, obj);
+    })
+
+    return rankCache;
+}
+
+// 计算表格下载时需要的数据
+function generateStudentInfos(rankCache) {
+    var studentInfos = {};
+    _.forEach(rankCache, (classGroup, scoreType) => {
+        var scoreMap = {};
+        var allStudents = [];
+        _.forEach(classGroup, (studentsArr, className) => {
+            var classScoreMap = {};
+            var classStudents = [];
+            _.forEach(studentsArr, (studentObj, index) => {
+                // 记录班级中各个学生的成绩
+                if (classScoreMap[studentObj.score] === undefined) {
+                    classScoreMap[studentObj.score] = { count: 1 };
+                } else {
+                    classScoreMap[studentObj.score].count += 1;
+                }
+
+                if (scoreMap[studentObj.score] === undefined) {
+                    scoreMap[studentObj.score] = { count: 1 };
+                } else {
+                    scoreMap[studentObj.score].count += 1;
+                }
+
+                // 添加学生信息
+                allStudents.push({ id: studentObj.id, score: studentObj.score });
+                classStudents.push({ id: studentObj.id, score: studentObj.score });
+
+                if (!studentInfos[studentObj.id]) {
+                    studentInfos[studentObj.id] = _.pick(studentObj, ['id', 'name', 'class_name']);
+                }
+                // 学生分数赋值
+                studentInfos[studentObj.id]['score_' + scoreType] = studentObj.score;
+            })
+            //计算班级成绩排名
+            var classScoreRank = _.orderBy(_.keys(classScoreMap).map(scoreStr => { return parseFloat(scoreStr) }), [], 'desc');
+            // 给班级scoreMap赋值
+            _.forEach(classScoreRank, (score, index) => {
+                if (index === 0) {
+                    classScoreMap[score].rank = 1;
+                } else {
+                    let preScoreObj = classScoreMap[classScoreRank[index - 1]];
+                    classScoreMap[score].rank = preScoreObj.rank + preScoreObj.count;
+                }
+            })
+            // 遍历班级学生，赋予班级排名
+            _.forEach(classStudents, studentObj => {
+                //把studentinfos对应考号的学生排名附上
+                studentInfos[studentObj.id]['classRank_' + scoreType] = classScoreMap[studentObj.score].rank;
+            })
+
+        })
+        //对所有成绩排序
+        var scoreRank = _.orderBy(_.keys(scoreMap).map(scoreStr => { return parseFloat(scoreStr) }), [], 'desc');
+        // 遍历scoreRank, 给scoreMap赋值
+        _.forEach(scoreRank, (score, index) => {
+            if (index === 0) {
+                scoreMap[score].rank = 1;
+            } else {
+                let preScoreObj = scoreMap[scoreRank[index - 1]];
+                scoreMap[score].rank = preScoreObj.rank + preScoreObj.count;
+            }
+        })
+        // 遍历所有的学生信息,给学生赋群体排名
+        _.forEach(allStudents, studentObj => {
+            studentInfos[studentObj.id]['groupRank_' + scoreType] = scoreMap[studentObj.score].rank;
+        })
+    })
+    return studentInfos;
+}
+// 计算表格下载时需要的数据
+function getStudentRankByClass(allStudentsPaperMap, studentsGroupByClass) {
+    var rankCache = getRankCache(allStudentsPaperMap, studentsGroupByClass);
+    var studentInfos = generateStudentInfos(rankCache);
+    var studentRankByClass = _.groupBy(studentInfos, 'class_name');
+    _.forEach(studentRankByClass, (studentList, className) => {
+        studentRankByClass[className] = _.orderBy(studentList, ['score_totalScore'], ['desc']);
+    })
+    return studentRankByClass;
 }
