@@ -473,7 +473,7 @@ function makeOriginalSubjectInfoRow(students, examPapersInfo, examInfo, examClas
 function makeGroupStudentsInfo(groupLength, students) {
     //需要原始的“根据考生总分排序好的” studentsInfo 数组
     //将数组内的元素分成10组，计算每一组中各个班级学生人数
-    var result = {}, flagCount = students.length, totalStudentCount = students.length;
+    var result = {}, flagCount = students.length, totalStudentCount = students.length;//注意：这里flagCount从最后开始就保证了高分在前，即高分组是前面的数据
     _.each(_.range(groupLength), function(index) {
         var groupCount = (index == groupLength-1) ? flagCount : (_.ceil(_.divide(totalStudentCount, groupLength)));
         //当前组的学生数组：
