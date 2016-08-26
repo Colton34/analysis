@@ -60,8 +60,8 @@ class DropdownList extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (!nextProps.needRefresh){
             return;
-        } 
-             
+        }
+
         this.multiChoiceNum = nextProps.multiChoiceNum ? nextProps.multiChoiceNum :nextProps.list.length;
         var theDropCount = (nextProps.list.length >= 2) ? 2 : 1;
         if (nextProps.isMultiChoice) {
@@ -69,7 +69,7 @@ class DropdownList extends React.Component {
                 nextProps.list[index].selected = true;
             })
         }
-        
+
         this.setState({
             active: false,
             current: nextProps.isMultiChoice ? {value:'选择班级'} : nextProps.list? nextProps.list[0] : {value:'无数据'},

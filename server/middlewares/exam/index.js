@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-26 11:02:30
+* @Last Modified time: 2016-08-26 12:20:08
 */
 
 'use strict';
@@ -654,6 +654,9 @@ exports.getMoreExams = function(req, res, next) {
     });
 
     when.all(examInfoPromises).then(function(results) {
+
+console.log('============  返回 ===============');
+
         res.status(200).json({
             newExamsInfo: results,
             currentClass: req.query.currentClass
