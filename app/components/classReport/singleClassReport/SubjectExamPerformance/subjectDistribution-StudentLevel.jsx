@@ -52,7 +52,6 @@ function getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, class
 //每一行需要的原数据是“当前学科” “本班学生” “成绩正序排名”
     var tableData = [];
     _.each(classHeaders, (headerObj) => {
-        // if(headerObj.id == 'totalScore') return; //没有总分的数据
         var subjectStudents = allStudentsPaperMap[headerObj.id];
         var groupStudentsInfo = makeGroupStudentsInfo(subjectStudents);
         var rowData = _.map(groupStudentsInfo, (obj) => {
@@ -64,10 +63,6 @@ function getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, class
     });
     return tableData;
 }
-
-
-
-//重写算法！！！注意reverse会修改原数据
 
 //除了总分外还要分不同的学科。需要所有学生各科的成绩
 //拿到这个数据结构然后在从里面筛选出属于此班级的数据

@@ -132,7 +132,7 @@ function getChartDS(best, worst) {
 
 
 
-//=================================================  迁移分界线  =================================================
+//=================================================  迁移分界线(可删除)  =================================================
 function getExamInspectDS(examPapersInfo, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, currentClass) {
     var result = {}, currentClassStudents = studentsGroupByClass[currentClass];
     var allStudentsPaperQuestionInfo = {};

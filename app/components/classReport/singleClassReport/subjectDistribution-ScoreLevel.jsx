@@ -11,34 +11,42 @@ import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap} from '../../../lib/con
 class SubjectLevelDisribution extends React.Component {
     constructor(props) {
         super(props);
-
-//TODO:科目跟着这个班走！
         var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = this.props;
-        // debugger;
-        var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
+        debugger;
+        var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
         this.levels = levels;
-        // debugger;
-        var theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
-        this.theDS = theDS;
-// debugger;
+        this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
 
         this.state = {
             activeTab: 0
         }
     }
+
+    componentWillReceiveProps(nextProps) {
+        var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = nextProps;
+        debugger;
+        var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
+        this.levels = levels;
+        this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
+
+        this.state = {
+            activeTab: 0
+        }
+    }
+
     switchTab(num) {
-        console.log('switch tab: ' + num);
         this.setState({
             activeTab: num
         })
     }
+
     render() {
         var {activeTab} = this.state;
         var levelLastIndex = _.size(this.levels) - 1;
         var currentLevelDS = this.theDS[(levelLastIndex - activeTab)];
         var tableDS = currentLevelDS.tableDS;
         var countSubjectDS = getSubjectDS(currentLevelDS.bestAndWorst);
-        var percentageSubjectDS = currentLevelDS.percentageSubjectDS; //TODO:新增，需要响应的文案
+        var percentageSubjectDS = currentLevelDS.percentageSubjectDS;
 
         return (
             <div id='scoreLevel' className={commonClass['section']}>

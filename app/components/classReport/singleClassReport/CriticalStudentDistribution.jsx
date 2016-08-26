@@ -12,9 +12,6 @@ import singleClassReportStyle from './singleClassReport.css';
 
 var COLOR_CONSTANT = ['#0099ff', '#33cc33', '#33cccc'];
 
-//临界生的信息，临界生各学科平均分；分档线各学科分档分
-//TODO:当只有一个学科的时候，显示没有可比性
-
 export default  function CriticalStudent({classStudents, reportDS}) {
     var examInfo = reportDS.examInfo.toJS(), levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), levelBuffers = reportDS.levelBuffers.toJS();
 
@@ -22,84 +19,7 @@ export default  function CriticalStudent({classStudents, reportDS}) {
     var tableDS = getTableDS(xAxis, criticalStudentInfo, levels, subjectLevels);
     var summaryInfo = getSummaryInfo(tableDS);
     var tableRenderData = getTableRenderData(tableDS);
-//TODO:废弃！！！
-    var chartDS = getChartDS(criticalStudentInfo);
-    var levelBufferInfo = getLevelBufferInfo(levelBuffers, levels);
-    
-    var config={
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: '',
-        },
-        subtitle: {
-            text: '(人数)',
-            floating:true,
-            x:-515,
-            y:7,
-            style:{
-              "color": "#767676",
-               "fontSize": "12px"
-            }
-        },
-        xAxis: {
-          tickWidth:'0px',//不显示刻度
-            categories: xAxis,//TODO:动态数据
-        },
-        yAxis: {
-          allowDecimals:false,
-          lineWidth:1,
-            gridLineDashStyle:'Dash',
-              gridLineColor:'#f2f2f3',
-            title: {
-                text: ''
-            },
-            plotLines: [{
-                value: 0,
-                width: 1,
-                color: '#f2f2f3'
-            }],
-        },
-        credits:{
-            enabled:false
-        },
 
-        legend:{
-            enabled:false,
-            align:'center',
-            verticalAlign:'top'
-        },
-        plotOptions: {
-           column: {
-               stacking: 'normal',//柱体堆叠
-               pointWidth:16,//柱宽
-               dataLabels: {
-                   enabled: true,
-                   color: '#000',
-                   style: {
-                       fontWeight: 'bold'
-                   },
-                   inside:false,
-                   formatter: function() {
-                       return this.point.y+'人' ;
-                   }
-               }
-           }
-       },
-        series: chartDS,
-        tooltip:{
-            enabled:true,
-            backgroundColor:'#000',
-            borderColor:'#000',
-            style:{
-                color:'#fff'
-            },
-            formatter: function(){
-                return this.point.studentList
-            }
-        },
-    };
     return (
          <div id='criticalStudent' className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
@@ -249,9 +169,9 @@ function getSummaryInfo(tableDS) {
         //如果有两个以上的科目则返回obj={better: , worse: }，否则只有一个科目则返回String:没有可比性
         var subjectNames = _.slice(obj.subjectNames, 1);
         if (subjectNames.length <= 1) return '只有一个学科没有可比性。';
-        
-        var criticalMeans = _.slice(obj.criticalMeans, 1), 
-            levelScores = _.slice(obj.levelScores, 1); 
+
+        var criticalMeans = _.slice(obj.criticalMeans, 1),
+            levelScores = _.slice(obj.levelScores, 1);
 
         var temp = _.map(subjectNames, (sname, index) => {
             return {
@@ -332,7 +252,5 @@ function getColumnStyle(cellData, rowData, rowIndex, columnIndex, id, tableData)
 function getLevelTitleFormat(cellData) {
     return cellData.value + '人';
 }
- 
-
 
 

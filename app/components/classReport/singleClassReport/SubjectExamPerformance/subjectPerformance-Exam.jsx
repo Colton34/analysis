@@ -106,7 +106,7 @@ function getLostStudentCount({examClassesInfo, currentClass, examPapersInfo, hea
     return examClassesInfo[currentClass].students.length - examPapersInfo[headerObj.id].classes[currentClass];//缺考人数
 }
 
-//TODO: 1.classStudentsPaperMap中的obj是
+//TODO（原因简单说明）: 1.classStudentsPaperMap中的obj是
 /*
     class_name:"1"
     id:359553

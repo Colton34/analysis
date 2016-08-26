@@ -23,7 +23,7 @@ class SingleClassReport extends React.Component {
         super(props);
     }
 
-//Note: 当前先打散，而没有再在结构上进行重组，后面结构化更清晰了会考虑进一步重组。
+//TODO: Note: 当前先打散，而没有再在结构上进行重组，后面结构化更清晰了会考虑进一步重组。
     render() {
         var {reportDS, grade, currentClass} = this.props;
         var studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), headers = reportDS.headers.toJS();
@@ -55,7 +55,6 @@ export default SingleClassReport;
 
 
 //=================================================  分界线  =================================================
-//TODO:注意这里需要替换数据源！！！
 function getClassStudents(studentsGroupByClass, currentClass) {
     return studentsGroupByClass[currentClass];
 }
@@ -85,34 +84,3 @@ function getClassHeadersWithTotalScore(headers, classStudentsPaperMap) {
     result.unshift(headers[0]);
     return result;
 }
-
-
-
-
-/* <ClassNav chooseClass={this.chooseClass.bind(this)} />  -- 被砍掉 */
-
-
-/*
-
-[
-    [
-        { "id": "class", "name": "班级", "rowSpan": 2 },
-        { "colSpan": 3, "name": "一档", headerStyle: { textAlign: 'center' } },
-        { "colSpan": 3, "name": "二档", headerStyle: { textAlign: 'center' } },
-        { "colSpan": 3, "name": "三档", headerStyle: { textAlign: 'center' } }
-    ],
-    [
-        { "id": "count_0", "name": "人数" },
-        { "id": "sumCount_0", "name": "累计人数" },
-        { "id": "sumPercentage_0", "name": "累计上线率" },
-        { "id": "count_1", "name": "人数" },
-        { "id": "sumCount_1", "name": "累计人数" },
-        { "id": "sumPercentage_1", "name": "累计上线率" },
-        { "id": "count_2", "name": "人数" },
-        { "id": "sumCount_2", "name": "累计人数" },
-        { "id": "sumPercentage_2", "name": "累计上线率" }
-    ]
-]
-
-
- */

@@ -67,12 +67,6 @@ var option = {
     }]
 };
 
-// var subjectPerformance={
-//     high:'较难题组',
-//     low:'较易题组'
-// };
-
-
 export default function QuestionLevel({classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate}) {
     option.series[0].data = [
         {
@@ -123,7 +117,7 @@ function getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroup
 }
 
 
-//=================================================  迁移分界线  =================================================
+//=================================================  迁移分界线(可删除)  =================================================
 //算法：
 //1.计算每一道题目的难度。
 //2.按照难度高低排序，分类出5个难度等级

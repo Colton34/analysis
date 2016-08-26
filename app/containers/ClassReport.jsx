@@ -19,24 +19,11 @@ import {initParams} from '../lib/util';
 
 import {COLORS_MAP as colorsMap} from '../lib/constants';
 
-/*
-设计：
-    1.一层一层往下拆分；遵从树状组织
-    2.数据结构走schoolReprot--TODO:重构成report通用的
- */
-
-/*
-设计：1.将className设置成SingleClassReport的state
-
- */
-
-
-
-
 class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
         var realClasses = this.props.reportDS.examInfo.toJS().realClasses;
+        this.ifCanReviewMultiReport = ifCanReviewMultiReport(this.props.user.auth, this.props.grade);
         this.authClasses = getAuthClasses(this.props.user.auth, this.props.grade, this.props.gradeName, realClasses);
         this.state = {
             reportType: 'single',
@@ -58,7 +45,7 @@ class ContentComponent extends React.Component {
     }
 
     render() {
-        var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
+        // var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
         var examName = this.props.reportDS.examInfo.toJS().name;
         var currentClass = this.state.currentClass;
         var authClassesList = this.authClasses;
@@ -66,7 +53,7 @@ class ContentComponent extends React.Component {
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
                 <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} />
-                {(isSchoolManagerOrGradeManager) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} classesList={authClassesList} reportDS={this.props.reportDS} /> : ''}
+                {(this.ifCanReviewMultiReport) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} classesList={authClassesList} reportDS={this.props.reportDS} /> : ''}
                 {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />
                     : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName}/>}
             </div>
@@ -117,6 +104,15 @@ function mapDispatchToProps(dispatch) {
     return {
         initReportDS : bindActionCreators(initReportDSAction, dispatch),
     }
+}
+
+
+
+
+
+
+function ifCanReviewMultiReport(auth, gradeKey) {
+    return (gradeKey && (auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])));
 }
 
 function getAuthClasses(auth, gradeKey, gradeName, realClasses) {
