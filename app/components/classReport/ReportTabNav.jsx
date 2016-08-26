@@ -22,6 +22,9 @@ class ReportTabNav extends React.Component {
             });
             this.props.changeClassReport({type: 'multi'});
         } else {
+            this.setState({
+                ifShowMultiReport: false
+            });
             this.props.changeClassReport({type: 'single', currentClass: item.key});
         }
     }
