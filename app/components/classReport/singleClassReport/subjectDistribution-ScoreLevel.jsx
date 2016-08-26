@@ -14,10 +14,13 @@ class SubjectLevelDisribution extends React.Component {
 
 //TODO:科目跟着这个班走！
         var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = this.props;
-        var levels = reportDS.levels.toJS(), subjecLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
+        // debugger;
+        var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
         this.levels = levels;
-        var theDS = getDS(levels, subjecLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
+        // debugger;
+        var theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
         this.theDS = theDS;
+// debugger;
 
         this.state = {
             activeTab: 0
@@ -75,10 +78,11 @@ export default SubjectLevelDisribution;
 
 //=================================================  分界线  =================================================
 //各个档次的table数据以及各个档次的文案数据
-function getDS(levels, subjecLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
+function getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
     var result = {};
     _.each(levels, (levObj, levelKey) => {
-        var subjectLevelMeanInfo = subjecLevels[levelKey];   //_.find(subjecLevels, (obj) => obj.levelKey == levelKey);
+        var subjectLevelMeanInfo = subjectLevels[levelKey];   //_.find(subjectLevels, (obj) => obj.levelKey == levelKey);
+        // debugger;
         if(!subjectLevelMeanInfo) return;
 
         var currentSubjectLevelInfo = makeCurrentSubjectLevelInfo(subjectLevelMeanInfo, levObj, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);

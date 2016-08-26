@@ -55,7 +55,7 @@ class ContentComponent extends React.Component {
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
                 <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} />
                 {(isSchoolManagerOrGradeManager) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} reportDS={this.props.reportDS} /> : ''}
-                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> 
+                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />
                     : <SingleClassReport reportDS={this.props.reportDS} user={user} grade={this.props.grade} gradeName={this.props.gradeName}/>}
             </div>
         );
@@ -68,8 +68,10 @@ class ClassReport extends React.Component {
     ]
 
     componentDidMount() {
-        if (this.props.reportDS.haveInit) return;
+        // debugger;
+        if (this.props.reportDS.haveInit || this.props.isLoading) return; // this.props.isLoading  -- 应该不需要才对！是什么导致initReportDS调用了之后在没有reset props的前提下又进来了？
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
+        // debugger;
         this.props.initReportDS(params);
     }
 
@@ -78,6 +80,10 @@ class ClassReport extends React.Component {
         var grade = this.props.location.query ? this.props.location.query.grade : '';//Note: grade用来区分是否是自定义分析，类似于一个isCustom的布尔值，从而走不通的server route path，gradeName是一定有值的--用来做显示，表明年级值。
         var gradeName = this.props.reportDS.examInfo.toJS().gradeName;
         if (!examid) return;
+
+// console.log(this.props.reportDS);
+// debugger;
+
 
         return (
             <div>

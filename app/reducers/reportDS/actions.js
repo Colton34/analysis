@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-02 16:38:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-16 21:08:12
+* @Last Modified time: 2016-08-26 11:25:12
 */
 
 'use strict';
@@ -17,16 +17,17 @@ import {
 } from '../../lib/constants';
 
 export function initReportDSAction(params) {
+    // debugger;
     return {
         type: INIT_REPORT_DS,
         promise: initReportDS(params)
     }
 }
 
-export function changeLevelAction(levels) {
+export function changeLevelAction(data) {
     return {
         type: CHANGE_LEVEL,
-        levels: levels
+        data: data
     }
 }
 
@@ -38,12 +39,9 @@ export function updateLevelBuffersAction(levelBuffers) {
 }
 
 export function saveBaselineAction(params) {
+    // debugger;
     return {
         type: SAVE_BASELINE,
         promise: saveBaseline(params)
     }
-}
-
-export function changeExamsAction(examids) {
-
 }

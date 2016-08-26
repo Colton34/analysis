@@ -254,7 +254,7 @@ class Dialog extends React.Component {
         //     return;
         // }
 
-        //保证层级是正确的 --- TODO: 将临界生分析那里的上下浮动5分的判断也验证也加入到这里
+        //保证层级是正确的 --- TODO: 将临界生分析那里的上下浮动5分的判断也验证也加入到这里！！！
         var isValid = _.every(_.range(_.size(this.levels) - 1), (index) => {
             return this.levels[index+''].score < this.levels[(index+1)+''].score
         });
@@ -274,13 +274,13 @@ class Dialog extends React.Component {
             })
         }
 
-        this.props.changeLevels(this.levels);
         //当有levels变动则修改baseline；当有levelBuffer变动则修改baseline？能进入到这里就是有效的设置了，但是levelBuffer那里是否有valid的校验，否则一旦存储，以后获取的都是错的就会麻烦
         //这里的grade走的是examInfo中的gradeName，而不是传递进来的url的query中的grade
         //TODO:要保证格式同Schema的格式：'[levels]'等
         var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
         var params = initParams({ 'request': window.request, examId: this.props.examId, grade:this.props.grade, baseline: newBaseline });
-        debugger;
+        this.props.changeLevels({levels: this.levels, subjecLevels: _.keyBy(newBaseline['[subjectLevels]'], 'levelKey')});
+        // debugger;
         this.props.saveBaseline(params);
 
         this.props.onHide();
