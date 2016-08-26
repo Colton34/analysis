@@ -62,7 +62,7 @@ class CustomScoreSegment extends React.Component {
                 </div>
                 <div style={{display: 'table-cell', paddingLeft: 18,verticalAlign: 'middle', width: 1200, height: 70, lineHeigth: 70, border: '1px solid ' + colorsMap.C05, background: colorsMap.C02, borderRadius: 3,position:'relative'}}>
                     您查看的科目为
-                    <DropdownList list={formatedSubjects} style={{margin: '0 10px', display: 'inline-block',position:'absolute'}}
+                    <DropdownList list={formatedSubjects} style={{margin: '0 10px', display: 'inline-block',position:'absolute',zIndex:1}}
                                 surfaceBtnStyle={{border: '1px solid ' + colorsMap.C08, color: colorsMap.C12}}
                                 onClickDropdownList={this.onChooseSubject.bind(this)}
                             />

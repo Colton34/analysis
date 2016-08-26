@@ -62,7 +62,7 @@ var option = {
            },
     tooltip: {
                    formatter: function (param) {
-                       return param.data.number+'<br/>'+'区分度：'+param.data.distinguish+'<br/>'+'得分率：'+param.data.value[0]+'<br/>'+'高于年级平均：'+(param.data.value[0]-param.data.value[1]).toFixed(2);
+                       return param.data.number+'<br/>'+'区分度：'+param.data.distinguish+'<br/>'+'得分率：'+param.data.value[0]+'<br/>'+'高于年级平均：'+(param.data.value[1]-param.data.value[0]).toFixed(2);
                    }
                },
     series: [

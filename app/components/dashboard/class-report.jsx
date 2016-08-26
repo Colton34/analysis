@@ -65,16 +65,19 @@ class ClassReport extends React.Component {
                   width: 1,
                   color: colorsMap.C03
               }, {
-                      value: average,//mork数据
+                      value: average,
                       color: colorsMap.B03,
                       dashStyle: 'Dash',
                       width: 1,
                       label: {
-                          text: '',
-                          align: 'right',
+                          text: '平均分'+average,
+                          align: 'center',
                           x: 0,
-                          y: 5
-
+                          y: -40,
+                          style:{
+                              color:colorsMap.B03,
+                              fontSize:'12px'
+                          }
                       }
                   }],
 
@@ -100,7 +103,7 @@ class ClassReport extends React.Component {
               {
                   name: '校级平均分:' + average,
                   color: colorsMap.B03,
-                  data: [100, 150, 300, 200, 300],
+                  data: theMeans
               }
           ],
           tooltip: {
