@@ -19,44 +19,43 @@ import {initParams} from '../lib/util';
 
 import {COLORS_MAP as colorsMap} from '../lib/constants';
 
-/*
-设计：
-    1.一层一层往下拆分；遵从树状组织
-    2.数据结构走schoolReprot--TODO:重构成report通用的
- */
-
-/*
-设计：1.将className设置成SingleClassReport的state
-
- */
-
-
 class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
+        var realClasses = this.props.reportDS.examInfo.toJS().realClasses;
+        this.ifCanReviewMultiReport = ifCanReviewMultiReport(this.props.user.auth, this.props.grade);
+        this.authClasses = getAuthClasses(this.props.user.auth, this.props.grade, this.props.gradeName, realClasses);
         this.state = {
-            reportType: 'single'
+            reportType: 'single',
+            currentClass: this.authClasses[0].key
         };
     }
 
-    changeClassReport(type) {
-        console.log('type == ', type);
-        this.setState({
-            reportType: type
-        })
+    changeClassReport(item) {
+        if(item.type == 'multi') {
+            this.setState({
+                reportType: item.type
+            });
+        } else {
+            this.setState({
+                reportType: item.type,
+                currentClass: item.currentClass
+            })
+        }
     }
 
     render() {
-        var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
+        // var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
         var examName = this.props.reportDS.examInfo.toJS().name;
-        var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
+        var currentClass = this.state.currentClass;
+        var authClassesList = this.authClasses;
 
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
                 <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} />
-                {(isSchoolManagerOrGradeManager) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} reportDS={this.props.reportDS} /> : ''}
-                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} /> 
-                    : <SingleClassReport reportDS={this.props.reportDS} user={user} grade={this.props.grade} gradeName={this.props.gradeName}/>}
+                {(this.ifCanReviewMultiReport) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} classesList={authClassesList} reportDS={this.props.reportDS} /> : ''}
+                {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />
+                    : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName}/>}
             </div>
         );
     }
@@ -68,7 +67,7 @@ class ClassReport extends React.Component {
     ]
 
     componentDidMount() {
-        if (this.props.reportDS.haveInit) return;
+        if (this.props.reportDS.haveInit || this.props.isLoading) return; // this.props.isLoading  -- 应该不需要才对！是什么导致initReportDS调用了之后在没有reset props的前提下又进来了？
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         this.props.initReportDS(params);
     }
@@ -79,10 +78,11 @@ class ClassReport extends React.Component {
         var gradeName = this.props.reportDS.examInfo.toJS().gradeName;
         if (!examid) return;
 
+        var user = Map.isMap(this.props.user) ? this.props.user.toJS() : this.props.user;
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <CommonLoadingView /> : (
-                    <ContentComponent reportDS={this.props.reportDS} user={this.props.user} examid={examid} grade={grade} gradeName={gradeName}/>
+                    <ContentComponent reportDS={this.props.reportDS} user={user} examid={examid} grade={grade} gradeName={gradeName}/>
                 ))}
             </div>
         );
@@ -104,6 +104,44 @@ function mapDispatchToProps(dispatch) {
     return {
         initReportDS : bindActionCreators(initReportDSAction, dispatch),
     }
+}
+
+
+
+
+
+
+function ifCanReviewMultiReport(auth, gradeKey) {
+    return (gradeKey && (auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])));
+}
+
+function getAuthClasses(auth, gradeKey, gradeName, realClasses) {
+    //获取此页面需要的auth classes
+    //如果是校级领导，年级主任，任意一门学科的学科组长，那么都将看到所有学生--因为这里涉及的自定义分析到选择学生页面没有学科的筛选了，就没办法和学科再联系一起了
+    if(gradeKey && (auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]))) {
+        return _.map(realClasses, (classKey) => {
+            return {
+                key: classKey,
+                value: gradeKey + classKey + '班'
+            }
+        })
+    }
+    //Note: 是自定义--不属于自己管理的年级。自定义可能是没有gradeKey传递--是undefined
+    if(!gradeKey || !auth.gradeAuth[gradeKey]) {
+        return _.map(realClasses, (classKey) => {
+            return {
+                key: classKey,
+                value: gradeName + classKey + '班'
+            }
+        })
+    }
+
+    return _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => {
+        return {
+            key: obj.group,
+            value: gradeKey + obj.group + '班'
+        }
+    });
 }
 
 

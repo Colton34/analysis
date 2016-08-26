@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-25 12:05:59
+* @Last Modified time: 2016-08-26 12:20:08
 */
 
 'use strict';
@@ -327,7 +327,8 @@ exports.schoolAnalysis = function(req, res, next) {
             examInfo: req.examInfo,
             examPapersInfo: req.examPapersInfo,
             examClassesInfo: req.examClassesInfo,
-            examStudentsInfo: examStudentsInfo
+            examStudentsInfo: examStudentsInfo,
+            examBaseline: req.exam.baseline
         });
     }).catch(function(err) {
         next(new errors.Error('schoolAnalysis Error', err));
@@ -464,13 +465,17 @@ exports.initExam = function(req, res, next) {
     var grade = decodeURI(req.query.grade);
     examUitls.generateExamInfo(req.query.examid, grade, req.user.schoolId).then(function(exam) {
         req.exam = exam;
-console.log('initExam 1');
-
+// console.log('initExam 1');
+// console.log('exam.baseline = ', req.exam.baseline);
         return examUitls.generateExamScoresInfo(req.exam, req.user.auth);
     }).then(function(result) {
-console.log('initExam 2');
+// console.log('initExam 2');
 
         req = _.assign(req, result);
+
+
+// console.log('exam.baseline = ', req.exam.baseline);
+
         next();
     }).catch(function(err) {
         next(err);
@@ -649,6 +654,9 @@ exports.getMoreExams = function(req, res, next) {
     });
 
     when.all(examInfoPromises).then(function(results) {
+
+console.log('============  返回 ===============');
+
         res.status(200).json({
             newExamsInfo: results,
             currentClass: req.query.currentClass

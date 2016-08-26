@@ -11,31 +11,42 @@ import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap} from '../../../lib/con
 class SubjectLevelDisribution extends React.Component {
     constructor(props) {
         super(props);
-
-//TODO:科目跟着这个班走！
         var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = this.props;
-        var levels = reportDS.levels.toJS(), subjecLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
+        debugger;
+        var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
         this.levels = levels;
-        var theDS = getDS(levels, subjecLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
-        this.theDS = theDS;
+        this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
 
         this.state = {
             activeTab: 0
         }
     }
+
+    componentWillReceiveProps(nextProps) {
+        var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = nextProps;
+        debugger;
+        var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
+        this.levels = levels;
+        this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
+
+        this.state = {
+            activeTab: 0
+        }
+    }
+
     switchTab(num) {
-        console.log('switch tab: ' + num);
         this.setState({
             activeTab: num
         })
     }
+
     render() {
         var {activeTab} = this.state;
         var levelLastIndex = _.size(this.levels) - 1;
         var currentLevelDS = this.theDS[(levelLastIndex - activeTab)];
         var tableDS = currentLevelDS.tableDS;
         var countSubjectDS = getSubjectDS(currentLevelDS.bestAndWorst);
-        var percentageSubjectDS = currentLevelDS.percentageSubjectDS; //TODO:新增，需要响应的文案
+        var percentageSubjectDS = currentLevelDS.percentageSubjectDS;
 
         return (
             <div id='scoreLevel' className={commonClass['section']}>
@@ -75,10 +86,11 @@ export default SubjectLevelDisribution;
 
 //=================================================  分界线  =================================================
 //各个档次的table数据以及各个档次的文案数据
-function getDS(levels, subjecLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
+function getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
     var result = {};
     _.each(levels, (levObj, levelKey) => {
-        var subjectLevelMeanInfo = subjecLevels[levelKey];   //_.find(subjecLevels, (obj) => obj.levelKey == levelKey);
+        var subjectLevelMeanInfo = subjectLevels[levelKey];   //_.find(subjectLevels, (obj) => obj.levelKey == levelKey);
+        // debugger;
         if(!subjectLevelMeanInfo) return;
 
         var currentSubjectLevelInfo = makeCurrentSubjectLevelInfo(subjectLevelMeanInfo, levObj, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);

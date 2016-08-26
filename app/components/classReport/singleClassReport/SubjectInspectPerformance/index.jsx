@@ -43,15 +43,10 @@ class SubjectInspectPerformance extends React.Component {
         this.state = {
             currentSubject: this.subjects[0]
         }
+        this.downloadData = getClassScoreTableData(this.state.currentSubject.key, currentClass, this.examPapersInfo, studentsGroupByClass);
     }
-    componentDidMount() {
-        var {reportDS, currentClass} = this.props;
-        var {currentSubject} = this.state;
-        var studentsGroupByClass = reportDS.studentsGroupByClass.toJS();
-        this.downloadData = getClassScoreTableData(currentSubject.key, currentClass, this.examPapersInfo, studentsGroupByClass);
-    }
+
     componentWillReceiveProps(nextProps) {
-        //Note: nextProps是所有的都有还是只有改变的东西
         var {reportDS, currentClass, classHeaders} = nextProps;
         var examPapersInfo = reportDS.examPapersInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
         this.examPapersInfo = examPapersInfo;
@@ -66,6 +61,7 @@ class SubjectInspectPerformance extends React.Component {
         this.state = {
             currentSubject: this.subjects[0]
         }
+        this.downloadData = getClassScoreTableData(this.state.currentSubject.key, currentClass, this.examPapersInfo, studentsGroupByClass);
     }
 
     onClickDropdownList(item) {
@@ -90,15 +86,10 @@ class SubjectInspectPerformance extends React.Component {
         var subjects = this.subjects;
         var currentSubject = this.state.currentSubject;
         var questions = this.examPapersInfo[currentSubject.key].questions;
-        // var {gradeQuestionScoreRates, classQuestionScoreRates, questionContriFactors, questionSeparation, questions} = this.theExamInspectDS[currentSubject.key];
         this.theExamInspectDS[currentSubject.key].questions = questions;
         var {best, worst} = getBestAndWorstQuestions(this.theExamInspectDS[currentSubject.key]);
         var bestQuestionNames = _.map(best, (obj) => obj.name), worstQuestionNames = _.map(worst, (obj) => obj.name);
         var {gradeQuestionLevelGroupMeanRate, classQuestionLevelGroupMeanRate} = this.questionLevelDS[currentSubject.key];
-        //TODO: var bestQuestionNames = ...
-
-        // var {best, worst} = getBestAndWorstQuestions(gradeQuestionScoreRates, classQuestionScoreRates, questionContriFactors, questionSeparation, questions);
-//theDS已经有所有的科目数据，坐等展现
 
         return (
             <div id='subjectInspectPerformance' className={commonClass['section']}>
@@ -129,23 +120,10 @@ class SubjectInspectPerformance extends React.Component {
                     <QuestionLevel gradeQuestionLevelGroupMeanRate={gradeQuestionLevelGroupMeanRate} classQuestionLevelGroupMeanRate={classQuestionLevelGroupMeanRate} />
                     <QuestionAbility />
                 </div>
-            {/*
-            */}
             </div>
         );
     }
 }
-
-/*
-
-                 <ExamInspect reportDS={reportDS} currentClass={currentClass} />
-                <div style={{marginTop: 30}}>
-                    <QuestionLevel reportDS={reportDS} currentClass={currentClass} />
-                    <QuestionAbility />
-                </div>
-
-
- */
 
 export default SubjectInspectPerformance;
 
@@ -281,7 +259,7 @@ function getQuestionScoreRate(questions, pid, students, allStudentsPaperQuestion
     });
 }
 
-//TODO: 怎么分组？？？--（得分率最高-得分率最低）/ 5
+//怎么分组？？？--（得分率最高-得分率最低）/ 5
 function getGradeQuestionLevelGroup(questions, gradeQuestionScoreRates) {
     var temp = _.map(questions, (obj, index) => {
         return {

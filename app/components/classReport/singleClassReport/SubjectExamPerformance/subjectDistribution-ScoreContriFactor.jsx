@@ -71,26 +71,6 @@ var localStyle = {
     },
 }
 
-
-// const SubjectConstrast = ({headerInfo}) => {
-//     return (
-//         <div style={{display: 'inline-block', width: 215, float: 'right', marginTop: 10}}>
-//             <div style={{ display: 'table-row'}}>
-//                 <div style={localStyle.subjectCard}>
-//                     <div style={_.assign({ fontSize: 30, color: colorsMap.B08, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.greater, '、')}>{_.join(headerInfo.greater, '、')}</div>
-//                     <p style={{ fontSize: 12, marginBottom: 10 }}>班级优势学科</p>
-//                 </div>
-//             </div>
-//             <div style={{height: 20}}></div>
-//             <div style={localStyle.subjectCard}>
-//                 <div style={_.assign({ fontSize: 30, color: colorsMap.B04, width: 215}, localStyle.lengthControl)} title={_.join(headerInfo.lesser, '、')}>{_.join(headerInfo.lesser, '、')}</div>
-//                 <p style={{fontSize: 12, marginBottom: 10}}>班级劣势学科</p>
-//             </div>
-//         </div>
-//     )
-// }
-
-
 export default function SubjectContriFactor({classStudents, classHeadersWithTotalScore, currentClass, reportDS}) {
     var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS();
     var {subjects, datas, headerInfo} = getDS(examInfo, examStudentsInfo, examPapersInfo, classStudents, classHeadersWithTotalScore, currentClass);
@@ -167,8 +147,6 @@ function makeOriginalSubjectInfoRow(students, examPapersInfo, examInfo) {
 }
 
 /**
- * TODO：但是当前要的是一个图表
- * //是平均得分率的小数表示的matrix
  * @param  {[type]} subjectMeanInfo [description]
  * @param  {[type]} classHeadersWithTotalScore         [description]
  * @return {[type]}                 [description]
@@ -220,20 +198,3 @@ function formatData(datas) {
     return findata;
 }
 
-
-//==========================================  Mock Data ========================================
-
-// var headerInfo = {greater: ['英语'], lesser: ['语文']};
-// var datas=[0.1,-0.2,0.2,-0.3,0.4,-0.5,0.6,-0.2,0.1,-0.2];//mork数据
-
-// xAxis: {
-//       tickWidth:'0px',//不显示刻度
-//         categories: ['语文','数学','英语','政治','地理','历史','化学','物理','生物','语文'],
-// }
-// series: [
-//     {
-//         name:'贡献指数',
-//         //color:'#0099ff',
-//         data:findata,
-//     }
-// ],

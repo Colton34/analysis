@@ -77,7 +77,7 @@ class SchoolReport extends React.Component {
                         <SubjectDistribution reportDS={this.props.reportDS} />
                         <ClassPerformance reportDS={this.props.reportDS} />
                         <SubjectPerformance reportDS={this.props.reportDS} />
-                        <GroupAnalysis reportDS={this.props.reportDS} examId={examid} grade={grade} updateLevelBuffers={this.props.updateLevelBuffers} saveBaseline={this.props.saveBaseline} />
+                        <GroupAnalysis reportDS={this.props.reportDS} examId={examid} grade={grade} updateLevelBuffers={this.props.updateLevelBuffers} saveBaseline={this.props.saveBaseline.bind(this)} />
                         <StudentPerformance reportDS={this.props.reportDS} />
                     </div>
                 ))}

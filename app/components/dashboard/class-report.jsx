@@ -78,10 +78,10 @@ class ClassReport extends React.Component {
               }
           },
           subtitle: {
-              text: '',
+              text: '平均分：'+average,
               floating: true,
-              x: -65,
-              y: 18,
+              x: 10,
+              y: 0,
               style: {
                   "color": colorsMap.B03,
                   "fontSize": "12px"
@@ -108,16 +108,16 @@ class ClassReport extends React.Component {
                       color: colorsMap.B03,
                       dashStyle: 'Dash',
                       width: 1,
-                      label: {
-                          text: '平均分'+average,
-                          align: 'center',
-                          x: 0,
-                          y: -40,
-                          style:{
-                              color:colorsMap.B03,
-                              fontSize:'12px'
-                          }
-                      }
+                    //   label: {
+                    //       text: average,
+                    //       align: 'right',
+                    //       x: 0,
+                    //       y: 0,
+                    //       style:{
+                    //           color:colorsMap.B03,
+                    //           fontSize:'12px'
+                    //       }
+                    //   }
                   }],
 
           },

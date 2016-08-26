@@ -52,7 +52,6 @@ function getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, class
 //每一行需要的原数据是“当前学科” “本班学生” “成绩正序排名”
     var tableData = [];
     _.each(classHeaders, (headerObj) => {
-        // if(headerObj.id == 'totalScore') return; //没有总分的数据
         var subjectStudents = allStudentsPaperMap[headerObj.id];
         var groupStudentsInfo = makeGroupStudentsInfo(subjectStudents);
         var rowData = _.map(groupStudentsInfo, (obj) => {
@@ -64,10 +63,6 @@ function getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, class
     });
     return tableData;
 }
-
-
-
-//重写算法！！！注意reverse会修改原数据
 
 //除了总分外还要分不同的学科。需要所有学生各科的成绩
 //拿到这个数据结构然后在从里面筛选出属于此班级的数据
@@ -114,7 +109,6 @@ function getSummaryInfo(tableDS) {
     } else if((_.first(tempSortByHigh).high == _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low != _.last(tempSortByLow).low)) {
         return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数相当，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较多。</span>;
     } else {
-        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject} </span> 学科高分段人数较多，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较少。</span>;
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject} </span> 学科高分段人数较多，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较多。</span>;
     }
 }
-

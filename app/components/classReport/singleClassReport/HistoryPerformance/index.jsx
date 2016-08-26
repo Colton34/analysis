@@ -16,26 +16,6 @@ import {
     SUBJECTS_WEIGHT as subjectWeight,
 } from '../../../../lib/constants';
 
-/**----------------------------mock data----------------------------------------------- */
-var examList = [{value:'放假效果抽检'}, {value:'勇能考试'}, {value:'八十八所中学大联考'}]
-/**----------------------------mock data end----------------------------------------------- */
-
-
-// export default function HistoryPerformance() {
-
-//     return (
-//         <div id='historyPerformance' className={commonClass['section']} style={{position: 'relative'}}>
-//             <div style={{marginBottom: 10}}>
-//                 <span className={commonClass['title-bar']}></span>
-//                 <span className={commonClass['title']}>历史表现比较</span>
-//                 <span className={commonClass['title-desc']}>通过相同性质的考试比较，可以发现各学科标准分与排名率的变化</span>
-//             </div>
-//             <DropdownList list={examList} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
-//             <StandardScoreContrast/>
-//             <RankRateContrast/>
-//         </div>
-//     )
-// }
 class HistoryContent extends React.Component {
     constructor(props) {
         super(props);
@@ -65,15 +45,16 @@ class HistoryContent extends React.Component {
     }
 
     onChangeExams(exams) {
-        debugger;
+        //TODO: Just For Test
+        // debugger;
         if(isCurrentExamsNoChange(exams, this.state.currentExams)) return; //根本没有改变currentExams
-        debugger;
+        // debugger;
         this.setState({
             currentExams: exams
         });
         if(isCurrentExamsInCache(exams, this.props.currentClassExamsInfoCache)) return; //虽然真正改变了currentExams但是命中缓存了
-        debugger;
-        this.props.getMoreExamsInfo(); //没有命中缓存，需要getMoreExamsInfo
+        // debugger;
+        this.props.getMoreExamsInfo(getMoreExamIds(exams, this.props.currentClassExamsInfoCache)); //没有命中缓存，需要getMoreExamsInfo
     }
 
     render() {
@@ -95,7 +76,6 @@ class HistoryContent extends React.Component {
         // debugger;
 
 
-//TODO: onClickDropdownList={this.onChangeExams.bind(this)}
         return (
             <div id='historyPerformance' className={commonClass['section']} style={{position: 'relative'}}>
                 <div style={{marginBottom: 10}}>
@@ -103,12 +83,20 @@ class HistoryContent extends React.Component {
                     <span className={commonClass['title']}>历史表现比较</span>
                     <span className={commonClass['title-desc']}>通过相同性质的考试比较，可以发现各学科标准分与排名率的变化</span>
                 </div>
-                <DropdownList list={currentExamsList} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
+                <DropdownList list={currentExamsList} isMultiChoice={true} handleSelectedItems={this.onChangeExams.bind(this)} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
                 <StandardScoreContrast currentClassExamsZScore={currentClassExamsZScore} categories={categories} />
                 {/*<RankRateContrast currentExamsZScore={currentExamsZScore} categories={categories} currentClass={this.props.currentClass} />*/}
             </div>
         );
     }
+}
+
+function getMoreExamIds(newExams, examsInfoCache) {
+    // return ['21308'];// Just For Test
+    //TODO: 放开
+    var newExamIds = _.map(newExams, (obj) => obj.key);
+    var cachedIds = _.map(examsInfoCache, (obj) => obj.examid);
+    return _.diff(newExamIds, cachedIds);
 }
 
 class HistoryPerformance extends React.Component {
@@ -140,10 +128,12 @@ console.log('切换班级了，并且此班级没有缓存过，去获取此班�
         }
     }
 
-    getMoreExamsInfo() {
+    getMoreExamsInfo(examids) {
+        debugger;
         var params = {request: window.request};
-        params.schoolId = this.props.user.schoolId;
-        params.grade = this.props.grade;
+        // params.schoolId = this.props.user.schoolId;
+        params.examids = examids;
+        params.grade = this.props.grade;  //TODO: Just For Test '三年级';
         params.currentClass = this.props.currentClass;
         this.props.getMoreExamsInfo(params);
     }

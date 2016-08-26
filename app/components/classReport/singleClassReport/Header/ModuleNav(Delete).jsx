@@ -58,6 +58,7 @@ class ModuleNav extends React.Component {
 
         for (var i in scrollTopList) {
             if (scrollTopList[i] <= bodyTop + 100 && scrollTopList[i] >= bodyTop - 100) {
+                debugger;
                 this.setState({
                     activeId: modules[i].id
                 })
@@ -71,7 +72,7 @@ class ModuleNav extends React.Component {
         var navBarTop = document.getElementById('navBar').offsetTop;
         var scrollTopList = [];
         _.forEach(modules, (module, index) => {
-            var moduleEle = document.getElementById(module.id);  
+            var moduleEle = document.getElementById(module.id);
             if(!moduleEle) {
                 console.log(module.id + ' not found!');
             } else {
@@ -104,6 +105,7 @@ class ModuleNav extends React.Component {
     render() {
         var moduleLen = modules.length;
         var {position} = this.state;
+        debugger;
         return (
             <div id='navBar' style={_.assign({}, {zIndex: 1, right: 0, height: 50, display: 'table-row',borderTop: '1px solid ' + colorsMap.C04, backgroundColor: colorsMap.C02},
                                     position === 'normal' ? {position:'relative', width: '100%', bottom: 0, left: 0} : {position: 'fixed', top: 0, width: '100%', borderBottom: '1px solid ' + colorsMap.C04})}>
@@ -127,7 +129,3 @@ class ModuleNav extends React.Component {
 }
 
 export default ModuleNav;
-
-
-
-//=================================================  分界线  =================================================
