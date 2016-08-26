@@ -15,7 +15,6 @@ import SubjectSmallScore from './SubjectSmallScore';
 class MultiClassReport extends React.Component {
     constructor(props) {
       super(props);
-
     }
 
     render() {

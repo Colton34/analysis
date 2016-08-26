@@ -10,31 +10,30 @@ import commonClass from '../../common/common.css'
 class ReportTabNav extends React.Component {
     constructor(props) {
         super(props);
-        var studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), gradeName = this.props.reportDS.examInfo.toJS().gradeName;
-        this.classesList = getClassesList(studentsGroupByClass, gradeName);
         this.state = {
-            activeType: this.classesList[0].value
+            ifShowMultiReport: false
         }
     }
-    onClickClassReportType(type) {
-        this.setState({
-            activeType: type
-        })
-        if (type === 'multi')
-            this.props.changeClassReport(type);
-        else
-            this.props.changeClassReport('single')
-    }
-    render() {
-        var {activeType} = this.state;
-        var showMultiReport = activeType === 'multi';
 
+    onClickReportNav(item) {
+        if(item == 'multi') {
+            this.setState({
+                ifShowMultiReport: true
+            });
+            this.props.changeClassReport({type: 'multi'});
+        } else {
+            this.props.changeClassReport({type: 'single', currentClass: item.key});
+        }
+    }
+
+    render() {
+        var {classesList} = this.props;
         return (
             <div className={commonClass['section']} style={{zIndex: 3, position: 'relative', width: '100%', height: 60, padding: 0, display: 'inline-block'}}>
-                <span style={_.assign({}, localStyle.item, showMultiReport  ? {color: colorsMap.B03,borderBottom:'2px solid rgb(29, 174, 248)'}: {})} onClick={this.onClickClassReportType.bind(this, 'multi')}>班级分析报告</span>
-                <span style={_.assign({}, localStyle.item, !showMultiReport ? {color: colorsMap.B03,borderBottom:'2px solid rgb(29, 174, 248)'}: {})}>
-                    <DropdownList style={{position:'relative'}} list={this.classesList} surfaceBtnStyle={_.assign({ border: 'none'}, !showMultiReport ? {color: colorsMap.B03} : {color: colorsMap.C12})}
-                                  onClickDropdownList={this.onClickClassReportType.bind(this)} coverAll
+                <span style={_.assign({}, localStyle.item, this.state.ifShowMultiReport  ? {color: colorsMap.B03,borderBottom:'2px solid rgb(29, 174, 248)'}: {})} onClick={this.onClickReportNav.bind(this, 'multi')}>班级分析报告</span>
+                <span style={_.assign({}, localStyle.item, !this.state.ifShowMultiReport ? {color: colorsMap.B03,borderBottom:'2px solid rgb(29, 174, 248)'}: {})}>
+                    <DropdownList style={{position:'relative'}} list={classesList} surfaceBtnStyle={_.assign({ border: 'none'}, !this.state.ifShowMultiReport ? {color: colorsMap.B03} : {color: colorsMap.C12})}
+                                  onClickDropdownList={this.onClickReportNav.bind(this)} coverAll
                                   />
                 </span>
             </div>

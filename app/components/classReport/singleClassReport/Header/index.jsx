@@ -2,15 +2,8 @@ import React from 'react';
 
 import HeaderInfo from './HeaderInfo';
 import ModuleNav from '../../../../common/ModuleNav';
+
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
-/** ---------------------------------------------mock data---------------------------------------------------------- */
-var examInfo = {
-    "lostClasses":[],"gradeName":"高三","subjects":["数学","数学","语文","英语","文综","理综"],
-    "realClasses":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],
-    "name":"15-16下学期高三保温考试","startTime":1464307200000,
-    "lostStudentsCount":192,"realStudentsCount":1009,"fullMark":1200
-}
-/** ---------------------------------------------mock data end---------------------------------------------------------- */
 
 var modules = [
     {
