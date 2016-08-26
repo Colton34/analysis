@@ -114,7 +114,6 @@ function getSummaryInfo(tableDS) {
     } else if((_.first(tempSortByHigh).high == _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low != _.last(tempSortByLow).low)) {
         return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数相当，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较多。</span>;
     } else {
-        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject} </span> 学科高分段人数较多，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较少。</span>;
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject} </span> 学科高分段人数较多，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较多。</span>;
     }
 }
-
