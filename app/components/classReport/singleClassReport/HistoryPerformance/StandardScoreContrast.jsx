@@ -77,6 +77,7 @@ var config={
 export default function StandardScoreContrast({currentClassExamsZScore, categories}) {
     var categorieSubjects = _.map(categories, (obj) => obj.subject);
     var seriesData = getSeriesData(currentClassExamsZScore, categories);
+    debugger;
     config.xAxis.categories = categorieSubjects;
     config.series = seriesData;
     return (

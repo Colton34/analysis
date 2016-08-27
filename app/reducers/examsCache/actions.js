@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-17 08:36:41
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-24 16:21:12
+* @Last Modified time: 2016-08-27 09:52:24
 */
 
 'use strict';
@@ -18,8 +18,6 @@ export function initExamCacheAction(params) {
 }
 
 export function getMoreExamsInfoAction(params) {
-console.log('获取更多的exams');
-debugger;
     return {
         type: GET_MORE_EXAMS_INFO,
         promise: getMoreExamsInfo(params)
