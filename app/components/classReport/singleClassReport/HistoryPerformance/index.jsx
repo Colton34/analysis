@@ -115,9 +115,10 @@ class HistoryPerformance extends React.Component {
 
     render() {
         var isNewClass = this.isNewClass;
-        if(isNewClass && !this.props.isLoading) {
-            var currentClassExamsInfoCache = this.props.examsInfoCache.get(this.props.currentClass);
-            var currentClassExamsList = this.props.examsListCache.get(this.props.currentClass);
+        var currentClassExamsInfoCache = this.props.examsInfoCache.get(this.props.currentClass);
+        var currentClassExamsList = this.props.examsListCache.get(this.props.currentClass);
+        //Hack:  !this.currentExams || this.currentExams.length == 0  -- 因为改变currentClass和触发改变isLoading不在同一次render里导致有问题！！！
+        if(!this.props.isLoading &&(isNewClass || !this.currentExams || this.currentExams.length == 0)) {
             var initExams = _.map(_.filter(currentClassExamsInfoCache, (obj) => obj.isInit), (tobj) => {
                 return {
                     key: tobj.examid,

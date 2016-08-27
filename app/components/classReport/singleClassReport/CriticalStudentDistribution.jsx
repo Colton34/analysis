@@ -156,7 +156,7 @@ function getCriticalSubjectMeans(criticalStudents, subjectLevelInfo) {
     return _.map(subjectLevelInfo, (subjectInfoObj, paperId) => {
         var criticalSubjectScores = _.map(criticalStudents, (stuObj) => {
             var targetPaper = _.find(stuObj.papers, (obj) => obj.paperid == paperId);
-            return targetPaper.score;
+            return (targetPaper) ? targetPaper.score : 0;
         });
         return _.round(_.mean(criticalSubjectScores), 2);
     });
