@@ -161,11 +161,8 @@ function getHeaderDS(totalScoreLevelInfoByLevel, currentClass) {
     _.each(totalScoreLevelInfoByLevel, (infoArr, levelKey) => {
         var temp = _.sortBy(infoArr, 'count');//TODO:确认，是根据“count”而不是"sumCount"的比较！！！
         var targetIndex = _.findIndex(temp, (obj) => obj.class == currentClass);
-        // debugger;
         if(targetIndex < 0) return;//TODO:应该给Tip Error！-- 这也是需要改进的：清晰明了的错误提示
-        // result[levelKey-0] = targetIndex;
         result[levelLastIndex - levelKey] = (temp.length - targetIndex);
-        // debugger;
     });
     return result;
 }

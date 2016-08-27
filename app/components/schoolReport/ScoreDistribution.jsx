@@ -280,7 +280,6 @@ class Dialog extends React.Component {
         var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
         var params = initParams({ 'request': window.request, examId: this.props.examId, grade:this.props.grade, baseline: newBaseline });
         this.props.changeLevels({levels: this.levels, subjecLevels: _.keyBy(newBaseline['[subjectLevels]'], 'levelKey')});
-        // debugger;
         this.props.saveBaseline(params);
 
         this.props.onHide();

@@ -37,7 +37,6 @@ class HistoryContent extends React.Component {
         if(!this.state.currentExams || !isCurrentExamsInCache(this.state.currentExams, this.props.currentClassExamsInfoCache)) return (<div></div>);
         //Note: 暂时不叫做currentClassExamsListCache--因为没有cache的操作，等如果后期需要对exams "GetMore"的时候再使用”currentClassExamsListCache“这个名字
         var currentExamsInfo = getCurrentExamsInfoFromCache(this.state.currentExams, this.props.currentClassExamsInfoCache);
-        debugger;
         var currentExamsList = _.map(this.props.currentClassExamsList, (obj) => {
             return {
                 key: obj.id,
@@ -47,7 +46,7 @@ class HistoryContent extends React.Component {
 
         var currentClassExamsZScore = getCurrentClassExamsZScore(currentExamsInfo, this.props.currentClass);
         var categories = getConfigCategories(currentClassExamsZScore);
-
+        var currentExams = this.state.currentExams;
         // var currentValidExamsZScore = getCurrentValidExamsZScore(currentExamsInfo, this.props.currentClass);//并且要求自己--currentClass--在这几场考试所考的科目是一样的！！！那么以什么标准为准呢？只能靠筛选--全部科目（不要取交集！！！不科学）
         // debugger;
 
@@ -59,7 +58,7 @@ class HistoryContent extends React.Component {
                     <span className={commonClass['title']}>历史表现比较</span>
                     <span className={commonClass['title-desc']}>通过相同性质的考试比较，可以发现各学科标准分与排名率的变化</span>
                 </div>
-                <DropdownList list={currentExamsList} isMultiChoice={true} handleSelectedItems={this.onChangeExams.bind(this)} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
+                <DropdownList list={currentExamsList} isMultiChoice={true} theTitle='选择考试' initSelected={currentExams} handleSelectedItems={this.onChangeExams.bind(this)} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
                 <StandardScoreContrast currentClassExamsZScore={currentClassExamsZScore} categories={categories} />
                 {/*<RankRateContrast currentExamsZScore={currentExamsZScore} categories={categories} currentClass={this.props.currentClass} />*/}
             </div>
@@ -117,12 +116,23 @@ class HistoryPerformance extends React.Component {
     render() {
         var isNewClass = this.isNewClass;
         if(isNewClass && !this.props.isLoading) {
-            var initExams = _.map(this.props.examsInfoCache.get(this.props.currentClass), (obj) => {
+            var currentClassExamsInfoCache = this.props.examsInfoCache.get(this.props.currentClass);
+            var currentClassExamsList = this.props.examsListCache.get(this.props.currentClass);
+            var initExams = _.map(_.filter(currentClassExamsInfoCache, (obj) => obj.isInit), (tobj) => {
                 return {
-                    key: obj.examid,
-                    value: obj.examInfo.name
+                    key: tobj.examid,
+                    value: tobj.examInfo.name
                 }
             });
+            if(initExams.length == 0) {
+                _.each(currentClassExamsInfoCache, (obj) => obj.isInit = true);
+                initExams = _.map(currentClassExamsInfoCache, (obj) => {
+                    return {
+                        key: obj.examid,
+                        value: obj.examInfo.name
+                    }
+                });
+            }
             this.currentExams = initExams;
         }
         var currentExams = this.currentExams;
@@ -236,9 +246,7 @@ function getCurrentClassExamsZScore(currentExamsInfo, currentClass) {
         var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, currentClass);
         var headers = getHeaders(obj.examPapersInfo);
         var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
-        debugger;
         var examZScore = getExamZScore(obj.examStudentsInfo, studentsGroupByClass[currentClass], allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
-        debugger;
         result[obj.examid] = {
             examid: obj.examid,
             name: obj.examInfo.name,
@@ -308,9 +316,6 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
             gradeMean = _.mean(gradeScores);
             gradeStandardDeviation = StatisticalLib.standardDeviation(gradeScores);
             zScore = _.round(StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation), 2);
-            if(!_.isNumber(zScore) || _.isNaN(zScore)) {
-                // debugger;
-            }
         } else {
             var currentClassPaperStudents = classStudentsPaperMap[headerObj.id];
             if(!currentClassPaperStudents) return;
@@ -319,9 +324,6 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
             gradeMean = _.mean(gradeScores);
             gradeStandardDeviation = StatisticalLib.standardDeviation(gradeScores);
             zScore = _.round(StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation), 2);
-            if(!_.isNumber(zScore) || _.isNaN(zScore)) {
-                // debugger;
-            }
         }
         if(_.isNumber(zScore) && !_.isNaN(zScore)) result.push({pid: headerObj.id, subject: headerObj.subject, zScore: zScore});
     });
