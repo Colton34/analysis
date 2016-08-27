@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-26 17:01:53
+* @Last Modified time: 2016-08-27 18:26:27
 */
 
 'use strict';
@@ -74,7 +74,7 @@ exports.home = function(req, res, next) {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
         var schoolReportResult = (ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
-        var classReportResult = (ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;
+        var classReportResult = (ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
         // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
         res.status(200).json({
             examInfoGuide: examInfoGuideResult,
@@ -1241,7 +1241,15 @@ function formatExamInfo(exam) {
     var examInfo = _.pick(exam, ['name', 'realStudentsCount', 'lostStudentsCount', 'realClasses', 'lostClasses', 'fullMark']);
     examInfo.gradeName = exam.grade.name;
     examInfo.startTime = moment(exam['event_time']).valueOf();
-    examInfo.subjects = _.map(exam['[papers]'], (paper) => paper.subject);
+    examInfo.subjects = _.map(exam['[papers]'], (paper) => {
+        if((paper.subject == '语文' || paper.subject == '数学')) {
+            if(_.includes(paper.name, '理科')) return paper.subject + '(理科)';
+            if(_.includes(paper.name, '文科')) return paper.subject + '(文科)';
+            return paper.subject;
+        } else {
+            return paper.subject;
+        }
+    });
     return examInfo;
 }
 
@@ -1253,7 +1261,20 @@ function formatExamInfo(exam) {
 function generateExamPapersInfo(exam) {
     var examPapersInfo = {};
     _.each(exam['[papers]'], (paperItem) => {
-        var obj = _.pick(paperItem, ['id', 'paper', 'subject']);
+        var obj = _.pick(paperItem, ['id', 'paper']);
+
+        if((paperItem.subject == '语文' || paperItem.subject == '数学')) {
+            if(_.includes(paperItem.name, '理科')) {
+                obj.subject = paperItem.subject + '(理科)';
+            } else if(_.includes(paperItem.name, '文科')) {
+                obj.subject = paperItem.subject + '(文科)';
+            } else {
+                obj.subject = paperItem.subject;
+            }
+        } else {
+            obj.subject = paperItem.subject;
+        }
+
         obj.fullMark = paperItem.manfen;
         obj.realClasses = _.keys(paperItem.scores);
         var gradeClassNames = _.map(exam.grade['[classes]'], (classItem) => classItem.name);
@@ -1379,7 +1400,7 @@ function makeExamStudentsInfo(examStudentsInfo) {
  */
 function makeExamPapersInfo(examPapersInfo) {
     var examPapersInfoArr = _.map(examPapersInfo, (paperItem) => {
-        var paperObj = _.pick(paperItem, ['id', 'paper', 'subject', 'fullMark', 'realStudentsCount', 'lostStudentsCount']);
+        var paperObj = _.pick(paperItem, ['id', 'paper', 'subject', 'fullMark', 'realStudentsCount', 'lostStudentsCount']);//TODO Note:暂时没有对自定义分析的文理进行区分
         paperObj = _.assign(paperObj, { realClasses: paperItem['[realClasses]'], lostClasses: paperItem['[lostClasses]'], questions: paperItem['[questions]'] });
         var classCountsMap = {};
         _.each(paperItem['[class]'], (classCountItem) => {

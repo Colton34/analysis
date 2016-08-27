@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-27 09:53:34
+* @Last Modified time: 2016-08-27 17:48:50
 */
 
 
@@ -233,7 +233,7 @@ export function initReportDS(params) {
         });
         var headers = [], restPapers = [];
         _.each(examPapersInfo, (paper, pid) => {
-            var index = _.findIndex(subjectWeight, (s) => (s == paper.subject));
+            var index = _.findIndex(subjectWeight, (s) => ((s == paper.subject) || (_.includes(paper.subject, s))));
             if (index >= 0) {
                 headers.push({
                     index: index,

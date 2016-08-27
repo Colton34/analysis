@@ -35,7 +35,7 @@ class SingleClassReport extends React.Component {
         var isCustomAnalysis = (reportDS.examInfo.toJS().from == '40');
         return (
             <div>
-                <Header examInfo={reportDS.examInfo} currentClass={currentClass}/>
+                <Header examInfo={reportDS.examInfo} classHeaders={classHeaders} currentClass={currentClass}/>
                 <TotalScoreTrend reportDS={reportDS} classStudents={classStudents} />
                 <TotalScoreLevelGuide reportDS={reportDS} classStudents={classStudents}/>
                 <TotalScoreLevelDistribution reportDS={reportDS} currentClass={currentClass} />
@@ -63,7 +63,7 @@ function getClassStudentsPaperMap(allStudentsPaperMap, currentClass) {
     var result = {};
     _.each(allStudentsPaperMap, (students, pid) => {
         var classStudents = _.filter(students, (studentObj) => studentObj['class_name'] == currentClass);
-        if(classStudents || classStudents.length > 0) result[pid] = classStudents;
+        if(classStudents && classStudents.length > 0) result[pid] = classStudents;
     });
     return result;
 }

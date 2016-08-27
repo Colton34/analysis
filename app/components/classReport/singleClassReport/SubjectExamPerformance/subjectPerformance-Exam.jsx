@@ -39,7 +39,7 @@ function getTableDS(examPapersInfo, examClassesInfo, classStudents, classHeaders
         _.each(columnIndicatorFunMap, (fun, key) => {
             value = fun({paperScores: paperScores, examClassesInfo: examClassesInfo, currentClass: currentClass, examPapersInfo: examPapersInfo, headerObj: headerObj});
             //obj[key] = (key == '缺考人数') ? {value: value, overlayData: {title: '学生名单', content: getLostStudentNames(examClassesInfo, classStudentsPaperMap, headerObj, currentClass, classStudents)}} : value;
-            obj[key] = value;
+            obj[key] = (key == '学科' || (_.isNumber(value) && !_.isNaN(value))) ? value : '无数据';
         });
         return obj;
     });
