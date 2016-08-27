@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-26 11:24:10
+* @Last Modified time: 2016-08-27 09:53:34
 */
 
 
@@ -49,11 +49,8 @@ export function initHomeData(params) {
 }
 
 export function saveBaseline(params) {
-console.log('client save baseline');
-
     var url = examPath + '/levels';
-    debugger;
-    // var url = (params.grade) ? examPath + '/levels' : examPath + '/custom/levels';
+
     return params.request.put(url, {examId: params.examId, baseline: params.baseline});
 }
 
@@ -219,7 +216,6 @@ subjectLevels:
     state中是个Map: { <levelKey> : <values> }
  */
 export function initReportDS(params) {
-    // debugger;
     var url = (params.grade) ? examPath + '/school/analysis?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/school/analysis?examid=' + params.examid;
 
     var examInfo, examStudentsInfo, examPapersInfo, examClassesInfo;
@@ -229,7 +225,6 @@ export function initReportDS(params) {
 
     return params.request.get(url).then(function(res) {
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, examBaseline} = res.data;
-        // debugger;
         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
         //TODO:打开；对paperStudents进行排序，这样到下面不用分别都再次排序了。
@@ -256,13 +251,10 @@ export function initReportDS(params) {
             id: 'totalScore'
         });
         headers = _.concat(headers, restPapers);
-        // debugger;
         var levels = (examBaseline && examBaseline['[levels]']) ? _.keyBy(examBaseline['[levels]'], 'key') : makeDefaultLevles(examInfo, examStudentsInfo);
-        // debugger;
         var levelBuffers = (examBaseline && examBaseline['[levelBuffers]']) ? _.map(examBaseline['[levelBuffers]'], (obj) => obj.score) : _.map(levels, (value, key) => 5);
 //设计：虽然把subjectLevels挂到state树上--其实是借用reportDS来存储，在校级报告里不直接用，而是在其他报告中直接用，校级报告中等于多算一遍。这个设计可能需要重构。
         var subjectLevels = (examBaseline && examBaseline['[subjectLevels]']) ? getSubjectLevelsFromBaseLine(examBaseline['[subjectLevels]']) : makeDefaultSubjectLevels(levels, examStudentsInfo, examPapersInfo, examInfo.fullMark);
-        // debugger;
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
@@ -387,11 +379,9 @@ export function initExamCache(params) {
 
 export function getMoreExamsInfo(params) {
     var ids = JSON.stringify(params.examids);
-    debugger;
     var url = examPath + '/get/more?examids=' + ids +'&grade=' + params.grade + '&currentClass=' + params.currentClass;
-debugger;
+
     return params.request.get(url).then(function(res) {
-        debugger;
         return Promise.resolve(res.data);
     });
 }

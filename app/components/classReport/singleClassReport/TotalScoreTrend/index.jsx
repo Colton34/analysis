@@ -72,7 +72,7 @@ function getYAxonsDS(segmentCounts, xAxons) {
 }
 
 function getSummaryInfo(classStudents) {
-    var skewness = StatisticalLib.sampleSkewness(_.map(classStudents, (obj) => obj.score)).toFixed(2);
+    var skewness = _.round(StatisticalLib.sampleSkewness(_.map(classStudents, (obj) => obj.score)), 2);
     if(skewness < -0.3) {
         return '以班级总分平均分来衡量，这次考试本班高于平均分的学生人数较多，相应高分段的学生人数密度来的较大，而低分段学生的成绩拉扯班级平均分较为显著，请班主任多关注底端的学生。鼓励他们提高总分水平，极有利于提高本班总平均分水平。';
     } else if(skewness < -0.05) {

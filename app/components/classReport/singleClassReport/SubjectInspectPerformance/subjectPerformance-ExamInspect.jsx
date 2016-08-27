@@ -186,7 +186,7 @@ function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStud
     return _.map(questions, (questionObj, index) => {
         var questionScores = _.map(paperStudents, (studentObj) => allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index]);
         var paperScores = _.map(paperStudents, (studentObj) => studentObj.score);
-        return StatisticalLib.sampleCorrelation(questionScores, paperScores).toFixed(2);
+        return _.round(StatisticalLib.sampleCorrelation(questionScores, paperScores), 2);
     });
 }
 

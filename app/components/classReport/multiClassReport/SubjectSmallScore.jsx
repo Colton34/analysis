@@ -6,28 +6,6 @@ import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
 
-/**----------------------------mock data ---------------------------- */
-// var tableHeaders = [[{id: 'tihao', name: '题目'}, {id: 'avg', name: '年级平均得分率'}]];
-// var classList = [{value:'初一1班'}, {value:'初一2班'}, {value:'初一3班'}, {value:'初一4班'}, {value:'初一5班'}];
-// _.forEach(classList, classObj => {
-//     var obj = {};
-//     obj.id = classObj.value;
-//     obj.name = classObj.value;
-//     tableHeaders[0].push(obj);
-// })
-// var tableData = [];
-// var tihaoList = ['T1', 'T2', 'T3', 'T4', 'T5'];
-// _.forEach(tihaoList, tihao => {
-//     var obj = {};
-//     obj.tihao = tihao;
-//     _.forEach(tableHeaders[0].slice(1), header => {
-//         obj[header.id] = parseInt(Math.random() * 20);
-//     })
-//     tableData.push(obj);
-// })
-
-/**----------------------------mock data end---------------------------- */
-
 class SubjectSmallScore extends React.Component {
     constructor(props) {
       super(props);
@@ -142,52 +120,3 @@ function getFormatedSubjects(headers) {
         return {value: headerObj.subject, totalScore: headerObj.fullMark, fullMark: headerObj.fullMark, id: headerObj.id} //TODO:这个命名有问题，需要改！
     })
 }
-
-
-
-
-
-// function getQuestionScoreRate(currentPaper) {
-// //横向扫描得到每一个题目的维度
-// //应该是currentPaper，currentSubject是个paper的subject字符串名字
-// // [questions] [students] matrix answers
-//     var matrix = [];
-//     var tableHeader = getTableHeader();
-//     matrix.push(tableHeader);
-//     _.each(allQuestions, (questionObj, index) => {
-//         var tempRow = [];
-//         var gradeQuestionScoreRate = getGradeQuestionScoreRate(allStudents, questionObj, index);
-//         tempRow.push(gradeQuestionScoreRate);
-//         var allClassesQuestionScoreRate = _.map(studentsGroupByClass, (classStudents, className) => getClassQuestionScoreRate(classStudents, questionObj, index));
-//         tempRow = _.concat(tempRow, allClassesQuestionScoreRate);
-//         tempRow.unshift(questionObj.name);
-//         matrix.push(tempRow);
-//     });
-//     return matrix;
-// }
-
-// function getQuestionScoreRate(questions, pid, students, allStudentsPaperQuestionInfo) {
-// //计算本班级的此道题目的得分率：
-//     //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分
-//     return _.map(questions, (questionObj, index) => {
-//         //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
-//         return _.round(_.divide(_.mean(_.map(students, (studentObj) => {
-//             // debugger;
-//             return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
-//         })), questionObj.score), 2);
-//     });
-// }
-
-
-
-// function getTableHeader() {
-
-// }
-
-// function getGradeQuestionScoreRate(allStudents, questionObj, index) {
-
-// }
-
-// function getClassQuestionScoreRate(classStudents, questionObj, index) {
-
-// }

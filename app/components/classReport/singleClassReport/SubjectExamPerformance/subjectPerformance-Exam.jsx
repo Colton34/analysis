@@ -88,10 +88,10 @@ function getMeanScore({paperScores}) {
     return _.round(_.mean(paperScores), 2);//平均分
 }
 function getStandardDeviation({paperScores}) {
-    return StatisticalLib.standardDeviation(paperScores).toFixed(2);//标准差
+    return _.round(StatisticalLib.standardDeviation(paperScores), 2);//标准差
 }
 function getDiscriminationFactor({paperScores}) {
-    var sdevia = StatisticalLib.standardDeviation(paperScores).toFixed(2);
+    var sdevia = _.round(StatisticalLib.standardDeviation(paperScores), 2);
     var mean = _.mean(paperScores);
     return _.round(_.divide(sdevia, mean), 2);//差异系数: 标准差/平均分
 }

@@ -30,6 +30,8 @@ let localStyle = {
 /**
  * props:
  * list: 下拉菜单显示项目
+ * theTitle: 当是多选的时候显示的默认title name
+ * initSelected: 初始化的默认选项
  * onClickDropdownList: 点击菜单项目时的回调
  * isMultiChoice: 是否多选；
  * multiChoiceNum: 可选，多选的数量,
@@ -44,17 +46,24 @@ class DropdownList extends React.Component {
     constructor(props) {
         super(props);
         this.multiChoiceNum = this.props.multiChoiceNum ? this.props.multiChoiceNum : this.props.list.length;
-        var theDropCount = (this.props.list.length >= 2) ? 2 : 1;
+        var theDropCount = (this.props.initSelected) ? this.props.initSelected.length : ((this.props.list.length >= 2) ? 2 : 1);
         if (this.props.isMultiChoice) {
-            _.each(_.range(theDropCount), index => { //默认选择前两个
-                this.props.list[index].selected = true;
-            })
+            if(this.props.initSelected) {
+                var targetKeys = _.map(this.props.initSelected, (obj) => obj.key);
+                _.each(this.props.list, (obj) => {
+                    if(_.includes(targetKeys, obj.key)) obj.selected = true;
+                });
+            } else {
+                _.each(_.range(theDropCount), index => { //默认选择前两个
+                    this.props.list[index].selected = true;
+                })
+            }
         }
         this.state = {
             active: false,
-            current: this.props.isMultiChoice ? {value:'选择班级'} : this.props.list? this.props.list[0] : {value:'无数据'},
+            current: this.props.isMultiChoice ? (this.props.theTitle ? {value: this.props.theTitle} : {value:'选择班级'}) : this.props.list? this.props.list[0] : {value:'无数据'},
             coveredItems: this.props.isMultiChoice || this.props.coverAll? this.props.list :this.props.list.slice(1),
-            selectedItems: this.props.list.slice(0, theDropCount)
+            selectedItems: (this.props.initSelected) ? (_.filter(this.props.list, (obj) => obj.selected)) : this.props.list.slice(0, theDropCount)
         }
     }
     componentWillReceiveProps(nextProps) {

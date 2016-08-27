@@ -85,7 +85,6 @@ export default function StandardScoreContrast({currentClassExamsZScore, categori
 }
 
 function getSeriesData(currentClassExamsZScore, categories) {
-    // debugger;
     var data, target, index = 0;
     return _.map(currentClassExamsZScore, (zObj, examid) => {
         data = _.map(categories, (obj) => {

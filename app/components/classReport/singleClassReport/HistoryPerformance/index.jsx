@@ -19,44 +19,22 @@ import {
 class HistoryContent extends React.Component {
     constructor(props) {
         super(props);
-        var initExams = _.map(this.props.currentClassExamsInfoCache, (obj) => {
-            return {
-                key: obj.examid,
-                value: obj.examInfo.name
-            }
-        });
         this.state = {
-            currentExams: initExams
+            currentExams: this.props.currentExams
         }
     }
 
-    componentWillReceiveProps(nextProps) {
-        var initExams = _.map(nextProps.currentClassExamsInfoCache, (obj) => {
-            return {
-                key: obj.examid,
-                value: obj.examInfo.name
-            }
-        });
-        this.setState({
-            currentExams: initExams
-        });
-    }
-
     onChangeExams(exams) {
-        //TODO: Just For Test
-        // debugger;
         if(isCurrentExamsNoChange(exams, this.state.currentExams)) return; //根本没有改变currentExams
-        // debugger;
         this.setState({
             currentExams: exams
         });
         if(isCurrentExamsInCache(exams, this.props.currentClassExamsInfoCache)) return; //虽然真正改变了currentExams但是命中缓存了
-        // debugger;
-        this.props.getMoreExamsInfo(getMoreExamIds(exams, this.props.currentClassExamsInfoCache)); //没有命中缓存，需要getMoreExamsInfo
+        this.props.getMoreExamsInfo(getMoreExamIds(exams, this.props.currentClassExamsInfoCache), exams); //没有命中缓存，需要getMoreExamsInfo
     }
 
     render() {
-        if(!isCurrentExamsInCache(this.state.currentExams, this.props.currentClassExamsInfoCache)) return (<div></div>);
+        if(!this.state.currentExams || !isCurrentExamsInCache(this.state.currentExams, this.props.currentClassExamsInfoCache)) return (<div></div>);
         //Note: 暂时不叫做currentClassExamsListCache--因为没有cache的操作，等如果后期需要对exams "GetMore"的时候再使用”currentClassExamsListCache“这个名字
         var currentExamsInfo = getCurrentExamsInfoFromCache(this.state.currentExams, this.props.currentClassExamsInfoCache);
         var currentExamsList = _.map(this.props.currentClassExamsList, (obj) => {
@@ -68,7 +46,7 @@ class HistoryContent extends React.Component {
 
         var currentClassExamsZScore = getCurrentClassExamsZScore(currentExamsInfo, this.props.currentClass);
         var categories = getConfigCategories(currentClassExamsZScore);
-
+        var currentExams = this.state.currentExams;
         // var currentValidExamsZScore = getCurrentValidExamsZScore(currentExamsInfo, this.props.currentClass);//并且要求自己--currentClass--在这几场考试所考的科目是一样的！！！那么以什么标准为准呢？只能靠筛选--全部科目（不要取交集！！！不科学）
         // debugger;
 
@@ -80,7 +58,7 @@ class HistoryContent extends React.Component {
                     <span className={commonClass['title']}>历史表现比较</span>
                     <span className={commonClass['title-desc']}>通过相同性质的考试比较，可以发现各学科标准分与排名率的变化</span>
                 </div>
-                <DropdownList list={currentExamsList} isMultiChoice={true} handleSelectedItems={this.onChangeExams.bind(this)} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
+                <DropdownList list={currentExamsList} isMultiChoice={true} theTitle='选择考试' initSelected={currentExams} handleSelectedItems={this.onChangeExams.bind(this)} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
                 <StandardScoreContrast currentClassExamsZScore={currentClassExamsZScore} categories={categories} />
                 {/*<RankRateContrast currentExamsZScore={currentExamsZScore} categories={categories} currentClass={this.props.currentClass} />*/}
             </div>
@@ -89,16 +67,18 @@ class HistoryContent extends React.Component {
 }
 
 function getMoreExamIds(newExams, examsInfoCache) {
-    // return ['21308'];// Just For Test
-    //TODO: 放开
     var newExamIds = _.map(newExams, (obj) => obj.key);
     var cachedIds = _.map(examsInfoCache, (obj) => obj.examid);
-    return _.diff(newExamIds, cachedIds);
+    return _.difference(newExamIds, cachedIds);
 }
 
+/*
+TODO Note: 这里实现的并不好！！！主要问题：1.场景特殊  2.通过promise获取异步数据会重新创建组件（调用constructor, component@illMount等），但是从组件的角度看应该走componentWillReceiveProps--从而导致对生命周期的函数进行了hack。需要重新设计实现！
+ */
 class HistoryPerformance extends React.Component {
     constructor(props) {
         super(props);
+        this.isNewClass = true;
     }
 
     componentDidMount() {
@@ -112,16 +92,20 @@ class HistoryPerformance extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         //Note: //!nextProps.isLoading--因为对isLoading的修改也会触发componentWillReceiveProps
-        if(this.props.currentClass != nextProps.currentClass && !this.props.examsInfoCache.get(nextProps.currentClass) && !nextProps.isLoading) {
+        if(this.props.currentClass != nextProps.currentClass && !nextProps.examsInfoCache.get(nextProps.currentClass) && !nextProps.isLoading) {
+            this.isNewClass = true;
             var params = {request: window.request};
             params.schoolId = nextProps.user.schoolId;
             params.grade = nextProps.grade;
             params.currentClass = nextProps.currentClass;
             this.props.initExamCache(params);
+        } else if(this.currentExams && this.props.currentClass == nextProps.currentClass && !nextProps.isLoading) {
+            this.isNewClass = false;
         }
     }
 
-    getMoreExamsInfo(examids) {
+    getMoreExamsInfo(examids, currentExams) {
+        this.currentExams = currentExams;
         var params = {request: window.request};
         params.examids = examids;
         params.grade = this.props.grade;  //TODO: Just For Test '三年级';
@@ -130,10 +114,32 @@ class HistoryPerformance extends React.Component {
     }
 
     render() {
+        var isNewClass = this.isNewClass;
+        if(isNewClass && !this.props.isLoading) {
+            var currentClassExamsInfoCache = this.props.examsInfoCache.get(this.props.currentClass);
+            var currentClassExamsList = this.props.examsListCache.get(this.props.currentClass);
+            var initExams = _.map(_.filter(currentClassExamsInfoCache, (obj) => obj.isInit), (tobj) => {
+                return {
+                    key: tobj.examid,
+                    value: tobj.examInfo.name
+                }
+            });
+            if(initExams.length == 0) {
+                _.each(currentClassExamsInfoCache, (obj) => obj.isInit = true);
+                initExams = _.map(currentClassExamsInfoCache, (obj) => {
+                    return {
+                        key: obj.examid,
+                        value: obj.examInfo.name
+                    }
+                });
+            }
+            this.currentExams = initExams;
+        }
+        var currentExams = this.currentExams;
         return (
             <div>
                 {
-                    (this.props.isLoading) ? (<h1>isLoading</h1>) : (<HistoryContent currentClass={this.props.currentClass} currentClassExamsList={this.props.examsListCache.get(this.props.currentClass)} currentClassExamsInfoCache={this.props.examsInfoCache.get(this.props.currentClass)} getMoreExamsInfo={this.getMoreExamsInfo.bind(this)} />)
+                    (this.props.isLoading) ? (<h1>isLoading</h1>) : (<HistoryContent currentExams={currentExams} currentClass={this.props.currentClass} currentClassExamsList={this.props.examsListCache.get(this.props.currentClass)} currentClassExamsInfoCache={this.props.examsInfoCache.get(this.props.currentClass)} getMoreExamsInfo={this.getMoreExamsInfo.bind(this)} />)
                 }
             </div>
         );
@@ -235,18 +241,12 @@ function getCurrentValidExamsZScore(currentExamsInfo, currentClass) {
 function getCurrentClassExamsZScore(currentExamsInfo, currentClass) {
     var result = {};
     _.each(currentExamsInfo, (obj) => {
-        // debugger;
         var studentsGroupByClass = _.groupBy(obj.examStudentsInfo, 'class');
-        // debugger;
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(obj.examStudentsInfo, (student) => student.papers)), 'paperid');
-        // debugger;
         var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, currentClass);
-        // debugger;
         var headers = getHeaders(obj.examPapersInfo);
-        // debugger;
         var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
         var examZScore = getExamZScore(obj.examStudentsInfo, studentsGroupByClass[currentClass], allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
-        // debugger;
         result[obj.examid] = {
             examid: obj.examid,
             name: obj.examInfo.name,
@@ -307,7 +307,6 @@ function getClassHeadersWithTotalScore(headers, classStudentsPaperMap) {
 
 function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore) {
     //观察一下classHeadersWithTotoalScore
-    // debugger;
     var gradeScores, classMean, gradeMean, gradeStandardDeviation, zScore;
     var result = [];
     _.each(classHeadersWithTotalScore, (headerObj, index) => {
@@ -315,21 +314,18 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
             gradeScores = _.map(examStudentsInfo, (studentObj) => studentObj.score);
             classMean = _.mean(_.map(classStudents, (studentObj) => studentObj.score));
             gradeMean = _.mean(gradeScores);
-            // debugger;
             gradeStandardDeviation = StatisticalLib.standardDeviation(gradeScores);
-            zScore = StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation).toFixed(2);
+            zScore = _.round(StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation), 2);
         } else {
             var currentClassPaperStudents = classStudentsPaperMap[headerObj.id];
             if(!currentClassPaperStudents) return;
             gradeScores = _.map(allStudentsPaperMap[headerObj.id], (studentObj) => studentObj.score);
             classMean = _.mean(_.map(classStudentsPaperMap[headerObj.id], (studentObj) => studentObj.score));
             gradeMean = _.mean(gradeScores);
-            // debugger;
             gradeStandardDeviation = StatisticalLib.standardDeviation(gradeScores);
-            // debugger;
-            zScore = StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation).toFixed(2);
+            zScore = _.round(StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation), 2);
         }
-        result.push({pid: headerObj.id, subject: headerObj.subject, zScore: zScore});
+        if(_.isNumber(zScore) && !_.isNaN(zScore)) result.push({pid: headerObj.id, subject: headerObj.subject, zScore: zScore});
     });
     return result;
 }
@@ -337,7 +333,6 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
 function getConfigCategories(currentClassExamsZScore) {
     //取全集，按照sweight的顺序 pid subject zScore
     var temp = _.unionBy(..._.map(currentClassExamsZScore, (zObj) => zObj.examZScore), (obj) => obj.subject);
-    // debugger;
     var results = [], theRest = [];
     _.each(temp, (obj) => {
         if(obj.pid == 'totalScore') return;

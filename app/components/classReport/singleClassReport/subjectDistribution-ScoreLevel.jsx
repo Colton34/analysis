@@ -12,7 +12,6 @@ class SubjectLevelDisribution extends React.Component {
     constructor(props) {
         super(props);
         var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = this.props;
-        debugger;
         var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
         this.levels = levels;
         this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
@@ -24,7 +23,6 @@ class SubjectLevelDisribution extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = nextProps;
-        debugger;
         var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
         this.levels = levels;
         this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
@@ -90,7 +88,6 @@ function getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, cur
     var result = {};
     _.each(levels, (levObj, levelKey) => {
         var subjectLevelMeanInfo = subjectLevels[levelKey];   //_.find(subjectLevels, (obj) => obj.levelKey == levelKey);
-        // debugger;
         if(!subjectLevelMeanInfo) return;
 
         var currentSubjectLevelInfo = makeCurrentSubjectLevelInfo(subjectLevelMeanInfo, levObj, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);

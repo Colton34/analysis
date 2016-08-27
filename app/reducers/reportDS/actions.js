@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-02 16:38:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-26 11:25:12
+* @Last Modified time: 2016-08-27 15:11:43
 */
 
 'use strict';
@@ -17,7 +17,6 @@ import {
 } from '../../lib/constants';
 
 export function initReportDSAction(params) {
-    // debugger;
     return {
         type: INIT_REPORT_DS,
         promise: initReportDS(params)
@@ -39,7 +38,6 @@ export function updateLevelBuffersAction(levelBuffers) {
 }
 
 export function saveBaselineAction(params) {
-    // debugger;
     return {
         type: SAVE_BASELINE,
         promise: saveBaseline(params)
