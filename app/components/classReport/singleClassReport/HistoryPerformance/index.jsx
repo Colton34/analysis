@@ -37,6 +37,7 @@ class HistoryContent extends React.Component {
         if(!this.state.currentExams || !isCurrentExamsInCache(this.state.currentExams, this.props.currentClassExamsInfoCache)) return (<div></div>);
         //Note: 暂时不叫做currentClassExamsListCache--因为没有cache的操作，等如果后期需要对exams "GetMore"的时候再使用”currentClassExamsListCache“这个名字
         var currentExamsInfo = getCurrentExamsInfoFromCache(this.state.currentExams, this.props.currentClassExamsInfoCache);
+        debugger;
         var currentExamsList = _.map(this.props.currentClassExamsList, (obj) => {
             return {
                 key: obj.id,
@@ -72,7 +73,9 @@ function getMoreExamIds(newExams, examsInfoCache) {
     return _.difference(newExamIds, cachedIds);
 }
 
-
+/*
+TODO Note: 这里实现的并不好！！！主要问题：1.场景特殊  2.通过promise获取异步数据会重新创建组件（调用constructor, component@illMount等），但是从组件的角度看应该走componentWillReceiveProps--从而导致对生命周期的函数进行了hack。需要重新设计实现！
+ */
 class HistoryPerformance extends React.Component {
     constructor(props) {
         super(props);
@@ -233,7 +236,9 @@ function getCurrentClassExamsZScore(currentExamsInfo, currentClass) {
         var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, currentClass);
         var headers = getHeaders(obj.examPapersInfo);
         var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
+        debugger;
         var examZScore = getExamZScore(obj.examStudentsInfo, studentsGroupByClass[currentClass], allStudentsPaperMap, classStudentsPaperMap, classHeadersWithTotalScore);
+        debugger;
         result[obj.examid] = {
             examid: obj.examid,
             name: obj.examInfo.name,
@@ -302,7 +307,10 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
             classMean = _.mean(_.map(classStudents, (studentObj) => studentObj.score));
             gradeMean = _.mean(gradeScores);
             gradeStandardDeviation = StatisticalLib.standardDeviation(gradeScores);
-            zScore = StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation).toFixed(2);
+            zScore = _.round(StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation), 2);
+            if(!_.isNumber(zScore) || _.isNaN(zScore)) {
+                // debugger;
+            }
         } else {
             var currentClassPaperStudents = classStudentsPaperMap[headerObj.id];
             if(!currentClassPaperStudents) return;
@@ -310,9 +318,12 @@ function getExamZScore(examStudentsInfo, classStudents, allStudentsPaperMap, cla
             classMean = _.mean(_.map(classStudentsPaperMap[headerObj.id], (studentObj) => studentObj.score));
             gradeMean = _.mean(gradeScores);
             gradeStandardDeviation = StatisticalLib.standardDeviation(gradeScores);
-            zScore = StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation).toFixed(2);
+            zScore = _.round(StatisticalLib.zScore(classMean, gradeMean, gradeStandardDeviation), 2);
+            if(!_.isNumber(zScore) || _.isNaN(zScore)) {
+                // debugger;
+            }
         }
-        result.push({pid: headerObj.id, subject: headerObj.subject, zScore: zScore});
+        if(_.isNumber(zScore) && !_.isNaN(zScore)) result.push({pid: headerObj.id, subject: headerObj.subject, zScore: zScore});
     });
     return result;
 }
