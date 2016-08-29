@@ -35,13 +35,16 @@ export default class ImportantStudentInfo extends React.Component  {
 
     }
     onDownloadScoreTable() {
-        var {currentClass} = this.props;
+        var {currentClass, reportDS} = this.props;
+        var {examInfo} = reportDS;
+
         if (!this.studentRankByClass[currentClass]) return;
         var headSelect = {};
         _.forEach(this.headSeq, head => {
             headSelect[head] = true;
         })
-        downloadTable(this.headSeq, headSelect, this.headerMapper, this.studentRankByClass[currentClass], '学生学科得分表');
+        var exportTableName = examInfo.name + '-' + examInfo.gradeName + currentClass + '班-' + '学生学科得分表'; 
+        downloadTable(this.headSeq, headSelect, this.headerMapper, this.studentRankByClass[currentClass], exportTableName);
     }
 
     render() {
