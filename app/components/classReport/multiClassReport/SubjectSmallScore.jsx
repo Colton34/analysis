@@ -24,7 +24,7 @@ class SubjectSmallScore extends React.Component {
             <div id='subjectSmallScore' className={commonClass['section']}>
                 <div style={{marginBottom: 30}}>
                     <span className={commonClass['title-bar']}></span>
-                    <span className={commonClass['title']}>学科小分得分率对比</span>
+                    <span className={commonClass['title']}>学科实体得分率对比</span>
                     <span className={commonClass['title-desc']}></span>
                 </div>
                 <TableView id='smallScoreTable' tableData={tableBodyData} tableHeaders={tableHeaders} TableComponent={EnhanceTable} options={{canDownload:true}}/>

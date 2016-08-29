@@ -118,7 +118,7 @@ class SubjectMeanRank extends React.Component {
             <div id='subjectMeanRank' className={commonClass['section']}>
                 <div style={{position: 'relative'}}>
                     <span className={commonClass['title-bar']}></span>
-                    <span className={commonClass['title']}>学科平均分排名</span>
+                    <span className={commonClass['title']}>总分平均分排名</span>
                     <span className={commonClass['title-desc']}></span>
                     <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} list={subjects} style={{position: 'absolute', right: 0, top: 0, zIndex: 1}}/>
                     <ReactHighcharts config={config} style={{ width: '100%', height: '400px', marginTop: 5}}></ReactHighcharts>
