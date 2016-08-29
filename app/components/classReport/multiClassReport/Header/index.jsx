@@ -15,7 +15,7 @@ var modules = [
         name: '班级成绩概况',
         id: 'classScoreGuide'
     }, {
-        name: '自定义成绩登记的人数比例对比',
+        name: '自定义成绩等级的人数比例对比',
         id: 'customScoreLevel'
     }, {
         name: '自定义分数段的人数分布',
