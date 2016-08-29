@@ -23,7 +23,7 @@ export default function Trend({reportDS, classStudents}) {
             <span className={commonClass['title-desc']}>学生总分分布，可反映本次考试班级学生的综合学业水平分布状况。</span>
 
             <InfoCards headerData={headerData}/>
-            <TrendChart chartDS={chartDS} examInfo={examInfo} />
+            <TrendChart chartDS={chartDS} examInfo={examInfo} classStudents={classStudents} />
             <div className={singleClassReportStyle['analysis-conclusion']}>
                 <div>分析诊断：</div>
                 <div>{skewnessInfo}</div>
