@@ -71,7 +71,7 @@ function getTableDS(examPapersInfo, classStudentsPaperMap, headers, currentClass
             rowData['count_' + index] = count;
         })
         result = _.map(result, (count) => {
-            var percentage = _.round(_.multiply(_.divide(count, paperObj.realStudentsCount), 100), 2);
+            var percentage = _.round(_.multiply(_.divide(count, classStudentsPaperMap[headerObj.id].length), 100), 2);
             return percentage;
         });
         _.forEach(result, (percentage, index) => {
