@@ -7,7 +7,8 @@ import {Link} from 'react-router';
 import {Map} from 'immutable';
 
 import CommonErrorView from '../common/ErrorView';
-import CommonLoadingView from '../common/LoadingView';
+// import CommonLoadingView from '../common/LoadingView';
+import Spinkit from '../common/Spinkit';
 import ReportNavHeader from '../common/report/NavHeader';
 import ReportTabNav from '../components/classReport/ReportTabNav';
 import MultiClassReport from '../components/classReport/multiClassReport';
@@ -81,7 +82,7 @@ class ClassReport extends React.Component {
         var user = Map.isMap(this.props.user) ? this.props.user.toJS() : this.props.user;
         return (
             <div>
-                {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <CommonLoadingView /> : (
+                {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <Spinkit /> : (
                     <ContentComponent reportDS={this.props.reportDS} user={user} examid={examid} grade={grade} gradeName={gradeName}/>
                 ))}
             </div>

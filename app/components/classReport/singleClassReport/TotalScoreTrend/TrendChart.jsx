@@ -4,7 +4,7 @@ import ReactHighcharts from 'react-highcharts';
 
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
-export default function TrendChart({chartDS, examInfo}) {
+export default function TrendChart({chartDS, examInfo,classStudents}) {
     var config = {
         colors: ['#00adfb'],
         title: {
@@ -44,7 +44,7 @@ export default function TrendChart({chartDS, examInfo}) {
             },
             formatter: function () {
                 return (this.point.low > 0 ? '(' : '[') + this.point.low + '-' + this.point.high + ']区间人数<br />' + this.point.y + '人,占'
-                    + Math.round(((this.point.y / examInfo.realStudentsCount) * 100)) + '%';
+                    + Math.round(((this.point.y / classStudents.length) * 100)) + '%';
             }
         },
         legend: {
