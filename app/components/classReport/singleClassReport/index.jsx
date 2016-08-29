@@ -35,7 +35,7 @@ class SingleClassReport extends React.Component {
         var isCustomAnalysis = (reportDS.examInfo.toJS().from == '40');
         return (
             <div>
-                <Header examInfo={reportDS.examInfo} classHeaders={classHeaders} currentClass={currentClass}/>
+                <Header examInfo={reportDS.examInfo} examClassesInfo={reportDS.examClassesInfo} classHeaders={classHeaders} currentClass={currentClass}/>
                 <TotalScoreTrend reportDS={reportDS} classStudents={classStudents} />
                 <TotalScoreLevelGuide reportDS={reportDS} classStudents={classStudents}/>
                 <TotalScoreLevelDistribution reportDS={reportDS} currentClass={currentClass} />
