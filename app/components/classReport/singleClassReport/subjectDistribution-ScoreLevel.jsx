@@ -162,6 +162,7 @@ function getTableDS(subjectLevelInfo, validOrderedSubjectMean, gradeName, curren
 
     var currentClassPercentageRow = getCurrentClassPercentageRow(currentClassCountRow, totalSchoolRow);
     currentClassPercentageRow.unshift('本班/全年级');
+    table.push(currentClassPercentageRow);
 
     table.unshift(titleHeader);
 

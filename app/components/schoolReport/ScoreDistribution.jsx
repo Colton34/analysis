@@ -39,7 +39,7 @@ const BasicInfo = ({examInfo, levels, examStudentsInfo, onShowDialog}) => {
         <div style={{position: 'relative', padding: 30, backgroundColor: colorsMap.B03, color: '#fff', marginBottom: 20}}>
             <p style={{marginRight: 20, fontSize: 18, marginBottom: 25}}>
                 <span style={{marginRight: 20}}>分档分数线 </span>
-                <span style={{fontSize: 12}}>分档分数线默认分为三档， 分别对应学生总数的10%，30%，60%，如需修改请点击右侧按钮</span>
+                <span style={{fontSize: 12}}>分档分数线默认分为三档， 分别对应学生总数的15%，25%，60%，如需修改请点击右侧按钮</span>
             </p>
             <p>本次考试满分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分，
             {
