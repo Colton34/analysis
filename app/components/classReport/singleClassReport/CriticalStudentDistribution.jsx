@@ -31,19 +31,22 @@ export default  function CriticalStudent({classStudents, reportDS}) {
                     return <EnhanceTable key={index} tableHeaders={renderData.tableHeaders} tableData={renderData.tableData} style={{marginTop: 20}}/>
                 })
             }
-          <div className={singleClassReportStyle['analysis-conclusion']}>
-                <div style={{lineHeight: '1.5'}}>分析诊断：</div>
-                {
-                    summaryInfo.map((info, index) => {
-                        return (
-                            <div key={index} style={{lineHeight: '1.5'}}>
-                                对于班级的{numberMap[index + 1]}档临界生群体，
-                                {info.better ? <span>表现好的学科是<span style={{color: colorsMap.B03, margin: '0 5px'}}>{info.better}</span>，表现不好的学科是<span style={{color: colorsMap.B03, margin: '0 5px'}}>{info.worse}</span>。</span> : info}
-                            </div>
-                        )
-                    })
-                }
-          </div>
+            {
+                _.some(summaryInfo, (item)=>{ return !!item})?(
+                     <div className={singleClassReportStyle['analysis-conclusion']}>
+                           <div style={{lineHeight: '1.5'}}>分析诊断：</div>
+                           {
+                               summaryInfo.map((info, index) => {
+                                   return (
+                                       <div key={index} style={{lineHeight: '1.5'}}>
+                                           {info.better ? <span>对于班级的{numberMap[index + 1]}档临界生群体，表现好的学科是<span style={{color: colorsMap.B03, margin: '0 5px'}}>{info.better}</span>，表现不好的学科是<span style={{color: colorsMap.B03, margin: '0 5px'}}>{info.worse}</span>。</span> : info}
+                                       </div>
+                                   )
+                               })
+                           }
+                     </div>): ''
+            }
+
         </div>
     )
 }
@@ -169,7 +172,7 @@ function getSummaryInfo(tableDS) {
         //如果有两个以上的科目则返回obj={better: , worse: }，否则只有一个科目则返回String:没有可比性
         var subjectNames = _.slice(obj.subjectNames, 1);
         if (subjectNames.length <= 1) return '只有一个学科没有可比性。';
-
+        if (obj.studentNames.length == 0) return '';
         var criticalMeans = _.slice(obj.criticalMeans, 1),
             levelScores = _.slice(obj.levelScores, 1);
 
@@ -252,5 +255,3 @@ function getColumnStyle(cellData, rowData, rowIndex, columnIndex, id, tableData)
 function getLevelTitleFormat(cellData) {
     return cellData.value + '人';
 }
-
-
