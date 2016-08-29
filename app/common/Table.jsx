@@ -84,7 +84,7 @@ const Table = ({tableData, tipConfig, colorCallback}) => {
                                 {
                                     _.map(tdList, (td,index) => {
                                         return (
-                                            <td key={'td' + index} className={styles['table-unit']} style={_.assign({}, {minWidth: 100, borderColor: colorsMap.C04}, colorCallback ? {color: colorCallback(td)} : {})}>
+                                            <td key={'td' + index} className={styles['table-unit']} style={_.assign({}, {minWidth: 100, borderColor: colorsMap.C04, whiteSpace:'nowrap'}, colorCallback ? {color: colorCallback(td)} : {})}>
                                                 {td}
                                             </td>
                                         )

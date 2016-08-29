@@ -33,7 +33,7 @@ class ReportTabNav extends React.Component {
         var {classesList} = this.props;
         return (
             <div className={commonClass['section']} style={{zIndex: 3, position: 'relative', width: '100%', height: 60, padding: 0, display: 'inline-block'}}>
-                <span style={_.assign({}, localStyle.item, this.state.ifShowMultiReport  ? {color: colorsMap.B03,borderBottom:'2px solid rgb(29, 174, 248)'}: {})} onClick={this.onClickReportNav.bind(this, 'multi')}>班级分析报告</span>
+                <span style={_.assign({}, localStyle.item, this.state.ifShowMultiReport  ? {color: colorsMap.B03,borderBottom:'2px solid rgb(29, 174, 248)'}: {})} onClick={this.onClickReportNav.bind(this, 'multi')}>班级对比分析</span>
                 <span style={_.assign({}, localStyle.item, !this.state.ifShowMultiReport ? {color: colorsMap.B03,borderBottom:'2px solid rgb(29, 174, 248)'}: {})}>
                     <DropdownList style={{position:'relative'}} list={classesList} surfaceBtnStyle={_.assign({ border: 'none'}, !this.state.ifShowMultiReport ? {color: colorsMap.B03} : {color: colorsMap.C12})}
                                   onClickDropdownList={this.onClickReportNav.bind(this)} coverAll

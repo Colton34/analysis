@@ -29,12 +29,10 @@ export default function reducer(state, action) {
     switch(action.type) {
         case INIT_EXAMCACHE_REQUEST:
         case GET_MORE_EXAMS_INFO_REQUEST:
-            debugger;
             return state.set('isLoading', true);
         case INIT_EXAMCACHE_SUCCESS:
             var newClassExamsList = state.examsListCache.set(action.res.currentClass, action.res.examsList);
             var newClassExamsInfoCache = state.examsInfoCache.set(action.res.currentClass, action.res.examsInfoCache);
-            debugger;
             return state.set('examsListCache', newClassExamsList).set('examsInfoCache', newClassExamsInfoCache).set('isLoading', false);
         case GET_MORE_EXAMS_INFO_SUCCESS:
             var temp = _.concat(state.examsInfoCache.get(action.res.currentClass), action.res.newExamsInfo);
