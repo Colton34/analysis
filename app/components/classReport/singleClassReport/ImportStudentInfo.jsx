@@ -119,8 +119,20 @@ function getStudentSubjectRankInfo(students, classStudentsPaperMap, classHeaders
             var classPaperStudents = classStudentsPaperMap[headerObj.id];
             if(!classPaperStudents) return;
             //这里要保证classPaperStudents是照这个科目的成绩有序的:从低到高
-            var targetIndex = _.findIndex(classPaperStudents, (s) => s.id == studentObj.id);
-            subjectScoreRanks.push(classPaperStudents.length - targetIndex);
+            
+            //考虑同分时排名应相同的情况
+            var targetIndex = 1;
+            var studentLen = classPaperStudents.length;
+            var curScore = classPaperStudents[studentLen -1].score;
+            for(let i = studentLen -1; i >= 0; i--) {
+                if (classPaperStudents[i].id === studentObj.id)
+                    break;
+                if (curScore !== classPaperStudents[i].score) {
+                    curScore = classPaperStudents[i].score;
+                    targetIndex = studentLen - i;
+                }
+            }
+            subjectScoreRanks.push(targetIndex);
         });
         rowData = _.concat(rowData, subjectScoreRanks);
         rowData.unshift(studentObj.name);
