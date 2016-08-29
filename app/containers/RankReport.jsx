@@ -768,7 +768,7 @@ class RankReport extends React.Component {
     componentDidMount() {
         if (this.props.haveInit) return;
 
-        var params = initParams(this.props.params, this.props.location, { 'request': window.request });
+        var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         this.props.initRankReport(params);
 
     }
