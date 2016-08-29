@@ -74,11 +74,14 @@ class SubjectInspectPerformance extends React.Component {
         if (!this.downloadData)
             return;
         var {headerKeys, tableHeaders, tableData} = this.downloadData;
+        var {reportDS, currentClass} = this.props;
+        var examInfo = reportDS.examInfo.toJS();
+
         var url = '/api/v1/file/export/rank/report';
         var inputKeys = "<input type='hidden' name='" + 'keys' + "' value='" + JSON.stringify(headerKeys) + "' />";
         var inputNames = "<input type='hidden' name='" + 'names' + "' value='" + JSON.stringify(tableHeaders) + "' />";
         var inputMatrix = "<input type='hidden' name='" + 'matrix' + "' value='" + JSON.stringify(tableData) + "' />";
-        var tableName = "<input type='hidden' name='" + 'exportTableName' + "' value='题目得分表' />";
+        var tableName = "<input type='hidden' name='" + 'exportTableName' + "' value='" + examInfo.name + '-' + examInfo.gradeName + currentClass + '班-' + this.state.currentSubject.value +  "-题目得分表' />";
         $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + tableName + '</form>')
             .appendTo('body').submit().remove();
     }
