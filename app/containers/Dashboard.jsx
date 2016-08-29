@@ -33,31 +33,6 @@ var {Header, Title, Body, Footer} = Modal;
 var examPath = "/exam";
 var customBaseUrl = examPath + '/custom/analysis';
 
-// 　Bgcolor:″＃F1FAFA″——做正文的背景色好，淡雅
-// 　　Bgcolor:″＃E8FFE8″——做标题的背景色较好，与上面的颜色搭配很协调
-// 　　Bgcolor:″＃E8E8FF″——做正文的背景色较好，文字颜色配黑色
-// 　　Bgcolor:″＃8080C0″——上配黄色白色文字较好
-// 　　Bgcolor:″＃E8D098″——上配浅蓝色或蓝色文字较好
-// 　　Bgcolor:″＃EFEFDA″——上配浅蓝色或红色文字较好
-// 　　Bgcolor:″＃F2F1D7″——配黑色文字素雅，如果是红色则显得醒目
-// 　　
-// 　　
-// 　　Bgcolor:″＃336699″——配白色文字好看些  -- 蓝色
-// 　　
-// 　　
-// 　　Bgcolor:″＃6699CC″——配白色文字好看些，可以做标题
-// 　　Bgcolor:″＃66CCCC″——配白色文字好看些，可以做标题
-// 　　Bgcolor:″＃B45B3E″——配白色文字好看些，可以做标题
-// 　　Bgcolor:″＃479AC7″——配白色文字好看些，可以做标题
-// 　　Bgcolor:″＃00B271″——配白色文字好看些，可以做标题
-// 　　Bgcolor:″＃FBFBEA″——配黑色文字比较好看，一般作为正文
-// 　　Bgcolor:″＃D5F3F4″——配黑色文字比较好看，一般作为正文
-// 　　Bgcolor:″＃D7FFF0″——配黑色文字比较好看，一般作为正文
-// 　　Bgcolor:″＃F0DAD2″——配黑色文字比较好看，一般作为正文
-// 　　Bgcolor:″＃DDF3FF″——配黑色文字比较好看，一般作为正文
-
-//   #f5f5dc   #ffe4c4
-
 @Radium
 class Dashboard extends React.Component {
     static need = [
@@ -130,18 +105,8 @@ class Dashboard extends React.Component {
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
                 {
-                    _.size(examInfoGuide) === 0 && _.size(scoreRank) === 0 && _.size(schoolReport) === 0 ? (
-                        <div>
-                            <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: '#333' }}>
-                                <Link to={{ pathname: '/' }} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
-                                <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}><a style={{ color: '#b4b4b4' }} href='/'>{'首页'}</a></span>
-                            </div>
-                            <div style={{ backgroundColor: '#fff', width: 1200, height: 650, display: 'table-cell', textAlign: 'center', verticalAlign: 'middle' }}>
-                                <div className={commonStyles['blank-list']} style={{ margin: '0 auto', marginBottom: 30 }}></div>
-                                <p style={{ color: colorsMap.C10, fontSize: 18, marginBottom: 30 }}>好桑心，您无法查看分析详情</p>
-                                <p style={{ color: colorsMap.C09 }}>您的角色、年级、班级、学科等基础信息与系统不匹配，请尽快联系管理员老师确认。</p>
-                            </div>
-                        </div>
+                    this.props.isLoading ? (
+                        <Spinkit />
                     ) : (
                             <div>
                                 <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px -15px', fontSize: 16, color: '#333' }}>
@@ -178,7 +143,8 @@ export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
 
 function mapStateToProps(state) {
     return {
-        dashboard: state.dashboard
+        dashboard: state.dashboard,
+        isLoading: state.global.isLoading
     }
 }
 
@@ -225,6 +191,24 @@ var styles = {
         ':hover': {textDecoration: 'none', color: '#de5d44'}
     },
     btn: {lineHeight: '34px', width: 54, height: 34,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#ee6b52',margin: '0 30px', color: '#fff', borderRadius: '4px'},
+}
+
+
+//Note:暂时Dashboard不会出现没有模块的时候。BlankPageView需要重构。
+function BlankPageView() {
+    return (
+        <div>
+            <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: '#333' }}>
+                <Link to={{ pathname: '/' }} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
+                <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}><a style={{ color: '#b4b4b4' }} href='/'>{'首页'}</a></span>
+            </div>
+            <div style={{ backgroundColor: '#fff', width: 1200, height: 650, display: 'table-cell', textAlign: 'center', verticalAlign: 'middle' }}>
+                <div className={commonStyles['blank-list']} style={{ margin: '0 auto', marginBottom: 30 }}></div>
+                <p style={{ color: colorsMap.C10, fontSize: 18, marginBottom: 30 }}>好桑心，您无法查看分析详情</p>
+                <p style={{ color: colorsMap.C09 }}>您的角色、年级、班级、学科等基础信息与系统不匹配，请尽快联系管理员老师确认。</p>
+            </div>
+        </div>
+    )
 }
 
 
