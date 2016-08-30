@@ -147,6 +147,7 @@ function getSeriesData(tableDS) {
         var rowData = tableDS[index+1];
         var className = rowData[0];
         var data = _.slice(rowData, 1, rowData.length);
+        _.reverse(data);
         return {
             name: className,
             data: data
