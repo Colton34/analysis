@@ -33,22 +33,11 @@ class App extends React.Component {
     static need = [
         initUser
     ];
-    getViewport() {
-        if (document.compatMode == "BackCompat") {
-            return {
-                width: document.body.clientWidth,
-                height: document.body.clientHeight
-            }
-        } else {
-            return {
-                width: document.documentElement.clientWidth,
-                height: document.documentElement.clientHeight
-            }
-        }
-    }
     componentDidMount() {
-        var viewPort = this.getViewport();
-        $('#appComp').css({'min-height': viewPort.height})
+        var minHeight  = Math.max(document.body.clientHeight || document.documentElement.clientHeight,  document.body.scrollHeight || document.documentElement.scrollHeight );
+        var minWidth  = Math.max(document.body.clientWidth || document.documentElement.clientWith, document.body.scrollWidth || document.documentElement.scrollWidth)
+        $('#appComp').css({'min-height': minHeight, 'min-width': minWidth});
+
     }
     render() {
         var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
