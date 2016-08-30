@@ -77,7 +77,8 @@ class ModuleNav extends React.Component {
 
     componentDidMount() {
         var {modules} = this.props;
-        var navBarTop = document.getElementById('navBar').offsetTop;
+        var navBarEle = document.getElementById('navBar');
+        var navBarTop = this.getElementTop(navBarEle);
         var scrollTopList = [];
         _.forEach(modules, (module, index) => {
             var moduleEle = document.getElementById(module.id);  
@@ -112,6 +113,16 @@ class ModuleNav extends React.Component {
         })
 
     }
+    
+    getElementTop(element){
+　　　　var actualTop = element.offsetTop;
+　　　　var current = element.offsetParent;
+　　　　while (current !== null){
+　　　　　　actualTop += current.offsetTop;
+　　　　　　current = current.offsetParent;
+　　　　}
+　　　　return actualTop;
+　　}
 
     render() {
         var {modules} = this.props;
