@@ -106,7 +106,13 @@ class SubjectMeanRank extends React.Component {
     render() {
         var currentClassMeanInfo = this.classMeanInfo[this.state.currentSubject.id], currentGradeMeanValue = this.gradeMeanInfo[this.state.currentSubject.id];
         if(!currentClassMeanInfo) return (<div></div>) //Blank Page -- 自定义Error信息
-        var xAxis = {'tickWidth': '0px', 'categories': currentClassMeanInfo.theClasses};
+        var xAxis = {'tickWidth': '0px', 'categories': currentClassMeanInfo.theClasses,
+            title:{
+            align:'high',
+            text:'班级',
+            margin:0,
+            offset:7
+        }};
         var series = [{ 'name': '校级平均分: '+currentGradeMeanValue, 'color': colorsMap.B03, data: currentClassMeanInfo.theMeans}];
         config.xAxis = xAxis, config.series = series;
         config.yAxis.plotLines[1].value = currentGradeMeanValue;

@@ -20,7 +20,13 @@ export default function TrendChart({chartDS, examInfo,classStudents}) {
         },
         xAxis: {
             tickWidth: '0px',//不显示刻度
-            categories: chartDS['x-axon']
+            categories: chartDS['x-axon'],
+            title:{
+                align:'high',
+                text:'分数段',
+                margin:0,
+                offset:7
+            }
         },
         yAxis: {
             allowDecimals:false,//不允许为小数
