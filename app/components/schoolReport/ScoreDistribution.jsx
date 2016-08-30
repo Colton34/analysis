@@ -279,7 +279,7 @@ class Dialog extends React.Component {
         //TODO:要保证格式同Schema的格式：'[levels]'等
         var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
         var params = initParams({ 'request': window.request, examId: this.props.examId, grade:this.props.grade, baseline: newBaseline });
-        this.props.changeLevels({levels: this.levels, subjecLevels: _.keyBy(newBaseline['[subjectLevels]'], 'levelKey')});
+        this.props.changeLevels({levels: this.levels, subjecLevels: getSubjectLevelsFromBaseLine(newBaseline['[subjectLevels]'])});
         this.props.saveBaseline(params);
 
         this.props.onHide();
@@ -1007,6 +1007,14 @@ function makeSubjectMean(students, examPapersInfo) {
         obj.id = pid;
 
         result[pid] = obj;
+    });
+    return result;
+}
+
+function getSubjectLevelsFromBaseLine(originalSubjectLevels) {
+    var result = {};
+    _.each(originalSubjectLevels, (obj) => {
+        result[obj.levelKey] = obj.values;
     });
     return result;
 }
