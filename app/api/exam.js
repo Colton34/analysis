@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-30 17:11:59
+* @Last Modified time: 2016-08-30 18:42:45
 */
 
 
@@ -275,7 +275,7 @@ export function initReportDS(params) {
 function getSubjectLevelsFromBaseLine(originalSubjectLevels) {
     var result = {};
     _.each(originalSubjectLevels, (obj) => {
-        result[obj.levelKey] = obj.values;
+        result[obj.levelKey] = _.keyBy(obj.values, 'id');
     });
     return result;
 }

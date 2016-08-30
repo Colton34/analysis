@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-08-02 16:38:11
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-26 11:27:10
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-08-30 18:31:15
 */
 
 'use strict';
@@ -34,7 +34,7 @@ export default function reducer(state, action) {
             return nextState;
         case CHANGE_LEVEL:
             var newLevelBuffers = _.map(action.data.levels, (value, key) => 5);
-            return state.set('levels', Map(action.data.levels)).set('subjectLevels', Map(action.data.subjecLevels)).set('levelBuffers', List(newLevelBuffers)).set('forseUpdate', !state.forseUpdate);
+            return state.set('levels', Map(action.data.levels)).set('subjectLevels', Map(action.data.subjectLevels)).set('levelBuffers', List(newLevelBuffers)).set('forseUpdate', !state.forseUpdate);
         case CHANGE_LEVEL_BUFFERS:
             return state.set('levelBuffers', List(action.levelBuffers));
     }

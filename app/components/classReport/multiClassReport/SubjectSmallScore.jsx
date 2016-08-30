@@ -29,7 +29,6 @@ class SubjectSmallScore extends React.Component {
     render() {
         var {tableHeaders, tableBodyData} = getFormatedData(this.theDS[this.state.currentSubject.key]);
         var formatedSubjects = this.formatedSubjects;
-        debugger;
         return (
             <div id='subjectSmallScore' className={commonClass['section']} style={{position:'relative'}}>
                 <div style={{marginBottom: 30}}>
