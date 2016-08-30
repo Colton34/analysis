@@ -6,6 +6,8 @@ import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
 
+import DropdownList from '../../../common/DropdownList';
+
 class SubjectSmallScore extends React.Component {
     constructor(props) {
       super(props);
@@ -18,15 +20,24 @@ class SubjectSmallScore extends React.Component {
         }
     }
 
+    changeSubject(item) {
+        this.setState({
+            currentSubject: item
+        })
+    }
+
     render() {
-        var {tableHeaders, tableBodyData} = getFormatedData(this.theDS[this.state.currentSubject.id]);
+        var {tableHeaders, tableBodyData} = getFormatedData(this.theDS[this.state.currentSubject.key]);
+        var formatedSubjects = this.formatedSubjects;
+        debugger;
         return (
-            <div id='subjectSmallScore' className={commonClass['section']}>
+            <div id='subjectSmallScore' className={commonClass['section']} style={{position:'relative'}}>
                 <div style={{marginBottom: 30}}>
                     <span className={commonClass['title-bar']}></span>
                     <span className={commonClass['title']}>学科实体得分率对比</span>
                     <span className={commonClass['title-desc']}></span>
                 </div>
+                <DropdownList onClickDropdownList={this.changeSubject.bind(this)} list={formatedSubjects} style={{position: 'absolute', right: 110, top: 30, zIndex: 1}}/>
                 <TableView id='smallScoreTable' tableData={tableBodyData} tableHeaders={tableHeaders} TableComponent={EnhanceTable} options={{canDownload:true}}/>
             </div>
         );
@@ -117,6 +128,6 @@ function getClassesQuestionScoreRate(questionObj, allPaperStudents, allStudentsP
 
 function getFormatedSubjects(headers) {
     return _.map(_.slice(headers, 1), (headerObj) => {
-        return {value: headerObj.subject, totalScore: headerObj.fullMark, fullMark: headerObj.fullMark, id: headerObj.id} //TODO:这个命名有问题，需要改！
+        return {value: headerObj.subject, totalScore: headerObj.fullMark, fullMark: headerObj.fullMark, key: headerObj.id} //TODO:这个命名有问题，需要改！
     })
 }
