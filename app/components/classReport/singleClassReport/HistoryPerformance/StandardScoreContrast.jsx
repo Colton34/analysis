@@ -32,7 +32,13 @@ var config={
         }
     },
     xAxis: {
-        tickWidth:'0px'//不显示刻度
+        tickWidth:'0px',//不显示刻度
+        title:{
+            align:'high',
+            text:'科目',
+            margin:0,
+            offset:7
+        }
     },
     yAxis: {
         allowDecimals:true,//刻度允许小数
@@ -62,14 +68,14 @@ var config={
         }
     },
     tooltip:{
-        enabled:false,
+        enabled:true,
         backgroundColor:'#000',
         borderColor:'#000',
         style:{
             color:'#fff'
         },
         formatter: function(){
-            return this.series.name+':'+this.point.y+'人'
+            return this.point.y
         }
     },
 };

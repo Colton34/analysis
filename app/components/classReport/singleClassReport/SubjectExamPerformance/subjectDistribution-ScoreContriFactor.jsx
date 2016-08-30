@@ -75,7 +75,13 @@ export default function SubjectContriFactor({classStudents, classHeadersWithTota
     var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS();
     var {subjects, datas, headerInfo} = getDS(examInfo, examStudentsInfo, examPapersInfo, classStudents, classHeadersWithTotalScore, currentClass);
     var finalData = formatData(datas);
-    config['xAxis'] = {tickWidth:'0px', categories: subjects};
+    config['xAxis'] = {tickWidth:'0px', categories: subjects,
+    title:{
+        align:'high',
+        text:'科目',
+        margin:0,
+        offset:7
+    }};
     config['series'] = [{name: '贡献指数', data: finalData}];
     return (
         <div style={{marginTop: 30}}>
@@ -197,4 +203,3 @@ function formatData(datas) {
     }
     return findata;
 }
-

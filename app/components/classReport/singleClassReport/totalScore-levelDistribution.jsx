@@ -193,7 +193,7 @@ function getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, gradeN
             totalSchoolDS[fieldKey+'_'+index] = tempValue[fieldKey];
         });
     });
-    totalSchoolDS['class'] = '全年级上档人数';
+    totalSchoolDS['class'] = '全年级';
     tableBodyDS.push(totalSchoolDS);
     _.each(_.range(_.size(levels)), (index) => {
         var tempValue = currentClassInfo[levelLastIndex-index];
@@ -201,7 +201,7 @@ function getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, gradeN
             classDS[fieldKey+'_'+index] = tempValue[fieldKey];
         });
     });
-    classDS['class'] = '本班上档人数';//gradeName+currentClass+'班';
+    classDS['class'] = '本班';//gradeName+currentClass+'班';
     tableBodyDS.push(classDS);
     return tableBodyDS;
 }
