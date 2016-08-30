@@ -68,7 +68,7 @@ class ClassReport extends React.Component {
               type: 'column'
           },
           title: {
-              text: '(分)',
+              text: '(总分)',
               floating: true,
               x: -110,
               y: 3,
@@ -78,7 +78,7 @@ class ClassReport extends React.Component {
               }
           },
           subtitle: {
-              text: '平均分：'+average,
+              text: '总分平均分：'+average,
               floating: true,
               x: 10,
               y: 0,
