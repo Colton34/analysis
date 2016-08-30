@@ -12,7 +12,11 @@ import singleClassReportStyle from '../singleClassReport.css';
 export default function SubjectStudentLevelDistirbution({classHeaders, reportDS, classStudents, currentClass}) {
 
     var examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
+    var classHeaders = _.cloneDeep(classHeaders);
+    classHeaders.unshift({id: 'totalScore', subject:'总分'});
+    allStudentsPaperMap['totalScore'] = reportDS.examStudentsInfo.toJS();
     var tableDS = getTableDS(examStudentsInfo, examPapersInfo, allStudentsPaperMap, classHeaders, currentClass);
+    delete allStudentsPaperMap['totalScore'];
     var summaryInfo = getSummaryInfo(tableDS);
     var tableHeaders = [[{id: 'subject', name: '学科'}]];
     var headers = _.range(10).map(num=> {
@@ -74,7 +78,7 @@ function makeGroupStudentsInfo(students, groupLength=10) {
         //当前组的学生数组：
         var currentGroupStudents = _.slice(students, (flagCount - groupCount), flagCount);
         //对当前组的学生按照班级进行group
-        var groupStudentsGroupByClass = _.groupBy(currentGroupStudents, 'class_name');
+        var groupStudentsGroupByClass = currentGroupStudents[0]['class_name']  ? _.groupBy(currentGroupStudents, 'class_name')  : _.groupBy(currentGroupStudents, 'class'); 
         flagCount -= groupCount;
         result[index] = { groupCount: groupCount, classStudents: groupStudentsGroupByClass, flagCount: flagCount };
     });
