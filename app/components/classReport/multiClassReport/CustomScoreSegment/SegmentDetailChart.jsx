@@ -77,6 +77,12 @@ class SegmentDetailChart extends React.Component {
             xAxis: {
                 tickWidth: '0px',//不显示刻度
                 categories: chartData.categories,
+                // title:{
+                //     align:'high',
+                //     text:'分数段',
+                //     margin:0,
+                //     offset:7
+                // }
             },
             yAxis: {
                 allowDecimals: true,//刻度允许小数
@@ -115,14 +121,14 @@ class SegmentDetailChart extends React.Component {
             },
             series: seriesShow,
             tooltip: {
-                enabled: false,
+                enabled: true,
                 backgroundColor: '#000',
                 borderColor: '#000',
                 style: {
                     color: '#fff'
                 },
                 formatter: function () {
-                    return this.series.name + ':' + this.point.y + '人'
+                    return  this.point.y
                 }
             },
         };
