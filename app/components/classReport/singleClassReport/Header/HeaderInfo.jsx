@@ -9,7 +9,7 @@ export default function HeaderInfo({examInfo, subjects, currentExamClassInfo}) {
     return (
         <div>
             <div id='header' style={{borderRadius: 2, backgroundColor: '#fff', padding: 30}}>
-                <p>亲爱的班主任，您好</p>
+                <p>您好</p>
                 <p>
                     本次考试，全校{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{examInfo.realClasses.length}</span>个班级，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试，缺考<span style={{ color: colorsMap.B03 }}>{examInfo.lostStudentsCount}</span>名。
                     本班级<span style={{ color: colorsMap.B03 }}>{currentExamClassInfo.realStudentsCount}</span>名学生参加考试，缺考<span style={{ color: colorsMap.B03 }}>{currentExamClassInfo.lostStudentsCount}</span>名。

@@ -279,7 +279,7 @@ class Dialog extends React.Component {
         //TODO:要保证格式同Schema的格式：'[levels]'等
         var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
         var params = initParams({ 'request': window.request, examId: this.props.examId, grade:this.props.grade, baseline: newBaseline });
-        this.props.changeLevels({levels: this.levels, subjecLevels: getSubjectLevelsFromBaseLine(newBaseline['[subjectLevels]'])});
+        this.props.changeLevels({levels: this.levels, subjectLevels: getSubjectLevelsFromBaseLine(newBaseline['[subjectLevels]'])});
         this.props.saveBaseline(params);
 
         this.props.onHide();
