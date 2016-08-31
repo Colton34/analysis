@@ -18,7 +18,7 @@ export default function SubjectScoreLevelDistribution({reportDS, currentClass, c
         <div>
             <div style={{marginTop: 30}}>
                 <span className={commonClass['sub-title']}>学科成绩等级的人数分布比例</span>
-                <span className={commonClass['title-desc']}>本次考试，将班级整体及各学科成绩，分为A,B,C,D等多个等级，来观察不同成绩等级下的学生人数分布。若修改成绩等级参数，请直接联系本校管理员。</span>
+                <span className={commonClass['title-desc']}>本次考试，将班级整体及各学科成绩，分为A,B,C,D等多个等级，来观察不同成绩等级下的学生人数分布。</span>
             </div>
             <div style={{marginTop: 30}}>
                 <TableView tableHeaders={tableDS.tableHeaders} tableData={tableDS.tableData} TableComponent={EnhanceTable}/>
