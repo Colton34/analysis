@@ -13,11 +13,13 @@ var columnIndicatorFunMap = getIndicatorFunMap(COLUMN_NAMES, INDICATORFUNS);
 
 export default function ClassScoreGuide({reportDS}) {
     var gradeName = reportDS.examInfo.toJS().gradeName, examPapersInfo = reportDS.examPapersInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), headers = reportDS.headers.toJS();
+    allStudentsPaperMap['totalScore'] = reportDS.examStudentsInfo.toJS();
     var subjectNames = _.map(headers, (headerObj) => headerObj.subject);
     var classNames = _.keys(studentsGroupByClass);
-
+    classNames.unshift('totalGrade');
+    
     var tableHeaders = getTableHeaderDS(subjectNames);
-    var tableBodyDS = getTableBodyDS(classNames, examPapersInfo, allStudentsPaperMap, studentsGroupByClass, headers, columnIndicatorFunMap);
+    var tableBodyDS = getTableBodyDS(classNames, gradeName, examPapersInfo, allStudentsPaperMap, studentsGroupByClass, headers, columnIndicatorFunMap);
     return (
         <div id='classScoreGuide' className={commonClass['section']}>
             <div>
@@ -40,24 +42,31 @@ function getTableHeaderDS(subjectNames) {
         var obj = {};
         obj.name = subject;
         obj.colSpan = 4;
+        obj.headerStyle = {textAlign: 'center'};
         tableHeaders[0].push(obj);
         _.each(COLUMN_NAMES, (subHead, index) => {
             var obj = {};
             obj.id = subject + '_' + subHead;
             obj.name = subHead;
+            if(subHead === '最高分' || subHead === '最低分' || subHead === '平均分') {
+                obj.columnSortable = true;
+            }
             tableHeaders[1].push(obj);
         })
     });
     return tableHeaders;
 }
 
-function getTableBodyDS(classNames, examPapersInfo, allStudentsPaperMap, studentsGroupByClass, headers, columnIndicatorFunMap) {
+function getTableBodyDS(classNames, gradeName, examPapersInfo, allStudentsPaperMap, studentsGroupByClass, headers, columnIndicatorFunMap) {
     return _.map(classNames, (className, index) => {
-        var obj = {}, classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, className), classStudents = studentsGroupByClass[className];
-        obj.class = className;
+        var  obj = {};
+        var classStudentsPaperMap = className !== 'totalGrade'?  getClassStudentsPaperMap(allStudentsPaperMap, className) : allStudentsPaperMap;
+        var classStudents = className !== 'totalGrade' ?  studentsGroupByClass[className] : allStudentsPaperMap['totalScore'];
+
+        obj.class = className !== 'totalGrade' ? (gradeName +  className + '班') : '全年级';
         _.each(headers, (headerObj) => {
             var paperScores = (headerObj.id == 'totalScore') ? _.map(classStudents, (stuObj) => stuObj.score) : _.map(classStudentsPaperMap[headerObj.id], (paper) => paper.score);
-            _.each(columnIndicatorFunMap, (fun, key) => obj[headerObj.subject+'_'+key] = fun({paperScores: paperScores, examPapersInfo: examPapersInfo, studentsGroupByClass: studentsGroupByClass, headerObj: headerObj, currentClass: className}));
+            _.each(columnIndicatorFunMap, (fun, key) => obj[headerObj.subject+'_'+key] = fun({paperScores: paperScores, examPapersInfo: examPapersInfo, studentsGroupByClass: studentsGroupByClass, headerObj: headerObj, currentClass: className, allStudentsPaperMap: allStudentsPaperMap}));
         });
         return obj;
     });
@@ -75,8 +84,8 @@ function getMeanScore({paperScores}) {
     return _.round(_.mean(paperScores), 2);//平均分
 }
 
-function getRealStudentCount({studentsGroupByClass, examPapersInfo, headerObj, currentClass}) {
-    return (headerObj.id == 'totalScore') ? studentsGroupByClass[currentClass].length : examPapersInfo[headerObj.id].classes[currentClass];//实考人数
+function getRealStudentCount({studentsGroupByClass, examPapersInfo, headerObj, currentClass, allStudentsPaperMap}) {
+    return (headerObj.id == 'totalScore') ? (currentClass!=='totalGrade' ? studentsGroupByClass[currentClass].length : allStudentsPaperMap['totalScore'].length): (currentClass !== 'totalGrade' ? examPapersInfo[headerObj.id].classes[currentClass] : allStudentsPaperMap[headerObj.id].length);//实考人数
 }
 
 function getIndicatorFunMap(columnNames, indicatorFuns) {
