@@ -24,7 +24,7 @@ class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
         var realClasses = this.props.reportDS.examInfo.toJS().realClasses;
-        this.ifCanReviewMultiReport = ifCanReviewMultiReport(this.props.user.auth, this.props.grade);
+        this.ifCanReviewMultiReport = ifCanReviewMultiReport(this.props.user.auth, this.props.grade, this.props.reportDS.examInfo.toJS());
         this.authClasses = getAuthClasses(this.props.user.auth, this.props.grade, this.props.gradeName, realClasses);
         this.state = {
             reportType: 'single',
@@ -74,7 +74,7 @@ class ClassReport extends React.Component {
     }
 
     render() {
-        
+
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';//Note: grade用来区分是否是自定义分析，类似于一个isCustom的布尔值，从而走不通的server route path，gradeName是一定有值的--用来做显示，表明年级值。
         var gradeName = this.props.reportDS.examInfo.toJS().gradeName;
@@ -113,8 +113,8 @@ function mapDispatchToProps(dispatch) {
 
 
 
-function ifCanReviewMultiReport(auth, gradeKey) {
-    return (gradeKey && (auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])));
+function ifCanReviewMultiReport(auth, gradeKey, examInfo) {
+    return ((!gradeKey && examInfo.from == '40') ||(gradeKey && (auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]))));
 }
 
 function getAuthClasses(auth, gradeKey, gradeName, realClasses) {
