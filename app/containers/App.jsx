@@ -34,17 +34,16 @@ class App extends React.Component {
         initUser
     ];
     componentDidMount() {
-        var minHeight  = Math.max(document.body.clientHeight || document.documentElement.clientHeight,  document.body.scrollHeight || document.documentElement.scrollHeight );
-        var minWidth  = Math.max(document.body.clientWidth || document.documentElement.clientWith, document.body.scrollWidth || document.documentElement.scrollWidth)
-        $('#appComp').css({'min-height': minHeight, 'min-width': minWidth});
-
+        // var minHeight  = Math.min(document.body.clientHeight || document.documentElement.clientHeight,  document.body.scrollHeight || document.documentElement.scrollHeight );
+        // var minWidth  = Math.max(document.body.clientWidth || document.documentElement.clientWith, document.body.scrollWidth || document.documentElement.scrollWidth);
+        // $('#appComp').css({'min-height': minHeight, 'min-width': minWidth});
     }
     render() {
         var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
 
         var currentPath = this.props.location.pathname;
         return (
-            <div id='appComp' style={_.assign({}, {backgroundColor: BACKGROUND_COLOR},(currentPath === '/' ? {}: {paddingBottom: 30}))} className={commonStyle['common-font']}>
+            <div id='appComp' style={_.assign({minWidth: '100vw', minHeight: '100vh'}, {backgroundColor: BACKGROUND_COLOR},(currentPath === '/' ? {}: {paddingBottom: 30}))} className={commonStyle['common-font']}>
                 <Header user={user} actions={this.props.actions}/>
                 <Dialog />
                     {this.props.children}
