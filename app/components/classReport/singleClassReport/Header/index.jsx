@@ -7,7 +7,7 @@ import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
 var modules = [
     {
-        name: '总分分布趋势',
+        name: '总分分布',
         id: 'totalScoreTrend'
     }, {
         name: '总分分档学生人数分布',
