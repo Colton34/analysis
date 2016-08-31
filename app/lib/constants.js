@@ -50,10 +50,16 @@ export const INIT_HOME_FAILURE = 'INIT_HOME_FAILURE';
 export const FETCH_HOME_RAW_DATA_SUCCESS = 'FETCH_HOME_RAW_DATA_SUCCESS';
 
 //注意：这两个变量值是一一对应的，如果修改其中一个，那么另一个也要修改。
-export const FROM_YUJUAN_TEXT = '阅卷';
+export const FROM_YUJUAN_ONE_TEXT = '阅卷1.x';
+export const FROM_YUJUAN_TWO_TEXT = '阅卷2.x';
+export const FROM_UPLOAD_TEXT = '上传';
+export const FROM_LIANKAO_TEXT = '联考';
 export const FROM_CUSTOM_TEXT = '自定义';
 export const FROM_FLAG = {
-    '1': FROM_YUJUAN_TEXT,
+    '1': FROM_YUJUAN_ONE_TEXT,
+    '10': FROM_YUJUAN_TWO_TEXT,
+    '30': FROM_UPLOAD_TEXT,
+    '20': FROM_LIANKAO_TEXT,
     '40': FROM_CUSTOM_TEXT
 };
 

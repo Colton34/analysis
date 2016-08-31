@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
-* @Last Modified by:   liucong
-* @Last Modified time: 2016-08-31 10:05:58
+* @Last Modified by:   HellMagic
+* @Last Modified time: 2016-08-31 12:52:53
 */
 
 'use strict';
@@ -465,17 +465,9 @@ exports.initExam = function(req, res, next) {
     var grade = decodeURI(req.query.grade);
     examUitls.generateExamInfo(req.query.examid, grade, req.user.schoolId).then(function(exam) {
         req.exam = exam;
-// console.log('initExam 1');
-// console.log('exam.baseline = ', req.exam.baseline);
         return examUitls.generateExamScoresInfo(req.exam, req.user.auth);
     }).then(function(result) {
-// console.log('initExam 2');
-
         req = _.assign(req, result);
-
-
-// console.log('exam.baseline = ', req.exam.baseline);
-
         next();
     }).catch(function(err) {
         next(err);
@@ -586,15 +578,6 @@ function getClassAllExamsList(school, grade, currentClass) {
     return when.promise(function(resolve, reject) {
         peterHFS.query('@Class', {school: school, grade: grade, name: currentClass}, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('查找@Class失败', err));
-
-console.log('school = ', school, '   grade = ', grade, '   currentClass = ', currentClass);
-
-if(results.length == 0) {
-    console.log('是0');
-} else if(results.length > 1) {
-    console.log('为毛这么多');
-}
-
             if(results.length == 0 || results.length > 1) return reject(new errors.Error('查找@Class有脏数据'));
 
             var target = _.orderBy(results[0]['[exam]'], ['event_time'], ['desc']);
@@ -809,7 +792,7 @@ function filterExamsByAuth(formatedExams, auth, uid) {
     _.each(formatedExams, (obj) => {
         var vaildExams = _.filter(obj.values, (examItem) => {
             //Note: 先过滤掉联考；只有自定义或者阅卷
-            return (((examItem.from != '30')) && ((examItem.from != '40') && (_.includes(authGrades, examItem.grade))) || ((examItem.from == '40') && (examItem.owner == uid)));
+            return (((examItem.from != '20')) && ((examItem.from != '40') && (_.includes(authGrades, examItem.grade))) || ((examItem.from == '40') && (examItem.owner == uid)));
         });
         if(vaildExams.length > 0) result.push({timeKey: obj.timeKey, values: vaildExams});
     });
