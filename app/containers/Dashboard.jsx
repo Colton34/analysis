@@ -2,7 +2,7 @@
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import {Link, browserHistory} from 'react-router';
+import {Link, browserHistory, withRouter} from 'react-router';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
 import _ from 'lodash';
@@ -45,15 +45,20 @@ class Dashboard extends React.Component {
             loading: false
         }
     }
-
     componentDidMount() {
         if (this.props.dashboard.haveInit) return;
 
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         this.props.initDashboard(params);
-        
-    }
 
+        this.props.router.setRouteLeaveHook(
+            this.props.route,
+            this.routerWillLeave
+        )
+
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+    }
     toViewSchoolAnalysis() {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
@@ -85,6 +90,10 @@ class Dashboard extends React.Component {
         this.setState({
             showConfirmDialog: false
         })
+    }
+    routerWillLeave(nextLocation) {
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
     }
     render() {
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
@@ -139,8 +148,7 @@ class Dashboard extends React.Component {
         );
     }
 }
-
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Dashboard));
 
 function mapStateToProps(state) {
     return {
