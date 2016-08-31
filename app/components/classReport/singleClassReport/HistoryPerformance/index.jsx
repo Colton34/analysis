@@ -56,7 +56,7 @@ class HistoryContent extends React.Component {
                 <div style={{marginBottom: 10}}>
                     <span className={commonClass['title-bar']}></span>
                     <span className={commonClass['title']}>历史表现比较</span>
-                    <span className={commonClass['title-desc']}>通过相同性质的考试比较，可以发现各学科标准分与排名率的变化</span>
+                    <span className={commonClass['title-desc']}>通过相同性质的考试比较，可以发现各学科标准分与班级排名的变化</span>
                 </div>
                 <DropdownList list={currentExamsList} isMultiChoice={true} theTitle='选择考试' initSelected={currentExams} handleSelectedItems={this.onChangeExams.bind(this)} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
                 <StandardScoreContrast currentClassExamsZScore={currentClassExamsZScore} categories={categories} />
@@ -464,6 +464,3 @@ function getExamSubjectRank() {
 //         testAsyncFun: bindActionCreators(testAsyncAction, dispatch)
 //     }
 // }
-
-
-

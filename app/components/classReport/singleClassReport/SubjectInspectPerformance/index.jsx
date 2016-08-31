@@ -108,8 +108,8 @@ class SubjectInspectPerformance extends React.Component {
                     <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this)} style={{float: 'right', marginRight: 10,position:'absolute',right:'130px',top:'0px'}} list={subjects} surfaceBtnStyle={{width: 100, height: 34}}/>
                 </div>
                 <div style={{marginBottom: 30, zIndex: 0}}>
-                    <Card title={bestQuestionNames.join(' ')} titleStyle={{color: colorsMap.B04}} desc={'表现较好的题目'} style={{marginRight: 20}}/>
-                    <Card title={worstQuestionNames.join(' ')} titleStyle={{color: colorsMap.B08}} desc={'表现较不足的题目'}/>
+                    <Card title={bestQuestionNames.join(' ')} titleStyle={{color: colorsMap.B04,fontSize:'30px'}} desc={'表现较好的题目'} style={{marginRight: 20}}/>
+                    <Card title={worstQuestionNames.join(' ')} titleStyle={{color: colorsMap.B08,fontSize:'30px'}} desc={'表现较不足的题目'}/>
                 </div>
                 <div >
                   <span>下图是本次考试，{this.state.currentSubject.value}学科所有试题区分度/难度的表现分布情况，其中通过柱形图重点展示出表现较好和表现不足的部分试题。</span>

@@ -87,7 +87,7 @@ export default function SubjectContriFactor({classStudents, classHeadersWithTota
         <div style={{marginTop: 30}}>
             <div style={{marginBottom: 30}}>
                 <span className={commonClass['sub-title']}>学科得分贡献指数</span>
-                <span className={commonClass['title-desc']}>以学科得分率为基础，综合考虑了该学科对班级、学校综合水平的均衡性影响，借此分析学科对班级得分水平的教学贡献大小，指数值为正，是促进作用；为负，是拖后腿</span>
+                <span className={commonClass['title-desc']}>以学科得分率为基础，综合考虑了该学科对班级、学校综合水平的均衡性影响，借此分析学科对班级得分水平的贡献大小，指数值为正，是促进作用；为负，是拖后腿</span>
             </div>
             {/*-----------------柱形图----------------------- */}
             <div style={{display: 'inline-block', width: 1140, height: 290, position: 'relative'}}>
