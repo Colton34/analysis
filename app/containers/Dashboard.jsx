@@ -51,6 +51,7 @@ class Dashboard extends React.Component {
 
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         this.props.initDashboard(params);
+        $('body').scrollTop(0);
     }
 
     toViewSchoolAnalysis() {
