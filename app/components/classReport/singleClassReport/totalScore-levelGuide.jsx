@@ -21,7 +21,7 @@ export default class LevelGuide extends React.Component  {
 
     render() {
         var {reportDS, classStudents} = this.props;
-        var levels = reportDS.levels.toJS(), 
+        var levels = reportDS.levels.toJS(),
             examInfo = reportDS.examInfo.toJS();
         var fullMark = examInfo.fullMark;
         var maxScore = _.last(classStudents).score;
@@ -53,7 +53,7 @@ export default class LevelGuide extends React.Component  {
                             return levels[(levTotal - 1 - levelKey)].percentage + '%' + (levelKey == levTotal - 1 ? '' : '、')
                         })
                     }
-                    。如需修改，请联系学校管理员。
+                    。如需修改，请在校级报告中修改。
                 </p>
             </div>
         );
