@@ -15,7 +15,7 @@ export default  function MultiHeaderInfo({examInfo}) {
                     考试学科：<span style={{ color: colorsMap.B03 }}> {_.join(examInfo.subjects, '、') }</span>，{examInfo.subjects.length}个学科。
                 </p>
                 <p style={{ marginBottom: 0 }}>
-                    此次分析是从各班级平均分、分数段人数、分组人数及试题得分率来，来对比分析各班级本次考试的表现情况，请结合各班级自身情况，与相关学科老师、班主任一起分析总结，提高整体教学质量。
+                    此次分析是从各班级平均分、分数段人数、分组人数及试题得分率来对比分析各班级本次考试的表现情况，请结合各班级自身情况，与相关学科老师、班主任一起分析总结，提高整体教学质量。
                 </p>
             </div>
         </div>
