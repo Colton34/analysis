@@ -70,9 +70,11 @@ class SubjectLevelDisribution extends React.Component {
                 <div className={singleClassReportStyle['analysis-conclusion']}>
                     <div>分析诊断：</div>
                     <div style={{marginBottom: 20}}>
-                    {/**-------------------------------todo： 补充真实数据 --------------------------------------- */}
-                        从提供{numberMap[activeTab + 1]}档上线人数来看，本班{<span style={{color: colorsMap.B03}}>{bestAndWorst.high}</span>}学科表现较佳，{<span style={{color: colorsMap.B03}}>{bestAndWorst.low}</span>}表现不足。
-                        从学生上线人数占比（本班级/全年级）来看，{<span style={{color: colorsMap.B03}}>{percentageSubjectDS.high}</span>}学科表现较佳，{<span style={{color: colorsMap.B03}}>{percentageSubjectDS.low}</span>}学科表现不足。
+                        {
+                            tableDS[0].length >= 4 ? (<div>从提供{numberMap[activeTab + 1]}档上线人数来看，本班{<span style={{color: colorsMap.B03}}>{bestAndWorst.high}</span>}学科表现较佳，{<span style={{color: colorsMap.B03}}>{bestAndWorst.low}</span>}表现不足。
+                            从学生上线人数占比（本班级/全年级）来看，{<span style={{color: colorsMap.B03}}>{percentageSubjectDS.high}</span>}学科表现较佳，{<span style={{color: colorsMap.B03}}>{percentageSubjectDS.low}</span>}学科表现不足。
+                        </div>) : (<div>只有一个学科没有可比性</div>)
+                        }
                     </div>
                     <div style={{fontSize: 12}}>查看班级学生上线人数与学生上线人数占比，分别从绝对数与相对数不同的方面反映出学科的贡献。仅看班级学生上线人数这个绝对数的表现，容易忽略全年级整体而言学科的表现情况，不够全面。</div>
                 </div>
