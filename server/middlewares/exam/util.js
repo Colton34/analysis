@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-31 17:13:52
+* @Last Modified time: 2016-08-31 18:07:55
 */
 'use strict';
 var _ = require('lodash');
@@ -144,15 +144,16 @@ function getGradeExamBaseline(examId, grade) {
 //Note: 这里只过滤班级，因为dashboard计算的是总分，所以不能缺少科目。具体到显示科目的地方走的是学生里面的paper
 exports.generateExamScoresInfo = function(exam, auth) {
     return fetchExamScoresById(exam.fetchId).then(function(scoresInfo) {
-        var authClasses = getAuthClasses(auth, exam.grade.name);
-        var targetClassesScore = {};
-        if(_.isBoolean(authClasses) && authClasses) {
-            targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
-        } else if(_.isArray(authClasses) && authClasses.length > 0) {
-            var allValidClasses = _.map(exam.grade['[classes]'], (classItem) => classItem.name);
-            authClasses = _.filter(authClasses, (className) => _.includes(allValidClasses, className));
-            targetClassesScore = _.pick(scoresInfo, authClasses);
-        }
+        // var authClasses = getAuthClasses(auth, exam.grade.name);
+        // var targetClassesScore = {};
+        // if(_.isBoolean(authClasses) && authClasses) {
+        //     targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
+        // } else if(_.isArray(authClasses) && authClasses.length > 0) {
+        //     var allValidClasses = _.map(exam.grade['[classes]'], (classItem) => classItem.name);
+        //     authClasses = _.filter(authClasses, (className) => _.includes(allValidClasses, className));
+        //     targetClassesScore = _.pick(scoresInfo, authClasses);
+        // }
+        var targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
 
         var orderedStudentScoreInfo = _.sortBy(_.concat(..._.values(targetClassesScore)), 'score');
         exam.realClasses = _.keys(targetClassesScore);

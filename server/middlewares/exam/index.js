@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-31 17:09:07
+* @Last Modified time: 2016-08-31 18:41:46
 */
 
 'use strict';
@@ -66,6 +66,10 @@ exports.home = function(req, res, next) {
         examScoreMap = req.classScoreMap,
         examScoreArr = req.orderedScoresArr;
 
+    var authClasses = getAuthClasses(req.user.auth, exam.grade.name, exam);
+    examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
+    examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
+
     var auth = req.user.auth;
     var gradeAuth = auth.gradeAuth;
     var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
@@ -86,6 +90,14 @@ exports.home = function(req, res, next) {
     } catch (e) {
         next(new errors.Error('format dashboard error : ', e));
     }
+}
+
+function getAuthScoreArr(examScoreArr, authClasses) {
+    return _.filter(examScoreArr, (obj) => _.includes(authClasses, obj.class));
+}
+
+function getAuthScoreMap(examScoreMap, authClasses) {
+    return _.pick(examScoreMap, authClasses);
 }
 
 function ifAtLeastGradeManager(auth, gradeAuth, exam) {
@@ -1460,6 +1472,33 @@ function updateNewExamBaseline(targetObjId, newBaseline) {
             resolve('ok');
         });
     });
+}
+
+/**
+ * 根据当前用户的auth和当前所选择的grade计算所管辖的班级
+ * @param  {[type]} auth     [description]
+ * @param  {[type]} gradeKey [description]
+ * @return {[type]} 返回true或者一个班级name的数组。
+ */
+
+        // if(_.isBoolean(authClasses) && authClasses) {
+        //     targetClassesScore = _.pick(scoresInfo, _.map(exam.grade['[classes]'], (classItem) => classItem.name));
+        // } else if(_.isArray(authClasses) && authClasses.length > 0) {
+        //     var allValidClasses = _.map(exam.grade['[classes]'], (classItem) => classItem.name);
+        //     authClasses = _.filter(authClasses, (className) => _.includes(allValidClasses, className));
+        //     targetClassesScore = _.pick(scoresInfo, authClasses);
+        // }
+
+
+function getAuthClasses(auth, gradeKey, exam) {
+//Note: 如果是schoolManager或者是此年级的年级主任或者是此年级某一学科的学科组长，那么都是给出全部此年级的班级。否则就要判断具体管理的是那些班级
+    var allClasses = _.map(exam.grade['[classes]'], (obj) => obj.name);
+    if(auth.isSchoolManager) return allClasses;
+    if(_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]) return allClasses;
+    if(_.isObject(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey].subjectManagers.length > 0) return allClasses;
+    var groupManagersClasses = _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => obj.group);
+    var subjectTeacherClasses = _.map(auth.gradeAuth[gradeKey].subjectTeachers, (obj) => obj.group);
+    return _.union(groupManagersClasses, subjectTeacherClasses);
 }
 
 
