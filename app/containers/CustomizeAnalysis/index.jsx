@@ -460,7 +460,7 @@ Note: studentsInfo中的papers object数组中的paperid就是paper中id，但�
                 studentsInfoMap[studentObj.kaohao] = obj;
             }
             var ids = _.find(subjectsIdArr, (obj) => obj.subject == subjectName);
-            obj["[papers]"].push({ paperid: ids.id, score: studentsPaperScore[index], class_name: studentObj.class });
+            obj["[papers]"].push({ paperid: ids.id, score: studentsPaperScore[index], class_name: studentObj.class, id: studentObj.id });
             obj['[questionScores]'].push({paperid: ids.id, '[scores]': matrix[index]}); //TODO：因为本身获取的时候就没有给answers，所以后面需要补充上，当前就先不存储answers。
         });
     });

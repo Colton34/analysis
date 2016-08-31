@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-27 18:26:27
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-08-31 10:05:58
 */
 
 'use strict';
@@ -586,6 +586,15 @@ function getClassAllExamsList(school, grade, currentClass) {
     return when.promise(function(resolve, reject) {
         peterHFS.query('@Class', {school: school, grade: grade, name: currentClass}, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('查找@Class失败', err));
+
+console.log('school = ', school, '   grade = ', grade, '   currentClass = ', currentClass);
+
+if(results.length == 0) {
+    console.log('是0');
+} else if(results.length > 1) {
+    console.log('为毛这么多');
+}
+
             if(results.length == 0 || results.length > 1) return reject(new errors.Error('查找@Class有脏数据'));
 
             var target = _.orderBy(results[0]['[exam]'], ['event_time'], ['desc']);
@@ -1368,7 +1377,7 @@ function getPaperInstanceByExam(exam) {
  * @return {[type]}          [description]
  */
 function makeExamInfo(examInfo) {
-    var result = _.pick(examInfo, ['name', 'gradeName', 'startTime', 'realStudentsCount', 'lostStudentsCount', 'fullMark']);
+    var result = _.pick(examInfo, ['name', 'gradeName', 'startTime', 'realStudentsCount', 'lostStudentsCount', 'fullMark', 'from']);
     result.realClasses = examInfo['[realClasses]'];
     result.lostClasses = examInfo['[lostClasses]'];
     result.subjects = examInfo['[subjects]'];
@@ -1403,10 +1412,10 @@ function makeExamPapersInfo(examPapersInfo) {
         var paperObj = _.pick(paperItem, ['id', 'paper', 'subject', 'fullMark', 'realStudentsCount', 'lostStudentsCount']);//TODO Note:暂时没有对自定义分析的文理进行区分
         paperObj = _.assign(paperObj, { realClasses: paperItem['[realClasses]'], lostClasses: paperItem['[lostClasses]'], questions: paperItem['[questions]'] });
         var classCountsMap = {};
-        _.each(paperItem['[class]'], (classCountItem) => {
+        _.each(paperItem['[class]'], (classCountItem) => {//Note: 这里就先不刷Schema了。最好修改为[classes]
             classCountsMap[classCountItem.name] = classCountItem.count;
         });
-        paperObj.class = classCountsMap;
+        paperObj.classes = classCountsMap;
         return paperObj;
     });
     return _.keyBy(examPapersInfoArr, 'id');

@@ -164,7 +164,7 @@ function getExamInspectDS(examPapersInfo, examStudentsInfo, studentsGroupByClass
     return result;
 }
 
-//Warning:所有有关学科的计算都应该是先找到“真正考试了此学科的所有考生”，然后再筛选出“此班级的学生”
+//Warning:所有有关学科的计算都应该是先找到“真正考试了此学科的所有考生”，然后再筛选出“此班级的学生”   -- allStudentsPaperMap中的student.id到底是什么！！！
 function getClassQuestionScoreRate(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass) {
 //计算本班级的此道题目的得分率：
     //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分

@@ -54,7 +54,7 @@ class ClassReport extends React.Component {
     }
     viewClassReport() {
         var {examid, grade} = this.props;
-        var targetUrl = grade ? '/class/report?examid=' + examid + '&grade=' + grade : '/school/report?examid=' + examid;
+        var targetUrl = grade ? '/class/report?examid=' + examid + '&grade=' + grade : '/class/report?examid=' + examid;
         browserHistory.push(targetUrl);
     }
     render(){
