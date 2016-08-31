@@ -68,7 +68,7 @@ class SchoolReport extends React.Component {
         //TOOD:Header那里为什么传入params和location？？？重构
         return (
             <div>
-                {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <CommonLoadingView /> : (
+                {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <Spinkit /> : (
                     <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: BACKGROUND_COLOR, zIndex: 0}}>
                         <NavHeader examInfo={this.props.reportDS.examInfo} examId={examid} grade={grade} />
                         <Header examInfo={this.props.reportDS.examInfo} />
