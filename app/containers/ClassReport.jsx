@@ -74,7 +74,7 @@ class ClassReport extends React.Component {
     }
 
     render() {
-        document.body.scrollTop = 0;
+        
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';//Note: grade用来区分是否是自定义分析，类似于一个isCustom的布尔值，从而走不通的server route path，gradeName是一定有值的--用来做显示，表明年级值。
         var gradeName = this.props.reportDS.examInfo.toJS().gradeName;

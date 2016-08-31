@@ -265,7 +265,7 @@ class ExamList extends React.Component {
                     })
                 }
         }
-    $('body').scrollTop(0);    
+       
     }
     render() {
         var {examList, errorInfo} = this.props;
