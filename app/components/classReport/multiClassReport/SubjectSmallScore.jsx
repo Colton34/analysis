@@ -33,7 +33,7 @@ class SubjectSmallScore extends React.Component {
             <div id='subjectSmallScore' className={commonClass['section']} style={{position:'relative'}}>
                 <div style={{marginBottom: 30}}>
                     <span className={commonClass['title-bar']}></span>
-                    <span className={commonClass['title']}>学科实体得分率对比</span>
+                    <span className={commonClass['title']}>学科试题得分率对比</span>
                     <span className={commonClass['title-desc']}></span>
                 </div>
                 <DropdownList onClickDropdownList={this.changeSubject.bind(this)} list={formatedSubjects} style={{position: 'absolute', right: 110, top: 30, zIndex: 1}}/>

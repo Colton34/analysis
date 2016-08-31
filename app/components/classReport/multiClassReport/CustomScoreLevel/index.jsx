@@ -99,10 +99,20 @@ function getDS(examPapersInfo, allStudentsPaperMap, headers, gradeName, levelPce
 //segments依然是从小到大，但这里展示的时候是从大到小（高难度档次在前）
     // levelPcentages = levelPcentages ? levelPcentages.push(1) : ;  //五个刻度，四个档次
     var result = {}, total = levelPcentages.length -1, matrix;
-    var titleHeader = _.map(_.range(total), (index) => {
-        return index==total-1 ?  letterMap[index] + '等（小于'+ _.round(_.divide(levelPcentages[total-index], 100), 2) +'）' : letterMap[index] + '等（'+ _.round(_.divide(levelPcentages[total-index-1], 100), 2) +'）';
-    });
-    titleHeader.unshift('班级');
+    var titleHeader = ['班级'];
+    _.forEach(_.range(total), index => {
+        if (index === 0) {
+            titleHeader.push(letterMap[index] + '等（得分率' + _.round(_.divide(levelPcentages[total-index-1], 100), 2) +'以上）');
+        } else if (index === total-1) {
+            titleHeader.push(letterMap[index] + '等（得分率' + _.round(_.divide(levelPcentages[total-index], 100), 2) +'以下）');
+        } else {
+            titleHeader.push(header.name = letterMap[index] + '等（得分率' + _.round(_.divide(levelPcentages[total-index-1], 100), 2) +'-' + _.round(_.divide(levelPcentages[total-index], 100), 2) + '）');
+        }
+    })
+    // var titleHeader = _.map(_.range(total), (index) => {
+    //     return index==total-1 ?  letterMap[index] + '等（小于'+ _.round(_.divide(levelPcentages[total-index], 100), 2) +'）' : letterMap[index] + '等（'+ _.round(_.divide(levelPcentages[total-index-1], 100), 2) +'）';
+    // });
+    // titleHeader.unshift('班级');
 
     _.each(examPapersInfo, (paperObj, index) => {
         //每一个科目|
