@@ -101,18 +101,26 @@ function getSummaryInfo(tableDS) {
             low: _.sum(_.map(_.takeRight(row, 3), (arr) => arr.length))
         }
     });
+    // 两极分化学科列表
+    var polarizationSubjects = [];
+    _.forEach(temp, data => {
+        if (data.high === data.low){
+            polarizationSubjects.push(data.subject);
+        }
+    })
     var tempSortByHigh = _.sortBy(temp, 'high');
     var tempSortByLow = _.sortBy(temp, 'low');
     var highSubject = _.last(tempSortByHigh).subject, lowSubject = _.last(tempSortByLow).subject;
-    if(highSubject == lowSubject) {
-        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject}</span> 学科高分段人数和低分段人数相同，表现两极分化。</span>;
+
+    if(polarizationSubjects.length !== 0) {
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{_.join(polarizationSubjects, '、')}</span> 高分段人数和低分段人数相同，表现两极分化。</span>;
     } else if((_.first(tempSortByHigh).high == _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low == _.last(tempSortByLow).low)) {
         return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数和低分段人数相同，表现两极分化。';
     } else if((_.first(tempSortByHigh).high != _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low == _.last(tempSortByLow).low)) {
-        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject}</span> 学科高分段人数较多，班级各学科低分段人数相当。</span>;
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject}</span> 高分段人数较多，班级各学科低分段人数相当。</span>;
     } else if((_.first(tempSortByHigh).high == _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low != _.last(tempSortByLow).low)) {
-        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数相当，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较多。</span>;
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数相当，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 低分段人数较多。</span>;
     } else {
-        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject} </span> 学科高分段人数较多，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 学科低分段人数较多。</span>;
+        return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject} </span> 高分段人数较多，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{lowSubject}</span> 低分段人数较多。</span>;
     }
 }
