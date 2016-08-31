@@ -96,7 +96,7 @@ export default function SubjectContriFactor({classStudents, classHeadersWithTota
             <div className={singleClassReportStyle['analysis-conclusion']}>
                 <div style={{lineHeight: 1.5}}>分析诊断：</div>
                 {
-                    headerInfo.greater !== headerInfo.lesser ?  (
+                    headerInfo.greater[0] !== headerInfo.lesser[0] ?  (
                         <div style={{lineHeight: 1.5}}>
                             根据上图各学科的得分率贡献指数的大小，可知本班级<span style={{color: colorsMap.B03, margin: '0 5px'}}>{headerInfo.greater}</span>学科表现对班级总分水平有较大的教学推进作用，
                             而<span style={{color: colorsMap.B03, margin: '0 5px'}}>{headerInfo.lesser}</span>学科表现对班级总分水平有较大的牵扯现象。
