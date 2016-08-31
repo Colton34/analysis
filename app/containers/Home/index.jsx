@@ -191,7 +191,7 @@ class ExamItem extends React.Component {
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>
-                                来自：<span style={(item['from'] == '1' || item['from'] == '10') ? {color: '#77bfef'}: {}}>{fromFlag[item['from']]}</span>
+                                来自：<span style={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? {color: '#77bfef'}: {}}>{fromFlag[item['from']]}</span>
                             </span>
                         </div>
                         <Link to={{ pathname: '/dashboard', query: queryOptions }}
@@ -265,6 +265,7 @@ class ExamList extends React.Component {
                     })
                 }
         }
+    $('body').scrollTop(0);    
     }
     render() {
         var {examList, errorInfo} = this.props;
