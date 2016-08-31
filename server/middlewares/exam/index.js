@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-31 12:52:53
+* @Last Modified time: 2016-08-31 17:09:07
 */
 
 'use strict';
@@ -371,7 +371,8 @@ exports.customSchoolAnalysis = function(req, res, next) {
         req.result = result;
         return examUitls.getGradeExamBaseline(req.query.examid);//自定义分析肯定只有一个年级，所以可以不添加grade query condition。
     }).then(function(baseline) {
-        req.result.baseline = baseline;
+        // examBaseline: req.exam.baseline
+        req.result.examBaseline = baseline;
         res.status(200).json(req.result);
     }).catch(function(err) {
         next(err);

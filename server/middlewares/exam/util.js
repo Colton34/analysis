@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-25 12:49:30
+* @Last Modified time: 2016-08-31 17:13:52
 */
 'use strict';
 var _ = require('lodash');
@@ -99,7 +99,8 @@ function getExamById(examid) {
 function getGradeExamBaseline(examId, grade) {
     // var targetObjId = paddingObjectId(examId); 设计：都存储短id好了！
     return when.promise(function(resolve, reject) {
-        peterFX.query('@ExamBaseline', {examid: examId, grade: grade}, function(err, results) {
+        var config = (grade) ? {examid: examId, grade: grade} : {examid: examId};
+        peterFX.query('@ExamBaseline', config, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('getGradeExamBaseline Mongo Error: ', err));
             resolve(results[0]);
         });
