@@ -8,7 +8,7 @@ export default function HeaderInfo({examInfo, subjects, currentExamClassInfo}) {
     var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
     return (
         <div>
-            <div id='header' style={{borderRadius: 2, backgroundColor: '#fff', padding: 30}}>
+            <div id='header' style={{borderRadius: 2, backgroundColor: '#fff', padding: 30,borderBottom: '1px solid rgb(238, 238, 238)'}}>
                 <p>您好</p>
                 <p>
                     本次考试，全校{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{examInfo.realClasses.length}</span>个班级，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试，缺考<span style={{ color: colorsMap.B03 }}>{examInfo.lostStudentsCount}</span>名。
