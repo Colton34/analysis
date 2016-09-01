@@ -44,16 +44,6 @@ class ContentComponent extends React.Component {
             })
         }
     }
-    componentDidMount() {
-        // 处理某些可能会有的白边问题；
-        var minHeight  = Math.min(document.body.clientHeight || document.documentElement.clientHeight,  document.body.scrollHeight || document.documentElement.scrollHeight );
-        var minWidth  = Math.max(document.body.clientWidth || document.documentElement.clientWith, document.body.scrollWidth || document.documentElement.scrollWidth);
-        $('#appComp').css({'min-height': minHeight, 'min-width': minWidth});
-    }
-    componentWillUnmount(){
-        // 处理某些可能会有的白边问题；
-        $('#appComp').css({'min-height': '100vh', 'min-width': '100vw'});
-    }
     render() {
         // var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
         var examName = this.props.reportDS.examInfo.toJS().name;
