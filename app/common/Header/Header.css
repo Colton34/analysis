@@ -62,7 +62,7 @@
   height: 36px;
   margin-top: -18px;
   border-radius: 50%;
-  background: url(../../images/avatar.png) 0 0 no-repeat;
+  background: url(../../images/defaultAvatar.png) 0 0 no-repeat;
   background-size: contain;
 }
 
