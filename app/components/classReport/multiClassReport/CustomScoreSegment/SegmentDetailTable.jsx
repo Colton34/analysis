@@ -9,7 +9,7 @@ import TableView from '../../../../common/TableView';
  */
 export default function SegmentDetailTable({tableHeaders, tableData, examName , gradeName, currentSubject}) {
     var tableHeaders = [tableHeaders];
-    var fileName = examName + '-' + gradeName + '-' +'自定义分数段的人数分布';
+    var fileName = examName + '-' + gradeName + '-' + currentSubject.value +'-自定义分数段的人数分布';
     var worksheetName = currentSubject.value;
     debugger
     return (

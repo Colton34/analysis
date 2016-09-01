@@ -46,7 +46,7 @@ class CustomScoreLevel extends React.Component {
 
         var {tableHeaders, tableBodyData} = getFormatedData(theDS[this.state.currentSubject.id]);
 
-        var fileName = this.examName + '-' + this.gradeName + '-自定义成绩等级的人数比例';
+        var fileName = this.examName + '-' + this.gradeName + '-' + this.state.currentSubject.value + '-自定义成绩等级的人数比例';
         return (
             <div id='customScoreLevel' className={commonClass['section']} >
                 <div style={{ position: 'relative' }}>
