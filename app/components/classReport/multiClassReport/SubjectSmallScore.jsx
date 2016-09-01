@@ -11,9 +11,12 @@ import DropdownList from '../../../common/DropdownList';
 class SubjectSmallScore extends React.Component {
     constructor(props) {
       super(props);
-        var examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS(), examClassesInfo = this.props.reportDS.examClassesInfo.toJS(), studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS(), gradeName = this.props.reportDS.examInfo.toJS().gradeName, headers = this.props.reportDS.headers.toJS();
+        var examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS(), examClassesInfo = this.props.reportDS.examClassesInfo.toJS(), studentsGroupByClass = this.props.reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS(), headers = this.props.reportDS.headers.toJS();
+        var examInfo = this.props.reportDS.examInfo.toJS();
+        this.gradeName = examInfo.gradeName;
+        this.examName = examInfo.name;
         this.formatedSubjects = getFormatedSubjects(headers);
-        var theDS = getDS(examPapersInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, gradeName);
+        var theDS = getDS(examPapersInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, allStudentsPaperMap, this.gradeName);
         this.theDS = theDS;
         this.state = {
             currentSubject: this.formatedSubjects[0]
@@ -29,6 +32,7 @@ class SubjectSmallScore extends React.Component {
     render() {
         var {tableHeaders, tableBodyData} = getFormatedData(this.theDS[this.state.currentSubject.key]);
         var formatedSubjects = this.formatedSubjects;
+        var fileName = this.examName + '-' + this.gradeName + '-' + this.state.currentSubject.value  +'-学科试题得分率';
         return (
             <div id='subjectSmallScore' className={commonClass['section']} style={{position:'relative'}}>
                 <div style={{marginBottom: 30}}>
@@ -37,7 +41,7 @@ class SubjectSmallScore extends React.Component {
                     <span className={commonClass['title-desc']}></span>
                 </div>
                 <DropdownList onClickDropdownList={this.changeSubject.bind(this)} list={formatedSubjects} style={{position: 'absolute', right: 110, top: 30, zIndex: 1}}/>
-                <TableView id='smallScoreTable' tableData={tableBodyData} tableHeaders={tableHeaders} TableComponent={EnhanceTable} options={{canDownload:true}}/>
+                <TableView id='smallScoreTable' tableData={tableBodyData} tableHeaders={tableHeaders} TableComponent={EnhanceTable} options={{canDownload:true, fileName: fileName, worksheetName: this.state.currentSubject.value}}/>
             </div>
         );
     }
