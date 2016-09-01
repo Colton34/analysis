@@ -31,13 +31,13 @@ class SingleClassReport extends React.Component {
         var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, currentClass);
         var classHeaders = getClassHeaders(headers, classStudentsPaperMap);
         var classHeadersWithTotalScore = getClassHeadersWithTotalScore(headers, classStudentsPaperMap);
-
+        var ifCanReviewMultiReport = this.props.ifCanReviewMultiReport;
         var isCustomAnalysis = (reportDS.examInfo.toJS().from == '40');
         return (
             <div>
                 <Header examInfo={reportDS.examInfo} examClassesInfo={reportDS.examClassesInfo} classHeaders={classHeaders} currentClass={currentClass}/>
                 <TotalScoreTrend reportDS={reportDS} classStudents={classStudents} />
-                <TotalScoreLevelGuide reportDS={reportDS} classStudents={classStudents}/>
+                <TotalScoreLevelGuide reportDS={reportDS} classStudents={classStudents} ifCanReviewMultiReport={ifCanReviewMultiReport}/>
                 <TotalScoreLevelDistribution reportDS={reportDS} currentClass={currentClass} />
                 <SubjectDistributionScoreLevel classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={currentClass} reportDS={reportDS} />
                 <CriticalStudentDistribution classStudents={classStudents} reportDS={reportDS} />

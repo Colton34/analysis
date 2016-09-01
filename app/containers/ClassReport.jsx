@@ -55,7 +55,7 @@ class ContentComponent extends React.Component {
                 <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} />
                 {(this.ifCanReviewMultiReport) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} classesList={authClassesList} reportDS={this.props.reportDS} /> : ''}
                 {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />
-                    : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName}/>}
+            : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName} ifCanReviewMultiReport={this.ifCanReviewMultiReport}/>}
             </div>
         );
     }

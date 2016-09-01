@@ -140,7 +140,7 @@ class HistoryPerformance extends React.Component {
         return (
             <div>
                 {
-                    (this.props.isLoading) ? (<h1>isLoading</h1>) : (<HistoryContent currentExams={currentExams} currentClass={this.props.currentClass} currentClassExamsList={this.props.examsListCache.get(this.props.currentClass)} currentClassExamsInfoCache={this.props.examsInfoCache.get(this.props.currentClass)} getMoreExamsInfo={this.getMoreExamsInfo.bind(this)} />)
+                    (this.props.isLoading) ? (<div></div>) : (<HistoryContent currentExams={currentExams} currentClass={this.props.currentClass} currentClassExamsList={this.props.examsListCache.get(this.props.currentClass)} currentClassExamsInfoCache={this.props.examsInfoCache.get(this.props.currentClass)} getMoreExamsInfo={this.getMoreExamsInfo.bind(this)} />)
                 }
             </div>
         );
