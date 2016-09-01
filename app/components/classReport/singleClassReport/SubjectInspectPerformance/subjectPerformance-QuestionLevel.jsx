@@ -63,7 +63,7 @@ var option = {
         name: '班级vs年级',
         type: 'radar',
         //areaStyle: {normal: {}},
-        color:['#0099ff','#cccccc']
+        color:['#0099ff','#B1B1B1']
     }]
 };
 
