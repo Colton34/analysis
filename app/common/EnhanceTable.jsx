@@ -103,7 +103,7 @@ class Table extends React.Component {
         if (!id || !options.canDownload) return ;
         $.when(this.props.onDownloadTable())
          .done(()=>{
-             $('#' + id).tableExport({type: 'excel', fileName: options.fileName ? options.fileName : '表格下载'});
+             $('#' + id).tableExport({type: 'excel', fileName: options.fileName ? options.fileName : '表格下载', worksheetName: options.worksheetName ? options.worksheetName : 'xlsWorksheetName'});
          })
 
     }
