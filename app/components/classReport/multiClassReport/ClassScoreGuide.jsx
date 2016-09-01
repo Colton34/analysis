@@ -12,7 +12,11 @@ var INDICATORFUNS = [getMaxScore, getMinScore, getMeanScore, getRealStudentCount
 var columnIndicatorFunMap = getIndicatorFunMap(COLUMN_NAMES, INDICATORFUNS);
 
 export default function ClassScoreGuide({reportDS}) {
-    var gradeName = reportDS.examInfo.toJS().gradeName, examPapersInfo = reportDS.examPapersInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), headers = reportDS.headers.toJS();
+    var examInfo = reportDS.examInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), headers = reportDS.headers.toJS();
+    var gradeName = examInfo.gradeName;
+    var examName = examInfo.name;
+    var exportTableName = examName + '-' + gradeName + '-' +'班级成绩概况';
+    var worksheetName = '班级成绩概况';
     allStudentsPaperMap['totalScore'] = reportDS.examStudentsInfo.toJS();
     var subjectNames = _.map(headers, (headerObj) => headerObj.subject);
     var classNames = _.keys(studentsGroupByClass);
@@ -28,7 +32,7 @@ export default function ClassScoreGuide({reportDS}) {
                 <span className={commonClass['title-desc']}></span>
             </div>
             <div style={{marginTop: 30}}>
-            <TableView id='classScoreGuidTable' tableHeaders={tableHeaders} tableData={tableBodyDS} TableComponent={EnhanceTable} options={{canDownload: true}}/>
+            <TableView id='classScoreGuidTable' tableHeaders={tableHeaders} tableData={tableBodyDS} TableComponent={EnhanceTable} options={{canDownload: true, fileName: exportTableName, worksheetName: worksheetName}}/>
             </div>
         </div>
     )
