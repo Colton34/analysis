@@ -27,7 +27,7 @@ const Card = ({title, desc, style}) => {
 
 var localStyle = {
     card: {
-        display: 'inline-block', width: 336, height: 112, lineHeight: '112px', border: '1px solid ' + colorsMap.C05, background: colorsMap.C02
+        display: 'inline-block', width: 336, height: 112, lineHeight: '112px', border: '1px solid #e6eef3', background: '#fbfdfe'
     }
 }
 
