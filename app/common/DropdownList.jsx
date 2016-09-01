@@ -18,6 +18,7 @@ let localStyle = {
         listStyleType: 'none',
         padding: 0,
         margin: 0,
+        lineHeight:'30px',
         borderRight: '1px solid ' + colorsMap.C04,
         borderLeft: '1px solid ' + colorsMap.C04,
         borderBottom: '1px solid ' + colorsMap.C04

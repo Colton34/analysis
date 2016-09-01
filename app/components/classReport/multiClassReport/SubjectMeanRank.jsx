@@ -113,7 +113,7 @@ class SubjectMeanRank extends React.Component {
             margin:0,
             offset:7
         }};
-        var series = [{ 'name': '校级平均分: '+currentGradeMeanValue, 'color': colorsMap.B03, data: currentClassMeanInfo.theMeans}];
+        var series = [{ 'name': '年级平均分: '+currentGradeMeanValue, 'color': colorsMap.B03, data: currentClassMeanInfo.theMeans}];
         config.xAxis = xAxis, config.series = series;
         config.yAxis.plotLines[1].value = currentGradeMeanValue;
 

@@ -46,6 +46,7 @@ p, div p {
 .tab-ctn ul .fl {
     float: left;
     background: #fbfbfb;
+    color:#333;
 }
 
 .tab-ctn ul .last {
