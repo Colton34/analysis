@@ -23,6 +23,9 @@ class CustomScoreLevel extends React.Component {
             showDialog: false,
             levelPercentages: [0, 60, 70, 85, 100]
         }
+        var examInfo = this.props.reportDS.examInfo.toJS();
+        this.gradeName = examInfo.gradeName;
+        this.examName = examInfo.name;
     }
 
     updateLevelPercentages(newLevelPercentages) {
@@ -42,6 +45,8 @@ class CustomScoreLevel extends React.Component {
         var theDS = getDS(examPapersInfo, allStudentsPaperMap, headers, gradeName, this.state.levelPercentages);
 
         var {tableHeaders, tableBodyData} = getFormatedData(theDS[this.state.currentSubject.id]);
+
+        var fileName = this.examName + '-' + this.gradeName + '-自定义成绩等级的人数比例';
         return (
             <div id='customScoreLevel' className={commonClass['section']} >
                 <div style={{ position: 'relative' }}>
@@ -53,7 +58,7 @@ class CustomScoreLevel extends React.Component {
                     <Dialog levelPercentages={this.state.levelPercentages} updateGrades={this.updateLevelPercentages.bind(this) } examPapersInfo={examPapersInfo} />
                 </div>
               <div style={{marginTop: 30}}>
-                    <TableView id='customScoreLevelTable' tableHeaders= {tableHeaders} tableData={tableBodyData} TableComponent={EnhanceTable} options={{canDownload: true}}/>
+                    <TableView id='customScoreLevelTable' tableHeaders= {tableHeaders} tableData={tableBodyData} TableComponent={EnhanceTable} options={{canDownload: true, fileName: fileName, worksheetName: this.state.currentSubject.value }}/>
                 </div>
             </div>
         )
