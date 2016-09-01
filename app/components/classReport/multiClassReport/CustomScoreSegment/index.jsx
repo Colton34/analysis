@@ -15,7 +15,9 @@ class CustomScoreSegment extends React.Component {
         super(props);
         this.examPapersInfo = this.props.reportDS.examPapersInfo.toJS();
         this.allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
-        this.gradeName = this.props.reportDS.examInfo.toJS().gradeName;
+        var examInfo = this.props.reportDS.examInfo.toJS();
+        this.gradeName = examInfo.gradeName;
+        this.examName = examInfo.name;
         var examClassesInfo = this.props.reportDS.examClassesInfo.toJS();
         var examClassKeys = _.keys(examClassesInfo);
         var headers = this.props.reportDS.headers.toJS();
@@ -70,7 +72,7 @@ class CustomScoreSegment extends React.Component {
                     <input defaultValue={this.state.currentScoreStep} onBlur={this.segmentInputBlur.bind(this)} style={{width: 70, height: 30, margin: '0 10px', paddingLeft: 10, border: '1px solid ' + colorsMap.C08}}/>为一个分数段，查看不同分数段的人数分布及详情</div>
                 </div>
                 <SegmentDetailChart chartData={formatedDS} classList={formatedClassList} needRefresh={this.dropdownListRefresh} dropdownListRefreshHandler={this.dropdownListRefreshHandler.bind(this)}/>
-                <SegmentDetailTable tableHeaders={formatedDS.tableHeader} tableData={formatedDS.tableData}/>
+                <SegmentDetailTable tableHeaders={formatedDS.tableHeader} tableData={formatedDS.tableData} currentSubject={this.state.currentSubject} examName={this.examName} gradeName={this.gradeName}/>
             </div>
         )
     }
