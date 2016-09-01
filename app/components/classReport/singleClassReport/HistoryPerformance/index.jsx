@@ -59,7 +59,7 @@ class HistoryContent extends React.Component {
                     <span className={commonClass['title-desc']}>通过相同性质的考试比较，可以发现各学科标准分与班级排名的变化</span>
                 </div>
                 <DropdownList list={currentExamsList} isMultiChoice={true} theTitle='选择考试' initSelected={currentExams} handleSelectedItems={this.onChangeExams.bind(this)} style={{position: 'absolute', top: 30, right: 30, zIndex: 1,borderRadius:2}}/>
-                <StandardScoreContrast currentClassExamsZScore={currentClassExamsZScore} categories={categories} />
+                {_.size(currentClassExamsZScore) == 0 ? (<h3>无匹配当前年级考试数据</h3>) : <StandardScoreContrast currentClassExamsZScore={currentClassExamsZScore} categories={categories} />}
                 {/*<RankRateContrast currentExamsZScore={currentExamsZScore} categories={categories} currentClass={this.props.currentClass} />*/}
             </div>
         );
@@ -242,6 +242,7 @@ function getCurrentValidExamsZScore(currentExamsInfo, currentClass) {
 function getCurrentClassExamsZScore(currentExamsInfo, currentClass) {
     var result = {};
     _.each(currentExamsInfo, (obj) => {
+        if(_.size(obj.examPapersInfo) == 0) return;
         var studentsGroupByClass = _.groupBy(obj.examStudentsInfo, 'class');
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(obj.examStudentsInfo, (student) => student.papers)), 'paperid');
         var classStudentsPaperMap = getClassStudentsPaperMap(allStudentsPaperMap, currentClass);
