@@ -11,7 +11,6 @@ export default function SegmentDetailTable({tableHeaders, tableData, examName , 
     var tableHeaders = [tableHeaders];
     var fileName = examName + '-' + gradeName + '-' + currentSubject.value +'-自定义分数段的人数分布';
     var worksheetName = currentSubject.value;
-    debugger
     return (
         <div>
             <div className={commonClass['sub-title']} style={{margin: '27px 0 20px 0'}}>

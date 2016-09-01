@@ -93,7 +93,7 @@ function getStudentNames(students, classStudents) {
 function getSummaryInfo(tableDS) {
     //1，2，3为高分组，7，8，9为低分组
     //计算各科的高分组人数和低分组人数，分别对两个组的数目排序
-    if(tableDS.length == 1) return '只有一个学科，没有可比性';
+    if(tableDS.length == 2) return '只有一个学科，没有可比性';
     var temp = _.map(tableDS, (row) => {
         return {
             subject: row[0],
@@ -111,10 +111,9 @@ function getSummaryInfo(tableDS) {
     var tempSortByHigh = _.sortBy(temp, 'high');
     var tempSortByLow = _.sortBy(temp, 'low');
     var highSubject = _.last(tempSortByHigh).subject, lowSubject = _.last(tempSortByLow).subject;
-
     if(polarizationSubjects.length !== 0) {
         return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{_.join(polarizationSubjects, '、')}</span> 高分段人数和低分段人数相同，表现两极分化。</span>;
-    } else if((_.first(tempSortByHigh).high == _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low == _.last(tempSortByLow).low)) {
+    } else if(_.every(temp, (item) => {return item.high === item.low})) {
         return '根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，班级各学科高分段人数和低分段人数相同，表现两极分化。';
     } else if((_.first(tempSortByHigh).high != _.last(tempSortByHigh).high) && (_.first(tempSortByLow).low == _.last(tempSortByLow).low)) {
         return <span>根据上图各学科高分段（一、二、三组）学生人数和低分段（八、九、十）学生人数大小可知，<span style={{color: colorsMap.B03, margin: '0 5px'}}>{highSubject}</span> 高分段人数较多，班级各学科低分段人数相当。</span>;
