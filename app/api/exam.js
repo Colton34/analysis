@@ -225,7 +225,6 @@ export function initReportDS(params) {
 
     return params.request.get(url).then(function(res) {
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, examBaseline} = res.data;
-        debugger;
         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
         //TODO:打开；对paperStudents进行排序，这样到下面不用分别都再次排序了。
@@ -256,7 +255,6 @@ export function initReportDS(params) {
         var levelBuffers = (examBaseline && examBaseline['[levelBuffers]']) ? _.map(examBaseline['[levelBuffers]'], (obj) => obj.score) : _.map(levels, (value, key) => 5);
 //设计：虽然把subjectLevels挂到state树上--其实是借用reportDS来存储，在校级报告里不直接用，而是在其他报告中直接用，校级报告中等于多算一遍。这个设计可能需要重构。
         var subjectLevels = (examBaseline && examBaseline['[subjectLevels]']) ? getSubjectLevelsFromBaseLine(examBaseline['[subjectLevels]']) : makeDefaultSubjectLevels(levels, examStudentsInfo, examPapersInfo, examInfo.fullMark);
-        debugger;
         return Promise.resolve({
             haveInit: true,
             examInfo: examInfo,
