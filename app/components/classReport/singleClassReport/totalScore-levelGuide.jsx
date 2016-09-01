@@ -26,6 +26,7 @@ export default class LevelGuide extends React.Component  {
         var fullMark = examInfo.fullMark;
         var maxScore = _.last(classStudents).score;
         var levTotal = _.size(levels);
+        var ifCanReviewMultiReport = this.props.ifCanReviewMultiReport;
         return (
             <div className={commonClass['section']}>
                 <div style={{ marginBottom: 20 }}>
@@ -53,7 +54,8 @@ export default class LevelGuide extends React.Component  {
                             return levels[(levTotal - 1 - levelKey)].percentage + '%' + (levelKey == levTotal - 1 ? '' : '、')
                         })
                     }
-                    。如需修改，请在校级报告中修改。
+                    {ifCanReviewMultiReport? '。如需修改，请在校级报告中修改。': '。如需修改，请联系管理员。'}
+
                 </p>
             </div>
         );
