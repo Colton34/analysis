@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-31 18:41:46
+* @Last Modified time: 2016-09-05 19:44:47
 */
 
 'use strict';
@@ -1243,7 +1243,7 @@ function getAuthExamInfo(authRankCache, examName, papers) {
  * @return {[type]}      [description]
  */
 function formatExamInfo(exam) {
-    var examInfo = _.pick(exam, ['name', 'realStudentsCount', 'lostStudentsCount', 'realClasses', 'lostClasses', 'fullMark']);
+    var examInfo = _.pick(exam, ['name', 'realStudentsCount', 'lostStudentsCount', 'realClasses', 'lostClasses', 'fullMark', 'from']);
     examInfo.gradeName = exam.grade.name;
     examInfo.startTime = moment(exam['event_time']).valueOf();
     examInfo.subjects = _.map(exam['[papers]'], (paper) => {
