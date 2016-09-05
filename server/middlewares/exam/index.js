@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-05 19:44:47
+* @Last Modified time: 2016-09-05 20:26:08
 */
 
 'use strict';
@@ -74,23 +74,43 @@ exports.home = function(req, res, next) {
     var gradeAuth = auth.gradeAuth;
     var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
     var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
+    var ifShowSubjectReport = ifShouldShowSubjectReport(auth, exam);
     try {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
         var schoolReportResult = (ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
         var classReportResult = (ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
+        var subjectReportResult = (ifShowSubjectReport) ? subjectReport() : null;
         // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
         res.status(200).json({
             examInfoGuide: examInfoGuideResult,
             scoreRank: scoreRankResult,
             schoolReport: schoolReportResult,
-            classReport: classReportResult
+            classReport: classReportResult,
+            subjectReport: subjectReportResult
             // levelScoreReport: levelScoreReportResult,
         });
     } catch (e) {
         next(new errors.Error('format dashboard error : ', e));
     }
 }
+
+function ifShouldShowSubjectReport(auth, exam) {
+    if(examInfo.from == '40' || (auth.isSchoolManager) || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])) {
+        return true;
+    } else if(auth.gradeAuth.subjectManagers && auth.gradeAuth.subjectManagers.length > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function subjectReport() {
+    return {
+        a: 'a'
+    }
+}
+
 
 function getAuthScoreArr(examScoreArr, authClasses) {
     return _.filter(examScoreArr, (obj) => _.includes(authClasses, obj.class));

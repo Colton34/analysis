@@ -14,18 +14,48 @@ import {initReportDSAction} from '../reducers/reportDS/actions';
 import {initParams} from '../lib/util';
 import {COLORS_MAP as colorsMap} from '../lib/constants';
 
+class SubjectsNav extends React.Component {
+    render() {
+        return (
+            <div>
+                {
+                    _.map(this.props.authSubjects, (obj) => {
+                        return (
+                            <button onClick={this.props.changeSubject.bind(null, obj)}>{obj.subject}</button>
+                        )
+                    })
+                }
+            </div>
+        );
+    }
+}
+
+
 class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
         this.authSubjects = getAuthSubjects(this.props.user.toJS().auth, this.props.reportDS.examInfo.toJS(), this.props.reportDS.headers.toJS());
+        this.ifShowSubjectNav = (this.authSubjects.length > 1);
+        this.state = {
+            currentSubject: this.authSubjects[0]
+        };
+    }
+
+    onChangeSubject(subjectObj) {
+        this.setState({
+            currentSubject: subjectObj
+        })
     }
 
     render() {
-        this.ifExistSubject = (this.authSubjects.length > 0);
+        // this.ifExistSubject = (this.authSubjects.length > 0);
+        // {(this.ifExistSubject) ? (<ReportContent authSubjects={this.authSubjects} reportDS={this.props.reportDS} />) : (<h1>没有您所管辖的学科</h1>)}
+        var authSubjects = this.authSubjects;
+        if(authSubjects.length == 0) return;
 
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                {(this.ifExistSubject) ? (<ReportContent authSubjects={this.authSubjects} reportDS={this.props.reportDS} />) : (<h1>没有您所管辖的学科</h1>)}
+                {(this.ifShowSubjectNav) ? (<SubjectsNav authSubjects={authSubjects} changeSubject={this.onChangeSubject.bind(this)} />) : ''}
             </div>
         );
     }
