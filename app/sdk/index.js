@@ -6,7 +6,7 @@
 */
 
 'use strict';
-
+import _ from 'lodash';
 /*
     求某一个群定的xx属性的区间分布:<注意，因为查找的方式使用了二分法，所以群体必须是有序的！！！>
         参数：区间 segments；群体 base；属性 key
@@ -31,7 +31,7 @@ export function makeSegmentsDistribution(segments, base, key) {
         return {
             index: index,
             low: segments[index],
-            hight: segments[index + 1],
+            high: segments[index + 1],
             count: count,
             targets: targets
         }
