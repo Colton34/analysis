@@ -10,6 +10,7 @@ import StatisticalLib from 'simple-statistics';
 //components
 import InfoCards from './InfoCards';
 import TrendChart from './TrendChart';
+import AnalysisFactor from './analysisFactor';
 
 export default function Trend({reportDS, currentSubject}) {
     // var examInfo = reportDS.examInfo.toJS();
@@ -22,7 +23,13 @@ export default function Trend({reportDS, currentSubject}) {
     var currentPaperStudentsInfo = allStudentsPaperMap[currentSubject.pid];
     debugger;
 
+/*
 
+            <InfoCards currentPaperInfo={currentPaperInfo} currentPaperStudentsInfo={currentPaperStudentsInfo} />
+            <TrendChart currentPaperInfo={currentPaperInfo} currentPaperStudentsInfo={currentPaperStudentsInfo} />
+
+
+ */
 
     return (
         <div id='totalScoreTrend' className={commonClass['section']}>
@@ -30,7 +37,7 @@ export default function Trend({reportDS, currentSubject}) {
             <span className={commonClass['title']}>总分分布</span>
             <span className={commonClass['title-desc']}>学生总分分布，可反映本次考试班级学生的综合学业水平分布状况。</span>
 
-            <InfoCards currentPaperInfo={currentPaperInfo} currentPaperStudentsInfo={currentPaperStudentsInfo} />
+            <AnalysisFactor currentPaperInfo={currentPaperInfo} currentPaperStudentsInfo={currentPaperStudentsInfo} />
             <div className={subjectReportStyle['analysis-conclusion']}>
                 <div>分析诊断：</div>
                 <div>这里是总结: 可以参看下面注释掉的算法，结合PRD的需求</div>
