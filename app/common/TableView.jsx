@@ -63,8 +63,9 @@ class TableView extends React.Component {
     }
     render() {
         var TableComponent = this.props.TableComponent ? this.props.TableComponent : Table;
+        var {style} = this.props;
         return (
-            <div>
+            <div style={_.assign({}, style ? style : {})}>
                 <div style={{ width: '100%'}}>
                     <TableComponent  {...this.props} tableData={this.state.showData}  onDownloadTable={this.onDownloadTable.bind(this)}/>
                 </div>
