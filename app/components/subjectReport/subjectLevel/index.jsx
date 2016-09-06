@@ -1,9 +1,7 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import Radium from 'radium';
-import {Link} from 'react-router';
+import commonClass from '../../../common/common.css';
+import {NUMBER_MAP as numberMap} from '../../../lib/constants';
 
 export default function SubjectLevelModule({reportDS, currentSubject}) {
     var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS();
@@ -17,10 +15,19 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
     var currentSubjectLevelRank = getCurrentSubjectLevelRank(subjectLevelDistribution, currentSubject.pid);//高档次名次在前
     var currentSubjectLevelClassInfo = getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubject.pid);
 
-
-    debugger;
+    var levelNumString = _.join(_.range(_.size(levels)).map(num => {return numberMap[num + 1]}), '、');
     return (
-        <div>待填充</div>
+        <div className={commonClass['section']}>
+            <div>
+                <span className={commonClass['title-bar']}></span>
+                <span className={commonClass['title']}>学科分档上线情况</span>
+                <span className={commonClass['title-desc']} style={{ marginTop: 10 }}>通过科学的算法，将总分分档线分解到各学科，得到学科的分数线。</span>
+            </div>
+            <p>
+                本次考试， 校管理者将总分分为{levelNumString}档分档线，分别而设置成{_.join(levelTotalScores.map(num => {return num + '分'}),'、')}。
+                通过科学分解，{currentSubject.subject}学科的{levelNumString}档分数线分别是：{_.join(currentSubjectLevelScores.map(num => {return num + '分'}),'、')}。
+            </p>
+        </div>
     )
 }
 
