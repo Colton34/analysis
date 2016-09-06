@@ -5,32 +5,21 @@ import { connect } from 'react-redux';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
-
-
-// class SubjectReportContent extends React.Component {
-//     constructor(props) {
-//         super(props);
-
-//     }
-
-//     render() {
-//         return (
-//             <div>学科报告内容</div>
-//         );
-//     }
-// }
-
+import Header from './Header';
+import TotalScoreTrend from './TotalScoreTrend';
 
 //当前学科报告内容
 class ReportContent extends React.Component {
     constructor(props) {
         super(props);
+        //TODO: 根据currentSubject和reportDS得到匹配当前科目的基础数据--作为base data
     }
 
     render() {
         return (
             <div>
-
+                <Header currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <TotalScoreTrend currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
             </div>
         );
     }

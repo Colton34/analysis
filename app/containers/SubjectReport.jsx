@@ -21,7 +21,7 @@ class SubjectsNav extends React.Component {
                 {
                     _.map(this.props.authSubjects, (obj) => {
                         return (
-                            <button onClick={this.props.changeSubject.bind(null, obj)}>{obj.subject}</button>
+                            <button key={obj.pid} onClick={this.props.changeSubject.bind(null, obj)}>{obj.subject}</button>
                         )
                     })
                 }
@@ -50,12 +50,13 @@ class ContentComponent extends React.Component {
     render() {
         // this.ifExistSubject = (this.authSubjects.length > 0);
         // {(this.ifExistSubject) ? (<ReportContent authSubjects={this.authSubjects} reportDS={this.props.reportDS} />) : (<h1>没有您所管辖的学科</h1>)}
-        var authSubjects = this.authSubjects;
+        var authSubjects = this.authSubjects, currentSubject = this.state.currentSubject;
         if(authSubjects.length == 0) return;
 
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
                 {(this.ifShowSubjectNav) ? (<SubjectsNav authSubjects={authSubjects} changeSubject={this.onChangeSubject.bind(this)} />) : ''}
+                <ReportContent currentSubject={currentSubject} reportDS={this.props.reportDS} />
             </div>
         );
     }

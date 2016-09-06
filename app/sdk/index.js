@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified by:   liucong
-* @Last Modified time: 2016-09-05 20:15:27
+* @Last Modified by:   HellMagic
+* @Last Modified time: 2016-09-06 08:59:47
 */
 
 'use strict';
@@ -20,7 +20,7 @@
                 }, ...
             ]
 */
-export function makeSegmentsCount(segments, base, key) {
+export function makeSegmentsDistribution(segments, base, key) {
     var groupCountDistribution = _.groupBy(base, function(item) {
         return getSegmentIndex(segments, item[key]);
     });
