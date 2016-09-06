@@ -49,5 +49,3 @@ export default function ReportHeader({reportDS, currentSubject}) {
     )
 }
 
-                // <HeaderInfo examInfo={examInfo} currentExamClassInfo={currentExamClassInfo} subjects={subjects} currentClass={currentClass}/>
-                // <ModuleNav modules={modules}/>
