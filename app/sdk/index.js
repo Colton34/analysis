@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-06 08:59:47
+* @Last Modified time: 2016-09-06 20:17:35
 */
 
 'use strict';
@@ -74,4 +74,33 @@ function getSegmentIndex(segments, target) {
         }
     }
     return high;
+}
+
+/**
+ * 将一个matrix通过行列操作计算离差
+ * @param  {[type]} originalMatrix [description]
+ * @return {[type]}                [description]
+ */
+export function makeFactor(originalMatrix) {
+    var tempMatrix = []; //不用map是因为避免占位
+    //1.行相减
+    _.each(originalMatrix, (classRow, rowIndex) => {
+        if (rowIndex == 0) return;
+        var rowFactors = _.map(classRow, (perItem, columnIndex) => (_.isNumber(perItem) ? _.round(_.subtract(perItem, originalMatrix[0][columnIndex]), 2) : perItem));
+        tempMatrix.push(rowFactors);
+    });
+
+    //2.列相减
+    var resultMatrix = [];
+    _.each(tempMatrix, (rowArr, rowIndex) => {
+        var tempRow = [];
+        _.each(rowArr, (tempFactor, columnIndex) => {
+            if (columnIndex == 0) return;
+            var resultTempFactor = (_.isNumber(tempFactor)) ? _.round(_.subtract(tempFactor, rowArr[0]), 2) : tempFactor;
+            tempRow.push(resultTempFactor);
+        });
+        resultMatrix.push(tempRow);
+    });
+
+    return resultMatrix;
 }
