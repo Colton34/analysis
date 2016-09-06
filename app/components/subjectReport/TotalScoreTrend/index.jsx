@@ -1,7 +1,7 @@
 //总分分布趋势
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
-import commonClass from '../../../styles/common.css';
+import commonClass from '../../../common/common.css';
 import subjectReportStyle from '../../../styles/subjectReport.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import {makeSegmentsDistribution, makeSegments} from '../../../sdk';
@@ -21,7 +21,6 @@ export default function Trend({reportDS, currentSubject}) {
     var allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
     var currentPaperInfo = examPapersInfo[currentSubject.pid];
     var currentPaperStudentsInfo = allStudentsPaperMap[currentSubject.pid];
-    debugger;
 
 /*
 
@@ -38,7 +37,7 @@ export default function Trend({reportDS, currentSubject}) {
             <span className={commonClass['title-desc']}>学生总分分布，可反映本次考试班级学生的综合学业水平分布状况。</span>
 
             <AnalysisFactor currentPaperInfo={currentPaperInfo} currentPaperStudentsInfo={currentPaperStudentsInfo} />
-            <div className={subjectReportStyle['analysis-conclusion']}>
+            <div className={commonClass['analysis-conclusion']}>
                 <div>分析诊断：</div>
                 <div>这里是总结: 可以参看下面注释掉的算法，结合PRD的需求</div>
             </div>
