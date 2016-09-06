@@ -9,6 +9,7 @@ import Header from './Header';
 import TotalScoreTrend from './TotalScoreTrend';
 import SubjectLevelModule from './subjectLevel';
 import SubjectQualityModule from './subjectQualityMe';
+import StudentSubjectDis from './studentSubjectDis';
 import SubjectCritical from './subjectCritical';
 
 //当前学科报告内
@@ -18,14 +19,22 @@ class ReportContent extends React.Component {
         //TODO: 根据currentSubject和reportDS得到匹配当前科目的基础数据--作为base data
     }
 
-    render() {
-        return (
-            <div>
+/*
+
                 <Header currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <TotalScoreTrend currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <SubjectLevelModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <SubjectCritical currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}/>
+                <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+
+ */
+
+
+    render() {
+        return (
+            <div>
+
+                <StudentSubjectDis currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
             </div>
         );
     }
