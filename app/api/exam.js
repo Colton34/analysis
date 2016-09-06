@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-31 17:09:37
+* @Last Modified time: 2016-09-06 14:52:15
 */
 
 
@@ -411,7 +411,7 @@ function findScoreSegmentIndex(segments, des) {
 }
 
 /**
- * 默认3档，每一档有固定的上线率，根据上线率计算出相应的分档分数线。固定的三个档次的上线率分别是15%, 25%, 60%。
+ * 默认3档，每一档有固定的上线率，根据上线率计算出相应的分档分数线。固定的三个档次的上线率分别是15%, 35%, 60%。
  * Note: 1.这里的levelKey是String类型的，但是有些时候（特别是通过findScoreSegmentIndex得到的返回值是Integer类型的，而对于Map的key来说，类型一定也要相同才能匹配到）得到的不是String类型，那么需要转换。
  *       2.parseInt(levelKey)值越小则等级越小（这点符合数据的直观性），但是一般视图展示的时候都是等级较高的放在前面，所以切记需要调整顺序。
  *       3.没有特殊情况（比如letterMap，0在展示上没有意义）则一般都是从'0'开始！
@@ -430,7 +430,7 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
         '1': {
             score: 0,
             count: 0,
-            percentage: 25
+            percentage: 35
         },
         '2': {
             score: 0,
