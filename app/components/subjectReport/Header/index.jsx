@@ -35,11 +35,13 @@ var modules = [
 
 export default function ReportHeader({reportDS, currentSubject}) {
 
+var examInfo = reportDS.examInfo.toJS();
+
     return (
         <div>
             <div style={{ width: 1200, height: 152, backgroundColor: colorsMap.B03, textAlign: 'center', color: '#fff', display: 'table-cell', verticalAlign: 'middle', borderTopLeftRadius: 3, borderTopRightRadius: 3 }}>
-                <p style={{ fontSize: 25, lineHeight: '30px' }}>考试名称</p>
-                <p style={{ fontSize: 18 }}>一些东西</p>
+                <p style={{ fontSize: 25, lineHeight: '30px' }}>{examInfo.name}</p>
+                <p style={{ fontSize: 18 }}>{currentSubject.subject}-学科分析诊断报告</p>
             </div>
             <div style={{ position: 'relative', marginBottom: 20 }}>
                 <HeaderInfo reportDS={reportDS} currentSubject={currentSubject} />
