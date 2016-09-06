@@ -8,8 +8,11 @@ import {Link} from 'react-router';
 import Header from './Header';
 import TotalScoreTrend from './TotalScoreTrend';
 import SubjectLevelModule from './subjectLevel';
+
 import SubjectQualityModule from './subjectQualityMe';
 import SubjectCritical from './subjectCritical';
+
+import SubjectTeacherQuality from './SubjectTeacherQuality';
 
 //当前学科报告内
 class ReportContent extends React.Component {
@@ -26,6 +29,7 @@ class ReportContent extends React.Component {
                 <SubjectLevelModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <SubjectCritical currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}/>
+                <SubjectTeacherQuality currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}></SubjectTeacherQuality>
             </div>
         );
     }
