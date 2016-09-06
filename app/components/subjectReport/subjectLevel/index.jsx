@@ -12,6 +12,9 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
     var currentPaperStudentsInfo = reportDS.allStudentsPaperMap.toJS()[currentSubject.pid];
     var subjectLevelDistribution = makeCurrentSubjectSegmentsDistribution(reportDS.subjectLevels.toJS(), reportDS.examPapersInfo.toJS(), reportDS.allStudentsPaperMap.toJS());
     debugger;
+    return (
+        <div>待填充</div>
+    )
 }
 
 /*
