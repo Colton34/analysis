@@ -5,12 +5,11 @@ import { connect } from 'react-redux';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
-// import {makeSegmentsDistribution} from '../../../sdk';
-
 export default function SubjectLevelModule({reportDS, currentSubject}) {
+    var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS();
     var currentPaperInfo = reportDS.examPapersInfo.toJS()[currentSubject.pid];
     var currentPaperStudentsInfo = reportDS.allStudentsPaperMap.toJS()[currentSubject.pid];
-    var subjectLevelDistribution = makeCurrentSubjectSegmentsDistribution(reportDS.subjectLevels.toJS(), reportDS.examPapersInfo.toJS(), reportDS.allStudentsPaperMap.toJS());
+    var subjectLevelDistribution = makeCurrentSubjectSegmentsDistribution(subjectLevels, reportDS.examPapersInfo.toJS(), reportDS.allStudentsPaperMap.toJS());
     debugger;
     return (
         <div>待填充</div>
@@ -41,10 +40,12 @@ function makeCurrentSubjectSegmentCountInfo(subjectLevels, examPapersInfo, allSt
         _.each(subLevObj, (obj, pid) => {
             var low = obj.mean;
             var high = (subjectLevels[parseInt(levelKey)+1+'']) ? subjectLevels[parseInt(levelKey)+1+''][pid].mean : examPapersInfo[pid].fullMark;
-            var count = (low >= high) ? 0 : (levelKey == '0' ? (_.filter(allStudentsPaperMap[pid], (obj) => ((low <= obj.score) && (obj.score <= high))).length) : (_.filter(allStudentsPaperMap[pid], (obj) => ((low < obj.score) && (obj.score <= high))).length));
+            // var count = (low >= high) ? 0 : (levelKey == '0' ? (_.filter(allStudentsPaperMap[pid], (obj) => ((low <= obj.score) && (obj.score <= high))).length) : (_.filter(allStudentsPaperMap[pid], (obj) => ((low < obj.score) && (obj.score <= high))).length));
+            var targets = (low >= high) ? [] : (levelKey == '0' ? (_.filter(allStudentsPaperMap[pid], (obj) => ((low <= obj.score) && (obj.score <= high)))) : (_.filter(allStudentsPaperMap[pid], (obj) => ((low < obj.score) && (obj.score <= high)))));
             currentLevelSubjectsDisInfo[pid] = {
                 mean: obj.mean,
-                count: count
+                count: targets.length,
+                targets: targets
             }
         });
         result[levelKey] = currentLevelSubjectsDisInfo;
