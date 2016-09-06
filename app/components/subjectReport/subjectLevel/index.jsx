@@ -10,6 +10,14 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
     var currentPaperInfo = reportDS.examPapersInfo.toJS()[currentSubject.pid];
     var currentPaperStudentsInfo = reportDS.allStudentsPaperMap.toJS()[currentSubject.pid];
     var subjectLevelDistribution = makeCurrentSubjectSegmentsDistribution(subjectLevels, reportDS.examPapersInfo.toJS(), reportDS.allStudentsPaperMap.toJS());
+
+    var levelTotalScores = _.reverse(_.map(levels, (obj) => obj.score));
+    var currentSubjectLevelScores = _.reverse(_.map(subjectLevels, (sobj) => sobj[currentSubject.pid].mean));
+    var currentSubjectLevelInfo = getCurrentSubjectLevelInfo(subjectLevelDistribution, currentSubject.pid);//注意：levelKey小的代表低档次
+    var currentSubjectLevelRank = getCurrentSubjectLevelRank(subjectLevelDistribution, currentSubject.pid);//高档次名次在前
+    var currentSubjectLevelClassInfo = getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubject.pid);
+
+
     debugger;
     return (
         <div>待填充</div>
@@ -60,4 +68,43 @@ function fillSubjectSumInfo(originalResult, allStudentsPaperMap) {
             obj.sumPercentage = _.round(_.divide(obj.sumCount, allStudentsPaperMap[pid].length), 2);
         });
     });
+}
+
+function getCurrentSubjectLevelInfo(subjectLevelDistribution, currentSubjectPid) {
+    var result = {};
+    _.each(subjectLevelDistribution, (obj, levelKey) => {
+        result[levelKey] = _.pick(obj[currentSubjectPid], ['count', 'sumCount', 'sumPercentage']);
+    });
+    return result;
+}
+
+function getCurrentSubjectLevelRank(subjectLevelDistribution, currentSubjectPid) {
+    //计算当前学科在各个分档线的排名--使用count，而不是sumCount
+    var temp;
+    var result = _.map(subjectLevelDistribution, (obj, levelKey) => {
+        temp = _.map(obj, (sobj, pid) => {
+            return {
+                pid: pid,
+                count: sobj.count,
+                subject: sobj.subject
+            }
+        });
+        temp = _.orderBy(temp, ['count'], ['desc']);
+        return (_.findIndex(temp, (obj) => obj.pid == currentSubjectPid) + 1);
+    });
+    return _.reverse(result);
+}
+
+function getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubjectPid) {
+    var result = {}, currentSubjectLevelStudentsGroup, temp;
+    _.each(subjectLevelDistribution, (obj, levelKey) => {
+        temp = {};
+        currentSubjectLevelStudentsGroup = _.groupBy(obj[currentSubjectPid].targets, 'class_name');
+        temp.totalSchool = obj[currentSubjectPid].targets.length;
+        _.each(currentSubjectLevelStudentsGroup, (cstudents, classKey) => {
+            temp[classKey] = cstudents.length;
+        });
+        result[levelKey] = temp;
+    });
+    return result;
 }

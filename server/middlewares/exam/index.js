@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-05 20:26:08
+* @Last Modified time: 2016-09-06 17:05:23
 */
 
 'use strict';
@@ -96,7 +96,7 @@ exports.home = function(req, res, next) {
 }
 
 function ifShouldShowSubjectReport(auth, exam) {
-    if(examInfo.from == '40' || (auth.isSchoolManager) || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])) {
+    if((auth.isSchoolManager) || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])) {
         return true;
     } else if(auth.gradeAuth.subjectManagers && auth.gradeAuth.subjectManagers.length > 0) {
         return true;
