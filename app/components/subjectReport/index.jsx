@@ -18,6 +18,7 @@ import SubjectCritical from './subjectCritical';
 import ImportStudentsModule from './importStudents';
 
 import SubjectTeacherQuality from './SubjectTeacherQuality';
+import ClassSubjectQuestion from './classSubjectQuestion';
 
 //当前学科报告内
 class ReportContent extends React.Component {
@@ -42,7 +43,7 @@ class ReportContent extends React.Component {
     render() {
         return (
             <div>
-
+                <ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <SubjectTeacherQuality currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}></SubjectTeacherQuality>
             </div>
