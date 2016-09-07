@@ -19,7 +19,6 @@ export default function ImportStudentsModule({reportDS, currentSubject}) {
     _.each(rankTopStudentsArr, (sarr) => {
         rankTopStudents = _.concat(rankTopStudents, sarr);
     });
-debugger;
     return (
         <div>
             <div>待填充</div>

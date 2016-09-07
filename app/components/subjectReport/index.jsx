@@ -49,7 +49,7 @@ class ReportContent extends React.Component {
                 <ClassDiffQuestionModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <SubjectTeacherQuality currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}></SubjectTeacherQuality>
+                <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
             </div>
         );
     }
