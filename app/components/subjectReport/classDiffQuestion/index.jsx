@@ -46,7 +46,6 @@ class ClassDiffQuestionModule extends React.Component {
     render() {
         var currentClassLevelGroupMeanRate = this.allClassLevelGroupMeanRate[this.state.currentClass];
         var gradeQuestionLevelGroupMeanRate = this.gradeQuestionLevelGroupMeanRate;
-        debugger;
 /*
     option.series[0].data = [
         {
