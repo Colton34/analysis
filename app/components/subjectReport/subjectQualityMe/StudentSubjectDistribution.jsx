@@ -88,7 +88,6 @@ function getTableRenderData (classHeaders, classDis, segments, currentStep) {
         })
         tableRenderData.push(rowData);
     })
-    debugger
     return tableRenderData;
 }    
 

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
-
+import StatisticalLib from 'simple-statistics';
 import DistributionTableModule from './distributionTableModule';
 import GradeQuestionDiffModule from './gradeQuestionDiffModule';
 
@@ -17,7 +17,6 @@ export default function ExamQuestionPerfromance({currentSubject, reportDS}) {
 
     var gradeQuestionSeparation = getGradeQuestionSeparation(currentPaperQuestions, currentSubject.pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
     var summaryInfo = getSummaryInfo(paperQuestionsDiffInfo);
-    debugger;
     return (
         <div>
             {/* <span>{summaryInfo}</span> */}

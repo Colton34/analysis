@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
 import StudentSubjectDistribution from './StudentSubjectDistribution';
-
+import ClassSubjectLevel from './ClassSubjectLevel';
 import {makeFactor} from '../../../sdk';
 
 export default function SubjectQualityModule({currentSubject, reportDS}) {
@@ -35,7 +35,8 @@ export default function SubjectQualityModule({currentSubject, reportDS}) {
                 </div>
             </div>
 
-            <StudentSubjectDistribution reportDS={reportDS}  currentSubject={currentSubject}/>
+            <StudentSubjectDistribution reportDS={reportDS} currentSubject={currentSubject}/>
+            <ClassSubjectLevel reportDS={reportDS} currentSubject={currentSubject}/>
         </div>
     )
 }
