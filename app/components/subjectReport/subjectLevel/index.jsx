@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
+import TableView from '../../../common/TableView';
+import EnhanceTable from '../../../common/EnhanceTable';
 import {NUMBER_MAP as numberMap} from '../../../lib/constants';
 
 export default function SubjectLevelModule({reportDS, currentSubject}) {
@@ -12,13 +14,18 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
     var levelTotalScores = _.reverse(_.map(levels, (obj) => obj.score));
     var currentSubjectLevelScores = _.reverse(_.map(subjectLevels, (sobj) => sobj[currentSubject.pid].mean));
     var currentSubjectLevelInfo = getCurrentSubjectLevelInfo(subjectLevelDistribution, currentSubject.pid);//注意：levelKey小的代表低档次
+    var {levelTableHeaders, levelTableData} = getLevelTableRenderData(currentSubjectLevelInfo, subjectLevels, currentSubject);
     var currentSubjectLevelRank = getCurrentSubjectLevelRank(subjectLevelDistribution, currentSubject.pid);//高档次名次在前
     var currentSubjectLevelClassInfo = getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubject.pid);
+    var {classInfoTableHeaders, classInfoTableData} = getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels);
+    var classInfoSummary = getclassInfoSummary(currentSubjectLevelClassInfo);
 
     var levelNumString = _.join(_.range(_.size(levels)).map(num => {return numberMap[num + 1]}), '、');
+    var levelSize = _.size(levels);
+    debugger
     return (
         <div className={commonClass['section']}>
-            <div>
+            <div style={{marginBottom: 10}}>
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>学科分档上线情况</span>
                 <span className={commonClass['title-desc']} style={{ marginTop: 10 }}>通过科学的算法，将总分分档线分解到各学科，得到学科的分数线。</span>
@@ -27,6 +34,35 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
                 本次考试， 校管理者将总分分为{levelNumString}档分档线，分别而设置成{_.join(levelTotalScores.map(num => {return num + '分'}),'、')}。
                 通过科学分解，{currentSubject.subject}学科的{levelNumString}档分数线分别是：{_.join(currentSubjectLevelScores.map(num => {return num + '分'}),'、')}。
             </p>
+
+            <TableView tableHeaders={levelTableHeaders} tableData={levelTableData} TableComponent={EnhanceTable}/>
+            <div className={commonClass['analysis-conclusion']}>
+                <p>分析诊断：</p>
+                <p>
+                    上表可看到{currentSubject.subject}学科{levelNumString}档线，在全年级学生人数的分布。与本次考试其他各学科进行对比，{currentSubject.subject}学科
+                    {
+                        _.join(currentSubjectLevelRank.map((rank, index) => {return '对全校学生上' + numberMap[index + 1] + '档线的学生上档人数排第' + rank + '名'}), '，')
+                    }。多联系本学科的教学实际，做进一步的教学反思，本学科能如何改进教学，才为全年级的高端教学成就提供更大的贡献。
+                </p>
+            </div>
+
+            <div style={{margin: '30px 0'}}>
+                <span className={commonClass['sub-title']}>班级分档上线人数分布</span>
+                <span className={commonClass['title-desc']}>对比各班级分档上线的人数分布，了解对本学科而言，各班级对各档线上线人数贡献的大小。</span>
+            </div>
+            <TableView tableHeaders={classInfoTableHeaders} tableData={classInfoTableData} TableComponent={EnhanceTable}/>
+            <div className={commonClass['analysis-conclusion']}>
+                <p>分析诊断：</p>
+                <p>
+                    对本学科而言，
+                    {
+                        _.map(classInfoSummary, (classList, levelNum) => {
+                            return numberMap[levelNum - 0 + 1] + '档线学生人数累计较多的班级是' + _.join(classList, '、') +  (levelNum - 0 !== levelSize -1 ? '，' : '。')
+                        })
+                    }
+                </p>
+            </div>
+            
         </div>
     )
 }
@@ -83,6 +119,70 @@ function getCurrentSubjectLevelInfo(subjectLevelDistribution, currentSubjectPid)
         result[levelKey] = _.pick(obj[currentSubjectPid], ['count', 'sumCount', 'sumPercentage']);
     });
     return result;
+}
+
+function getLevelTableRenderData(currentSubjectLevelInfo, subjectLevels, currentSubject) {
+    var levelSize = _.size(subjectLevels);
+    var tableHeaders = [[{name: '科目', id: 'subject', rowSpan: 2}], []];
+    var subHeads = [{name:'人数', id: 'count'} , {name: '累计人数', id: 'sumCount'}, {name:'累计上线率', id:'sumPercentage'}];
+    _.forEachRight(subjectLevels, (levelInfo, levelNum) => {
+        tableHeaders[0].push({name: numberMap[levelSize - levelNum] + '档（' + levelInfo[currentSubject.pid].mean +'分）', colSpan: 3, headerStyle: {textAlign: 'center'}});
+        _.forEach(subHeads, subHead => {
+            var subHeadObj = {};
+            subHeadObj.name = subHead.name;
+            subHeadObj.id = subHead.id + '_' + (levelSize - levelNum -1);
+            tableHeaders[1].push(subHeadObj);
+        })
+    })
+
+    var tableData = [];
+    var rowData = {subject: currentSubject.subject};
+    _.forEach(currentSubjectLevelInfo, (levelInfo, levelNum) => {
+        _.forEach(subHeads, (subHead, index) => {
+            rowData[subHead.id + '_' + levelNum] = levelInfo[subHead.id];
+        })
+    })
+    tableData.push(rowData);
+    return {levelTableHeaders: tableHeaders, levelTableData: tableData};
+
+}
+
+function getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels) {
+    var tableHeaders = [[{id: 'level', name: '学科上线人数'}, {id: 'totalSchool', name: '全年级'}]];
+    var classList = _.keys(_.omit(currentSubjectLevelClassInfo[0], ['totalSchool']));
+    _.forEach(classList, (className) => {
+        tableHeaders[0].push({id: className, name: className+'班'});
+    })
+
+    var tableData = [];
+    _.forEach(currentSubjectLevelClassInfo, (levelInfo, levelNum) => {
+        var rowData = {};
+        rowData.level = numberMap[levelNum - 0 + 1] + '档上线人数';
+        _.forEach(levelInfo, (count, className) => {
+           rowData[className] = count;
+        })
+        tableData.push(rowData);
+    })
+    return {classInfoTableHeaders: tableHeaders, classInfoTableData: tableData};
+}
+
+function getclassInfoSummary(currentSubjectLevelClassInfo) {
+    var summaryInfo = {};
+    _.forEach(currentSubjectLevelClassInfo, (levelInfo, levelNum) => {
+        var countClassMap = {};
+        _.forEach(levelInfo, (count, className) => {
+            if (className !== 'totalSchool') {
+                if (countClassMap[count]) {
+                    countClassMap[count].push(className + '班');
+                } else {
+                    countClassMap[count] = [className + '班']
+                }
+            }
+        })
+        var countSort = _.sortBy(_.values(_.omit(levelInfo, ['totalSchool'])));
+        summaryInfo[levelNum] =  _.flatten(_.reverse(_.takeRight(countSort, 2)).map(count => {return countClassMap[count]}));
+    })
+    return summaryInfo;
 }
 
 function getCurrentSubjectLevelRank(subjectLevelDistribution, currentSubjectPid) {
