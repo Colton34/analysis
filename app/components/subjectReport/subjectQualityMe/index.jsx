@@ -4,6 +4,8 @@ import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
 import StudentSubjectDistribution from './StudentSubjectDistribution';
 import ClassSubjectLevel from './ClassSubjectLevel';
+import StudentsGroupLevel from './StudentsGroupLevel';
+
 import {makeFactor} from '../../../sdk';
 
 export default function SubjectQualityModule({currentSubject, reportDS}) {
@@ -37,6 +39,7 @@ export default function SubjectQualityModule({currentSubject, reportDS}) {
 
             <StudentSubjectDistribution reportDS={reportDS} currentSubject={currentSubject}/>
             <ClassSubjectLevel reportDS={reportDS} currentSubject={currentSubject}/>
+            <StudentsGroupLevel reportDS={reportDS} currentSubject={currentSubject}/>
         </div>
     )
 }
