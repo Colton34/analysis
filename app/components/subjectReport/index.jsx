@@ -11,6 +11,7 @@ import SubjectLevelModule from './subjectLevel';
 import SubjectQualityModule from './subjectQualityMe';
 import StudentSubjectDis from './studentSubjectDis';
 import ClassSubjectLevel from './classSubjectLevel';
+import StudentsGroupLevel from './studentsGroupLevel';
 import SubjectCritical from './subjectCritical';
 
 //当前学科报告内
@@ -28,6 +29,7 @@ class ReportContent extends React.Component {
                 <SubjectCritical currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}/>
                 <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <StudentSubjectDis currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <ClassSubjectLevel currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
  */
 
 
@@ -35,7 +37,7 @@ class ReportContent extends React.Component {
         return (
             <div>
 
-                <ClassSubjectLevel currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <StudentsGroupLevel currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
             </div>
         );
     }
