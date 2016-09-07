@@ -10,7 +10,6 @@ export default function StudentsGroupLevel({currentSubject, reportDS}) {
 
     var tableData = getTableDS(paperFullMark, currentPaperStudentsInfo);
     var summaryInfo = getSummaryInfo(tableData);
-    debugger
     return (
         <div>
             <div style={{margin: '30px 0'}}>
