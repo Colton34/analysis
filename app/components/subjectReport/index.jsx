@@ -15,6 +15,8 @@ import ClassSubjectLevel from './classSubjectLevel';
 import StudentsGroupLevel from './studentsGroupLevel';
 import SubjectCritical from './subjectCritical';
 
+import ImportStudentsModule from './importStudents';
+
 import SubjectTeacherQuality from './SubjectTeacherQuality';
 
 //当前学科报告内
@@ -41,7 +43,7 @@ class ReportContent extends React.Component {
         return (
             <div>
 
-
+                <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <SubjectTeacherQuality currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}></SubjectTeacherQuality>
             </div>
         );
