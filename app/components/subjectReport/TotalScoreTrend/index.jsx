@@ -33,7 +33,7 @@ export default function Trend({reportDS, currentSubject}) {
                 <div>分析诊断：</div>
                 <div>{currentPaperInfo.subject}{summaryInfo}</div>
             </div>
-            <AnalysisFactor currentPaperInfo={currentPaperInfo} currentPaperStudentsInfo={currentPaperStudentsInfo} />
+            <AnalysisFactor currentPaperInfo={currentPaperInfo} currentPaperStudentsInfo={currentPaperStudentsInfo} reportDS={reportDS} currentSubject={currentSubject} />
             <div className={commonClass['analysis-conclusion']}></div>
         </div>
     )

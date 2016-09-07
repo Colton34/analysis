@@ -4,14 +4,17 @@ import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
 import StatisticalLib from 'simple-statistics';
 
-var functionList = [getSubjectName, getRealStudentCount, getLostStudentCount, getFullMark, getMaxScore, getMinScore, getMeanScore, getStandardDeviation, getDiscriminationFactor, getDifficulty];
+var functionList = [getSubjectName, getRealStudentCount, getLostStudentCount, getFullMark, getMaxScore, getMinScore, getMeanScore, getStandardDeviation, getDiscriminationFactor, getDifficulty, getReliabilityCoefficient, getSampleCorrelation];
 
 //TODO:会缺少阿尔法信度系数和相关系数，看一下PRD。
-export default function AnalysisFactor({currentPaperInfo, currentPaperStudentsInfo}) {
+export default function AnalysisFactor({currentPaperInfo, currentPaperStudentsInfo, reportDS, currentSubject}) {
+    var examStudentsInfo = reportDS.examStudentsInfo.toJS();
+
     var paperScores = _.map(currentPaperStudentsInfo, (obj) => obj.score);//Note:已经排好序了，从小到大
-    var tableData = [['科目', '参考总人数', '缺考人数', '满分', '最高分', '最低分', '平均分', '标准差', '差异系数', '难度'], []];
+    var tableData = [['科目', '参考总人数', '缺考人数', '满分', '最高分', '最低分', '平均分', '标准差', '差异系数', '难度', 'a信度系数', '相关系数'], []];
+
     _.forEach(functionList, func => {
-        tableData[1].push(func({currentPaperInfo, paperScores}));
+        tableData[1].push(func({currentPaperInfo, paperScores, currentPaperStudentsInfo, currentSubject, examStudentsInfo}));
     })
 
     return (
@@ -58,4 +61,39 @@ function getRealStudentCount({currentPaperInfo}) {
 }
 function getLostStudentCount({currentPaperInfo}) {
     return currentPaperInfo.lostStudentsCount;//缺考人数
+}
+//a=[K/(K-1)]×[1-(∑S2i)/(S2x)] -- k是此科目题目数量； ∑S2i是每道题目的方差和  S2x是所有题目总分（即学科得分）的方差
+function getReliabilityCoefficient({currentPaperStudentsInfo, currentSubject, examStudentsInfo}) {
+//当前科目所包含的题目 每个学生在各个题目上的得分
+    var currentSubjectStudentQuestionScores = getStudentsQuestionScores(examStudentsInfo, currentSubject);
+    var k = currentSubjectStudentQuestionScores[0].length;
+    var tempMap = {};
+    _.each(_.range(k), (i) => tempMap[i] = []);
+    _.each(currentSubjectStudentQuestionScores, (stuQueScores) => {
+        _.each(stuQueScores, (score, i) => tempMap[i].push(score));
+    });
+    var questionVarianceSum = _.sum(_.map(tempMap, (queScoArr) => StatisticalLib.variance(queScoArr)));
+    var paperScoreVariance = StatisticalLib.variance(_.map(currentPaperStudentsInfo, (obj) => obj.score));
+    var reliabilityCoefficient = _.round(_.multiply(_.divide(k, (k-1)), (1 - _.divide(questionVarianceSum, paperScoreVariance))), 2);
+    return reliabilityCoefficient;
+}
+
+function getStudentsQuestionScores(examStudentsInfo, currentSubject) {
+    // var allStudentsPaperQuestionInfo = {};
+    //各个学生在当前学科的小分表
+    var currentSubjectStudentQuestionScores = _.map(examStudentsInfo, (studentObj) => {
+        return _.find(studentObj.questionScores, (obj) => obj.paperid == currentSubject.pid)['scores'];
+    });
+    return currentSubjectStudentQuestionScores;
+}
+
+function getSampleCorrelation({currentPaperStudentsInfo, examStudentsInfo}) {
+//注意要是当前考了此科目的学生的信息
+    var currentPaperStudentScoreMap = {};
+    _.each(currentPaperStudentsInfo, (obj) => currentPaperStudentScoreMap[obj.id] = obj.score);
+    var allStudentScoreMap = {};
+    _.each(examStudentsInfo, (obj) => allStudentScoreMap[obj.id] = obj.score);
+    var currentPaperStudentIds = _.keys(currentPaperStudentScoreMap);
+    var currentPaperStudentTotalScoreMap = _.pick(allStudentScoreMap, currentPaperStudentIds);
+    return _.round(StatisticalLib.sampleCorrelation(_.values(currentPaperStudentTotalScoreMap), _.values(currentPaperStudentScoreMap)), 2);
 }

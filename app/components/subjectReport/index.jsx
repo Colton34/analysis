@@ -31,6 +31,13 @@ class ReportContent extends React.Component {
 
 /*
 
+                <ExamQuestionPerfromance currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <ClassDiffQuestionModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+
+
                 <Header currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <TotalScoreTrend currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <SubjectLevelModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
@@ -45,11 +52,8 @@ class ReportContent extends React.Component {
     render() {
         return (
             <div>
-                <ExamQuestionPerfromance currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <ClassDiffQuestionModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <TotalScoreTrend currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+
             </div>
         );
     }
