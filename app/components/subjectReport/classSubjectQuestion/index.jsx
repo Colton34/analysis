@@ -43,7 +43,6 @@ class ClassSubjectQuestion extends React.Component {
     render() {
         var currentClassQuestionScoreRate = this.allClassesQuestionScoreRate[this.state.currentClass];
         var gradeQuestionSeparation = this.gradeQuestionSeparation;
-        debugger;
         return (
             <div></div>
         );

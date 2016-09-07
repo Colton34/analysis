@@ -1,3 +1,4 @@
+// 学科分档上线情况
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
