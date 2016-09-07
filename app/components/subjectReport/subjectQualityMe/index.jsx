@@ -2,6 +2,10 @@ import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
+import StudentSubjectDistribution from './StudentSubjectDistribution';
+import ClassSubjectLevel from './ClassSubjectLevel';
+import StudentsGroupLevel from './StudentsGroupLevel';
+
 import {makeFactor} from '../../../sdk';
 
 export default function SubjectQualityModule({currentSubject, reportDS}) {
@@ -23,15 +27,19 @@ export default function SubjectQualityModule({currentSubject, reportDS}) {
             <TableView tableData={contriFactorsTableData}/>
             <div className={commonClass['analysis-conclusion']}>
                 <p>分析诊断：</p>
-                <p>
+                <div>
                     对于各班自身学科综合水平而言，经分析得出各个班级本学科的得分率贡献指数，表达该班级本学科对班级学科综合水平的贡献情况。数值为正，越大越好；数值为负，绝对值越大越不好。
                     根据上面的数表，
                     {
                         _.join(contriFactorsSummary.map(classInfo => {return classInfo.className + '班';}), '、')
                     }
                     班级的{currentSubject.subject }教学值得注意。
-                </p>
+                </div>
             </div>
+
+            <StudentSubjectDistribution reportDS={reportDS} currentSubject={currentSubject}/>
+            <ClassSubjectLevel reportDS={reportDS} currentSubject={currentSubject}/>
+            <StudentsGroupLevel reportDS={reportDS} currentSubject={currentSubject}/>
         </div>
     )
 }

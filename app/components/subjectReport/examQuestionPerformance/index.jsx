@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
-
+import StatisticalLib from 'simple-statistics';
+import commonClass from '../../../common/common.css';
 import DistributionTableModule from './distributionTableModule';
 import GradeQuestionDiffModule from './gradeQuestionDiffModule';
 
@@ -17,10 +18,13 @@ export default function ExamQuestionPerfromance({currentSubject, reportDS}) {
 
     var gradeQuestionSeparation = getGradeQuestionSeparation(currentPaperQuestions, currentSubject.pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
     var summaryInfo = getSummaryInfo(paperQuestionsDiffInfo);
-    debugger;
     return (
-        <div>
-            {/* <span>{summaryInfo}</span> */}
+        <div className={commonClass['section']}>
+            <div>
+                <span className={commonClass['title-bar']}></span>
+                <span className={commonClass['title']}>试卷整体命题及考试表现</span>
+                <span className={commonClass['title-desc']}></span>
+            </div>
             <DistributionTableModule paperQuestionsDiffInfo={paperQuestionsDiffInfo} />
             <GradeQuestionDiffModule gradeQuestionSeparation={gradeQuestionSeparation} paperQuestionsDiffInfo={paperQuestionsDiffInfo} />
         </div>
