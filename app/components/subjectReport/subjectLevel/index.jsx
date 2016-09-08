@@ -4,7 +4,7 @@ import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
-import {NUMBER_MAP as numberMap} from '../../../lib/constants';
+import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap} from '../../../lib/constants';
 
 export default function SubjectLevelModule({reportDS, currentSubject}) {
     var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS();
@@ -41,7 +41,13 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
                 <p>
                     上表可看到{currentSubject.subject}学科{levelNumString}档线，在全年级学生人数的分布。与本次考试其他各学科进行对比，{currentSubject.subject}学科
                     {
-                        _.join(currentSubjectLevelRank.map((rank, index) => {return '对全校学生上' + numberMap[index + 1] + '档线的学生上档人数排第' + rank + '名'}), '，')
+                        currentSubjectLevelRank.map((rank, index) => {
+                            return <span>
+                                    对全校学生上{numberMap[index + 1]}档线的学生上档人数排第 
+                                    <span style={{color: colorsMap.B03, margin: '0 5px'}}>{rank}</span>名
+                                    {index !== currentSubjectLevelRank.length -1 ? '，' : '。'}
+                                </span>
+                        })
                     }。多联系本学科的教学实际，做进一步的教学反思，本学科能如何改进教学，才为全年级的高端教学成就提供更大的贡献。
                 </p>
             </div>
