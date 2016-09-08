@@ -145,7 +145,7 @@ class ClassDiffQuestionModule extends React.Component {
         ];
 
         return (
-            <div >
+            <div  style={{position:'relative'}}>
                 <div style={{marginBottom: 18}}>
                     <span className={commonClass['sub-title']}>班级难度题组表现的差异情况</span>
                     <span className={commonClass['title-desc']}>应用大数据分析方法对具有相近难度的试题进行聚类，将题目分成5个难度的试题组。</span>
@@ -161,7 +161,7 @@ class ClassDiffQuestionModule extends React.Component {
                         {summaryInfo}
                     </div>
                 </div>
-                <DropdownList list={examClasses} onClickDropdownList={this.changeClass.bind(this)} style={{position: 'absolute', top: 0, right: 214, zIndex: 1}} />
+                <DropdownList list={examClasses} onClickDropdownList={this.changeClass.bind(this)} style={{position: 'absolute', top: 70, right: 50, zIndex: 1}} />
             </div>
         )
     }

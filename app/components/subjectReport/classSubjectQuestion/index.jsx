@@ -152,13 +152,13 @@ class ClassSubjectQuestion extends React.Component {
         option.series[0].data = chartData;
         var examClasses = this.examClasses;
         return (
-            <div >
+            <div style={{position:'relative'}}>
                 <div style={{marginBottom: 18,marginTop:30}}>
                     <span className={commonClass['sub-title']}>班级学科试题表现的差异情况</span>
                     <span className={commonClass['title-desc']}>对比各班级的学科各试题题目的得分率，可以看到，各班级有表现较好的试题，也有表现不好的试题。这一现象是值得教师认真分析的</span>
                 </div>
                 <ECharts option={option} style={{width:1340,height:400,position:'relative',left:-100,top:0}}></ECharts>
-                <DropdownList list={examClasses} onClickDropdownList={this.changeClass.bind(this)} style={{position: 'absolute', top: 0, right: 214, zIndex: 1}} />
+                <DropdownList list={examClasses} onClickDropdownList={this.changeClass.bind(this)} style={{position: 'absolute', top: 30, right: 50, zIndex: 1}} />
             </div>
         );
     }
