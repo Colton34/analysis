@@ -77,11 +77,12 @@ export default function ClassImportGoodStudents({currentPaperStudentsInfo}) {
                 color:'#fff'
             },
             formatter: function(){
-                return this.point.name
+                return this.point.y
             }
         },
         series:[{
-            data:chartDS.seriesData
+            data:chartDS.seriesData,
+            color:'#0099ff'
         }]
     };
 
@@ -114,7 +115,7 @@ function getBetterStudent(currentPaperStudentsInfo){
 
 function getChartDS(allStudentGroupByNum){
     var xAxis = _.map(allStudentGroupByNum,function(value,key){
-        return numberMap[value.name]+'班';
+        return value.name+'班';
     });
     var seriesData = allStudentGroupByNum;
         return {
