@@ -18,7 +18,7 @@ export default function ImportStudentsModule({reportDS, currentSubject}) {
             <span className={commonClass['title-bar']}></span>
             <span className={commonClass['title']}>重点学生信息</span>
             <span className={commonClass['title-desc']}>本学科成绩，在全校排名前10的学生</span>
-            <div>
+            <div style={{width: 1140, height: '100%', border: '1px solid' + colorsMap.C05, borderRadius: 2,marginBottom:20}}>
                 <table  style={_.assign({}, { width: '100%', minHeight: 220, margin: '30px 0 0 30px'}) }>
                     <thead>
                         <tr>
@@ -84,7 +84,7 @@ function getTopStudentAllInfo(rankTopStudents,examStudentsInfo){
              });
         });
     });
-    return allStudent;
+    return _.take(allStudent,10);
 }
 function getScoreById(id,examStudentsInfo,pro){
      return _.result(_.find(examStudentsInfo,function(arr){

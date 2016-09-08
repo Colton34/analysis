@@ -36,7 +36,7 @@ export default function SubjectQualityModule({currentSubject, reportDS}) {
                     对于各班自身学科综合水平而言，经分析得出各个班级本学科的得分率贡献指数，表达该班级本学科对班级学科综合水平的贡献情况。数值为正，越大越好；数值为负，绝对值越大越不好。
                     根据上面的数表，
                     {
-                        contriFactorsSummary.length ? <span><span style={{color: colorsMap.B03}}>{_.join(contriFactorsSummary.map(classInfo => {return classInfo.className + '班' }), '、') }</span>的<span style={{margin: '0 5px'}}>{currentSubject.subject}</span>教学值得注意。</span>  
+                        contriFactorsSummary.length ? <span><span style={{color: colorsMap.B03}}>{_.join(contriFactorsSummary.map(classInfo => {return classInfo.className + '班' }), '、') }</span>的<span style={{margin: '0 5px'}}>{currentSubject.subject}</span>教学值得注意。</span>
                         : <span>{currentSubject.subject} 是在本次考试中表现很强的优势学科。</span>
                     }
                 </div>
