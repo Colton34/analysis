@@ -18,8 +18,7 @@ import SubjectCritical from './subjectCritical';
 import ImportStudentsModule from './importStudents';
 
 import SubjectTeacherQuality from './SubjectTeacherQuality';
-import ClassSubjectQuestion from './classSubjectQuestion';
-import ClassDiffQuestionModule from './classDiffQuestion';
+
 import ExamQuestionPerfromance from './examQuestionPerformance';
 
 //当前学科报告内
@@ -33,7 +32,7 @@ class ReportContent extends React.Component {
 
                 <ExamQuestionPerfromance currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <ClassDiffQuestionModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                ////<ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
 
@@ -45,14 +44,24 @@ class ReportContent extends React.Component {
                 <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <StudentSubjectDis currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <StudentsGroupLevel currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <ClassSubjectLevel currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                /////<ClassSubjectLevel currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
  */
 
 
     render() {
         return (
             <div>
+
                 <ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+
+                <Header currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <TotalScoreTrend currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <SubjectLevelModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <SubjectCritical currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}/>
+                <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <ExamQuestionPerfromance currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+
             </div>
         );
     }
@@ -71,3 +80,13 @@ export default ReportContent;
 
 
 
+
+// <div>
+//     <Header currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+//     <TotalScoreTrend currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+//     <SubjectLevelModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+//     <SubjectCritical currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}/>
+//     <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+//     <ExamQuestionPerfromance currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+//     <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+// </div>

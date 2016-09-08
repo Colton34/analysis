@@ -1,4 +1,6 @@
+//班级学科试题表现的差异情况  K线图
 import _ from 'lodash';
+
 import React, { PropTypes } from 'react';
 import StatisticalLib from 'simple-statistics';
 
@@ -47,8 +49,10 @@ class ClassSubjectQuestion extends React.Component {
         var gradeQuestionScoreRates = this.gradeQuestionScoreRates;
         var currentClassQuestionScoreRate = this.allClassesQuestionScoreRate[this.state.currentClass];
         debugger;
+
         return (
-            <div>待填充</div>
+            <div style={{color:'red',fontSize:18}}>填充K线图</div>
+
         );
     }
 }
