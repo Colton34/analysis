@@ -5,6 +5,7 @@ import ECharts from 'react-echarts';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import commonClass from '../../../common/common.css';
 import subjectReportStyle from '../../../styles/subjectReport.css';
+import DropdownList from '../../../common/DropdownList';
 
 import {makeFactor} from '../../../sdk';
 
@@ -76,7 +77,12 @@ class ClassDiffQuestionModule extends React.Component {
         });
 
         var currentPaperInfo = this.props.reportDS.examPapersInfo.toJS()[this.props.currentSubject.pid];
-        var examClasses = currentPaperInfo.realClasses;
+        this.examClasses = _.map(currentPaperInfo.realClasses, (classKey) => {
+            return {
+                key: classKey,
+                value: classKey + '班'
+            }
+        });
 
         var currentPaperQuestions = currentPaperInfo.questions, allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
         var currentPaperStudentsInfo = allStudentsPaperMap[this.props.currentSubject.pid];
@@ -88,13 +94,18 @@ class ClassDiffQuestionModule extends React.Component {
         this.subjectName = currentPaperInfo.subject;
 
         this.state = {
-            currentClass: examClasses[0]
+            currentClass: this.examClasses[0]
         }
     }
 
     componentWillReceiveProps(nextProps) {
         var currentPaperInfo = nextProps.reportDS.examPapersInfo.toJS()[nextProps.currentSubject.pid];
-        var examClasses = currentPaperInfo.realClasses;
+        this.examClasses = _.map(currentPaperInfo.realClasses, (classKey) => {
+            return {
+                key: classKey,
+                value: classKey + '班'
+            }
+        });
 
         var currentPaperQuestions = currentPaperInfo.questions, allStudentsPaperMap = nextProps.reportDS.allStudentsPaperMap.toJS();
         var currentPaperStudentsInfo = allStudentsPaperMap[nextProps.currentSubject.pid];
@@ -106,14 +117,21 @@ class ClassDiffQuestionModule extends React.Component {
         this.subjectName = currentPaperInfo.subject;
 
         this.state = {
-            currentClass: examClasses[0]
+            currentClass: this.examClasses[0]
         }
+    }
+
+    changeClass(item) {
+        this.setState({
+            currentClass: item
+        })
     }
 
     render() {
         var gradeQuestionLevelGroupMeanRate = this.gradeQuestionLevelGroupMeanRate;
-        var currentClassLevelGroupMeanRate = this.allClassLevelGroupMeanRate[this.state.currentClass];
-        var summaryInfo = getSummaryInfo(this.allClassLevelGroupFactorsInfo[this.state.currentClass], this.subjectName);
+        var currentClassLevelGroupMeanRate = this.allClassLevelGroupMeanRate[this.state.currentClass.key];
+        var summaryInfo = getSummaryInfo(this.allClassLevelGroupFactorsInfo[this.state.currentClass.key], this.subjectName);
+        var examClasses = this.examClasses;
 
         option.series[0].data = [
             {
@@ -143,6 +161,7 @@ class ClassDiffQuestionModule extends React.Component {
                         {summaryInfo}
                     </div>
                 </div>
+                <DropdownList list={examClasses} onClickDropdownList={this.changeClass.bind(this)} style={{position: 'absolute', top: 0, right: 214, zIndex: 1}} />
             </div>
         )
     }

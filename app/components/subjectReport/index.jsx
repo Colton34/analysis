@@ -52,14 +52,8 @@ class ReportContent extends React.Component {
     render() {
         return (
             <div>
-                <ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <Header currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <TotalScoreTrend currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <SubjectLevelModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <SubjectCritical currentSubject={this.props.currentSubject} reportDS={this.props.reportDS}/>
-                <SubjectQualityModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <ExamQuestionPerfromance currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-                <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+
+                <ClassDiffQuestionModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
             </div>
         );
     }
