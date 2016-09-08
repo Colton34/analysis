@@ -113,13 +113,13 @@ function getCriticalStudentInfo(reportDS) {
     return criticalStudentInfo;
 }
 function getRenderData(reportDS, criticalStudentInfo, currentLevel, currentSubject) {
-
     var tableData = [['分档临界生', '年级']];
-    var examClassesInfo = reportDS.examClassesInfo.toJS();
-    _.forEach(examClassesInfo, (classInfo, className) => {
+    var studentsGroupByClass = reportDS.studentsGroupByClass.toJS();
+    var classList = [];
+    _.forEach(studentsGroupByClass, (classInfo, className) => {
         tableData[0].push(className + '班');
+        classList.push(className);
     })
-    var classList = _.keys(examClassesInfo);
 
     var criticalStudentCountRowData = getCriticalStudentCountRowData(criticalStudentInfo, classList, currentLevel);
     tableData.push(criticalStudentCountRowData);
@@ -191,7 +191,6 @@ function  getDeviationRowData(subjectMeanRowData, classList, subjectLevels, curr
     var badPerformanceClass = [];
     var meanData = subjectMeanRowData.slice(2);
     var subjectMean = subjectLevels[_.size(subjectLevels) - currentLevel - 1][currentSubject.pid].mean;
-    
     // 全年级：
     rowData.push(_.round(subjectMeanRowData[1] - subjectMean, 2));
     // 各班级
