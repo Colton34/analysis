@@ -52,7 +52,7 @@ function getSummaryInfo(currentPaperStudentsInfo) {
     } else if(skewness < 0.6) {
         return '学科试卷整体要求较高，试卷难度较难。';
     } else if(skewness < 0.7) {
-        return '学科试卷要求有点偏高，试卷难度偏难';
+        return '学科试卷要求有点偏高，试卷难度偏难。';
     } else if(skewness < 0.8) {
         return '学科试卷比较适应学生群体水平，考试要求属正常范围。';
     } else if(skewness < 0.9){
