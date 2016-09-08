@@ -1,4 +1,4 @@
-//重点学生信息模块
+//学科报告：重点学生信息模块
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
@@ -14,7 +14,7 @@ export default function ImportStudentsModule({reportDS, currentSubject}) {
     var rankTopStudents = getTopStudentsInfo(currentPaperStudentsInfo);//排名前十的学生
     var allStudent = getTopStudentAllInfo(rankTopStudents,examStudentsInfo);
     return (
-        <div id='ImportStudentsModule' className={commonClass['section']}>
+        <div id='importantStudents' className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
             <span className={commonClass['title']}>重点学生信息</span>
             <span className={commonClass['title-desc']}>本学科成绩，在全校排名前10的学生</span>

@@ -1,3 +1,4 @@
+//学科报告：分档临界生情况
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
@@ -38,7 +39,7 @@ export default class SubejctCriticalModule extends React.Component{
         var levelSize = _.size(reportDS.levels.toJS());
 
         return (
-            <div className={commonClass['section']}>
+            <div id="subjectCritical" className={commonClass['section']}>
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>分档临界生情况</span>
                 <span className={commonClass['title-desc']}>对比本学科各班级临界生情况，关注临界生群体，提高年级教学质量</span>
@@ -112,13 +113,13 @@ function getCriticalStudentInfo(reportDS) {
     return criticalStudentInfo;
 }
 function getRenderData(reportDS, criticalStudentInfo, currentLevel, currentSubject) {
-
     var tableData = [['分档临界生', '年级']];
-    var examClassesInfo = reportDS.examClassesInfo.toJS();
-    _.forEach(examClassesInfo, (classInfo, className) => {
+    var studentsGroupByClass = reportDS.studentsGroupByClass.toJS();
+    var classList = [];
+    _.forEach(studentsGroupByClass, (classInfo, className) => {
         tableData[0].push(className + '班');
+        classList.push(className);
     })
-    var classList = _.keys(examClassesInfo);
 
     var criticalStudentCountRowData = getCriticalStudentCountRowData(criticalStudentInfo, classList, currentLevel);
     tableData.push(criticalStudentCountRowData);
@@ -190,7 +191,6 @@ function  getDeviationRowData(subjectMeanRowData, classList, subjectLevels, curr
     var badPerformanceClass = [];
     var meanData = subjectMeanRowData.slice(2);
     var subjectMean = subjectLevels[_.size(subjectLevels) - currentLevel - 1][currentSubject.pid].mean;
-    
     // 全年级：
     rowData.push(_.round(subjectMeanRowData[1] - subjectMean, 2));
     // 各班级

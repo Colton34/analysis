@@ -29,7 +29,7 @@ class StudentSubjectDis extends React.Component {
         var subjectMaxScore = _.last(currentPaperStudents).score;
         var segments = makeSegments(paperFullMark, 0, this.state.currentStep);
         var {classHeaders, classDis} = getSegmentsClassDis(segments, currentPaperStudents);
-        var tableRenderData = getTableRenderData(classHeaders, classDis, segments, this.state.currentStep);
+        var tableRenderData = getTableRenderData(classHeaders, classDis, segments, this.state.currentStep, paperFullMark);
 
         return (
             <div>
@@ -37,11 +37,11 @@ class StudentSubjectDis extends React.Component {
                     <span className={commonClass['sub-title']}>学生学科成绩分布情况</span>
                     <span className={commonClass['title-desc']}>分析班级的学科表现，还需要从学生的成绩分布上考察学生水平的差异情况。</span>
                 </div>
-                <div>
-                    <div style={{ margin: '0 10px 30px 0', display: 'inline-block' }}>本科满分为{paperFullMark}分, 最高分{subjectMaxScore}分，您可以设置
-                        <input defaultValue={this.state.currentStep} onBlur={this.segmentInputBlur.bind(this) }  style={{ width: 70, height: 30, margin: '0 10px', paddingLeft: 10, border: '1px solid ' + colorsMap.C08 }}/>为一个分数段，查看不同分数段的人数分布及详情</div>
-                    </div>
-                <TableView tableData={tableRenderData}/>
+                <div style={{display: 'table-cell', paddingLeft: 18,verticalAlign: 'middle', width: 1200, height: 70, lineHeigth: 70, border: '1px solid ' + colorsMap.C05, background: colorsMap.C02, borderRadius: 3,position:'relative'}}>
+                    本科满分为{paperFullMark}分, 最高分{subjectMaxScore}分，您可以设置
+                    <input defaultValue={this.state.currentStep} onBlur={this.segmentInputBlur.bind(this) }  style={{ width: 70, height: 30, margin: '0 10px', paddingLeft: 10, border: '1px solid ' + colorsMap.C08 }}/>为一个分数段，查看不同分数段的人数分布及详情
+                </div>
+                <TableView tableData={tableRenderData} style={{marginTop: 27}}/>
             </div>
         );
     }
@@ -74,7 +74,7 @@ function getSegmentsClassDis(segments, currentPaperStudents) {
     }
 }
 
-function getTableRenderData (classHeaders, classDis, segments, currentStep) {
+function getTableRenderData (classHeaders, classDis, segments, currentStep, paperFullMark) {
     var  tableRenderData = [];
     var tableHeaders = ['分段'];
     tableHeaders = tableHeaders.concat(classHeaders);
@@ -82,8 +82,9 @@ function getTableRenderData (classHeaders, classDis, segments, currentStep) {
 
 
     _.forEachRight(segments.slice(0, segments.length -1), segment => {
-        var rowData = [(segment + currentStep) + '-' + (segment)];
-        _.forEach(classDis['[' + segment + '-' + (segment + currentStep) + ']'], data => {
+        var rightSideValue = (segment + currentStep < paperFullMark ? segment + currentStep : paperFullMark);
+        var rowData = [(rightSideValue) + '-' + segment];
+        _.forEach(classDis['[' + segment + '-' + rightSideValue + ']'], data => {
             rowData.push(data.count);
         })
         tableRenderData.push(rowData);
