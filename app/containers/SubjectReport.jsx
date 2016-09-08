@@ -7,21 +7,30 @@ import {Link} from 'react-router';
 
 import ReportContent from '../components/subjectReport';
 import CommonErrorView from '../common/ErrorView';
-// import CommonLoadingView from '../common/LoadingView';
+import commonClass from '../common/common.css';
 import Spinkit from '../common/Spinkit';
 
 import {initReportDSAction} from '../reducers/reportDS/actions';
 import {initParams} from '../lib/util';
 import {COLORS_MAP as colorsMap} from '../lib/constants';
 
+var localStyle = {
+    navItem: {display: 'inline-block', height: 60, lineHeight: '60px', margin: '0 30px', float: 'left', cursor: 'pointer'}
+}
+/**
+ * props:
+ * authSubjects: 
+ * currentSubject:
+ */
 class SubjectsNav extends React.Component {
     render() {
+        var {currentSubject} = this.props;
         return (
-            <div>
+            <div className={commonClass['section']} style={{zIndex: 3, position: 'relative', width: '100%', height: 60, padding: 0, display: 'inline-block'}}>
                 {
                     _.map(this.props.authSubjects, (obj) => {
                         return (
-                            <button key={obj.pid} onClick={this.props.changeSubject.bind(null, obj)}>{obj.subject}</button>
+                            <span key={obj.pid} onClick={this.props.changeSubject.bind(null, obj)} style={_.assign({}, localStyle.navItem, obj.pid === currentSubject.pid ? {color: colorsMap.B03, borderBottom:'2px solid ' + colorsMap.B03}: {})}>{obj.subject}</span>
                         )
                     })
                 }
@@ -55,7 +64,7 @@ class ContentComponent extends React.Component {
 
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                {(this.ifShowSubjectNav) ? (<SubjectsNav authSubjects={authSubjects} changeSubject={this.onChangeSubject.bind(this)} />) : ''}
+                {(this.ifShowSubjectNav) ? (<SubjectsNav authSubjects={authSubjects} changeSubject={this.onChangeSubject.bind(this)} currentSubject={currentSubject}/>) : ''}
                 <ReportContent currentSubject={currentSubject} reportDS={this.props.reportDS} />
             </div>
         );
