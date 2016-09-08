@@ -9,6 +9,8 @@ import StudentsGroupLevel from './StudentsGroupLevel';
 
 import {makeFactor} from '../../../sdk';
 
+import {COLORS_MAP as colorsMap} from '../../../lib/constants';
+
 export default function SubjectQualityModule({currentSubject, reportDS}) {
     var examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), totalScoreFullMark = reportDS.examInfo.toJS().fullMark;
     var paperStudentsInfo = reportDS.allStudentsPaperMap.toJS()[currentSubject.pid], paperFullMark = reportDS.examPapersInfo.toJS()[currentSubject.pid].fullMark;
@@ -25,7 +27,7 @@ export default function SubjectQualityModule({currentSubject, reportDS}) {
                 <div className={commonClass['title-desc']} style={{marginTop: 5}}>各班级某学科的表现，是所有考试科目表现的其中之一，它们之间存在一定的关联性，不仅要分析班级平均分的高低，要联系班级及全校多学科的综合水平来考察，班级某一个学科的相对表现水平。这可用学科得分率贡献指数来表达。如下表各班级本科表现：</div>
             </div>
             
-            <TableView tableData={contriFactorsTableData}/>
+            <TableView tableData={contriFactorsTableData} colorCallback={tableColorCallback}/>
             <div className={commonClass['analysis-conclusion']}>
                 <p>分析诊断：</p>
                 <div>
@@ -110,4 +112,9 @@ function getContriFactorsSummary(contriFactors, classList) {
         classFactorsList.push(obj);
     })
     return _.take(_.sortBy(classFactorsList, 'factor'), 2);
+}
+
+function tableColorCallback(data) {
+    if (data < 0) return colorsMap.B08;
+    else return 'inherit';
 }
