@@ -63,7 +63,11 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
                     对本学科而言，
                     {
                         _.map(classInfoSummary, (classList, levelNum) => {
-                            return numberMap[levelNum - 0 + 1] + '档线学生人数累计较多的班级是' + _.join(classList, '、') +  (levelNum - 0 !== levelSize -1 ? '，' : '。')
+                            if (classList.length){
+                                return <span>{numberMap[levelNum - 0 + 1]}档线学生人数<span style={{fontWeight: 'bold', margin: '0 2px'}}>累计</span>较多的班级是<span style={{color: colorsMap.B03}}>{_.join(classList, '、')}</span>{(levelNum - 0 !== levelSize -1 ? '，' : '。')}</span>
+                            } else {
+                                return numberMap[levelNum - 0 + 1] + '档线学生人数累计较多的班级是: 只有一个班级没有可比性。';
+                            }
                         })
                     }
                 </p>
@@ -174,19 +178,34 @@ function getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels) {
 
 function getclassInfoSummary(currentSubjectLevelClassInfo) {
     var summaryInfo = {};
+    var classSize = _.size(currentSubjectLevelClassInfo[0]) - 1;
+
+    //考虑只有一个班的情况
+    if (classSize === 1) {
+        _.forEach(_.range(_.size(currentSubjectLevelClassInfo)), num => {
+            summaryInfo[num] = [];
+        })
+        return summaryInfo;
+    }
     _.forEach(currentSubjectLevelClassInfo, (levelInfo, levelNum) => {
         var countClassMap = {};
         _.forEach(levelInfo, (count, className) => {
-            if (className !== 'totalSchool') {
-                if (countClassMap[count]) {
-                    countClassMap[count].push(className + '班');
-                } else {
-                    countClassMap[count] = [className + '班']
-                }
+            if (className === 'totalSchool')
+                return;
+            // 计算累计, 例如二档线要计算一、二档线的总和；
+            var countSum = 0;
+            _.forEach(_.range(levelNum - 0 + 1), num => {
+                countSum += currentSubjectLevelClassInfo[num][className];
+            })
+            if (countClassMap[countSum]) {
+                countClassMap[countSum].push(className + '班');
+            } else {
+                countClassMap[countSum] = [className + '班'];
             }
         })
-        var countSort = _.sortBy(_.values(_.omit(levelInfo, ['totalSchool'])));
-        summaryInfo[levelNum] =  _.flatten(_.reverse(_.takeRight(countSort, 2)).map(count => {return countClassMap[count]}));
+        //var countSort = _.sortBy(_.values(_.omit(levelInfo, ['totalSchool'])));
+        var countSort = _.sortBy(_.keys(countClassMap).map(countStr => {return parseInt(countStr)}));
+        summaryInfo[levelNum] = _.flatten(_.reverse(classSize > 2 ? _.takeRight(countSort, 2) : _.takeRight(countSort, 1)).map(count => { return countClassMap[count]}));
     })
     return summaryInfo;
 }
