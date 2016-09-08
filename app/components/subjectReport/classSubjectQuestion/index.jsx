@@ -6,6 +6,8 @@ import subjectReportStyle from '../../../styles/subjectReport.css';
 import React, { PropTypes } from 'react';
 import StatisticalLib from 'simple-statistics';
 import ECharts from 'react-echarts';
+import DropdownList from '../../../common/DropdownList';
+
 
 class ClassSubjectQuestion extends React.Component {
     constructor(props) {
@@ -17,26 +19,35 @@ class ClassSubjectQuestion extends React.Component {
         });
 
         var currentPaperInfo = this.props.reportDS.examPapersInfo.toJS()[this.props.currentSubject.pid];
-        var examClasses = currentPaperInfo.realClasses;
+        this.examClasses = _.map(currentPaperInfo.realClasses, (classKey) => {
+            return {
+                key: classKey,
+                value: classKey + '班'
+            }
+        });
 
         var currentPaperQuestions = currentPaperInfo.questions, allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
         var currentPaperStudentsInfo = allStudentsPaperMap[this.props.currentSubject.pid];
         var {gradeQuestionSeparation, gradeQuestionScoreRates, allClassesQuestionScoreRate} = getQuestionInfo(currentPaperQuestions, currentPaperStudentsInfo, this.props.currentSubject.pid, allStudentsPaperMap, examStudentsInfo, this.allStudentsPaperQuestionInfo);
         var questionNames = getQuestionName(currentPaperQuestions);
-        debugger;
         this.gradeQuestionSeparation = gradeQuestionSeparation;
         this.gradeQuestionScoreRates = gradeQuestionScoreRates;
         this.allClassesQuestionScoreRate = allClassesQuestionScoreRate;
         this.questionNames = questionNames;
         this.state = {
-            currentClass: examClasses[0]
+            currentClass: this.examClasses[0]
         }
     }
 
     componentWillReceiveProps(nextProps) {
         //建立新的科目的各个班级的info
         var currentPaperInfo = nextProps.reportDS.examPapersInfo.toJS()[nextProps.currentSubject.pid];
-        var examClasses = currentPaperInfo.realClasses;
+        this.examClasses = _.map(currentPaperInfo.realClasses, (classKey) => {
+            return {
+                key: classKey,
+                value: classKey + '班'
+            }
+        });
         var currentPaperQuestions = currentPaperInfo.questions, allStudentsPaperMap = nextProps.reportDS.allStudentsPaperMap.toJS(), examStudentsInfo = nextProps.reportDS.examStudentsInfo.toJS();
         var currentPaperStudentsInfo = allStudentsPaperMap[nextProps.currentSubject.pid];
         var questionNames = getQuestionName(currentPaperQuestions);
@@ -46,17 +57,22 @@ class ClassSubjectQuestion extends React.Component {
         this.allClassesQuestionScoreRate = allClassesQuestionScoreRate;
         this.questionNames = questionNames;
         this.state = {
-            currentClass: examClasses[0]
+            currentClass: this.examClasses[0]
         }
+    }
+
+    changeClass(item) {
+        this.setState({
+            currentClass: item
+        })
     }
 
     render() {
         var gradeQuestionSeparation = this.gradeQuestionSeparation;
         var gradeQuestionScoreRates = this.gradeQuestionScoreRates;
-        var currentClassQuestionScoreRate = this.allClassesQuestionScoreRate[this.state.currentClass];
+        var currentClassQuestionScoreRate = this.allClassesQuestionScoreRate[this.state.currentClass.key];
         var questionNames = this.questionNames;
         var chartData = getChartDS(gradeQuestionSeparation,gradeQuestionScoreRates,currentClassQuestionScoreRate,questionNames);
-        debugger;
         var option = {
             title: {
                 text: '',
@@ -134,6 +150,7 @@ class ClassSubjectQuestion extends React.Component {
         };
         option.xAxis.data = gradeQuestionSeparation.sort();
         option.series[0].data = chartData;
+        var examClasses = this.examClasses;
         return (
             <div >
                 <div style={{marginBottom: 18,marginTop:30}}>
@@ -141,7 +158,7 @@ class ClassSubjectQuestion extends React.Component {
                     <span className={commonClass['title-desc']}>对比各班级的学科各试题题目的得分率，可以看到，各班级有表现较好的试题，也有表现不好的试题。这一现象是值得教师认真分析的</span>
                 </div>
                 <ECharts option={option} style={{width:1340,height:400,position:'relative',left:-100,top:0}}></ECharts>
-
+                <DropdownList list={examClasses} onClickDropdownList={this.changeClass.bind(this)} style={{position: 'absolute', top: 0, right: 214, zIndex: 1}} />
             </div>
         );
     }
@@ -201,7 +218,6 @@ function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStud
 // var questionContriFactors = _.map(classQuestionScoreRates, (x, i) => _.round(_.subtract(x, gradeQuestionScoreRates[i]), 2));
 function getQuestionName(currentPaperQuestions){
     var questionNames = _.map(currentPaperQuestions,(obj) => {return obj.name});
-    debugger
     return questionNames;
 }
 /*
