@@ -1,5 +1,10 @@
+//班级难度题组表现的差异情况
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
+import ECharts from 'react-echarts';
+import {COLORS_MAP as colorsMap} from '../../../lib/constants';
+import commonClass from '../../../common/common.css';
+import subjectReportStyle from '../../../styles/subjectReport.css';
 
 var questionLevelTitles = ['容易题组', '较容易题组', '中等题组', '较难题组', '最难题组'];
 var indicator = _.map(questionLevelTitles, (qt) => {
@@ -50,8 +55,6 @@ var option = {
                color: '#f2f2f3'
            }
        }
-
-
     },
     series: [{
         name: '班级vs年级',
@@ -101,45 +104,43 @@ class ClassDiffQuestionModule extends React.Component {
         }
     }
 
-
     render() {
         var currentClassLevelGroupMeanRate = this.allClassLevelGroupMeanRate[this.state.currentClass];
         var gradeQuestionLevelGroupMeanRate = this.gradeQuestionLevelGroupMeanRate;
-/*
-    option.series[0].data = [
-        {
-            value: _.reverse(classQuestionLevelGroupMeanRate),
-            name: '班级平均得分率'
-        },
-        {
-            value: _.reverse(gradeQuestionLevelGroupMeanRate),
-            name: '年级平均得分率'
-        }
-    ];
+        debugger;
 
-    var summaryInfo = getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate);
+        option.series[0].data = [
+            {
+                value: _.reverse(currentClassLevelGroupMeanRate),
+                name: '班级平均得分率'
+            },
+            {
+                value: _.reverse(gradeQuestionLevelGroupMeanRate),
+                name: '年级平均得分率'
+            }
+        ];
 
     return (
-        <div style={{marginRight: 20, display: 'inline-block'}}>
+        <div >
             <div style={{marginBottom: 18}}>
-                <span className={commonClass['sub-title']}>试题难度题组表现</span>
-                <span className={commonClass['title-desc']}>我们把这次考试的所有题目按照难度分成了5个题组</span>
+                <span className={commonClass['sub-title']}>班级难度题组表现的差异情况</span>
+                <span className={commonClass['title-desc']}>应用大数据分析方法对具有相近难度的试题进行聚类，将题目分成5个难度的试题组。</span>
             </div>
-            <div style={{width: 560, height: 465, border: '1px solid' + colorsMap.C05, borderRadius: 2}}>
-
-            <ECharts option={option} style={{height:400}}></ECharts>
-            <p style={{fontSize: 12, marginTop: 0,marginLeft:15,marginRight:15}}><span style={{color: colorsMap.B08}}>*</span>{summaryInfo}</p>
+            <div style={{width: 1140, height: 400, border: '1px solid' + colorsMap.C05, borderRadius: 2,marginBottom:20}}>
+                <div style={{width:600,height:400,margin:'0 auto'}}>
+                    <ECharts option={option} ></ECharts>
+                </div>
+            </div>
+            <div className={commonClass['analysis-conclusion']}>
+                <p>分析诊断：</p>
+                <div>
+                    不同教学班级对相对较难题组的测试反应有不同的具体表现。比如处于本学科高端水平的是 8 班，在这类题组上 7 班， 6 班表现好，而处于本本学科低端水平的是 9 班，在这类题组上表现不错。
+                </div>
             </div>
         </div>
     )
 
 
- */
-
-
-        return (
-            <div>待填充</div>
-        );
     }
 }
 
