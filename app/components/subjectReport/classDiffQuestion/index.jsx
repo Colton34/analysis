@@ -1,5 +1,10 @@
+//班级难度题组表现的差异情况
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
+import ECharts from 'react-echarts';
+import {COLORS_MAP as colorsMap} from '../../../lib/constants';
+import commonClass from '../../../common/common.css';
+import subjectReportStyle from '../../../styles/subjectReport.css';
 
 import {makeFactor} from '../../../sdk';
 
@@ -52,8 +57,6 @@ var option = {
                color: '#f2f2f3'
            }
        }
-
-
     },
     series: [{
         name: '班级vs年级',
@@ -80,7 +83,6 @@ class ClassDiffQuestionModule extends React.Component {
 
         var {gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate, allClassLevelGroupFactorsInfo} = getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, currentPaperInfo.fullMark, this.props.currentSubject.pid, this.allStudentsPaperQuestionInfo);
         this.gradeQuestionLevelGroupMeanRate = gradeQuestionLevelGroupMeanRate;
-        // this.allClassPaperMeanRate = allClassPaperMeanRate;
         this.allClassLevelGroupMeanRate = allClassLevelGroupMeanRate;
         this.allClassLevelGroupFactorsInfo = allClassLevelGroupFactorsInfo;
         this.subjectName = currentPaperInfo.subject;
@@ -99,7 +101,6 @@ class ClassDiffQuestionModule extends React.Component {
 
         var {gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate, allClassLevelGroupFactorsInfo} = getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, currentPaperInfo.fullMark, nextProps.currentSubject.pid, this.allStudentsPaperQuestionInfo);
         this.gradeQuestionLevelGroupMeanRate = gradeQuestionLevelGroupMeanRate;
-        // this.allClassPaperMeanRate = allClassPaperMeanRate;
         this.allClassLevelGroupMeanRate = allClassLevelGroupMeanRate;
         this.allClassLevelGroupFactorsInfo = allClassLevelGroupFactorsInfo;
         this.subjectName = currentPaperInfo.subject;
@@ -109,49 +110,42 @@ class ClassDiffQuestionModule extends React.Component {
         }
     }
 
-
     render() {
         var gradeQuestionLevelGroupMeanRate = this.gradeQuestionLevelGroupMeanRate;
         var currentClassLevelGroupMeanRate = this.allClassLevelGroupMeanRate[this.state.currentClass];
         var summaryInfo = getSummaryInfo(this.allClassLevelGroupFactorsInfo[this.state.currentClass], this.subjectName);
         debugger;
 
-        // var summaryInfo = getSummaryInfo(currentClassPaperMeanRate, currentClassLevelGroupMeanRate);
-/*
-    option.series[0].data = [
-        {
-            value: _.reverse(classQuestionLevelGroupMeanRate),
-            name: '班级平均得分率'
-        },
-        {
-            value: _.reverse(gradeQuestionLevelGroupMeanRate),
-            name: '年级平均得分率'
-        }
-    ];
-
-    var summaryInfo = getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate);
-
-    return (
-        <div style={{marginRight: 20, display: 'inline-block'}}>
-            <div style={{marginBottom: 18}}>
-                <span className={commonClass['sub-title']}>试题难度题组表现</span>
-                <span className={commonClass['title-desc']}>我们把这次考试的所有题目按照难度分成了5个题组</span>
-            </div>
-            <div style={{width: 560, height: 465, border: '1px solid' + colorsMap.C05, borderRadius: 2}}>
-
-            <ECharts option={option} style={{height:400}}></ECharts>
-            <p style={{fontSize: 12, marginTop: 0,marginLeft:15,marginRight:15}}><span style={{color: colorsMap.B08}}>*</span>{summaryInfo}</p>
-            </div>
-        </div>
-    )
-
-
- */
-
+        option.series[0].data = [
+            {
+                value: _.reverse(currentClassLevelGroupMeanRate),
+                name: '班级平均得分率'
+            },
+            {
+                value: _.reverse(gradeQuestionLevelGroupMeanRate),
+                name: '年级平均得分率'
+            }
+        ];
 
         return (
-            <div>待填充</div>
-        );
+            <div >
+                <div style={{marginBottom: 18}}>
+                    <span className={commonClass['sub-title']}>班级难度题组表现的差异情况</span>
+                    <span className={commonClass['title-desc']}>应用大数据分析方法对具有相近难度的试题进行聚类，将题目分成5个难度的试题组。</span>
+                </div>
+                <div style={{width: 1140, height: 400, border: '1px solid' + colorsMap.C05, borderRadius: 2,marginBottom:20}}>
+                    <div style={{width:600,height:400,margin:'0 auto'}}>
+                        <ECharts option={option} ></ECharts>
+                    </div>
+                </div>
+                <div className={commonClass['analysis-conclusion']}>
+                    <p>分析诊断：</p>
+                    <div>
+                        {summaryInfo}
+                    </div>
+                </div>
+            </div>
+        )
     }
 }
 
@@ -181,18 +175,9 @@ function getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, curren
 function getClassQuestionLevelFactorsInfo(gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate, currentPaperStudentsInfo, currentPaperFullMark, classKeys) {
     var questionGroupLastIndex = questionLevelTitles.length - 1;
     var {gradePaperMeanRate, allClassPaperMeanRate} = getPaperMeanRateInfo(currentPaperStudentsInfo, currentPaperFullMark);
-    //组织originalMatrix，计算factors
     var theOriginalMatrix = getOriginalMatrix(gradePaperMeanRate, gradeQuestionLevelGroupMeanRate, allClassPaperMeanRate, allClassLevelGroupMeanRate);
-    debugger; //确认这里每一行的数值都是从小到大的--难题在前面
     var theFactors = makeFactor(theOriginalMatrix);
     return _.zipObject(classKeys, theFactors);
-    // var result = {};
-    // _.each(theFactors, (classQuestionLevelFactors, index) => {
-
-    // })
-    //组织matrix
-    //计算factors
-    //作为数据结构，以classKey存储，并带上题组信息，供切换班级的时候得出分析结论
 }
 
 function getOriginalMatrix(gradePaperMeanRate, gradeQuestionLevelGroupMeanRate, allClassPaperMeanRate, allClassLevelGroupMeanRate) {
@@ -210,17 +195,13 @@ function getOriginalMatrix(gradePaperMeanRate, gradeQuestionLevelGroupMeanRate, 
 }
 
 function getQuestionScoreRate(questions, pid, students, allStudentsPaperQuestionInfo) {
-//计算本班级的此道题目的得分率：
-    //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分
     return _.map(questions, (questionObj, index) => {
-        //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
         return _.round(_.divide(_.mean(_.map(students, (studentObj) => {
             return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
         })), questionObj.score), 2);
     });
 }
 
-//怎么分组？？？--（得分率最高-得分率最低）/ 5
 function getGradeQuestionLevelGroup(questions, gradeQuestionScoreRates) {
     var temp = _.map(questions, (obj, index) => {
         return {
@@ -230,10 +211,8 @@ function getGradeQuestionLevelGroup(questions, gradeQuestionScoreRates) {
             qid: obj.qid
         }
     });
-    temp = _.sortBy(temp, 'gradeRate');//得分率 == 正向 难度  得分率高==容易  这里是从小到大正序，所以是“最难”开始
-
+    temp = _.sortBy(temp, 'gradeRate');
     var segments = getStepSegments(temp);
-    // 0.3, 0.4, 0.5, 0.6, 0.7, 0.8
     var gradeQuestionLevelGroup = {};
     _.each(_.range(segments.length-1), (index) => {
         var targets = _.filter(temp, (obj) => (index == 0) ? (segments[index] <= obj.gradeRate && obj.gradeRate <= segments[index+1]) : (segments[index] < obj.gradeRate && obj.gradeRate <= segments[index+1]));
@@ -248,9 +227,6 @@ function getClassQuestionLevelGroupMeanRate(gradeQuestionLevelGroup, classQuesti
     return classQuestionLevelGroupMeanRate;
 }
 
-//获取各个班级当前学科的平均得分率：
-//  遍历各个班级
-//      求得学科平均分，算出得分率
 function getPaperMeanRateInfo(currentPaperStudentsInfo, currentPaperFullMark) {
     var gradePaperMeanRate = _.round(_.divide(_.mean(_.map(currentPaperStudentsInfo, (obj) => obj.score)), currentPaperFullMark), 2);
     var classesPaperMeanRate = {};
@@ -264,7 +240,6 @@ function getPaperMeanRateInfo(currentPaperStudentsInfo, currentPaperFullMark) {
     };
 }
 
-//注意：gradeQuestionLevelGroup是倒序的，最难在最前面
 function getClassQuestionLevelGroup(gradeQuestionLevelGroup, classQuestionScoreRates, questions) {
     var classQuestionLevelGroup = {};
     var classQuestionScoreRateMap = {};

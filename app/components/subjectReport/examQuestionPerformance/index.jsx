@@ -18,7 +18,7 @@ export default function ExamQuestionPerfromance({currentSubject, reportDS}) {
     var paperQuestionsDiffInfo = getPaperQuestionsDiffInfo(currentPaperQuestions, currentSubject.pid, currentPaperStudentsInfo, allStudentsPaperQuestionInfo);
 
     var gradeQuestionSeparation = getGradeQuestionSeparation(currentPaperQuestions, currentSubject.pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
-    var summaryInfo = getSummaryInfo(paperQuestionsDiffInfo);
+    var {paperDiff, summaryInfo} = getSummaryInfo(paperQuestionsDiffInfo, currentSubject);
     return (
         <div id="examQuestionPerformance" className={commonClass['section']}>
             <div>
@@ -26,7 +26,7 @@ export default function ExamQuestionPerfromance({currentSubject, reportDS}) {
                 <span className={commonClass['title']}>试卷整体命题及考试表现</span>
                 <span className={commonClass['title-desc']}></span>
             </div>
-            <DistributionTableModule paperQuestionsDiffInfo={paperQuestionsDiffInfo} />
+            <DistributionTableModule paperQuestionsDiffInfo={paperQuestionsDiffInfo} paperDiff={paperDiff} summaryInfo={summaryInfo}/>
             <GradeQuestionDiffModule gradeQuestionSeparation={gradeQuestionSeparation} paperQuestionsDiffInfo={paperQuestionsDiffInfo} />
         </div>
     )
@@ -74,6 +74,20 @@ function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStud
 
 function getSummaryInfo(paperQuestionsDiffInfo) {
     var paperDiff = _.round(_.divide(_.sum(_.map(paperQuestionsDiffInfo, (obj) => obj.diff)), paperQuestionsDiffInfo.length), 2);
-    //TODO: 通过当前paperDiff的值给出结论。【偏难】。。等
-    return '';
+    var summaryInfo = '';
+    if(paperDiff < 0.5) {
+        summaryInfo = currentSubject.subject + '学科试卷难度过大，学科要求过高，对中低端学生给予的展现空间不足。';
+    } else if(paperDiff < 0.6) {
+        summaryInfo = currentSubject.subject + '学科试卷整体要求较高，试卷难度较难。';
+    } else if(paperDiff < 0.7) {
+        summaryInfo = '学科试卷要求有点偏高，试卷难度偏难。';
+    } else if(paperDiff < 0.8) {
+        summaryInfo = currentSubject.subject + '学科试卷比较适应学生群体水平，考试要求属正常范围。';
+    } else if(paperDiff < 0.9){
+        summaryInfo = currentSubject.subject + '学科要求偏宽，试卷整体难度偏容易。';
+    }else{
+        summaryInfo = currentSubject.subject + '学科试卷难度过容易，不利于中高端学生的学业水平展现。';
+    }
+    return {paperDiff, summaryInfo};
+
 }

@@ -11,7 +11,7 @@ export default function AnalysisFactor({currentPaperInfo, currentPaperStudentsIn
     var examStudentsInfo = reportDS.examStudentsInfo.toJS();
 
     var paperScores = _.map(currentPaperStudentsInfo, (obj) => obj.score);//Note:已经排好序了，从小到大
-    var tableData = [['科目', '参考总人数', '缺考人数', '满分', '最高分', '最低分', '平均分', '标准差', '差异系数', '难度', 'a信度系数', '相关系数'], []];
+    var tableData = [['科目', '参考总人数', '缺考人数', '满分', '最高分', '最低分', '平均分', '标准差', '差异系数', '难度', 'α信度系数', '相关系数'], []];
 
     _.forEach(functionList, func => {
         tableData[1].push(func({currentPaperInfo, paperScores, currentPaperStudentsInfo, currentSubject, examStudentsInfo}));

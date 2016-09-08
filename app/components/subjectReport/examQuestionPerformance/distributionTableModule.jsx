@@ -3,18 +3,18 @@ import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
+import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
-
-export default function DistributionTableModule({paperQuestionsDiffInfo}) {
+export default function DistributionTableModule({paperQuestionsDiffInfo, paperDiff, summaryInfo}) {
     var {tableHeaders, tableData} = getTableRenderData(paperQuestionsDiffInfo);
     return (
-       <div>
-            <p>本学科的整体难度把握: <span style={{color: 'red'}}>数据待填充</span></p>
+       <div style={{marginTop: 20}}>
+            <p>本学科的整体难度把握: <span style={{color: colorsMap.B03}}>{paperDiff}</span>，{summaryInfo}</p>
             <p>分布从客观题，主观题试题难度分布结构看，这次考试试题的难度分布情况见下表。</p>
 
             <TableView tableHeaders={tableHeaders} tableData={tableData} TableComponent={EnhanceTable}/>
             <div className={commonClass['analysis-conclusion']}>
-                <div style={{color: 'red'}}>结论部分，待填充</div>
+                 试题的难度分布对学生的考试成绩分布有直接的影响，它反映了命题者的命题指导思想。对试卷总体难度的把握与设计时，一定要多从试题难度的分布结构上来思考。
             </div>
         </div>
     )
