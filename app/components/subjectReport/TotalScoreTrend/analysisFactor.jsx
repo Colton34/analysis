@@ -3,6 +3,7 @@ import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
 import StatisticalLib from 'simple-statistics';
+import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
 var functionList = [getSubjectName, getRealStudentCount, getLostStudentCount, getFullMark, getMaxScore, getMinScore, getMeanScore, getStandardDeviation, getDiscriminationFactor, getDifficulty, getReliabilityCoefficient, getSampleCorrelation];
 
@@ -24,6 +25,10 @@ export default function AnalysisFactor({currentPaperInfo, currentPaperStudentsIn
                 <span className={commonClass['title-desc']}>观察本次考试的常用分析指标，结合年级及班级自身情况，发现本学科教学信息</span>
             </div>
             <TableView tableData={tableData}/>
+            <div className={commonClass['analysis-conclusion']}>
+                <p>分析与诊断：</p>
+                <div>作为学校组织的学科考试，总体难度控制为<span style={{color: colorsMap.B03}}>{tableData[1][9]}</span>。关于试题难度更详细的分析可参见本报告“实体整体命题”部分。</div>
+            </div>
         </div>
     )
 }
