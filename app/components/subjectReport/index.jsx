@@ -52,11 +52,22 @@ class ReportContent extends React.Component {
     render() {
         return (
             <div>
-                <TotalScoreTrend currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
-
+                <ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
             </div>
         );
     }
 }
 
 export default ReportContent;
+
+
+
+
+
+
+
+
+
+
+
+

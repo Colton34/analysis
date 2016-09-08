@@ -6,6 +6,7 @@ import commonClass from '../../../common/common.css';
 import subjectReportStyle from '../../../styles/subjectReport.css';
 import ClassImportGoodStudents from './classImportGoodStudents';
 import ClassImportBadStudents from './classImportBadStudents';
+import DisadvantagedSubjectModule from './disadvantagedSubject';
 
 export default function ImportStudentsModule({reportDS, currentSubject}) {
     var examStudentsInfo = reportDS.examStudentsInfo.toJS();
@@ -47,6 +48,7 @@ export default function ImportStudentsModule({reportDS, currentSubject}) {
             </div>
             <ClassImportGoodStudents currentPaperStudentsInfo={currentPaperStudentsInfo}></ClassImportGoodStudents>
             <ClassImportBadStudents currentPaperStudentsInfo={currentPaperStudentsInfo}></ClassImportBadStudents>
+            <DisadvantagedSubjectModule currentSubject={currentSubject} reportDS={reportDS} />
         </div>
     )
 }

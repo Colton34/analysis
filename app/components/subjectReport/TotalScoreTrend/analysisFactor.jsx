@@ -7,7 +7,6 @@ import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
 var functionList = [getSubjectName, getRealStudentCount, getLostStudentCount, getFullMark, getMaxScore, getMinScore, getMeanScore, getStandardDeviation, getDiscriminationFactor, getDifficulty, getReliabilityCoefficient, getSampleCorrelation];
 
-//TODO:会缺少阿尔法信度系数和相关系数，看一下PRD。
 export default function AnalysisFactor({currentPaperInfo, currentPaperStudentsInfo, reportDS, currentSubject}) {
     var examStudentsInfo = reportDS.examStudentsInfo.toJS();
 
