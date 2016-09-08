@@ -23,7 +23,7 @@ export default function GradeQuestionDiffModule({paperQuestionsDiffInfo, gradeQu
       subtitle: {
         text: '(区分度)',
         floating: true,
-        x: 530,
+        x: 520,
         y: 300,
         style: {
 
@@ -45,6 +45,10 @@ export default function GradeQuestionDiffModule({paperQuestionsDiffInfo, gradeQu
         lineWidth: 1,
         tickLength: 0,//刻度长度
         startOnTick: true,
+        endOnTick:true,
+        max: 1,//最大
+        min:0,
+        minTickInterval: 0.2,//刻度最小间隔
       },
       yAxis: {
         allowDecimals: true,//刻度允许小数
@@ -84,7 +88,7 @@ export default function GradeQuestionDiffModule({paperQuestionsDiffInfo, gradeQu
                 <span className={commonClass['title-desc']}>将每一个试题的难度，区分度结合起来分析</span>
             </div>
             <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
-            <div className={commonClass['analysis-conclusion']}>
+            <div className={commonClass['analysis-conclusion']} style={{display:summaryInfo==''?'none':'block'}}>
                 <p>分析诊断：</p>
                 <div>
                     从试题的测试功能看，试题 <span style={{color:'#0099ff'}}>{summaryInfo}</span>  需要进一步审视试题的难度设置。
@@ -108,7 +112,7 @@ function getChartDS({paperQuestionsDiffInfo, gradeQuestionSeparation}){
 
 function getSummaryInfo(chartDS){
      var summaryInfo = _.filter(chartDS,function(obj){
-        return obj.x<=0.2&&obj.y<=0.4
+        return 0<obj.x<=0.2&&obj.y<=0.4
     });
      var summaryInfoString = _.map(summaryInfo,(obj) => {return obj.name})
     return summaryInfoString.join('   ');
