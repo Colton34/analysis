@@ -21,9 +21,7 @@ import SubjectTeacherQuality from './SubjectTeacherQuality';
 
 import ExamQuestionPerfromance from './examQuestionPerformance';
 import ClassDiffQuestionModule from './classDiffQuestion';
-
 import ClassSubjectQuestion from './classSubjectQuestion';
-
 //当前学科报告内
 class ReportContent extends React.Component {
     constructor(props) {
