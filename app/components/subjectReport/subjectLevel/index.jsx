@@ -7,7 +7,8 @@ import EnhanceTable from '../../../common/EnhanceTable';
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap} from '../../../lib/constants';
 
 export default function SubjectLevelModule({reportDS, currentSubject}) {
-    var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS();
+    var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS();
+    var classList = _.keys(studentsGroupByClass);
     var currentPaperInfo = reportDS.examPapersInfo.toJS()[currentSubject.pid];
     var currentPaperStudentsInfo = reportDS.allStudentsPaperMap.toJS()[currentSubject.pid];
     var subjectLevelDistribution = makeCurrentSubjectSegmentsDistribution(subjectLevels, reportDS.examPapersInfo.toJS(), reportDS.allStudentsPaperMap.toJS());
@@ -17,7 +18,7 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
     var currentSubjectLevelInfo = getCurrentSubjectLevelInfo(subjectLevelDistribution, currentSubject.pid);//注意：levelKey小的代表低档次
     var {levelTableHeaders, levelTableData} = getLevelTableRenderData(currentSubjectLevelInfo, subjectLevels, currentSubject);
     var currentSubjectLevelRank = getCurrentSubjectLevelRank(subjectLevelDistribution, currentSubject.pid);//高档次名次在前
-    var currentSubjectLevelClassInfo = getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubject.pid);
+    var currentSubjectLevelClassInfo = getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubject.pid, classList);
     var {classInfoTableHeaders, classInfoTableData} = getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels);
     var classInfoSummary = getclassInfoSummary(currentSubjectLevelClassInfo);
 
@@ -227,15 +228,20 @@ function getCurrentSubjectLevelRank(subjectLevelDistribution, currentSubjectPid)
     return _.reverse(result);
 }
 
-function getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubjectPid) {
+function getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubjectPid, classList) {
     var result = {}, currentSubjectLevelStudentsGroup, temp;
     _.each(subjectLevelDistribution, (obj, levelKey) => {
         temp = {};
         currentSubjectLevelStudentsGroup = _.groupBy(obj[currentSubjectPid].targets, 'class_name');
+
         temp.totalSchool = obj[currentSubjectPid].targets.length;
-        _.each(currentSubjectLevelStudentsGroup, (cstudents, classKey) => {
-            temp[classKey] = cstudents.length;
-        });
+        // 按照classList来遍历班级，避免有的有的档次没有某些班；
+        _.forEach(classList, className => {
+            temp[className] = currentSubjectLevelStudentsGroup[className] ? currentSubjectLevelStudentsGroup[className].length : 0; 
+        })
+        // _.each(currentSubjectLevelStudentsGroup, (cstudents, classKey) => {
+        //     temp[classKey] = cstudents.length;
+        // });
         result[levelKey] = temp;
     });
     return result;

@@ -8,7 +8,6 @@ import ReactHighcharts from 'react-highcharts';
 export default function GradeQuestionDiffModule({paperQuestionsDiffInfo, gradeQuestionSeparation}) {
     var chartDS = getChartDS({paperQuestionsDiffInfo, gradeQuestionSeparation});
     var summaryInfo = getSummaryInfo(chartDS);
-    debugger;
     var config = {
       title: {
         text: '(得分率)',

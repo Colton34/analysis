@@ -4,7 +4,6 @@ import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
 export default function InfoCards ({currentPaperInfo, currentPaperStudentsInfo}) {
     var headerData = getHeaderData(currentPaperInfo, currentPaperStudentsInfo);
-    debugger;
     return (
         <div style={{marginTop: 30}}>
             试卷共  {headerData.totalQuestionCount} 道题目，主观题  {headerData.subjectiveQuestionsCount} 道，分值占比 {headerData.subjectiveQuestionsScorePercentage}，客观题 {headerData.objectiveQuestionsCount} 道，分值占比 {headerData.objectiveQuestionsScorePercentage}；学科总分 {currentPaperInfo.fullMark}，本次考试年级最高分 {headerData.maxScore} 分，最低分 {headerData.minScore} 分，年级平均分 {headerData.avgScore} 分。

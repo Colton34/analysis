@@ -23,7 +23,6 @@ class ClassSubjectQuestion extends React.Component {
         var currentPaperStudentsInfo = allStudentsPaperMap[this.props.currentSubject.pid];
         var {gradeQuestionSeparation, gradeQuestionScoreRates, allClassesQuestionScoreRate} = getQuestionInfo(currentPaperQuestions, currentPaperStudentsInfo, this.props.currentSubject.pid, allStudentsPaperMap, examStudentsInfo, this.allStudentsPaperQuestionInfo);
         var questionNames = getQuestionName(currentPaperQuestions);
-        debugger;
         this.gradeQuestionSeparation = gradeQuestionSeparation;
         this.gradeQuestionScoreRates = gradeQuestionScoreRates;
         this.allClassesQuestionScoreRate = allClassesQuestionScoreRate;
@@ -56,7 +55,6 @@ class ClassSubjectQuestion extends React.Component {
         var currentClassQuestionScoreRate = this.allClassesQuestionScoreRate[this.state.currentClass];
         var questionNames = this.questionNames;
         var chartData = getChartDS(gradeQuestionSeparation,gradeQuestionScoreRates,currentClassQuestionScoreRate,questionNames);
-        debugger;
         var option = {
             title: {
                 text: '',
@@ -201,7 +199,6 @@ function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStud
 // var questionContriFactors = _.map(classQuestionScoreRates, (x, i) => _.round(_.subtract(x, gradeQuestionScoreRates[i]), 2));
 function getQuestionName(currentPaperQuestions){
     var questionNames = _.map(currentPaperQuestions,(obj) => {return obj.name});
-    debugger
     return questionNames;
 }
 /*

@@ -114,7 +114,6 @@ class ClassDiffQuestionModule extends React.Component {
         var gradeQuestionLevelGroupMeanRate = this.gradeQuestionLevelGroupMeanRate;
         var currentClassLevelGroupMeanRate = this.allClassLevelGroupMeanRate[this.state.currentClass];
         var summaryInfo = getSummaryInfo(this.allClassLevelGroupFactorsInfo[this.state.currentClass], this.subjectName);
-        debugger;
 
         option.series[0].data = [
             {

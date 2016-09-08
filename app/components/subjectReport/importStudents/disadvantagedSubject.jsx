@@ -5,7 +5,6 @@ export default function DisadvantagedSubjectModule({currentSubject, reportDS}) {
     var allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), currentPaperId = currentSubject.pid;
     var currentPaperInfo = reportDS.examPapersInfo.toJS()[currentPaperId];
     var {categories, disadvantagedSubjectInfo} = getCurrentSubjectDisadvantagedInfo(allStudentsPaperMap, examStudentsInfo, currentPaperId, currentPaperInfo);
-    debugger;
 
     return (
         <div>待填充</div>
