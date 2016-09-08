@@ -52,7 +52,7 @@ class ReportContent extends React.Component {
     render() {
         return (
             <div>
-                <ClassSubjectQuestion currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
+                <ClassDiffQuestionModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
             </div>
         );
     }

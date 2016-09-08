@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 
+import {makeFactor} from '../../../sdk';
+
 var questionLevelTitles = ['容易题组', '较容易题组', '中等题组', '较难题组', '最难题组'];
 var indicator = _.map(questionLevelTitles, (qt) => {
     return {
@@ -76,9 +78,12 @@ class ClassDiffQuestionModule extends React.Component {
         var currentPaperQuestions = currentPaperInfo.questions, allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
         var currentPaperStudentsInfo = allStudentsPaperMap[this.props.currentSubject.pid];
 
-        var {gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate} = getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, this.props.currentSubject.pid, this.allStudentsPaperQuestionInfo);
+        var {gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate, allClassLevelGroupFactorsInfo} = getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, currentPaperInfo.fullMark, this.props.currentSubject.pid, this.allStudentsPaperQuestionInfo);
         this.gradeQuestionLevelGroupMeanRate = gradeQuestionLevelGroupMeanRate;
+        // this.allClassPaperMeanRate = allClassPaperMeanRate;
         this.allClassLevelGroupMeanRate = allClassLevelGroupMeanRate;
+        this.allClassLevelGroupFactorsInfo = allClassLevelGroupFactorsInfo;
+        this.subjectName = currentPaperInfo.subject;
 
         this.state = {
             currentClass: examClasses[0]
@@ -92,9 +97,12 @@ class ClassDiffQuestionModule extends React.Component {
         var currentPaperQuestions = currentPaperInfo.questions, allStudentsPaperMap = nextProps.reportDS.allStudentsPaperMap.toJS();
         var currentPaperStudentsInfo = allStudentsPaperMap[nextProps.currentSubject.pid];
 
-        var {gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate} = getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, nextProps.currentSubject.pid, this.allStudentsPaperQuestionInfo);
+        var {gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate, allClassLevelGroupFactorsInfo} = getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, currentPaperInfo.fullMark, nextProps.currentSubject.pid, this.allStudentsPaperQuestionInfo);
         this.gradeQuestionLevelGroupMeanRate = gradeQuestionLevelGroupMeanRate;
+        // this.allClassPaperMeanRate = allClassPaperMeanRate;
         this.allClassLevelGroupMeanRate = allClassLevelGroupMeanRate;
+        this.allClassLevelGroupFactorsInfo = allClassLevelGroupFactorsInfo;
+        this.subjectName = currentPaperInfo.subject;
 
         this.state = {
             currentClass: examClasses[0]
@@ -103,8 +111,12 @@ class ClassDiffQuestionModule extends React.Component {
 
 
     render() {
-        var currentClassLevelGroupMeanRate = this.allClassLevelGroupMeanRate[this.state.currentClass];
         var gradeQuestionLevelGroupMeanRate = this.gradeQuestionLevelGroupMeanRate;
+        var currentClassLevelGroupMeanRate = this.allClassLevelGroupMeanRate[this.state.currentClass];
+        var summaryInfo = getSummaryInfo(this.allClassLevelGroupFactorsInfo[this.state.currentClass], this.subjectName);
+        debugger;
+
+        // var summaryInfo = getSummaryInfo(currentClassPaperMeanRate, currentClassLevelGroupMeanRate);
 /*
     option.series[0].data = [
         {
@@ -145,9 +157,7 @@ class ClassDiffQuestionModule extends React.Component {
 
 export default ClassDiffQuestionModule;
 
-
-
-function getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, currentPaperId, allStudentsPaperQuestionInfo) {
+function getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, currentPaperFullMark, currentPaperId, allStudentsPaperQuestionInfo) {
     var studentsByClass = _.groupBy(currentPaperStudentsInfo, 'class_name');
     var allClassLevelGroupMeanRate = {};
 
@@ -160,10 +170,43 @@ function getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, curren
         allClassLevelGroupMeanRate[classKey] = getClassQuestionLevelGroupMeanRate(gradeQuestionLevelGroup, classQuestionScoreRates, currentPaperQuestions);
     });
 
+    var allClassLevelGroupFactorsInfo = getClassQuestionLevelFactorsInfo(gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate, currentPaperStudentsInfo, currentPaperFullMark, _.keys(studentsByClass));
     return {
         gradeQuestionLevelGroupMeanRate: gradeQuestionLevelGroupMeanRate,
-        allClassLevelGroupMeanRate: allClassLevelGroupMeanRate
+        allClassLevelGroupMeanRate: allClassLevelGroupMeanRate,
+        allClassLevelGroupFactorsInfo: allClassLevelGroupFactorsInfo
     }
+}
+
+function getClassQuestionLevelFactorsInfo(gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate, currentPaperStudentsInfo, currentPaperFullMark, classKeys) {
+    var questionGroupLastIndex = questionLevelTitles.length - 1;
+    var {gradePaperMeanRate, allClassPaperMeanRate} = getPaperMeanRateInfo(currentPaperStudentsInfo, currentPaperFullMark);
+    //组织originalMatrix，计算factors
+    var theOriginalMatrix = getOriginalMatrix(gradePaperMeanRate, gradeQuestionLevelGroupMeanRate, allClassPaperMeanRate, allClassLevelGroupMeanRate);
+    debugger; //确认这里每一行的数值都是从小到大的--难题在前面
+    var theFactors = makeFactor(theOriginalMatrix);
+    return _.zipObject(classKeys, theFactors);
+    // var result = {};
+    // _.each(theFactors, (classQuestionLevelFactors, index) => {
+
+    // })
+    //组织matrix
+    //计算factors
+    //作为数据结构，以classKey存储，并带上题组信息，供切换班级的时候得出分析结论
+}
+
+function getOriginalMatrix(gradePaperMeanRate, gradeQuestionLevelGroupMeanRate, allClassPaperMeanRate, allClassLevelGroupMeanRate) {
+    var matrix = [], gradeRow = [], classRow;
+    gradeRow.push(gradePaperMeanRate);
+    gradeRow = _.concat(gradeRow, gradeQuestionLevelGroupMeanRate);
+    matrix.push(gradeRow);
+    _.each(allClassPaperMeanRate, (currentClassPaperMeanRate, classKey) => {
+        classRow = [];
+        classRow.push(currentClassPaperMeanRate);
+        classRow = _.concat(classRow, allClassLevelGroupMeanRate[classKey]);
+        matrix.push(classRow);
+    });
+    return matrix;
 }
 
 function getQuestionScoreRate(questions, pid, students, allStudentsPaperQuestionInfo) {
@@ -187,7 +230,7 @@ function getGradeQuestionLevelGroup(questions, gradeQuestionScoreRates) {
             qid: obj.qid
         }
     });
-    temp = _.sortBy(temp, 'gradeRate');
+    temp = _.sortBy(temp, 'gradeRate');//得分率 == 正向 难度  得分率高==容易  这里是从小到大正序，所以是“最难”开始
 
     var segments = getStepSegments(temp);
     // 0.3, 0.4, 0.5, 0.6, 0.7, 0.8
@@ -203,6 +246,22 @@ function getClassQuestionLevelGroupMeanRate(gradeQuestionLevelGroup, classQuesti
     var classQuestionLevelGroup = getClassQuestionLevelGroup(gradeQuestionLevelGroup, classQuestionScoreRates, questions);
     var classQuestionLevelGroupMeanRate = _.map(classQuestionLevelGroup, (questionRateMap) => _.round(_.mean(_.values(questionRateMap)), 2));
     return classQuestionLevelGroupMeanRate;
+}
+
+//获取各个班级当前学科的平均得分率：
+//  遍历各个班级
+//      求得学科平均分，算出得分率
+function getPaperMeanRateInfo(currentPaperStudentsInfo, currentPaperFullMark) {
+    var gradePaperMeanRate = _.round(_.divide(_.mean(_.map(currentPaperStudentsInfo, (obj) => obj.score)), currentPaperFullMark), 2);
+    var classesPaperMeanRate = {};
+    _.each(_.groupBy(currentPaperStudentsInfo, 'class_name'), (students, classKey) => {
+        var meanRate = _.round(_.divide(_.mean(_.map(students, (obj) => obj.score)), currentPaperFullMark), 2);
+        classesPaperMeanRate[classKey] = meanRate;
+    });
+    return {
+        gradePaperMeanRate: gradePaperMeanRate,
+        allClassPaperMeanRate: classesPaperMeanRate
+    };
 }
 
 //注意：gradeQuestionLevelGroup是倒序的，最难在最前面
@@ -229,22 +288,42 @@ function getStepSegments(gradeRateInfo) {
     return segments;
 }
 
-function getSummaryInfo(classQuestionLevelGroupMeanRate, gradeQuestionLevelGroupMeanRate) {
-    var temp = _.map(classQuestionLevelGroupMeanRate, (classMeanRate, i) => (_.round(_.subtract(classMeanRate, gradeQuestionLevelGroupMeanRate[i]), 2)));
-    temp = _.map(questionLevelTitles, (qt, i) => {
+function getSummaryInfo(currentClassLevelGroupFactorInfo, subjectName) {
+    var infoHeader = `通过对数据的深入分析，对于${subjectName}学科五个不同难度题组，`;
+    var lastQuestionTitleIndex = questionLevelTitles.length - 1;
+    currentClassLevelGroupFactorInfo = _.map(currentClassLevelGroupFactorInfo, (factor, index) => {
         return {
-            name: qt,
-            diff: temp[i]
+            factor: factor,
+            questionTitle: questionLevelTitles[lastQuestionTitleIndex - index]
         }
     });
-    temp = _.sortBy(temp, 'diff');
-    var isAllGood = _.every(temp, (obj) => obj.diff >= 0);
-    var isAllBad = _.every(temp, (obj) => obj.diff <= 0);
-    if(isAllGood) {
-        return `本次考试中，班级整体没有明显表现不好的题组，表现最好的题组是${_.last(temp).name}，请总结经验继续保持`;
-    } else if(isAllBad) {
-        return `本次考试中，班级整体在各个题组都表现不太理想，特别是在${_.first(temp).name}表现最为不好，请及时针对此类题组进行专项训练`;
-    } else {
-        return `本次考试中，班级整体在${_.last(temp).name}表现很好，但是在${_.first(temp).name}表现不好，请结合班级实际情况，关注重点，在下一次考试中，提高班级整体水平`;
+    currentClassLevelGroupFactorInfo = _.orderBy(currentClassLevelGroupFactorInfo, ['factor'], ['desc']);
+    var goodInfo = _.join(_.map(_.filter(currentClassLevelGroupFactorInfo, (obj) => obj.factor > 0), (fobj) => fobj.questionTitle), '，');
+    var normalInfo = _.join(_.map(_.filter(currentClassLevelGroupFactorInfo, (obj) => obj.factor == 0), (fobj) => fobj.questionTitle), '，');
+    var badInfo = _.join(_.map(_.filter(currentClassLevelGroupFactorInfo, (obj) => obj.factor < 0), (fobj) => fobj.questionTitle), '，');
+
+    var infoBody;
+    if(goodInfo && normalInfo && badInfo) {
+        //三者都有
+        infoBody = `本班在${goodInfo}表现较好，在${normalInfo}表现一般，在${badInfo}表现较差`;
+    } else if(goodInfo && normalInfo && !badInfo) {
+        //好的，一般的，没有坏的
+        infoBody = `本班在${goodInfo}表现较好，在${normalInfo}表现一般。`;
+    } else if(goodInfo && !normalInfo && badInfo) {
+        //好的，坏的，没有一般的
+        infoBody = `本班在${goodInfo}表现较好，在${badInfo}表现较差`;
+    } else if(!goodInfo && normalInfo && badInfo) {
+        //一般的，坏的，没有好的
+        infoBody = `本班在${normalInfo}表现一般，在${badInfo}表现较差`;
+    } else if(goodInfo && !normalInfo && !badInfo) {
+        //只有好的
+        infoBody = `本班在所有上都表现较好，可以及时总结经验，继续保持`;
+    } else if(!goodInfo && normalInfo && !badInfo) {
+        //只有一般的
+        infoBody = '本班在所有上都表现一般，可以通过细致检查，提升拔高'
+    } else if(!goodInfo && !normalInfo && badInfo) {
+        //只有坏的
+        infoBody = '本班在所有上都表现较差，希望能及时总结原因，加强查漏补缺';
     }
+    return infoHeader + infoBody;
 }
