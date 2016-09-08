@@ -1,3 +1,4 @@
+//学科报告：分档临界生情况
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
@@ -38,7 +39,7 @@ export default class SubejctCriticalModule extends React.Component{
         var levelSize = _.size(reportDS.levels.toJS());
 
         return (
-            <div className={commonClass['section']}>
+            <div id="subjectCritical" className={commonClass['section']}>
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>分档临界生情况</span>
                 <span className={commonClass['title-desc']}>对比本学科各班级临界生情况，关注临界生群体，提高年级教学质量</span>

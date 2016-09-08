@@ -1,3 +1,4 @@
+// 学科报告：试卷整体命题及考试表现
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import StatisticalLib from 'simple-statistics';
@@ -19,7 +20,7 @@ export default function ExamQuestionPerfromance({currentSubject, reportDS}) {
     var gradeQuestionSeparation = getGradeQuestionSeparation(currentPaperQuestions, currentSubject.pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
     var summaryInfo = getSummaryInfo(paperQuestionsDiffInfo);
     return (
-        <div className={commonClass['section']}>
+        <div id="examQuestionPerformance" className={commonClass['section']}>
             <div>
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>试卷整体命题及考试表现</span>

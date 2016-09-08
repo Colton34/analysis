@@ -1,3 +1,4 @@
+// 学科报告：学科教学质量分析
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
@@ -17,7 +18,7 @@ export default function SubjectQualityModule({currentSubject, reportDS}) {
     var contriFactorsTableData = getContriFactorsTableData(subjectMeans, contriFactors, classList);
     var contriFactorsSummary = getContriFactorsSummary(contriFactors, classList);
     return (
-        <div id='SubjectTeacherQuality' className={commonClass['section']}>
+        <div id='subjectQuality' className={commonClass['section']}>
             <div style={{marginBottom: 30}}>
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>学科教学质量分析</span>

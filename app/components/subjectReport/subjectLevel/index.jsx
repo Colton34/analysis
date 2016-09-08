@@ -1,4 +1,4 @@
-// 学科分档上线情况
+// 学科报告：学科分档上线情况
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
@@ -23,9 +23,8 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
 
     var levelNumString = _.join(_.range(_.size(levels)).map(num => {return numberMap[num + 1]}), '、');
     var levelSize = _.size(levels);
-    debugger
     return (
-        <div className={commonClass['section']}>
+        <div id="subjectLevel" className={commonClass['section']}>
             <div style={{marginBottom: 10}}>
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>学科分档上线情况</span>
