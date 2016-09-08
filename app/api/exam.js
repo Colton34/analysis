@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-06 14:52:15
+* @Last Modified time: 2016-09-08 11:07:45
 */
 
 
@@ -139,7 +139,7 @@ export function initRankReportdData(params) {
                 class:
                 score:
                 papers: [
-                    {paperid: , score: }
+                    {id: , paperid: , score: , class_name: }
                 ],
                 questionScores: [
                     {paperid: , scores: [], answers: [] }
@@ -229,7 +229,24 @@ export function initReportDS(params) {
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
         //TODO:打开；对paperStudents进行排序，这样到下面不用分别都再次排序了。
         _.each(allStudentsPaperMap, (students, pid) => {
-            allStudentsPaperMap[pid] = _.sortBy(students, 'score');
+            // allStudentsPaperMap[pid] = _.sortBy(students, 'score');
+            //TODO:把排名的信息补充进来
+            // debugger;
+            var papserStudentsByScore = _.groupBy(students, 'score');
+            var papserStudentsByScoreInfo = _.map(papserStudentsByScore, (v, k) => {
+                return {
+                    score: k,
+                    students: v
+                }
+            });
+            var orderedPaperStudentScoreInfo = _.orderBy(papserStudentsByScoreInfo, ['score'], 'desc');
+            // debugger;
+            var finalRankStudentsInfo = _.concat(..._.map(orderedPaperStudentScoreInfo, (theObj, theRank) => _.map(theObj.students, (stuObj) => {
+                // debugger;
+                stuObj.rank = (theRank+1);
+                return stuObj;
+            })));
+            allStudentsPaperMap[pid] = finalRankStudentsInfo;
         });
         var headers = [], restPapers = [];
         _.each(examPapersInfo, (paper, pid) => {

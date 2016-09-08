@@ -8,7 +8,6 @@ export default function ClassImportGoodStudents({currentPaperStudentsInfo}) {
     var studentsNum = _.round(_.size(currentPaperStudentsInfo)*0.2);
     var allStudentGroupByNum = getBetterStudent(currentPaperStudentsInfo);
     var chartDS = getChartDS(allStudentGroupByNum);
-    debugger;
     var config={
         chart: {
             type: 'column'
