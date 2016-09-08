@@ -16,8 +16,9 @@ class ClassSubjectQuestion extends React.Component {
 
         var currentPaperQuestions = currentPaperInfo.questions, allStudentsPaperMap = this.props.reportDS.allStudentsPaperMap.toJS();
         var currentPaperStudentsInfo = allStudentsPaperMap[this.props.currentSubject.pid];
-        var {gradeQuestionSeparation, allClassesQuestionScoreRate} = getQuestionInfo(currentPaperQuestions, currentPaperStudentsInfo, this.props.currentSubject.pid, allStudentsPaperMap, examStudentsInfo, this.allStudentsPaperQuestionInfo);
+        var {gradeQuestionSeparation, gradeQuestionScoreRates, allClassesQuestionScoreRate} = getQuestionInfo(currentPaperQuestions, currentPaperStudentsInfo, this.props.currentSubject.pid, allStudentsPaperMap, examStudentsInfo, this.allStudentsPaperQuestionInfo);
         this.gradeQuestionSeparation = gradeQuestionSeparation;
+        this.gradeQuestionScoreRates = gradeQuestionScoreRates;
         this.allClassesQuestionScoreRate = allClassesQuestionScoreRate;
 
         this.state = {
@@ -32,8 +33,9 @@ class ClassSubjectQuestion extends React.Component {
         var currentPaperQuestions = currentPaperInfo.questions, allStudentsPaperMap = nextProps.reportDS.allStudentsPaperMap.toJS(), examStudentsInfo = nextProps.reportDS.examStudentsInfo.toJS();
         var currentPaperStudentsInfo = allStudentsPaperMap[nextProps.currentSubject.pid];
 
-        var {gradeQuestionSeparation, allClassesQuestionScoreRate} = getQuestionInfo(currentPaperQuestions, currentPaperStudentsInfo, nextProps.currentSubject.pid, allStudentsPaperMap, examStudentsInfo, this.allStudentsPaperQuestionInfo);
+        var {gradeQuestionSeparation, gradeQuestionScoreRates, allClassesQuestionScoreRate} = getQuestionInfo(currentPaperQuestions, currentPaperStudentsInfo, nextProps.currentSubject.pid, allStudentsPaperMap, examStudentsInfo, this.allStudentsPaperQuestionInfo);
         this.gradeQuestionSeparation = gradeQuestionSeparation;
+        this.gradeQuestionScoreRates = gradeQuestionScoreRates;
         this.allClassesQuestionScoreRate = allClassesQuestionScoreRate;
         this.state = {
             currentClass: examClasses[0]
@@ -41,10 +43,12 @@ class ClassSubjectQuestion extends React.Component {
     }
 
     render() {
-        var currentClassQuestionScoreRate = this.allClassesQuestionScoreRate[this.state.currentClass];
         var gradeQuestionSeparation = this.gradeQuestionSeparation;
+        var gradeQuestionScoreRates = this.gradeQuestionScoreRates;
+        var currentClassQuestionScoreRate = this.allClassesQuestionScoreRate[this.state.currentClass];
+        debugger;
         return (
-            <div></div>
+            <div>待填充</div>
         );
     }
 }
@@ -52,6 +56,7 @@ class ClassSubjectQuestion extends React.Component {
 function getQuestionInfo(currentPaperQuestions, currentPaperStudentsInfo, currentPaperId, allStudentsPaperMap, examStudentsInfo, allStudentsPaperQuestionInfo) {
     var studentsByClass = _.groupBy(currentPaperStudentsInfo, 'class_name');
     var gradeQuestionSeparation = getGradeQuestionSeparation(currentPaperQuestions, currentPaperId, allStudentsPaperMap, allStudentsPaperQuestionInfo);
+    var gradeQuestionScoreRates = getGradeQuestionScoreRate(currentPaperQuestions, currentPaperId, allStudentsPaperMap, allStudentsPaperQuestionInfo);
 
     var allClassesQuestionScoreRate = {};
     _.each(studentsByClass, (students, classKey) => {
@@ -59,13 +64,9 @@ function getQuestionInfo(currentPaperQuestions, currentPaperStudentsInfo, curren
     });
     return {
         gradeQuestionSeparation: gradeQuestionSeparation,
+        gradeQuestionScoreRates: gradeQuestionScoreRates,
         allClassesQuestionScoreRate: allClassesQuestionScoreRate
     };
-
-    // var classQuestionScoreRates = getClassQuestionScoreRate(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass);
-    // var gradeQuestionScoreRates = getGradeQuestionScoreRate(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
-    // var questionContriFactors = _.map(classQuestionScoreRates, (x, i) => _.round(_.subtract(x, gradeQuestionScoreRates[i]), 2));
-
 }
 
 export default ClassSubjectQuestion;
@@ -73,11 +74,8 @@ export default ClassSubjectQuestion;
 
 
 function getClassQuestionScoreRate(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass) {
-//计算本班级的此道题目的得分率：
-    //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分
     var currentClassPaperStudents = _.filter(allStudentsPaperMap[pid], (studentObj) => studentObj['class_name'] == currentClass);
     return _.map(questions, (questionObj, index) => {
-        //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
         return _.round(_.divide(_.mean(_.map(currentClassPaperStudents, (studentObj) => {
             return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
         })), questionObj.score), 2);
@@ -85,11 +83,8 @@ function getClassQuestionScoreRate(questions, pid, allStudentsPaperMap, allStude
 }
 
 function getGradeQuestionScoreRate(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo) {
-//计算本班级的此道题目的得分率：
-    //本班所有学生 在此道题目上得到的平均分（所有得分和/人数） 除以  此道题的满分
     var gradePaperStudents = allStudentsPaperMap[pid];
     return _.map(questions, (questionObj, index) => {
-        //本班学生在这道题上面的得分率：mean(本班所有学生在这道题上的得分) / 这道题目的总分
         return _.round(_.divide(_.mean(_.map(gradePaperStudents, (studentObj) => {
             return allStudentsPaperQuestionInfo[studentObj.id][pid].scores[index];
         })), questionObj.score), 2);
@@ -105,3 +100,8 @@ function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStud
         return _.round(StatisticalLib.sampleCorrelation(questionScores, paperScores), 2);
     });
 }
+
+//Test Code
+// var classQuestionScoreRates = getClassQuestionScoreRate(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo, currentClass);
+// var gradeQuestionScoreRates = getGradeQuestionScoreRate(paperObj.questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
+// var questionContriFactors = _.map(classQuestionScoreRates, (x, i) => _.round(_.subtract(x, gradeQuestionScoreRates[i]), 2));
