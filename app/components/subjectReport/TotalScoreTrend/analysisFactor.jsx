@@ -19,7 +19,7 @@ export default function AnalysisFactor({currentPaperInfo, currentPaperStudentsIn
 
     return (
         <div>
-            <div style={{marginBottom: 30}}>
+            <div style={{marginBottom: 30,marginTop:30}}>
                 <span className={commonClass['sub-title']}>学科考试常用分析指标</span>
                 <span className={commonClass['title-desc']}>观察本次考试的常用分析指标，结合年级及班级自身情况，发现本学科教学信息</span>
             </div>
