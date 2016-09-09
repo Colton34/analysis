@@ -11,7 +11,7 @@ export default function HeaderInfo({reportDS, currentSubject}) {
         <div>
 {
             <div id='header' style={{borderRadius: 2, backgroundColor: '#fff', padding: 30,borderBottom: '1px solid rgb(238, 238, 238)'}}>
-                <p>您好</p>
+                <p>您好:</p>
                 <p>
                     本次考试（考试时间：{startTime}），全校{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{examInfo.realClasses.length}</span>个班，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试，缺考<span style={{ color: colorsMap.B03 }}>{examInfo.lostStudentsCount}</span>名。
                     考试学科：<span style={{ color: colorsMap.B03 }}> {_.join(examInfo.subjects, '、') }</span>，{examInfo.subjects.length}个学科。
