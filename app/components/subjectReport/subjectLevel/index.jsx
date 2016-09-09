@@ -43,8 +43,8 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
                     上表可看到{currentSubject.subject}学科{levelNumString}档线，在全年级学生人数的分布。与本次考试其他各学科进行对比，{currentSubject.subject}学科
                     {
                         currentSubjectLevelRank.map((rank, index) => {
-                            return <span>
-                                    对全校学生上{numberMap[index + 1]}档线的学生上档人数排第 
+                            return <span key={index}>
+                                    对全校学生上{numberMap[index + 1]}档线的学生上档人数排第
                                     <span style={{color: colorsMap.B03, margin: '0 5px'}}>{rank}</span>名
                                     {index !== currentSubjectLevelRank.length -1 ? '，' : '。'}
                                 </span>
@@ -65,7 +65,7 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
                     {
                         _.map(classInfoSummary, (classList, levelNum) => {
                             if (classList.length){
-                                return <span>{numberMap[levelNum - 0 + 1]}档线学生人数<span style={{fontWeight: 'bold', margin: '0 2px'}}>累计</span>较多的班级是<span style={{color: colorsMap.B03}}>{_.join(classList, '、')}</span>{(levelNum - 0 !== levelSize -1 ? '，' : '。')}</span>
+                                return <span key={levelNum}>{numberMap[levelNum - 0 + 1]}档线学生人数<span style={{fontWeight: 'bold', margin: '0 2px'}}>累计</span>较多的班级是<span style={{color: colorsMap.B03}}>{_.join(classList, '、')}</span>{(levelNum - 0 !== levelSize -1 ? '，' : '。')}</span>
                             } else {
                                 return numberMap[levelNum - 0 + 1] + '档线学生人数累计较多的班级是: 只有一个班级没有可比性。';
                             }
@@ -73,7 +73,7 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
                     }
                 </p>
             </div>
-            
+
         </div>
     )
 }
@@ -237,7 +237,7 @@ function getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubjec
         temp.totalSchool = obj[currentSubjectPid].targets.length;
         // 按照classList来遍历班级，避免有的有的档次没有某些班；
         _.forEach(classList, className => {
-            temp[className] = currentSubjectLevelStudentsGroup[className] ? currentSubjectLevelStudentsGroup[className].length : 0; 
+            temp[className] = currentSubjectLevelStudentsGroup[className] ? currentSubjectLevelStudentsGroup[className].length : 0;
         })
         // _.each(currentSubjectLevelStudentsGroup, (cstudents, classKey) => {
         //     temp[classKey] = cstudents.length;

@@ -111,6 +111,7 @@ class ClassDiffQuestionModule extends React.Component {
         var currentPaperStudentsInfo = allStudentsPaperMap[nextProps.currentSubject.pid];
 
         var {gradeQuestionLevelGroupMeanRate, allClassLevelGroupMeanRate, allClassLevelGroupFactorsInfo} = getQuestionInfo(currentPaperStudentsInfo, currentPaperQuestions, currentPaperInfo.fullMark, nextProps.currentSubject.pid, this.allStudentsPaperQuestionInfo);
+
         this.gradeQuestionLevelGroupMeanRate = gradeQuestionLevelGroupMeanRate;
         this.allClassLevelGroupMeanRate = allClassLevelGroupMeanRate;
         this.allClassLevelGroupFactorsInfo = allClassLevelGroupFactorsInfo;
@@ -135,11 +136,11 @@ class ClassDiffQuestionModule extends React.Component {
 
         option.series[0].data = [
             {
-                value: _.reverse(currentClassLevelGroupMeanRate),
+                value: _.reverse(_.cloneDeep(currentClassLevelGroupMeanRate)),
                 name: '班级平均得分率'
             },
             {
-                value: _.reverse(gradeQuestionLevelGroupMeanRate),
+                value: _.reverse(_.cloneDeep(gradeQuestionLevelGroupMeanRate)),
                 name: '年级平均得分率'
             }
         ];

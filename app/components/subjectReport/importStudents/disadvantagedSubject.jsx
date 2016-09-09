@@ -9,7 +9,6 @@ export default function DisadvantagedSubjectModule({currentSubject, reportDS}) {
     var currentPaperInfo = reportDS.examPapersInfo.toJS()[currentPaperId];
     var {categories, disadvantagedSubjectInfo} = getCurrentSubjectDisadvantagedInfo(allStudentsPaperMap, examStudentsInfo, currentPaperId, currentPaperInfo);
     var yaxisData = getYaxisData(disadvantagedSubjectInfo);
-    debugger;
     var config={
         chart: {
             type: 'column'
@@ -141,4 +140,4 @@ function getYaxisData(disadvantagedSubjectInfo){
     });
     return yaxisData;
 }
- 
+

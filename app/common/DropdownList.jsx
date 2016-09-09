@@ -133,7 +133,6 @@ class DropdownList extends React.Component {
             this.setState({current: item, active: false, coveredItems: _.without(this.props.list, item)});
         }
         this.props.onClickDropdownList && this.props.onClickDropdownList(item);
-        console.log('dropdown list, click: ' + item.value)
     }
     render() {
         var {surfaceBtnStyle, style} = this.props;

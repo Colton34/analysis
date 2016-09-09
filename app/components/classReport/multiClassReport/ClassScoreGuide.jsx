@@ -24,7 +24,6 @@ export default function ClassScoreGuide({reportDS}) {
 
     var tableHeaders = getTableHeaderDS(subjectNames);
     var tableBodyDS = getTableBodyDS(classNames, gradeName, examPapersInfo, allStudentsPaperMap, studentsGroupByClass, headers, columnIndicatorFunMap);
-    debugger;
 
     return (
         <div id='classScoreGuide' className={commonClass['section']}>

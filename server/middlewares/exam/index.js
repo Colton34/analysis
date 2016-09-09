@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-06 17:05:23
+* @Last Modified time: 2016-09-09 14:53:18
 */
 
 'use strict';
@@ -66,21 +66,25 @@ exports.home = function(req, res, next) {
         examScoreMap = req.classScoreMap,
         examScoreArr = req.orderedScoresArr;
 
-    var authClasses = getAuthClasses(req.user.auth, exam.grade.name, exam);
+    var auth = req.user.auth;
+    var gradeAuth = auth.gradeAuth;
+
+    var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
+    var authClasses = getAuthClasses(auth, exam.grade.name, exam);
+
     examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
     examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
 
-    var auth = req.user.auth;
-    var gradeAuth = auth.gradeAuth;
+
     var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
     var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
-    var ifShowSubjectReport = ifShouldShowSubjectReport(auth, exam);
+    var ifShowSubjectReport = (authSubjects.length > 0);
     try {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
         var schoolReportResult = (ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
         var classReportResult = (ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
-        var subjectReportResult = (ifShowSubjectReport) ? subjectReport() : null;
+        var subjectReportResult = (ifShowSubjectReport) ? authSubjects : null;
         // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
         res.status(200).json({
             examInfoGuide: examInfoGuideResult,
@@ -95,22 +99,35 @@ exports.home = function(req, res, next) {
     }
 }
 
-function ifShouldShowSubjectReport(auth, exam) {
+function getAuthSubjectsInfo(auth, exam, examScoreArr) {
+    var result = [], subjectMeanRates = [];
+    var totalScoreMeanRate = _.round(_.divide(_.mean(_.map(examScoreArr, (obj) => obj.score)), exam.fullMark), 2);
+
+    if(exam['[papers]'] && exam['[papers]'].length > 0) {
+        subjectMeanRates = _.map(exam['[papers]'], (obj) => {
+            var studentsPaperScores = [];
+            _.each(_.values(obj.scores), (scoresArr) => {
+                studentsPaperScores = _.concat(studentsPaperScores, scoresArr);
+            });
+            var meanRate = _.round(_.divide(_.mean(studentsPaperScores), obj.manfen), 2);
+            return {
+                subject: obj.subject,
+                meanRate: meanRate
+            }
+        });
+    }
+
     if((auth.isSchoolManager) || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])) {
-        return true;
+        result.push({subject: '总分', meanRate: totalScoreMeanRate});
+        result = _.concat(result, subjectMeanRates);
     } else if(auth.gradeAuth.subjectManagers && auth.gradeAuth.subjectManagers.length > 0) {
-        return true;
-    } else {
-        return false;
+        result.push({subject: '总分', meanRate: totalScoreMeanRate});
+        var authSubjects = _.map(auth.gradeAuth.subjectManagers, (obj) => obj.subject);
+        var authSubjectMeanRates = _.filter(subjectMeanRates, (obj) => _.includes(authSubjects, obj.subject));
+        result = _.concat(result, authSubjectMeanRates);
     }
+    return result;
 }
-
-function subjectReport() {
-    return {
-        a: 'a'
-    }
-}
-
 
 function getAuthScoreArr(examScoreArr, authClasses) {
     return _.filter(examScoreArr, (obj) => _.includes(authClasses, obj.class));
@@ -148,13 +165,15 @@ exports.customDashboard = function(req, res, next) {
             var customScoreRankResult = customScoreRank(exam);
             var customSchoolReportResult = customExamSchoolReport(exam);
             var customClassReportResult = customClassReport(exam);
+            var customSubjectReportResult = customSubjectReport(exam);
             // var customLevelScoreReportResult = customLevelScoreReport(exam);
 
             res.status(200).json({
                 examInfoGuide: customExamInfoGuideResult,
                 scoreRank: customScoreRankResult,
                 schoolReport: customSchoolReportResult,
-                classReport: customClassReportResult
+                classReport: customClassReportResult,
+                subjectReport: customSubjectReportResult
                 // levelScoreReport: customLevelScoreReportResult,
             })
         } catch(e) {
@@ -1098,6 +1117,28 @@ function customClassReport(exam) {
         gradeMean: scoreMean,
         top5ClassesMean: _.reverse(_.takeRight(orderedClassesMean, 5))
     };
+}
+
+function customSubjectReport(exam) {
+    //总分meanRate和各科meanRate
+    var result = [];
+    var examInfo = exam.info;
+    var examStudentsInfo = exam['[studentsInfo]'];
+    var examPapersInfo = exam['[papersInfo]'];
+    var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student['[papers]'])), 'paperid');
+
+    var totalScoreMeanRate = _.round(_.divide(_.mean(_.map(examStudentsInfo, (obj) => obj.score)), examInfo.fullMark), 2);
+    result.push({subject: '总分', meanRate: totalScoreMeanRate});
+    _.each(allStudentsPaperMap, (students, pid) => {
+        var targetPaper = _.find(examPapersInfo, (obj) => obj.id == pid);
+        if(!targetPaper) return;
+        var meanRate = _.round(_.divide(_.mean(_.map(students, (obj) => obj.score)), targetPaper.fullMark), 2);
+        result.push({
+            subject: targetPaper.subject,
+            meanRate: meanRate
+        });
+    });
+    return result;
 }
 
 /**

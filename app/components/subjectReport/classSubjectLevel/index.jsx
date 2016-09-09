@@ -8,7 +8,7 @@ export default function ClassSubjectLevel({currentSubject, reportDS}) {
     var paperFullMark = reportDS.examPapersInfo.toJS()[currentSubject.pid].fullMark;
     var currentPaperStudentsInfo = reportDS.allStudentsPaperMap.toJS()[currentSubject.pid];
     var theTableDS = getTableDS(paperFullMark, currentPaperStudentsInfo);
-    debugger;
+    // debugger;
 }
 
 

@@ -10,9 +10,9 @@ import TotalScoreTrend from './TotalScoreTrend';
 import SubjectLevelModule from './subjectLevel';
 
 import SubjectQualityModule from './subjectQualityMe';
-import StudentSubjectDis from './studentSubjectDis';
-import ClassSubjectLevel from './classSubjectLevel';
-import StudentsGroupLevel from './studentsGroupLevel';
+// import StudentSubjectDis from './studentSubjectDis';
+// import ClassSubjectLevel from './classSubjectLevel';
+// import StudentsGroupLevel from './studentsGroupLevel';
 import SubjectCritical from './subjectCritical';
 
 import ImportStudentsModule from './importStudents';
@@ -53,12 +53,6 @@ class ReportContent extends React.Component {
     render() {
         return (
             <div>
-
-
-
-
-
-
                 <Header currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <TotalScoreTrend currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <SubjectLevelModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
@@ -67,7 +61,6 @@ class ReportContent extends React.Component {
                 <ExamQuestionPerfromance currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <ImportStudentsModule currentSubject={this.props.currentSubject} reportDS={this.props.reportDS} />
                 <Wishes />
-
             </div>
         );
     }
