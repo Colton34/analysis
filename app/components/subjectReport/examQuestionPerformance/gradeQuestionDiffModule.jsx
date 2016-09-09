@@ -110,8 +110,8 @@ function getChartDS({paperQuestionsDiffInfo, gradeQuestionSeparation}){
 }
 
 function getSummaryInfo(chartDS){
-     var summaryInfo = _.filter(chartDS,function(obj){
-        return 0<obj.x<=0.2&&obj.y<=0.4
+     var summaryInfo = _.filter(chartDS, function(obj){
+        return 0<obj.x && obj.x<=0.2 && obj.y<=0.4
     });
      var summaryInfoString = _.map(summaryInfo,(obj) => {return obj.name})
     return summaryInfoString.join('   ');
