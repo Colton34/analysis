@@ -290,7 +290,7 @@ class Dialog extends React.Component {
  */
     onInputBlur(id, event) {
         var value = parseFloat(event.target.value);
-        if (!(value && _.isNumber(value) && value >= 0)) return;
+        if (!(!_.isNaN(value) && value >= 0)) return;
         var arr = id.split('-');
         var type = arr[0];
         var num = arr[1]; //是第一个（高档次） 还是 最后一个（低档次），但是赋值给levels的时候就应该颠倒过来了
@@ -326,8 +326,14 @@ class Dialog extends React.Component {
                 } else {
                     targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > value);
                 }
-                var count = examStudentsInfo.length - targetIndex;
-                var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);
+
+                if (targetIndex !== -1) {
+                    var count = examStudentsInfo.length - targetIndex;
+                    var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);    
+                } else {
+                    var count = 0;
+                    var percentage = 0;
+                }
 
                 temp.score = value;
                 temp.percentage = percentage;
@@ -388,6 +394,7 @@ class Dialog extends React.Component {
     render() {
         var _this = this;
         var {examInfo, examStudentsInfo} = this.props;
+        var {hasError, errorMsg} = this.state;
 
         // this.levels = this.props.levels;
         this.levLastIndex = _.size(this.levels) - 1;
@@ -400,7 +407,7 @@ class Dialog extends React.Component {
                     </button>
                     设置分档线
                 </Header>
-                <Body style={{padding: 30}}>
+                <Body style={{padding: '30px 30px 0 30px'}}>
                     <div style={{ minHeight: 230 }}>
                         <div style={{ marginBottom: 20 }}>
                             考试总分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分, 将整体成绩分档为：
@@ -426,13 +433,14 @@ class Dialog extends React.Component {
                                 })
                             }
                         </div>
+                        <div style={{color: colorsMap.B08, margin: '20px 0 20px 40px'}}>{hasError && errorMsg ? errorMsg : ''}</div>
                     </div>
                 </Body>
                 <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0, padding: '0 0 30px 0' }}>
                     <a href="javascript:void(0)" style={_.assign({}, localStyle.btn, { backgroundColor: '#59bde5', color: '#fff' }) } onClick={_this.okClickHandler.bind(_this) }>
                         确定
                     </a>
-                    <a href="javascript:void(0)" style={localStyle.btn} onClick={this.props.onHide}>
+                    <a href="javascript:void(0)" style={localStyle.btn} onClick={this.onHide.bind(this)}>
                         取消
                     </a>
                 </Footer>
