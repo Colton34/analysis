@@ -20,9 +20,9 @@ export default function StudentsGroupLevel({currentSubject, reportDS}) {
             <TableView tableData={tableData}/>
             <div className={commonClass['analysis-conclusion']}>
                 <p>分析诊断：</p>
-                <p>各班中有的学科而成绩较高的学生比较密集，有的学科成绩较低的学生比较密集，如下所示：</p>
+                <p>各班中有的学科成绩较高的学生比较密集，有的学科成绩较低的学生比较密集，如下所示：</p>
                 <p>高分段学生密集的班级排名：<span style={{color: colorsMap.B03}}>{_.join(summaryInfo.high.map(item => {return item.className}), '、')}</span>。其中<span style={{color: colorsMap.B03}}>{summaryInfo.high[0].className}</span>高分段人数最多。</p>
-                <p>高分段学生密集的班级排名：<span style={{color: colorsMap.B03}}>{_.join(summaryInfo.low.map(item => {return item.className}), '、')}</span>。其中<span style={{color: colorsMap.B03}}>{summaryInfo.low[0].className}</span>低分段人数最多，需要注意。</p>
+                <p>低分段学生密集的班级排名：<span style={{color: colorsMap.B03}}>{_.join(summaryInfo.low.map(item => {return item.className}), '、')}</span>。其中<span style={{color: colorsMap.B03}}>{summaryInfo.low[0].className}</span>低分段人数最多，需要注意。</p>
                 <div>学生学科成绩两极分化的班级：{summaryInfo.polar.length ? <span style={{color: colorsMap.B03}}>{_.join(summaryInfo.polar, '、')}</span> : '无'}。</div>
             </div>
         </div>
