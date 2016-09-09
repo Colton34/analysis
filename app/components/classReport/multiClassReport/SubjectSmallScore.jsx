@@ -41,7 +41,7 @@ class SubjectSmallScore extends React.Component {
                     <span className={commonClass['title-desc']}></span>
                 </div>
                 <DropdownList onClickDropdownList={this.changeSubject.bind(this)} list={formatedSubjects} style={{position: 'absolute', right: 110, top: 30, zIndex: 1}}/>
-                <TableView id='smallScoreTable' tableData={tableBodyData} tableHeaders={tableHeaders} TableComponent={EnhanceTable} options={{canDownload:true, fileName: fileName, worksheetName: this.state.currentSubject.value}}/>
+                <TableView id='smallScoreTable' tableData={tableBodyData} tableHeaders={tableHeaders} TableComponent={EnhanceTable} options={{canDownload:true, fileName: fileName, worksheetName: this.state.currentSubject.value}} tableSortable/>
             </div>
         );
     }
