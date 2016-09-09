@@ -16,7 +16,7 @@ export default function SegmentDetailTable({tableHeaders, tableData, examName , 
             <div className={commonClass['sub-title']} style={{margin: '27px 0 20px 0'}}>
                 各分数段详细人数
             </div>
-            <TableView id='segmentDetailTable' tableHeaders={tableHeaders} tableData={tableData} TableComponent = {EnhanceTable} options={{canDownload: true, fileName: fileName, worksheetName: worksheetName}}/>
+            <TableView id='segmentDetailTable' tableHeaders={tableHeaders} tableData={tableData} tableSortable TableComponent = {EnhanceTable} options={{canDownload: true, fileName: fileName, worksheetName: worksheetName}}/>
         </div>
     )
 }
