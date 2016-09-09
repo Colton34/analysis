@@ -43,7 +43,7 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
                     上表可看到{currentSubject.subject}学科{levelNumString}档线，在全年级学生人数的分布。与本次考试其他各学科进行对比，{currentSubject.subject}学科
                     {
                         currentSubjectLevelRank.map((rank, index) => {
-                            return <span>
+                            return <span key={index}>
                                     对全校学生上{numberMap[index + 1]}档线的学生上档人数排第
                                     <span style={{color: colorsMap.B03, margin: '0 5px'}}>{rank}</span>名
                                     {index !== currentSubjectLevelRank.length -1 ? '，' : '。'}
