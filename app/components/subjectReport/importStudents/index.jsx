@@ -12,7 +12,6 @@ var tablethStyle = {lineHeight:'40px',verticalAlign:'center'};
 
 
 export default function ImportStudentsModule({reportDS, currentSubject}) {
-    debugger;
     var examStudentsInfo = reportDS.examStudentsInfo.toJS();
     var currentPaperStudentsInfo = reportDS.allStudentsPaperMap.toJS()[currentSubject.pid];
     var rankTopStudents = getTopStudentsInfo(currentPaperStudentsInfo);//排名前十的学生

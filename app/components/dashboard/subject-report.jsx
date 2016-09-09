@@ -57,7 +57,6 @@ class SubjectReport extends React.Component {
         var meanRateInfo = formatSubjectMeanRateInfo(this.props.data);
         var xData = _.map(meanRateInfo,(obj) => {return obj.subject});
         var seriesData = _.map(meanRateInfo,(obj) => {return obj.meanRate})
-        debugger;
         var config = {
             chart: {
                 type: 'column'

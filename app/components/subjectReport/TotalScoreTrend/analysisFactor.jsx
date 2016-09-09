@@ -85,8 +85,10 @@ function getReliabilityCoefficient({currentPaperStudentsInfo, currentSubject, ex
 function getStudentsQuestionScores(examStudentsInfo, currentSubject) {
     // var allStudentsPaperQuestionInfo = {};
     //各个学生在当前学科的小分表
-    var currentSubjectStudentQuestionScores = _.map(examStudentsInfo, (studentObj) => {
-        return _.find(studentObj.questionScores, (obj) => obj.paperid == currentSubject.pid)['scores'];
+    var currentSubjectStudentQuestionScores = [], targetQuestionScoreObj;
+    _.each(examStudentsInfo, (studentObj) => {
+        var targetQuestionScoreObj = _.find(studentObj.questionScores, (obj) => obj.paperid == currentSubject.pid);
+        if(targetQuestionScoreObj) currentSubjectStudentQuestionScores.push(targetQuestionScoreObj['scores']);
     });
     return currentSubjectStudentQuestionScores;
 }
