@@ -101,9 +101,8 @@ class Dashboard extends React.Component {
         var schoolReport = (Map.isMap(this.props.dashboard.schoolReport)) ? this.props.dashboard.schoolReport.toJS() : this.props.dashboard.schoolReport;
         var classReport = (Map.isMap(this.props.dashboard.classReport)) ? this.props.dashboard.classReport.toJS() : this.props.dashboard.classReport;
         //TODO: var subjectReport = (Map.isMap(this.props.dashboard.subjectReport)) ? this.props.dashboard.subjectReport.toJS() : this.props.dashboard.subjectReport;
-
-
         // var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
+
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) location.href = '/';
         var grade = this.props.location.query.grade || '';
@@ -139,8 +138,8 @@ class Dashboard extends React.Component {
                                 {/* */}
                                 <div className='row' style={{ marginTop: 20 }}>
                                     {(classReport && _.size(classReport) > 0) ? <ClassReport data={classReport} grade={grade} examid={examid} /> : ''}
+                                    {(examInfoGuide && _.size(examInfoGuide) > 0) ? <SubjectReport grade={grade} examid={examid} /> : ''}
                                     <LevelReport />
-                                    <SubjectReport />
                                 </div>
                                 <Dialog show={this.state.showConfirmDialog} onHide={this.onHideDialog.bind(this) } onConfirm={this.onDeleteAnalysis.bind(this) }/>
                         </div>

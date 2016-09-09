@@ -131,7 +131,6 @@ class ClassDiffQuestionModule extends React.Component {
     render() {
         var gradeQuestionLevelGroupMeanRate = this.gradeQuestionLevelGroupMeanRate;
         var currentClassLevelGroupMeanRate = this.allClassLevelGroupMeanRate[this.state.currentClass.key];
-        debugger;
         var summaryInfo = getSummaryInfo(this.allClassLevelGroupFactorsInfo[this.state.currentClass.key], this.subjectName);
         var examClasses = this.examClasses;
 
@@ -145,7 +144,6 @@ class ClassDiffQuestionModule extends React.Component {
                 name: '年级平均得分率'
             }
         ];
-        debugger;
 
         return (
             <div  style={{position:'relative'}}>
