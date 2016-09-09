@@ -72,7 +72,7 @@ function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStud
     });
 }
 
-function getSummaryInfo(paperQuestionsDiffInfo) {
+function getSummaryInfo(paperQuestionsDiffInfo, currentSubject) {
     var paperDiff = _.round(_.divide(_.sum(_.map(paperQuestionsDiffInfo, (obj) => obj.diff)), paperQuestionsDiffInfo.length), 2);
     var summaryInfo = '';
     if(paperDiff < 0.5) {
