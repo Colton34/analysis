@@ -1,6 +1,9 @@
+import _ from 'lodash';
 import React from 'react';
 import dashboardStyle from './dashboard.css';
 import {browserHistory} from 'react-router';
+
+import {SUBJECTS_WEIGHT as subjectWeight} from '../../lib/constants';
 
 class SubjectReport extends React.Component {
     constructor(props){
@@ -15,6 +18,8 @@ class SubjectReport extends React.Component {
     }
 
     render() {
+        var meanRateInfo = formatSubjectMeanRateInfo(this.props.data);
+        debugger;
         return (
             <div onClick={this.viewClassReport.bind(this)} style={{display: 'inline-block', height: 340, padding: '0 0 0 10px', cursor:'pointer' }}  className='col-lg-4'>
                 {/*<div style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
@@ -33,3 +38,26 @@ class SubjectReport extends React.Component {
 }
 
 export default SubjectReport;
+
+
+function formatSubjectMeanRateInfo(origianlInfo) {
+    var result = [], restPapers = [];
+    var totalScoreMeanRateInfo = origianlInfo[0];
+    origianlInfo = _.slice(origianlInfo, 1);
+    _.each(origianlInfo, (obj) => {
+        var index = _.findIndex(subjectWeight, (s) => ((s == obj.subject) || (_.includes(obj.subject, s))));
+        if (index >= 0) {
+            result.push({
+                index: index,
+                subject: obj.subject,
+                meanRate: obj.meanRate
+            });
+        } else {
+            restPapers.push(obj);
+        }
+    });
+    result = _.sortBy(result, 'index');
+    result.unshift(totalScoreMeanRateInfo);
+    result = _.concat(result, restPapers);
+    return result;
+}

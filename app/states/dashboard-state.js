@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:09:30
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-05 20:26:29
+* @Last Modified time: 2016-09-09 13:54:32
 */
 
 'use strict';
@@ -15,7 +15,7 @@ var InitialState = Record({
     scoreRank: {},
     schoolReport: {},
     classReport: {},
-    subjectReport: {}
+    subjectReport: []
 });
 
 export default InitialState;
