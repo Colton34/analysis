@@ -14,8 +14,8 @@ var tablethStyle = {lineHeight:'40px',verticalAlign:'center'};
 export default function ImportStudentsModule({reportDS, currentSubject}) {
     var examStudentsInfo = reportDS.examStudentsInfo.toJS();
     var currentPaperStudentsInfo = reportDS.allStudentsPaperMap.toJS()[currentSubject.pid];
-    var rankTopStudents = getTopStudentsInfo(currentPaperStudentsInfo);//排名前十的学生
-    var allStudent = getTopStudentAllInfo(rankTopStudents,examStudentsInfo);
+    var topStudents = getTopStudentsInfo(currentPaperStudentsInfo, examStudentsInfo);//排名前十的学生
+    // var topStudents = getTopStudentAllInfo(rankTopStudents,examStudentsInfo);
     return (
         <div id='importantStudents' className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
@@ -34,7 +34,7 @@ export default function ImportStudentsModule({reportDS, currentSubject}) {
                     </thead>
                     <tbody>
                         {
-                            allStudent.map((student, index) => {
+                            topStudents.map((student, index) => {
                                 {
                                     var localStyle = {};
                                     switch (student.rank) {
@@ -77,41 +77,23 @@ export default function ImportStudentsModule({reportDS, currentSubject}) {
     )
 }
 
-
-function getTopStudentsInfo(currentPaperStudentsInfo){
-    var papserStudentsByScore = _.groupBy(currentPaperStudentsInfo, 'score');
-    var papserStudentsByScoreInfo = _.map(papserStudentsByScore, (v, k) => {
+function getTopStudentsInfo(currentPaperStudentsInfo, examStudentsInfo) {
+    //从后面去除分数高的
+    var hashExamStudentsInfo = _.keyBy(examStudentsInfo, 'id');
+    var topStudents = _.reverse(_.takeRight(currentPaperStudentsInfo, 10));
+    return _.map(topStudents, (obj) => {
+        var paperScore = obj.score;
+        var className = obj['class_name'];
+        var rank = obj.rank;
+        var totalScore = hashExamStudentsInfo[obj.id].score;
+        var name = hashExamStudentsInfo[obj.id].name;
         return {
-            score: k,
-            students: v
+            rank: obj.rank,
+            class: obj['class_name'],
+            subjectScore: obj.score,
+            id: obj.id,
+            score: hashExamStudentsInfo[obj.id].score,
+            name: hashExamStudentsInfo[obj.id].name
         }
     });
-    var orderedPaperStudentScoreInfo = _.orderBy(papserStudentsByScoreInfo, ['score'], 'desc');
-    var rankTopStudentsArr = _.take(orderedPaperStudentScoreInfo, 10);
-    var rankTopStudents = [];
-    _.each(rankTopStudentsArr, (sarr) => {
-        rankTopStudents = _.concat(rankTopStudents, sarr);
-    });
-    return rankTopStudents;
 }
-function getTopStudentAllInfo(rankTopStudents,examStudentsInfo){
-    var allStudent = [];
-    _.forEach(rankTopStudents,function(obj,index){
-        _.forEach(_.range(_.size(obj.students)),function(num){
-             allStudent.push( {
-                 rank:index+1,
-                 class:obj.students[num].class_name,
-                 subjectScore:obj.students[num].score,
-                 id:obj.students[num].id,
-                 score:getScoreById(obj.students[num].id,examStudentsInfo,'score'),
-                 name:getScoreById(obj.students[num].id,examStudentsInfo,'name'),
-             });
-        });
-    });
-    return _.take(allStudent,10);
-}
-function getScoreById(id,examStudentsInfo,pro){
-     return _.result(_.find(examStudentsInfo,function(arr){
-         return arr.id==id;
-     }),pro)
- }

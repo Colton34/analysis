@@ -39,7 +39,7 @@ function getTableDS(paperFullMark, currentPaperStudentsInfo, levelPcentages=[0, 
     var classPaperStudentsGroup = _.groupBy(currentPaperStudentsInfo, 'class_name');
     _.map(classPaperStudentsGroup, (classStudents, classKey) => {
         var classSegmentsDis = makeSegmentsDistribution(segments, classStudents, 'score');
-        var classSegmentsDisCounts = _.map(classSegmentsDis, (obj) => obj.count);
+        var classSegmentsDisCounts = _.reverse(_.map(classSegmentsDis, (obj) => obj.count));
         classSegmentsDisCounts.unshift(classKey + '班');
         tableDS.push(classSegmentsDisCounts);
     });
