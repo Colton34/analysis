@@ -80,9 +80,8 @@ function makeGroupStudentsInfo(students, groupLength=10) {
 
  function getSummaryInfo(tableData) {
      var summaryInfo = {high: [], low: [], polar: []};
-
-     var classNum = tableData[0].length - 1;
-     for (let i = 1 ; i < classNum; i++) {
+     var classNum = tableData.length - 1;
+     for (let i = 1 ; i <= classNum; i++) {
          var data = tableData[i].slice(1);
          var highSum = _.sum(_.take(data,3));
          var lowSum = _.sum(_.takeRight(data, 3));
@@ -95,7 +94,7 @@ function makeGroupStudentsInfo(students, groupLength=10) {
              summaryInfo.polar.push(className);
          }
          summaryInfo.high = _.orderBy(summaryInfo.high, ['count'], ['desc']);
-         summaryInfo.low = _.orderBy(summaryInfo.low, ['count'], ['desc']); 
+         summaryInfo.low = _.orderBy(summaryInfo.low, ['count'], ['desc']);
      }
      return summaryInfo;
  }
