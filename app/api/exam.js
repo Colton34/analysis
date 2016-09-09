@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-09 14:27:24
+* @Last Modified time: 2016-09-09 19:15:44
 */
 
 
@@ -234,15 +234,16 @@ export function initReportDS(params) {
             var papserStudentsByScore = _.groupBy(students, 'score');
             var papserStudentsByScoreInfo = _.map(papserStudentsByScore, (v, k) => {
                 return {
-                    score: k,
+                    score: parseFloat(k),
                     students: v
                 }
             });
-            var orderedPaperStudentScoreInfo = _.orderBy(papserStudentsByScoreInfo, ['score'], 'desc');
+            var orderedPaperStudentScoreInfo = _.orderBy(papserStudentsByScoreInfo, ['score'], ['desc']);
             var finalRankStudentsInfo = _.concat(..._.map(orderedPaperStudentScoreInfo, (theObj, theRank) => _.map(theObj.students, (stuObj) => {
                 stuObj.rank = (theRank+1);
                 return stuObj;
             })));
+            _.reverse(finalRankStudentsInfo);
             allStudentsPaperMap[pid] = finalRankStudentsInfo;
         });
         var headers = [], restPapers = [];
