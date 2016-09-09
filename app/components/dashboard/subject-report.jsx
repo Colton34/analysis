@@ -1,6 +1,12 @@
+
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+
+import _ from 'lodash';
+import React from 'react';
+
+
 import {browserHistory} from 'react-router';
 import classNames from 'classnames/bind';
 import Radium from 'radium';
@@ -8,12 +14,10 @@ import ReactHighcharts from 'react-highcharts';
 import _ from 'lodash';
 import dashboardStyle from './dashboard.css';
 import {COLORS_MAP as colorsMap} from '../../lib/constants';
+import {SUBJECTS_WEIGHT as subjectWeight} from '../../lib/constants';
 
-
-/**
- * toViewAnalysis: 返回校级报告的函数
- */
 class CardHeader extends React.Component {
+
     constructor(props){
         super(props);
         this.state = {
@@ -136,6 +140,11 @@ class SubjectReport extends React.Component {
             }
         };
 
+
+    render() {
+        var meanRateInfo = formatSubjectMeanRateInfo(this.props.data);
+        debugger;
+
         return (
         <div style={{display: 'inline-block', height: 317, padding: '0 10px 0 0', cursor: 'pointer'}}  className='col-lg-4 dashboard-card'
             onClick={this.viewSubjectReport.bind(this)}
@@ -156,4 +165,29 @@ var localStyles = {
     }
 }
 
+
 export default Radium(SubjectReport);
+
+
+
+function formatSubjectMeanRateInfo(origianlInfo) {
+    var result = [], restPapers = [];
+    var totalScoreMeanRateInfo = origianlInfo[0];
+    origianlInfo = _.slice(origianlInfo, 1);
+    _.each(origianlInfo, (obj) => {
+        var index = _.findIndex(subjectWeight, (s) => ((s == obj.subject) || (_.includes(obj.subject, s))));
+        if (index >= 0) {
+            result.push({
+                index: index,
+                subject: obj.subject,
+                meanRate: obj.meanRate
+            });
+        } else {
+            restPapers.push(obj);
+        }
+    });
+    result = _.sortBy(result, 'index');
+    result.unshift(totalScoreMeanRateInfo);
+    result = _.concat(result, restPapers);
+    return result;
+}
