@@ -9,6 +9,7 @@ import ReportContent from '../components/subjectReport';
 import CommonErrorView from '../common/ErrorView';
 import commonClass from '../common/common.css';
 import Spinkit from '../common/Spinkit';
+import ReportNavHeader from '../common/report/NavHeader';
 
 import {initReportDSAction} from '../reducers/reportDS/actions';
 import {initParams} from '../lib/util';
@@ -19,7 +20,7 @@ var localStyle = {
 }
 /**
  * props:
- * authSubjects: 
+ * authSubjects:
  * currentSubject:
  */
 class SubjectsNav extends React.Component {
@@ -62,8 +63,10 @@ class ContentComponent extends React.Component {
         var authSubjects = this.authSubjects, currentSubject = this.state.currentSubject;
         if(authSubjects.length == 0) return;
 
+        var examName = this.props.reportDS.examInfo.toJS().name;
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
+                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} />
                 {(this.ifShowSubjectNav) ? (<SubjectsNav authSubjects={authSubjects} changeSubject={this.onChangeSubject.bind(this)} currentSubject={currentSubject}/>) : ''}
                 <ReportContent currentSubject={currentSubject} reportDS={this.props.reportDS} />
             </div>
@@ -84,10 +87,13 @@ class SubjectReport extends React.Component {
     }
 
     render() {
+        var examid = this.props.location.query ? this.props.location.query.examid : '';
+        if (!examid) return;
+        var grade = this.props.location.query ? this.props.location.query.grade : '';//Note: grade用来区分是否是自定义分析，类似于一个isCustom的布尔值，从而走不通的server route path，gradeName是一定有值的--用来做显示，表明年级值。
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <Spinkit /> : (
-                    <ContentComponent reportDS={this.props.reportDS} user={this.props.user} />
+                    <ContentComponent examid={examid} grade={grade} reportDS={this.props.reportDS} user={this.props.user} />
                 ))}
             </div>
         );
