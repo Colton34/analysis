@@ -202,7 +202,7 @@ function getGradeQuestionScoreRate(questions, pid, allStudentsPaperMap, allStude
     });
 }
 
-//firstInput: 某一道题目得分  secondInput: 此道题目所属科目的成绩
+//firstInput: 某一道题目得分  secondInput: 此道题目所属科目的成绩 TODO: 如果所有学生对于此道题目的得分都是零，由于计算方法的原因，导出NaN
 function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStudentsPaperQuestionInfo) {
     var paperStudents = allStudentsPaperMap[pid];
     return _.map(questions, (questionObj, index) => {
