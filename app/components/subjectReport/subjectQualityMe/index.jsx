@@ -17,8 +17,8 @@ export default function SubjectQualityModule({currentSubject, reportDS}) {
     var examStudentsInfo = reportDS.examStudentsInfo.toJS(), studentsGroupByClass = reportDS.studentsGroupByClass.toJS(), totalScoreFullMark = reportDS.examInfo.toJS().fullMark;
     var paperStudentsInfo = reportDS.allStudentsPaperMap.toJS()[currentSubject.pid], paperFullMark = reportDS.examPapersInfo.toJS()[currentSubject.pid].fullMark;
     var classList = _.keys(studentsGroupByClass);
-    var subjectMeans = getCurrentSubjectMean(paperStudentsInfo);
-    var contriFactors = getContriFactors(examStudentsInfo, studentsGroupByClass, totalScoreFullMark, paperStudentsInfo, paperFullMark);
+    var subjectMeans = getCurrentSubjectMean(paperStudentsInfo, classList);
+    var contriFactors = getContriFactors(examStudentsInfo, studentsGroupByClass, totalScoreFullMark, paperStudentsInfo, paperFullMark, classList);
     var contriFactorsTableData = getContriFactorsTableData(subjectMeans, contriFactors, classList);
     var contriFactorsSummary = getContriFactorsSummary(contriFactors, classList);
     return (
@@ -51,20 +51,29 @@ export default function SubjectQualityModule({currentSubject, reportDS}) {
     )
 }
 
-function getContriFactors(examStudentsInfo, studentsGroupByClass, totalScoreFullMark, paperStudentsInfo, paperFullMark) {
+function getContriFactors(examStudentsInfo, studentsGroupByClass, totalScoreFullMark, paperStudentsInfo, paperFullMark, classList) {
     var totalScoreMeanRate = getTotalScoreMeanRate(examStudentsInfo, studentsGroupByClass, totalScoreFullMark);
-    var currentSubjectMeanRate = getCurrentSubjectMeanRate(paperStudentsInfo, paperFullMark);
+    var currentSubjectMeanRate = getCurrentSubjectMeanRate(paperStudentsInfo, paperFullMark, classList);
     var originalMatrix = [];
     originalMatrix.push(totalScoreMeanRate);
     originalMatrix.push(currentSubjectMeanRate);
     return makeFactor(originalMatrix)[0];
 }
 
-function getCurrentSubjectMean(paperStudentsInfo) {
+function getCurrentSubjectMean(paperStudentsInfo, classList) {
     var totalSchoolSubjectMean = _.round(_.mean(_.map(paperStudentsInfo, (obj) => obj.score)), 2);
-    var classSubjectMeans = _.map(_.groupBy(paperStudentsInfo, 'class_name'), (students, classKey) => {
-        return _.round(_.mean(_.map(students, (obj) => obj.score)), 2);
-    });
+    var groupPaperStudentsInfoByClass = _.groupBy(paperStudentsInfo, 'class_name');
+    var classSubjectMeans = _.map(classList, className => {
+        if(groupPaperStudentsInfoByClass[className]) {
+            return _.round(_.mean(_.map(groupPaperStudentsInfoByClass[className], (student) => {return student.score}), 2));
+        } else {
+            return 0;
+        }
+    })
+    // 以下方法没有考虑到某些班级没有参加该科目考试的情况:
+    // var classSubjectMeans = _.map(_.groupBy(paperStudentsInfo, 'class_name'), (students, classKey) => {
+    //     return _.round(_.mean(_.map(students, (obj) => obj.score)), 2);
+    // });
     classSubjectMeans.unshift(totalSchoolSubjectMean);
     return classSubjectMeans;
 }
@@ -79,13 +88,24 @@ function getTotalScoreMeanRate(examStudentsInfo, studentsGroupByClass, totalScor
     return classRates;
 }
 
-function getCurrentSubjectMeanRate(paperStudentsInfo, paperFullMark) {
+function getCurrentSubjectMeanRate(paperStudentsInfo, paperFullMark, classList) {
     var totalSchoolRate = _.round(_.divide(_.mean(_.map(paperStudentsInfo, (obj) => obj.score)), paperFullMark), 2);
-    var classRates = _.map(_.groupBy(paperStudentsInfo, 'class_name'), (students, classKey) => {
-        return _.round(_.divide(_.mean(_.map(students, (obj) => obj.score)), paperFullMark), 2);
-    });
+    var paperStudentsInfoByClass = _.groupBy(paperStudentsInfo, 'class_name');
+
+    var classRates = _.map(classList, className => {
+        if (paperStudentsInfoByClass[className]) {
+            return _.round(_.divide(_.mean(_.map(paperStudentsInfoByClass[className], (obj) => obj.score)), paperFullMark), 2); 
+        } else {
+            return 0;
+        }
+    })
+    // 以下方法没有考虑到某些班级没有参加该科目考试的情况
+    // var classRates = _.map(_.groupBy(paperStudentsInfo, 'class_name'), (students, classKey) => {
+    //     return _.round(_.divide(_.mean(_.map(students, (obj) => obj.score)), paperFullMark), 2);
+    // });
     classRates.unshift(totalSchoolRate);
     return classRates;
+    
 }
 
 function getContriFactorsTableData(subjectMeans, contriFactors, classList) {

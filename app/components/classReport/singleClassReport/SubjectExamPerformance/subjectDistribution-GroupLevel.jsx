@@ -21,7 +21,7 @@ export default function SubjectScoreLevelDistribution({reportDS, currentClass, c
                 <span className={commonClass['title-desc']}>本次考试，将班级整体及各学科成绩，分为A,B,C,D等多个等级，来观察不同成绩等级下的学生人数分布。</span>
             </div>
             <div style={{marginTop: 30}}>
-                <TableView tableHeaders={tableDS.tableHeaders} tableData={tableDS.tableData} TableComponent={EnhanceTable}/>
+                <TableView tableHeaders={tableDS.tableHeaders} tableData={tableDS.tableData} TableComponent={EnhanceTable} tableSortable/>
             </div>
         </div>
     )

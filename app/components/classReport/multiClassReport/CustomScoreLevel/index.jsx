@@ -58,7 +58,7 @@ class CustomScoreLevel extends React.Component {
                     <Dialog levelPercentages={this.state.levelPercentages} updateGrades={this.updateLevelPercentages.bind(this) } examPapersInfo={examPapersInfo} />
                 </div>
               <div style={{marginTop: 30}}>
-                    <TableView id='customScoreLevelTable' tableHeaders= {tableHeaders} tableData={tableBodyData} TableComponent={EnhanceTable} options={{canDownload: true, fileName: fileName, worksheetName: this.state.currentSubject.value }}/>
+                    <TableView id='customScoreLevelTable' tableHeaders= {tableHeaders} tableData={tableBodyData}  tableSortable TableComponent={EnhanceTable} options={{canDownload: true, fileName: fileName, worksheetName: this.state.currentSubject.value}}/>
                 </div>
             </div>
         )
@@ -79,7 +79,7 @@ function getFormatedData(theDS) {
 // ]
 function getTableHeaders(headerDS) {
     return [_.map(headerDS, (v, i) => {
-        return (i == 0) ? {id: 'class', name: v} : {id: letterMap[i-1], name: v}
+        return (i == 0) ? {id: 'class', name: v} : {id: letterMap[i-1], name: v, dataFormat: getTableTdFormat}
     })]
 }
 
@@ -131,9 +131,9 @@ function getDS(examPapersInfo, allStudentsPaperMap, headers, gradeName, levelPce
             var temp = makeSegmentsCount(studentsArr, segments);
             temp = _.map(_.reverse(temp), (count) => {
                 var percentage = _.round(_.multiply(_.divide(count, paperObj.realStudentsCount), 100), 2);
-                return percentage + '%';
+                return percentage;
             });
-            temp.unshift(gradeName+className+'班');
+            temp.unshift(gradeName + className+'班');
             matrix.push(temp);
         });
 
@@ -153,4 +153,8 @@ function getFormatedSubjects(headers) {
     return _.map(_.slice(headers, 1), (headerObj) => {
         return {value: headerObj.subject, totalScore: headerObj.fullMark, fullMark: headerObj.fullMark, id: headerObj.id} //TODO:这个命名有问题，需要改！
     })
+}
+
+function getTableTdFormat(cell) {
+    return cell + '%';
 }

@@ -289,63 +289,63 @@ class SubjectPerformance extends React.Component {
 
 //自定义Moudle数据结构：
 
-var config={
-chart: {
-    type: 'column'
-},
-title: {
-    text: '',
-    enabled:false
-},
-subtitle: {
-    text: '(离差)',
-    floating:true,
-    x:-512,
-    y:5,
-    style:{
-      "color": "#767676",
-       "fontSize": "14px"
-    }
-},
-colors:['#1daef8','#16d2c7'],
-xAxis: {
-  tickWidth:'0px',//不显示刻度
-  categories:subjects
-},
-yAxis: {
-  title:{
-    text:''
-  },
-  lineWidth:1,
-gridLineDashStyle:'Dash',
-  gridLineColor:'#f2f2f3',
-},
-credits:{
-  enabled:false
-},
-tooltip:{
-enabled:true,
-backgroundColor:'#000',
-borderColor:'#000',
-style:{
-  color:'#fff'
-},
-formatter: function(){
-     return this.point.y.toFixed(2);
-}
-},
-legend:{
-  enabled:false
-},
-plotOptions: {
-           column: {
-               pointWidth:16
-           }
-       },
-series: [{
-    data: factors
-}]
-};
+        var config = {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '',
+                enabled: false
+            },
+            subtitle: {
+                text: '(离差)',
+                floating: true,
+                x: -512,
+                y: 5,
+                style: {
+                    "color": "#767676",
+                    "fontSize": "14px"
+                }
+            },
+            colors: ['#1daef8', '#16d2c7'],
+            xAxis: {
+                tickWidth: '0px',//不显示刻度
+                categories: subjects
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                lineWidth: 1,
+                gridLineDashStyle: 'Dash',
+                gridLineColor: '#f2f2f3',
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                enabled: true,
+                backgroundColor: '#000',
+                borderColor: '#000',
+                style: {
+                    color: '#fff'
+                },
+                formatter: function () {
+                    return this.point.y.toFixed(2);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                column: {
+                    pointWidth: 16
+                }
+            },
+            series: [{
+                data: factors
+            }]
+        };
         // var factorSubjects = _.map(_.reverse(disData), (obj) => obj.subject);
 
         // 表格表头的鼠标悬停提示
