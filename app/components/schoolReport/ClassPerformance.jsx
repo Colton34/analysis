@@ -34,7 +34,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                     {
                         _.map(tableHeaderData, (subject, index) => {
                             return (
-                                <th colSpan="2" key={index} className={styles['table-unit']} style={{minWidth: 100, borderColor: colorsMap.C04}}>{subject}</th>
+                                <th colSpan="2" key={index} className={styles['table-unit']} style={{minWidth: 100, borderColor: colorsMap.C04, textAlign: 'center'}}>{subject}</th>
                             )
                         })
                     }
@@ -57,7 +57,7 @@ const AverageTable = ({tableHeaderData, tableData}) => {
                                 {
                                     _.map(tdList, (td, tindex) => {
                                         return (
-                                            <td key={'td' + tindex}className={styles['table-unit']} style={{minWidth: 100, borderColor: colorsMap.C04}}>
+                                            <td key={'td' + tindex}className={styles['table-unit']} style={_.assign({},{minWidth: 100, borderColor: colorsMap.C04}, bindex !== 0 && tindex !== 0 && td < tableData[0][tindex] ? {color: colorsMap.B08}:{})}>
                                                 {td}
                                             </td>
                                         )
@@ -137,7 +137,6 @@ class ClassPerformance extends React.Component {
 //自定义Module数据结构：
         var _this = this;
         var meanTableHeaderData = _.map(headers, (headerObj) => headerObj.subject);
-
         var config = {
           colors:[
            '#0099ff',
