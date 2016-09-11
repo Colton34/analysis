@@ -22,7 +22,6 @@ export default function ExamQuestionPerfromance({currentSubject, reportDS}) {
     var gradeQuestionSeparation = getGradeQuestionSeparation(currentPaperQuestions, currentSubject.pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
 
     var paperDiff = getDifficulty({currentPaperStudentsInfo, currentPaperInfo});
-    debugger;
     var summaryInfo = getSummaryInfo(paperDiff, currentSubject);
     return (
         <div id="examQuestionPerformance" className={commonClass['section']}>

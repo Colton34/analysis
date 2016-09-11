@@ -151,10 +151,8 @@ function getLevelTableRenderData(currentSubjectLevelInfo, subjectLevels, current
 
     var tableData = [];
     var rowData = {subject: currentSubject.subject};
-    // debugger;
     _.forEach(currentSubjectLevelInfo, (levelInfo, levelNum) => {
         var currentSubjectLevelObj = currentSubjectLevelInfo[levelSize - levelNum - 1];
-        debugger;
         _.forEach(subHeads, (subHead, index) => {
             rowData[subHead.id + '_' + levelNum] = currentSubjectLevelObj[subHead.id];
         })
@@ -174,7 +172,6 @@ function getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels) {
     var tableData = [], levelLastIndex = _.size(levels) - 1;
     _.forEach(currentSubjectLevelClassInfo, (levelInfo, levelNum) => {
         var rowData = {}, currentSubjectLevelClassObj = currentSubjectLevelClassInfo[levelLastIndex - levelNum];
-        debugger;
         rowData.level = numberMap[levelNum - 0 + 1] + '档上线人数';
         _.forEach(currentSubjectLevelClassObj, (count, className) => {
            rowData[className] = count;
