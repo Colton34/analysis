@@ -49,7 +49,7 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
                                     {index !== currentSubjectLevelRank.length -1 ? '，' : '。'}
                                 </span>
                         })
-                    }。多联系本学科的教学实际，做进一步的教学反思，本学科能如何改进教学，才为全年级的高端教学成就提供更大的贡献。
+                    }多联系本学科的教学实际，做进一步的教学反思，本学科能如何改进教学，才为全年级的高端教学成就提供更大的贡献。
                 </p>
             </div>
 
@@ -151,9 +151,12 @@ function getLevelTableRenderData(currentSubjectLevelInfo, subjectLevels, current
 
     var tableData = [];
     var rowData = {subject: currentSubject.subject};
+    // debugger;
     _.forEach(currentSubjectLevelInfo, (levelInfo, levelNum) => {
+        var currentSubjectLevelObj = currentSubjectLevelInfo[levelSize - levelNum - 1];
+        debugger;
         _.forEach(subHeads, (subHead, index) => {
-            rowData[subHead.id + '_' + levelNum] = levelInfo[subHead.id];
+            rowData[subHead.id + '_' + levelNum] = currentSubjectLevelObj[subHead.id];
         })
     })
     tableData.push(rowData);
@@ -168,11 +171,12 @@ function getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels) {
         tableHeaders[0].push({id: className, name: className+'班'});
     })
 
-    var tableData = [];
+    var tableData = [], levelLastIndex = _.size(levels) - 1;
     _.forEach(currentSubjectLevelClassInfo, (levelInfo, levelNum) => {
-        var rowData = {};
+        var rowData = {}, currentSubjectLevelClassObj = currentSubjectLevelClassInfo[levelLastIndex - levelNum];
+        debugger;
         rowData.level = numberMap[levelNum - 0 + 1] + '档上线人数';
-        _.forEach(levelInfo, (count, className) => {
+        _.forEach(currentSubjectLevelClassObj, (count, className) => {
            rowData[className] = count;
         })
         tableData.push(rowData);
@@ -181,7 +185,7 @@ function getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels) {
 }
 
 function getclassInfoSummary(currentSubjectLevelClassInfo) {
-    var summaryInfo = {};
+    var summaryInfo = {}, levelLastIndex = _.size(currentSubjectLevelClassInfo) - 1;
     var classSize = _.size(currentSubjectLevelClassInfo[0]) - 1;
 
     //考虑只有一个班的情况
@@ -192,8 +196,8 @@ function getclassInfoSummary(currentSubjectLevelClassInfo) {
         return summaryInfo;
     }
     _.forEach(currentSubjectLevelClassInfo, (levelInfo, levelNum) => {
-        var countClassMap = {};
-        _.forEach(levelInfo, (count, className) => {
+        var countClassMap = {}, currentSubjectLevelClassObj = currentSubjectLevelClassInfo[levelLastIndex - levelNum];
+        _.forEach(currentSubjectLevelClassObj, (count, className) => {
             if (className === 'totalSchool')
                 return;
             // 计算累计, 例如二档线要计算一、二档线的总和；

@@ -10,7 +10,7 @@ export default function DistributionTableModule({paperQuestionsDiffInfo, paperDi
     return (
        <div style={{marginTop: 20}}>
             <p>本学科的整体难度把握: <span style={{color: colorsMap.B03}}>{paperDiff}</span>，{summaryInfo}</p>
-            <p>分布从客观题，主观题试题难度分布结构看，这次考试试题的难度分布情况见下表。</p>
+            <p>分别从客观题，主观题试题难度分布结构看，这次考试试题的难度分布情况见下表：</p>
 
             <TableView tableHeaders={tableHeaders} tableData={tableData} TableComponent={EnhanceTable}/>
             <div className={commonClass['analysis-conclusion']}>
@@ -27,9 +27,9 @@ function getTableRenderData(paperQuestionsDiffInfo) {
         var headObj = {};
         headObj.id = num ;
         headObj.name = _.round(num * 0.2, 2) + '-' + _.round((num + 1) * 0.2, 2);
-        tableHeaders[0].push(headObj);   
+        tableHeaders[0].push(headObj);
     })
-    
+
     var tableData = [];
     // 主客观题数据行填充
     var typeName = {obj: '客观题', sub: '主观题'};
@@ -42,8 +42,8 @@ function getTableRenderData(paperQuestionsDiffInfo) {
 
                 rowData.diff = '题号';
                 _.forEach(diffInfo[type], (questionList, groupNum) => {
-                    var questionNameList = questionList.map(questionInfo => {return questionInfo.name}); 
-                    rowData[groupNum] = questionNameList.length ? _.join(questionNameList, ',') : '--'; 
+                    var questionNameList = questionList.map(questionInfo => {return questionInfo.name});
+                    rowData[groupNum] = questionNameList.length ? _.join(questionNameList, ',') : '--';
                 })
             } else {
                 rowData.diff = '合计赋分';

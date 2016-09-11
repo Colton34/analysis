@@ -66,7 +66,7 @@ function getTableDS(examPapersInfo, classStudentsPaperMap, headers, currentClass
         var paperObj = examPapersInfo[headerObj.id];
         var segments = makeSubjectLevelSegments(paperObj.fullMark, levelPcentages);
         var result = makeSegmentsCount(classStudentsPaperMap[headerObj.id], segments); //注意：低等次在前
-        result = _.reverse(result);//高等次在前
+        _.reverse(result);//高等次在前
         _.forEach(result, (count, index) => {
             rowData['count_' + index] = count;
         })

@@ -13,12 +13,17 @@ export default function ExamQuestionPerfromance({currentSubject, reportDS}) {
     _.each(examStudentsInfo, (studentObj) => {
         allStudentsPaperQuestionInfo[studentObj.id] = _.keyBy(studentObj.questionScores, 'paperid');
     });
-    var currentPaperQuestions = reportDS.examPapersInfo.toJS()[currentSubject.pid].questions, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
+
+    var currentPaperInfo = reportDS.examPapersInfo.toJS()[currentSubject.pid];
+    var currentPaperQuestions = currentPaperInfo.questions, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
     var currentPaperStudentsInfo = allStudentsPaperMap[currentSubject.pid];
     var paperQuestionsDiffInfo = getPaperQuestionsDiffInfo(currentPaperQuestions, currentSubject.pid, currentPaperStudentsInfo, allStudentsPaperQuestionInfo);
 
     var gradeQuestionSeparation = getGradeQuestionSeparation(currentPaperQuestions, currentSubject.pid, allStudentsPaperMap, allStudentsPaperQuestionInfo);
-    var {paperDiff, summaryInfo} = getSummaryInfo(paperQuestionsDiffInfo, currentSubject);
+
+    var paperDiff = getDifficulty({currentPaperStudentsInfo, currentPaperInfo});
+    debugger;
+    var summaryInfo = getSummaryInfo(paperDiff, currentSubject);
     return (
         <div id="examQuestionPerformance" className={commonClass['section']}>
             <div>
@@ -72,8 +77,12 @@ function getGradeQuestionSeparation(questions, pid, allStudentsPaperMap, allStud
     });
 }
 
-function getSummaryInfo(paperQuestionsDiffInfo, currentSubject) {
-    var paperDiff = _.round(_.divide(_.sum(_.map(paperQuestionsDiffInfo, (obj) => obj.diff)), paperQuestionsDiffInfo.length), 2);
+function getDifficulty({currentPaperStudentsInfo, currentPaperInfo}) {
+    var mean = _.mean(_.map(currentPaperStudentsInfo, (obj) => obj.score));
+    return _.round(_.divide(mean, currentPaperInfo.fullMark), 2);
+}
+
+function getSummaryInfo(paperDiff, currentSubject) {
     var summaryInfo = '';
     if(paperDiff < 0.5) {
         summaryInfo = currentSubject.subject + '学科试卷难度过大，学科要求过高，对中低端学生给予的展现空间不足。';
@@ -88,6 +97,6 @@ function getSummaryInfo(paperQuestionsDiffInfo, currentSubject) {
     }else{
         summaryInfo = currentSubject.subject + '学科试卷难度过容易，不利于中高端学生的学业水平展现。';
     }
-    return {paperDiff, summaryInfo};
+    return summaryInfo;
 
 }

@@ -89,7 +89,7 @@ export default function ClassImportGoodStudents({currentPaperStudentsInfo}) {
 return (
     <div>
         <div style={{margfinBottom: 30,marginTop:30}}>
-            <span className={commonClass['sub-title']}>全年级本学科分数排名在后20%的学生总人数为 {studentsNum} ，在各班的分布情况如下图：</span>
+            <span className={commonClass['sub-title']}>全年级本学科分数排名在前20%的学生总人数为 {studentsNum} ，在各班的分布情况如下图：</span>
             <span className={commonClass['title-desc']}></span>
         </div>
         <div style={{marginTop:30}}>

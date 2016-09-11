@@ -9,11 +9,11 @@ import {Link} from 'react-router';
 
 /**
  * props:
- * //({reportDS, currentSubject}) 
+ * //({reportDS, currentSubject})
  */
 export default class SubejctCriticalModule extends React.Component{
     constructor(props){
-        
+
         super(props);
         this.state = {
             currentLevel: 0 //高分档数字小
@@ -33,7 +33,7 @@ export default class SubejctCriticalModule extends React.Component{
     }
     render(){
         var {reportDS, currentSubject} = this.props;
-        var {currentLevel} = this.state; 
+        var {currentLevel} = this.state;
         var criticalStudentInfo = getCriticalStudentInfo(reportDS);
         var {tableData, badPerformanceClass} = getRenderData(reportDS, criticalStudentInfo, currentLevel, currentSubject);
         var levelSize = _.size(reportDS.levels.toJS());
@@ -43,7 +43,7 @@ export default class SubejctCriticalModule extends React.Component{
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>分档临界生情况</span>
                 <span className={commonClass['title-desc']}>对比本学科各班级临界生情况，关注临界生群体，提高年级教学质量</span>
-                
+
                 {/****************** 切换标签 *************** */}
                 <div className='tab-ctn'>
                     <ul>
@@ -63,8 +63,8 @@ export default class SubejctCriticalModule extends React.Component{
                     <p>分析诊断：</p>
                     <p>
                     {
-                        badPerformanceClass.length ? '从差异来看，对各班级临界生而言，' + currentSubject.subject + '学科表现欠佳的班级是' + _.join(badPerformanceClass, '、') + '。' 
-                            : '针对各班级临界生而言，整体来看学科平均表现都在学科分档线之上，但也要去具体关注每一个临界生学生的具体表现。' 
+                        badPerformanceClass.length ? '从差异来看，对各班级临界生而言，' + currentSubject.subject + '学科表现欠佳的班级是' + _.join(badPerformanceClass, '、') + '。'
+                            : '针对各班级临界生而言，整体来看学科平均表现都在学科分档线之上，但也要去具体关注每一个临界生学生的具体表现。'
 
                     }
                     </p>
@@ -72,7 +72,7 @@ export default class SubejctCriticalModule extends React.Component{
             </div>
     )
     }
-    
+
 }
 
 function makeCriticalStudentsInfo(students, levels, levelBuffers) {
@@ -83,7 +83,7 @@ function makeCriticalStudentsInfo(students, levels, levelBuffers) {
     var segments = makeCriticalSegments(levelBuffers, levels);
     var classCountsInfoArr = makeSegmentsCountInfo(students, segments);
     var classRow = _.filter(classCountsInfoArr, (countInfo, index) => (index % 2 == 0));//从低到高
-    classRow = _.reverse(classRow); //从高到底
+    _.reverse(classRow); //从高到底
 
     _.each(classRow, (arr, index) => {
         criticalLevelInfo[index] = arr;//这里是反转后的数据。
@@ -203,7 +203,7 @@ function  getDeviationRowData(subjectMeanRowData, classList, subjectLevels, curr
                 badPerformanceClass.push(classList[index] + '班');
             }
         }
-        
+
     })
     return {deviationRowData: rowData, badPerformanceClass: badPerformanceClass};
 }

@@ -126,7 +126,7 @@ function getTableHeader(segments) {
         categories.push(value);
         return {id: value, name: value};
     });
-    header = _.reverse(header);
+    _.reverse(header);
     header.unshift({id: 'class', name: '班级'});
     return header;
     // return {header: header, categories: categories};

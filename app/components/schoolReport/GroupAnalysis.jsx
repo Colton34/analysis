@@ -394,14 +394,14 @@ function criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass,
 
     var totalSchool = _.filter(totalSchoolCounts, (count, index) => (index % 2 == 0));
 
-    totalSchool = _.reverse(totalSchool);
+    _.reverse(totalSchool);
     totalSchool.unshift('全校');
     table.push(totalSchool);
 
     _.each(studentsGroupByClass, (students, className) => {
         var classCounts = makeSegmentsCount(students, segments);
         var classRow = _.filter(classCounts, (count, index) => (index % 2 == 0));//从低到高
-        classRow = _.reverse(classRow); //从高到底
+        _.reverse(classRow); //从高到底
 
         _.each(classRow, (count, index) => {
             criticalLevelInfo[index].push({'class': className, count: count});//因为这里使用的是反转后得到classRow，所以这里criticalLevelInfo中的
