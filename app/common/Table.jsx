@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './common.css';
 import _ from 'lodash';
-import {Table as BootTable, Popover} from 'react-bootstrap';
+import {Table as BootTable, Popover, OverlayTrigger} from 'react-bootstrap';
 import {COLORS_MAP as colorsMap} from '../lib/constants';
 import Tip from './Tip';
 /**
@@ -9,6 +9,14 @@ import Tip from './Tip';
  * 传入的参数为 tableData
  */
 
+
+const popoverFactory = ({title, content}) => {
+    return (
+        <Popover id='tipPopover' title={title}>
+            {content}
+        </Popover>
+    )
+}
 /**
  * props:
  * tableData: 渲染表格的数据
@@ -32,7 +40,15 @@ const Table = ({tableData, tipConfig, colorCallback}) => {
                                     tipConfig && tipNames.indexOf(th) !== -1 ? (
                                         <div>
                                             <span style={{marginRight: 5}}>{th}</span>
-                                            <Tip content={tipConfig[th].content} direction={tipConfig[th].direction} />
+                                            <OverlayTrigger
+                                                placement={'bottom'}
+                                                trigger={['hover', 'focus']}
+                                                overlay={popoverFactory({title: '', content: tipConfig[th].content})}
+                                                >
+                                                <div style={{ display: 'inline-block', width: 16, height: 16, lineHeight: '16px', borderRadius: '50%', textAlign: 'center', color: '#fff', backgroundColor: colorsMap.C08 }}>
+                                                    <i className='icon-help-1'></i>
+                                                </div>
+                                            </OverlayTrigger>
                                         </div>
                                     ) : th
                                  }
