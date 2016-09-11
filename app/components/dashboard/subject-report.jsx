@@ -119,9 +119,9 @@ class SubjectReport extends React.Component {
             },
         };
         return (
-        <div style={{display: 'inline-block', height: 317, padding: '0 10px 0 0', cursor: 'pointer'}}  className='col-lg-4 dashboard-card'
+        <div style={{display: 'inline-block', height: 317, padding: '0 10px', cursor: 'pointer'}}  className='col-lg-4'
             onClick={this.viewSubjectReport.bind(this)}>
-            <div style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
+            <div className='dashboard-card' style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
                 <CardHeader toViewAnalysis={this.viewSubjectReport.bind(this)} />
                 <ReactHighcharts config={config} style={{ maxWidth: 330, maxHeight: 230, marginTop: 20}}></ReactHighcharts>
             </div>
