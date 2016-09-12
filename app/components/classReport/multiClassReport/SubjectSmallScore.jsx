@@ -5,8 +5,9 @@ import React, { PropTypes } from 'react';
 import commonClass from '../../../common/common.css';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
-
 import DropdownList from '../../../common/DropdownList';
+
+import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
 class SubjectSmallScore extends React.Component {
     constructor(props) {
@@ -62,7 +63,7 @@ function getFormatedTableHeaders(headerDS) {
     return [_.map(headerDS, (v, i) => {
         if(i == 0) return {id: 'tihao', name: '题目'};
         if(i == 1) return {id: 'avg', name: '年级平均得分率'};
-        return {id: v, name: v}
+        return {id: v, name: v, columnStyle: getTableTdStyle}
     })]
 }
 
@@ -133,4 +134,11 @@ function getFormatedSubjects(headers) {
     return _.map(_.slice(headers, 1), (headerObj) => {
         return {value: headerObj.subject, totalScore: headerObj.fullMark, fullMark: headerObj.fullMark, key: headerObj.id} //TODO:这个命名有问题，需要改！
     })
+}
+
+// 小于年级平均分则标红
+function getTableTdStyle(cell, rowData) {
+    if (cell < rowData.avg) {
+        return {color: colorsMap.B08}
+    } else return {}
 }

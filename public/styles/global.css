@@ -109,9 +109,6 @@ p, div p {
 .dashboard-card:hover {
     box-shadow: 0 15px 15px rgba(0,0,0,.1);
     transform: translate3d(0,-3px,0);
-    transition: all .2s linear;
-    background-color: #fff;
-    background-origin: padding-box;
 }
 /**------------------------dashboard card end-----------------------------------------------*/
 

@@ -6,6 +6,7 @@ import EnhanceTable from '../../../common/EnhanceTable';
 import TableView from '../../../common/TableView';
 
 import commonClass from '../../../common/common.css';
+import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
 var COLUMN_NAMES = ['最高分', '最低分', '平均分', '考试人数'];
 var INDICATORFUNS = [getMaxScore, getMinScore, getMeanScore, getRealStudentCount];
@@ -55,6 +56,7 @@ function getTableHeaderDS(subjectNames) {
             obj.name = subHead;
             if(subHead === '最高分' || subHead === '最低分' || subHead === '平均分') {
                 obj.columnSortable = true;
+                obj.columnStyle = getTableColumnStyle;
             }
             tableHeaders[1].push(obj);
         })
@@ -108,4 +110,13 @@ function getClassStudentsPaperMap(allStudentsPaperMap, currentClass) {
         if(classStudents || classStudents.length > 0) result[pid] = classStudents;
     });
     return result;
+}
+
+// 各班级数据和年级数据做比较，小于全年级数据则标红
+function getTableColumnStyle(cell, rowData, rowIndex, columnIndex, id, tableData) {
+    if (cell < tableData[0][id]) {
+        return {color: colorsMap.B08};
+    } else {
+        return {};
+    }
 }

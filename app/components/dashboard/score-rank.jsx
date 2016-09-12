@@ -85,8 +85,8 @@ class ScoreRank extends React.Component {
 
         var queryOptions = (grade) ? {examid: examid, grade: grade} : {examid: examid};
         return (
-            <div style={_.assign({ display: 'inline-block', minHeight: 340, cursor: 'pointer'}, this.props.expand ? { padding: 0} : {padding: '0 10px 0 0'})} onClick={this.onClickScoreRank.bind(this, queryOptions)} className={this.props.expand? 'col-md-12 dashboard-card' : 'col-md-6 dashboard-card'}>
-                <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
+            <div style={_.assign({ display: 'inline-block', minHeight: 340, cursor: 'pointer'}, this.props.expand ? { padding: 0} : {padding: '0 10px 0 0'})} onClick={this.onClickScoreRank.bind(this, queryOptions)} className={this.props.expand? 'col-md-12' : 'col-md-6'}>
+                <div className='dashboard-card' style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
                    <CardHeader queryOptions={queryOptions}/>
                     <Table id='topRankTable' responsive style={{ width: '100%', height: '100%', margin: '20px 0 30px 0' }}>
                         <thead>

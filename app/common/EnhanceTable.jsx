@@ -155,7 +155,16 @@ class Table extends React.Component {
                                                     onClick={this.onSortColumn.bind(this, sortable ? header.id : undefined)}
                                                     >
                                                     <span style={header.tipContent !== undefined ? {marginRight: 5} : {}}>{header.name}</span>
-                                                    {header.tipContent !== undefined ? <Tip content={header.tipContent}/> : ''}
+                                                    {header.tipContent !== undefined ? (
+                                                        <OverlayTrigger
+                                                            placement={'bottom'}
+                                                            trigger={['hover', 'focus']}
+                                                            overlay={popoverFactory({title: '', content: header.tipContent})}
+                                                            >
+                                                            <div style={{display: 'inline-block', width: 16, height: 16, lineHeight: '16px', borderRadius: '50%', textAlign: 'center', color: '#fff', backgroundColor: colorsMap.C08}}>
+                                                                <i className='icon-help-1'></i>
+                                                            </div>
+                                                        </OverlayTrigger> ): ''}
                                                     {sortable? <SortDirection sortInfo={this.state.sortInfo} id={header.id}/> : ''}
                                                 </th>
                                             )

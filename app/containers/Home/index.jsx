@@ -100,13 +100,16 @@ class TeacherHelper extends React.Component {
         })
     }
     render(){
+        var {videoLinkHover} = this.state
         return (
             <div>
                 <div className={styles.title}>老师助手</div>
                 <a  href='/faq?section=intro&sub=introVideo'
                     onMouseEnter={this.onHoverVideoLink.bind(this)}
-                    onMouseLeave={this.onLeaveVideoLink.bind(this)}
-                    className={this.state.videoLinkHover ? styles['video-img-hover'] : styles['video-img']} ></a>
+                    onMouseLeave={this.onLeaveVideoLink.bind(this)}>
+                    <div className={styles['video-img']} style={videoLinkHover ? {display: 'none'}: {display: 'block'}}></div>
+                    <div className={styles['video-img-hover']} style={videoLinkHover ? {display: 'block'}: {display: 'none'}}></div>
+                </a>
                 <a style={localStyle.downloadBtn}
                     target='_blank'
                     onClick={this.downloadHomeGuidePdf.bind(this)}
