@@ -115,13 +115,14 @@ function getConclusionSummary(paperQuestionsDiffInfo){
     var allQuestionDiff =  _.filter(paperQuestionsDiffInfo,function(obj){
         return obj.diff<=0.2;
     });
+    debugger;
     if(diffQuestion.length>0 && allQuestionDiff.length>0){
-        var summary = '从试题难度分布表中可看到，本学科试卷中 有难度特别大（难度低于0.5）的客观题，其难度设计的考虑还可以周全些。 所有试题中，难度系数在0.2以下的试题在这次考试中有设置，作为学校学业水平性的考试，这样对试题难度设计的考虑，是否一定有必要，可以进一步斟酌.';
-    }else if(diffQuestion.length>0 && allQuestionDiff.length<0){
+        var summary = '从试题难度分布表中可看到，本学科试卷中 有难度特别大（难度低于0.5）的客观题，其难度设计的考虑还可以周全些。 所有试题中，难度系数在0.2以下的试题在这次考试中有设置，作为学校学业水平性的考试，这样对试题难度设计的考虑，是否一定有必要，可以进一步斟酌。';
+    }else if(diffQuestion.length>0 && allQuestionDiff.length<=0){
         var summary = '从试题难度分布表中可看到，本学科试卷中 有难度特别大（难度低于0.5）的客观题，其难度设计的考虑还可以周全些。';
-    }else if(diffQuestion.length<0 && allQuestionDiff.length>0){
+    }else if(diffQuestion.length<=0 && allQuestionDiff.length>0){
         var summary = '所有试题中，难度系数在0.2以下的试题在这次考试中有设置，作为学校学业水平性的考试，这样对试题难度设计的考虑，是否一定有必要，可以进一步斟酌。'
-    }else if(diffQuestion.length<0 && allQuestionDiff.length<0){
+    }else if(diffQuestion.length<=0 && allQuestionDiff.length<=0){
         var summary = '';
     }
     return summary;
