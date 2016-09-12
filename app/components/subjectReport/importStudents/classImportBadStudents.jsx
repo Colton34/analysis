@@ -7,7 +7,7 @@ import ReactHighcharts from 'react-highcharts';
 export default function ClassImportBadStudents({currentPaperStudentsInfo}) {
     var studentsNum = _.round(_.size(currentPaperStudentsInfo)*0.2);
     var allStudentGroupByNum = getBadStudent(currentPaperStudentsInfo);
-    var chartDS = getChartDS(allStudentGroupByNum);
+    var chartDS = getChartDS(allStudentGroupByNum,currentPaperStudentsInfo);
     var config={
         chart: {
             type: 'column'
@@ -104,18 +104,27 @@ function getBadStudent(currentPaperStudentsInfo){
      var allStudentGroupBy = _.groupBy(allStudent,'class_name');
      var allStudentGroupByNum = _.map(allStudentGroupBy,function(value,key){
          return {
-             name:key,
+             name:key+'班',
              y:_.size(value)
          }
      });
      return allStudentGroupByNum;
 }
 
-function getChartDS(allStudentGroupByNum){
-    var xAxis = _.map(allStudentGroupByNum,function(value,key){
-        return value.name+'班';
+function getChartDS(allStudentGroupByNum,currentPaperStudentsInfo){
+    var xAxis = _.map(_.groupBy(currentPaperStudentsInfo,'class_name'),function(value,key){
+        return key+'班';
     });
-    var seriesData = allStudentGroupByNum;
+
+    var seriesData = _.map(xAxis,function(obj){
+        var result = _.find(allStudentGroupByNum,function(object){
+        return object.name==obj;
+    });
+        return {
+            name:obj,
+            y:result?result.y:0
+                }
+    })
         return {
             xAxis:xAxis,
             seriesData:seriesData
