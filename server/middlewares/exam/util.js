@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-31 18:07:55
+* @Last Modified time: 2016-09-12 13:43:05
 */
 'use strict';
 var _ = require('lodash');
@@ -66,7 +66,7 @@ exports.generateExamInfo = function(examid, gradeName, schoolid) {
         return getSchoolById(schoolid);
     }).then(function(school) {
         var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
-        if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.Error('没有找到对应的年级或者从属此年级的班级'));
+        if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.Error('学校没有找到对应的年级或者从属此年级的班级：【schoolid = ' +schoolid + '  schoolName = ' +school.name + '  gradeName = ' + gradeName + '】'));
 
         data.exam.grade = targetGrade;
         data.exam.fetchId = examid;
