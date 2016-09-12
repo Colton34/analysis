@@ -38,7 +38,13 @@ const FullScoreTrend = ({reportDS}) => {
         },
         xAxis: {
           tickWidth:'0px',//不显示刻度
-            categories: result['x-axon']
+          title:{//x轴标签
+              align:'high',
+              text:'分数',
+              margin:0,
+              offset:7
+          },
+        categories: result['x-axon']
         },
         yAxis: {
           lineWidth:1,
