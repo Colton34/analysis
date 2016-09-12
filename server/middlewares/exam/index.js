@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-09 14:53:18
+* @Last Modified time: 2016-09-12 09:49:26
 */
 
 'use strict';
@@ -100,7 +100,7 @@ exports.home = function(req, res, next) {
 }
 
 function getAuthSubjectsInfo(auth, exam, examScoreArr) {
-    var result = [], subjectMeanRates = [];
+    var result = [], subjectMeanRates = [], gradeKey = exam.grade.name;
     var totalScoreMeanRate = _.round(_.divide(_.mean(_.map(examScoreArr, (obj) => obj.score)), exam.fullMark), 2);
 
     if(exam['[papers]'] && exam['[papers]'].length > 0) {
