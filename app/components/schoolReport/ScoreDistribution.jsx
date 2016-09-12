@@ -51,7 +51,7 @@ const BasicInfo = ({examInfo, levels, examStudentsInfo, onShowDialog}) => {
                             </span>
                         )
                     })
-            }
+            }。分别对应年级学生总数的前{_.join(_.map(levels, (levObj, levelKey) => levels[(levTotal - 1 - levelKey) + ''].percentage + '%'), '、')}。
             </p>
             <span onClick={onShowDialog} style={{ cursor: 'pointer', color: colorsMap.B03, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30}}>
                     <i className='icon-cog-2' style={{fontSize: 12}}></i>
