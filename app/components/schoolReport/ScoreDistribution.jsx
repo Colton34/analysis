@@ -329,7 +329,7 @@ class Dialog extends React.Component {
 
                 if (targetIndex !== -1) {
                     var count = examStudentsInfo.length - targetIndex;
-                    var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);    
+                    var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);
                 } else {
                     var count = 0;
                     var percentage = 0;
@@ -513,7 +513,7 @@ class ScoreDistribution extends React.Component {
 
     //算法数据结构
         var totalScoreLevelInfo = makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels);
-        var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels);
+        var tableData = theTotalScoreLevelTable(totalScoreLevelInfo, levels,examInfo);
         var disData = theTotalScoreLevelDiscription(totalScoreLevelInfo, levels);
         //自定义Module数据结构
         var _this = this;
@@ -729,7 +729,7 @@ class OnlineInfo extends React.Component {
  * @return {[type]}                     table的matrix。这里是夹心header，所以不提供header，从levels中获取行排列（夹心栏就按照图表给的顺序：['人数',
  *   '累计人数', '累计占比']）
  */
-function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
+function theTotalScoreLevelTable(totalScoreLevelInfo, levels,examInfo) {
     var table = [];
     var totalSchoolObj = totalScoreLevelInfo.totalSchool;
 
@@ -741,7 +741,7 @@ function theTotalScoreLevelTable(totalScoreLevelInfo, levels) {
     _.each(totalScoreLevelInfo, (levInfoItem, theKey) => {
         if(theKey == 'totalSchool') return;
         var totalClassRow = makeLevelTableRow(levInfoItem);
-        totalClassRow.unshift(theKey+'班');
+        totalClassRow.unshift(examInfo.gradeName + theKey+'班');
         table.push(totalClassRow);
     });
     return table;

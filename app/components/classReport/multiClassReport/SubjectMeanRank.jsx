@@ -25,7 +25,7 @@ var config = {
     subtitle: {
         text: '----',
         floating: true,
-        x: -65,
+        x: -75,
         y: 18,
         style: {
             "color": colorsMap.B03,
@@ -105,6 +105,7 @@ class SubjectMeanRank extends React.Component {
 
     render() {
         var currentClassMeanInfo = this.classMeanInfo[this.state.currentSubject.id], currentGradeMeanValue = this.gradeMeanInfo[this.state.currentSubject.id];
+        var currentSubject = this.examPapersInfo[this.state.currentSubject.id].subject;
         if(!currentClassMeanInfo) return (<div></div>) //Blank Page -- 自定义Error信息
         var xAxis = {'tickWidth': '0px', 'categories': currentClassMeanInfo.theClasses,
             title:{
@@ -113,7 +114,7 @@ class SubjectMeanRank extends React.Component {
             margin:0,
             offset:7
         }};
-        var series = [{ 'name': '年级平均分: '+currentGradeMeanValue, 'color': colorsMap.B03, data: currentClassMeanInfo.theMeans}];
+        var series = [{ 'name': currentSubject+'年级平均分: '+currentGradeMeanValue, 'color': colorsMap.B03, data: currentClassMeanInfo.theMeans}];
         config.xAxis = xAxis, config.series = series;
         config.yAxis.plotLines[1].value = currentGradeMeanValue;
 
