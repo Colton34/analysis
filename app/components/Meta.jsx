@@ -10,7 +10,7 @@ import config from '../lib/helmconfig';
 //   config.link = config.link.filter(l => l.rel !== 'stylesheet');
 // }
 
-const Meta = () => <Helmet title="云校分析" meta={config.meta} link={config.link} />;
+const Meta = () => <Helmet title="好分数-分析" meta={config.meta} link={config.link} />;
 
 
 ReactDOMServer.renderToString(<Meta />);
