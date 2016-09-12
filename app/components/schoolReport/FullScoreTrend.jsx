@@ -2,9 +2,11 @@ import React from 'react';
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
 import ReactHighcharts from 'react-highcharts';
+import StatisticalLib from 'simple-statistics';
+
 import { COLORS_MAP as colorsMap, B03, C04, C07, C12, C14 } from '../../lib/constants';
 import {makeSegments, makeSegmentsCount} from '../../api/exam';
-
+import subjectReportStyle from '../../styles/subjectReport.css';
 const FullScoreTrend = ({reportDS}) => {
     var examInfo = reportDS.examInfo.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS();
 //算法数据结构：
@@ -85,15 +87,22 @@ const FullScoreTrend = ({reportDS}) => {
             enabled: false
         }
     }
+    var summaryInfo = getSummaryInfo(examStudentsInfo);
     return (
         <div id='fullScoreTrend' style={{padding: '30px 0 30px 30px', borderRadius: 2, backgroundColor: '#fff', position: 'relative', marginBottom: 20}}>
              <div style={{marginBottom: 30}}>
                 <span style={{border: '2px solid ' + B03, display: 'inline-block', height: 20, borderRadius: 20, margin: '2px 10px 0 0', float: 'left'}}></span>
-                <span style={{fontSize: 18, color: C12, marginRight: 20}}>总分分布趋势</span> <span className={schoolReportStyles['title-desc']}>学生总分分布趋势，可反映本次考试全校学生的综合学习水平</span>
+                <span style={{fontSize: 18, color: C12, marginRight: 20}}>总分分布图</span> <span className={schoolReportStyles['title-desc']}>学生总分分布趋势，可反映本次考试全校学生的综合学习水平</span>
              </div>
-             <div style={{}}>
+             <div>
                 <ReactHighcharts config={config} style={{ width: 870, height: 330, display: 'inline-block'}}></ReactHighcharts>
                 <FullScoreInfo yData={result['y-axon']}/>
+                <div style={{paddingRight:30}}>
+                    <div className={subjectReportStyle['analysis-conclusion']}>
+                        <div>分析诊断：</div>
+                        <div>{summaryInfo}</div>
+                    </div>
+                </div>
                 <div style={{clear: 'both'}}></div>
              </div>
         </div>
@@ -126,7 +135,7 @@ class FullScoreInfo extends React.Component {
     render() {
         var {yData} = this.props;
         return (
-            <ul style={_.assign({ width: 240, height: 360, padding: '20px 0 40px 20px', marginBottom: 0, backgroundColor: C14, border: '1px solid ' + C04, position: 'absolute', right: 0, bottom: 0,listStyleType: 'none', fontSize: 12 }, this.state.showScroll ? { overflowY: 'scroll'}: {overflowY: 'hidden'})} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
+            <ul style={_.assign({ width: 240, height: 360, padding: '20px 0 40px 20px', marginBottom: 0, backgroundColor: C14, border: '1px solid ' + C04, position: 'absolute', right: 0, top: 38,listStyleType: 'none', fontSize: 12 }, this.state.showScroll ? { overflowY: 'scroll'}: {overflowY: 'hidden'})} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
                 {
                     yData.map((data, index) => {
                         return (
