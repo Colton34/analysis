@@ -142,8 +142,9 @@ class LevelInfo extends React.Component {
                    <InfoBlock studentsGroupByClass={studentsGroupByClass} disData={disData}/>
                     {/* 离差图 */}
                     <p style={{margin: '40px 0 30px 0'}}>
-                        <span style={{fontSize: 16,marginRight:20}}>学科上线率离差</span>
-                        <span className={schoolReportStyles['title-desc']}>通过各班级学科上线率的差异，（学科上线率离差 = 班级某学科上线率 - 全校该学科平均上线率），反映了该学科对班级上线贡献的大小，正值表示该科贡献大，负值表示贡献小</span>
+                        <span style={{fontSize: 16,marginRight:20}}>学科上线贡献率</span>
+                        <span className={schoolReportStyles['title-desc']}>通过各班级学科上线率的差异，提取出“学科上线贡献率”指标，反映该学科对班级上线贡献的大小。学科上线率离差正值表示该科贡献率大，负值表示贡献小。
+下图列出各班级学科上线率离差最大与最小的学科。</span>
                     </p>
                    <ReactHighcharts config={chartConfig} style={{width: '100%'}}></ReactHighcharts>
                 </div>

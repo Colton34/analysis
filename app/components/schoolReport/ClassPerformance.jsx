@@ -241,7 +241,7 @@ class ClassPerformance extends React.Component {
                 {/* 得分率贡献指数 */}
                 <p style={{marginBottom: 20, marginTop: 40}}>
                     <span className={schoolReportStyles['sub-title']}>班级学科得分率贡献指数</span>
-                    <span className={schoolReportStyles['title-desc']}>得分率贡献指数 = 班级学科得分率 - 全校学科平均得分率。指数值为正，是促进作用；为负，是拖后腿。</span>
+                    <span className={schoolReportStyles['title-desc']}>以学科得分率为基础，综合考虑了该学科对班级、学科综合水平的均衡性影响。提取出“学科得分率贡献指数”，借此分析学科对班级得分综合水平的教学贡献大小。指数为正，是促进作用，为负，是拖后腿。</span>
                 </p>
                 <TableView tableData={factorsTableData} reserveRows={6} colorCallback={this.colorCallback}/>
             </div>
