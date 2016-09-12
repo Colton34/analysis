@@ -48,7 +48,7 @@ export default function Trend({reportDS, currentSubject}) {
 function getSummaryInfo(currentPaperStudentsInfo) {
     var skewness = _.round(StatisticalLib.sampleSkewness(_.map(currentPaperStudentsInfo, (obj) => obj.score)), 2);
     if(skewness < -0.3) {
-        return '以全年级学科平均分来衡量，这次考试本年级高于学科平均分的学生人数较多，相应高分段的学生人数密度来的较大，而低分段学生的成绩拉扯全年级本学科平均分较为显著，请学科组长与任课老师多关注底端的学生。鼓励他们提高总分水平，极有利于提高本班总平均分水平。';
+        return '以全年级学科平均分来衡量，这次考试本年级高于学科平均分的学生人数较多，相应高分段的学生人数密度来的较大，而低分段学生的成绩拉扯全年级本学科平均分较为显著，请学科组长与任课老师多关注底端的学生。鼓励他们提高总分水平，极有利于提高本学科总平均分水平。';
     } else if(skewness < -0.5) {
         return '以全年级学科平均分来衡量，这次考试全年级高于学科平均分的学生人数稍多一点，相应高分段的学生密度还是大一些。低分段学生的成绩对全年级学科分水平有一定的影响，鼓励他们提高总分水平，有利于提高全年级的本学科总平均水平。';
     } else if(skewness < 0.05) {

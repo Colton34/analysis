@@ -14,7 +14,7 @@ var localStyle = {
     }
 };
 
-export default function NavHeader({examName, examId, grade}) {
+export default function NavHeader({examName, examId, grade,reportName}) {
     var queries = grade ? {examid: examId, grade: grade} : {examid: examId};
     return (
         <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}}>
@@ -22,7 +22,7 @@ export default function NavHeader({examName, examId, grade}) {
                 <Link to={{ pathname: '/dashboard',  query: queries}} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
                 <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}>
                     <Link to={{ pathname: '/dashboard',  query: queries}} style={{color: '#b4b4b4'}}>{examName}</Link>
-                    <span><i className='icon-right-open-2'></i>班级分析报告</span>
+                    <span><i className='icon-right-open-2'></i>{reportName}</span>
               </span>
             </div>
         </div>

@@ -66,7 +66,7 @@ class ContentComponent extends React.Component {
         var examName = this.props.reportDS.examInfo.toJS().name;
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} />
+                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} reportName={'学科分析报告'}/>
                 {(this.ifShowSubjectNav) ? (<SubjectsNav authSubjects={authSubjects} changeSubject={this.onChangeSubject.bind(this)} currentSubject={currentSubject}/>) : ''}
                 <ReportContent currentSubject={currentSubject} reportDS={this.props.reportDS} />
             </div>

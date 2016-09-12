@@ -52,7 +52,7 @@ class ContentComponent extends React.Component {
 
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} />
+                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} reportName={'班级分析报告'}/>
                 {(this.ifCanReviewMultiReport) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} classesList={authClassesList} reportDS={this.props.reportDS} /> : ''}
                 {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />
             : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName} ifCanReviewMultiReport={this.ifCanReviewMultiReport}/>}
