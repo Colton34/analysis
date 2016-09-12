@@ -15,7 +15,7 @@ import SubjectInspectPerformance from './SubjectInspectPerformance';
 import Wishes from './Wishes';
 
 import ImportStudentInfo from './ImportStudentInfo';
-// import HistoryPerformance from './HistoryPerformanceMe';
+// import HistoryPerformance from './HistoryPerformanceMe';  {(!isCustomAnalysis) ? (<HistoryPerformance user={this.props.user} grade={grade} currentClass={currentClass} />) : (<div></div>)} -- 【暂时】去掉历史模块
 import HistoryPerformance from './HistoryPerformance';
 
 class SingleClassReport extends React.Component {
@@ -44,7 +44,6 @@ class SingleClassReport extends React.Component {
                 <SubjectPerformance classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeaders={classHeaders} classHeadersWithTotalScore={classHeadersWithTotalScore} currentClass={currentClass} reportDS={reportDS} />
                 <SubjectInspectPerformance reportDS={reportDS} currentClass={currentClass} classHeaders={classHeaders} />
                 <ImportStudentInfo reportDS={reportDS.toJS()} currentClass={currentClass} classStudents={classStudents} classStudentsPaperMap={classStudentsPaperMap} classHeadersWithTotalScore={classHeadersWithTotalScore} />
-                {(!isCustomAnalysis) ? (<HistoryPerformance user={this.props.user} grade={grade} currentClass={currentClass} />) : (<div></div>)}
                 <Wishes />
             </div>
         );

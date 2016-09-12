@@ -130,7 +130,7 @@ function getDS(examPapersInfo, allStudentsPaperMap, headers, gradeName, levelPce
         _.each(paperStudentsGroupByClass, (studentsArr, className) => {
             var temp = makeSegmentsCount(studentsArr, segments);
             temp = _.map(_.reverse(temp), (count) => {
-                var percentage = _.round(_.multiply(_.divide(count, paperObj.realStudentsCount), 100), 2);
+                var percentage = _.round(_.multiply(_.divide(count, studentsArr.length), 100), 2);
                 return percentage;
             });
             temp.unshift(gradeName + className+'班');
