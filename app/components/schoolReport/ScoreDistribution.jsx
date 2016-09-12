@@ -38,9 +38,10 @@ const BasicInfo = ({examInfo, levels, examStudentsInfo, onShowDialog}) => {
     return (
         <div style={{position: 'relative', padding: 30, backgroundColor: colorsMap.B03, color: '#fff', marginBottom: 20}}>
             <p style={{marginRight: 20, fontSize: 18, marginBottom: 25}}>
-                <span style={{marginRight: 20}}>分档分数线 </span>
-                <span style={{fontSize: 12}}>分档分数线默认分为三档， 分别对应学生总数的15%，25%，60%，如需修改请点击右侧按钮</span>
+                <span style={{marginRight: 20}}>分档分数线划定</span>
+                <span style={{fontSize: 12}}>了解总分分布趋势后，还需要对总分进行分档分析。设置总分分数线，可以分析得到学生学业综合水平的分层表现，还可以引导出对学科教学贡献的分析。</span>
             </p>
+            <p>将总分划线进行分档分析是常用的分析方法，特别适合高考、中考的模拟考试。即便是对日常其中期末考试，通过总分分档分析，也能考察高端学生综合水平的分布情况。总分分数线应由学校统一设置，未设置前，由本分析系统默认设置。</p>
             <p>本次考试满分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分，
             {
                     _.map(levels, (levObj, levelKey) => {
@@ -50,7 +51,7 @@ const BasicInfo = ({examInfo, levels, examStudentsInfo, onShowDialog}) => {
                             </span>
                         )
                     })
-            }
+            }。分别对应年级学生总数的前{_.join(_.map(levels, (levObj, levelKey) => levels[(levTotal - 1 - levelKey) + ''].percentage + '%'), '、')}。
             </p>
             <span onClick={onShowDialog} style={{ cursor: 'pointer', color: colorsMap.B03, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30}}>
                     <i className='icon-cog-2' style={{fontSize: 12}}></i>
