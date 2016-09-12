@@ -148,7 +148,7 @@ class ClassSubjectQuestion extends React.Component {
                 }
             ]
         };
-        option.xAxis.data = gradeQuestionSeparation.sort();
+        option.xAxis.data = _.map(chartData, (obj) => obj.distinguish);
         option.series[0].data = chartData;
         var examClasses = this.examClasses;
         return (
