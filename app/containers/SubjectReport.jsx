@@ -44,7 +44,7 @@ class SubjectsNav extends React.Component {
 class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
-        this.authSubjects = getAuthSubjects(this.props.user.toJS().auth, this.props.reportDS.examInfo.toJS(), this.props.reportDS.headers.toJS());
+        this.authSubjects = getAuthSubjects(this.props.user.toJS().auth, this.props.reportDS.examInfo.toJS(), this.props.reportDS.headers.toJS(), this.props.grade);
         this.ifShowSubjectNav = (this.authSubjects.length > 1);
         this.state = {
             currentSubject: this.authSubjects[0]
@@ -117,7 +117,7 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-function getAuthSubjects(auth, examInfo, headers) {
+function getAuthSubjects(auth, examInfo, headers, gradeKey) {
     if(examInfo.from == '40' || (auth.isSchoolManager) || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])) {
         return _.map(_.slice(headers, 1), (obj) => {
             return {
