@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-09 19:15:44
+* @Last Modified time: 2016-09-12 11:11:14
 */
 
 
@@ -228,9 +228,11 @@ export function initReportDS(params) {
         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
         //Note: 已经对paperStudents进行排序，这样到下面不用分别都再次排序了。
+        var rankIndex;
         _.each(allStudentsPaperMap, (students, pid) => {
             // allStudentsPaperMap[pid] = _.sortBy(students, 'score');
             //Note: 已经把排名的信息补充进来
+            rankIndex = 1;
             var papserStudentsByScore = _.groupBy(students, 'score');
             var papserStudentsByScoreInfo = _.map(papserStudentsByScore, (v, k) => {
                 return {
@@ -239,10 +241,15 @@ export function initReportDS(params) {
                 }
             });
             var orderedPaperStudentScoreInfo = _.orderBy(papserStudentsByScoreInfo, ['score'], ['desc']);
-            var finalRankStudentsInfo = _.concat(..._.map(orderedPaperStudentScoreInfo, (theObj, theRank) => _.map(theObj.students, (stuObj) => {
-                stuObj.rank = (theRank+1);
-                return stuObj;
-            })));
+            var finalRankStudentsInfo = [];
+            _.each(orderedPaperStudentScoreInfo, (theObj, theRank) => {
+                var currentRankStudents = _.map(theObj.students, (stuObj) => {
+                    stuObj.rank = (rankIndex);
+                    return stuObj;
+                });
+                finalRankStudentsInfo = _.concat(finalRankStudentsInfo, currentRankStudents);
+                rankIndex += currentRankStudents.length;
+            });
             _.reverse(finalRankStudentsInfo);
             allStudentsPaperMap[pid] = finalRankStudentsInfo;
         });

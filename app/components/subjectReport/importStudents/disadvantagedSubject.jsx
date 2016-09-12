@@ -117,7 +117,10 @@ function getCurrentSubjectDisadvantagedInfo(allStudentsPaperMap, examStudentsInf
         //rank低就是排名靠前，所以差学科是rank高的，即排名靠后的
         if(currentStudentSubjectRankInfo.length == 0) return;
         var currentStudentDisadvantagedSubjectObj = _.last(_.sortBy(currentStudentSubjectRankInfo, 'rank'));
-        if(currentStudentDisadvantagedSubjectObj.paperid == currentPaperId) gradeDisadvantagedSubjectStudents.push(currentStudentDisadvantagedSubjectObj);
+        if(currentStudentDisadvantagedSubjectObj.paperid == currentPaperId) {//这里paperid最好改为pid
+            currentStudentDisadvantagedSubjectObj.name = studentObj.name;
+            gradeDisadvantagedSubjectStudents.push(currentStudentDisadvantagedSubjectObj)
+        }
     });
     var classesDisadvantagedSubjectStudentsMap = _.groupBy(gradeDisadvantagedSubjectStudents, 'class_name');
     var classDisadvantagedStudents = _.map(currentPaperClasses, (classKey) => (classesDisadvantagedSubjectStudentsMap[classKey] || []));
