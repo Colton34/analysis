@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React from 'react';
 import Radium from 'radium';
 import moment from 'moment';
@@ -128,32 +129,26 @@ class Header extends React.Component {
     render() {
         var examInfo = this.props.examInfo.toJS();
         var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
-
         return (
-            <div id='header' style={{zIndex: 100, padding: '30px 0 30px 30px ', marginBottom: 20, borderRadius: 2, backgroundColor: '#fff', position: 'relative'}}>
-                <p style={{fontSize: 18, color: C12, marginBottom: 15}}>校级分析报告-{examInfo.name}</p>
-                <p style={{fontSize: 12, color: colorsMap.C10, marginBottom: 28}}>
-                    <span style={{marginRight: 15}}>时间: {startTime}</span>
-                    <span style={{marginRight: 15}}>人员: {examInfo.gradeName}年级，{examInfo.realClasses.length}个班级，{examInfo.realStudentsCount}位学生</span>
-                    <span style={{marginRight: 15}}>
-                        科目：
-                        {
-                            _.map(examInfo.subjects, (subject, index) => {
-                                if (index === examInfo.subjects.length -1) {
-                                    return subject
-                                }
-                                return subject + ','
-                            })
-                        }
-                    </span>
-                </p>
-                {/*
-                <div className={styles['button']} style={{width: 180, height: 40, lineHeight: '40px', borderRadius:2, backgroundColor: colorsMap.A12, color: '#fff', cursor: 'pointer'}}>
-                    <i className='icon-download-1'></i>
-                    下载校级分析报告
+            <div id='header' style={{zIndex: 100, padding: '0px 0 30px 0px ', marginBottom: 20, borderRadius: 2, backgroundColor: '#fff', position: 'relative'}}>
+                <div>
+                    <div style={{ width: 1200, height: 152, backgroundColor: colorsMap.B03, textAlign: 'center', color: '#fff', display: 'table-cell', verticalAlign: 'middle', borderTopLeftRadius: 3, borderTopRightRadius: 3 }}>
+                        <p style={{ fontSize: 25, lineHeight: '30px' }}>{examInfo.name}</p>
+                        <p style={{ fontSize: 18 }}>校级分析诊断报告</p>
+                    </div>
                 </div>
-                */}
-                {/************************* 导航条 ******************************/}
+                <div style={{ position: 'relative', marginBottom: 20 }}>
+                    <div id='header' style={{borderRadius: 2, backgroundColor: '#fff', padding: 30,borderBottom: '1px solid rgb(238, 238, 238)'}}>
+                        <p>尊敬的校领导，您好:</p>
+                        <p>
+                            本次考试（考试时间：{startTime}），全校{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{examInfo.realClasses.length}</span>个班，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试，缺考<span style={{ color: colorsMap.B03 }}>{examInfo.lostStudentsCount}</span>名。
+                            考试学科：<span style={{ color: colorsMap.B03 }}> {_.join(examInfo.subjects, '、') }</span>，{examInfo.subjects.length}个学科。
+                        </p>
+                        <p style={{ marginBottom: 0 }}>
+                            此次分析是从科目总分，学科成绩、学科内在结构几个层面分析了全年级、各班级各学科的考试基本表现。在全校的总分分布，总分分档线，学科分档上线分布，班级学科水平，各学科内在表现，重点学生等方面揭示全校的学业表现及特征状况。力图分析与发现学校学业优势与不足，帮助学校教学领导全面掌握全校的学生基本情况，便于有针对性地指导与改进学校教学，提高教学质量。
+                        </p>
+                    </div>
+                </div>
                 <NavBar/>
             </div>
         )
