@@ -7,6 +7,8 @@ import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
 export default function DistributionTableModule({paperQuestionsDiffInfo, paperDiff, summaryInfo}) {
     var {tableHeaders, tableData} = getTableRenderData(paperQuestionsDiffInfo);
+    var conclusionSummary = getConclusionSummary(paperQuestionsDiffInfo);
+    debugger;
     return (
        <div style={{marginTop: 20}}>
             <p>本学科的整体难度把握: <span style={{color: colorsMap.B03}}>{paperDiff}</span>，{summaryInfo}</p>
@@ -14,7 +16,7 @@ export default function DistributionTableModule({paperQuestionsDiffInfo, paperDi
 
             <TableView tableHeaders={tableHeaders} tableData={tableData} TableComponent={EnhanceTable}/>
             <div className={commonClass['analysis-conclusion']}>
-                 试题的难度分布对学生的考试成绩分布有直接的影响，它反映了命题者的命题指导思想。对试卷总体难度的把握与设计时，一定要多从试题难度的分布结构上来思考。
+                 {conclusionSummary}试题的难度分布对学生的考试成绩分布有直接的影响，它反映了命题者的命题指导思想。对试卷总体难度的把握与设计时，一定要多从试题难度的分布结构上来思考。
             </div>
         </div>
     )
@@ -103,4 +105,24 @@ function getDiffInfo(paperQuestionsDiffInfo) {
         }
     })
     return diffInfo;
+}
+
+function getConclusionSummary(paperQuestionsDiffInfo){
+    var groupBy = _.groupBy(paperQuestionsDiffInfo,'isObjective');
+     var diffQuestion = _.filter(groupBy.true,function(obj){
+        return obj.diff<=0.5;
+    });
+    var allQuestionDiff =  _.filter(paperQuestionsDiffInfo,function(obj){
+        return obj.diff<=0.2;
+    });
+    if(diffQuestion.length>0 && allQuestionDiff.length>0){
+        var summary = '从试题难度分布表中可看到，本学科试卷中 有难度特别大（难度低于0.5）的客观题，其难度设计的考虑还可以周全些。 所有试题中，难度系数在0.2以下的试题在这次考试中有设置，作为学校学业水平性的考试，这样对试题难度设计的考虑，是否一定有必要，可以进一步斟酌.';
+    }else if(diffQuestion.length>0 && allQuestionDiff.length<0){
+        var summary = '从试题难度分布表中可看到，本学科试卷中 有难度特别大（难度低于0.5）的客观题，其难度设计的考虑还可以周全些。';
+    }else if(diffQuestion.length<0 && allQuestionDiff.length>0){
+        var summary = '所有试题中，难度系数在0.2以下的试题在这次考试中有设置，作为学校学业水平性的考试，这样对试题难度设计的考虑，是否一定有必要，可以进一步斟酌。'
+    }else if(diffQuestion.length<0 && allQuestionDiff.length<0){
+        var summary = '';
+    }
+    return summary;
 }
