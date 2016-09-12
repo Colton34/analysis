@@ -20,7 +20,7 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
     var currentSubjectLevelRank = getCurrentSubjectLevelRank(subjectLevelDistribution, currentSubject.pid);//高档次名次在前
     var currentSubjectLevelClassInfo = getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubject.pid, classList);
     var {classInfoTableHeaders, classInfoTableData} = getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels);
-    var classInfoSummary = getclassInfoSummary(currentSubjectLevelClassInfo);
+    var classInfoSummary = getclassInfoSummary(classInfoTableData);
 
     var levelNumString = _.join(_.range(_.size(levels)).map(num => {return numberMap[num + 1]}), '、');
     var levelSize = _.size(levels);
@@ -89,8 +89,9 @@ function makeCurrentSubjectSegmentsDistribution(subjectLevels, examPapersInfo, a
     //计算各个档次，各个科目在此档次的人数分布--不是累计，后面有累计
     var result = makeCurrentSubjectSegmentCountInfo(subjectLevels, examPapersInfo, allStudentsPaperMap);
     //然后再填充sumCount信息和sumPercentage的信息，得到最终的DS
-    fillSubjectSumInfo(result, allStudentsPaperMap);
-    return result;
+    //TODO:这里错了！！！
+    return fillSubjectSumInfo(result, allStudentsPaperMap);
+    // return result;
 }
 
 function makeCurrentSubjectSegmentCountInfo(subjectLevels, examPapersInfo, allStudentsPaperMap) {
@@ -102,11 +103,7 @@ function makeCurrentSubjectSegmentCountInfo(subjectLevels, examPapersInfo, allSt
         _.each(subLevObj, (obj, pid) => {
             var low = obj.mean;
             var high = (subjectLevels[parseInt(levelKey)+1+'']) ? subjectLevels[parseInt(levelKey)+1+''][pid].mean : examPapersInfo[pid].fullMark;
-            //TODO:明天！！！这里！
-            // debugger;
-            // var count = (low >= high) ? 0 : (levelKey == '0' ? (_.filter(allStudentsPaperMap[pid], (obj) => ((low <= obj.score) && (obj.score <= high))).length) : (_.filter(allStudentsPaperMap[pid], (obj) => ((low < obj.score) && (obj.score <= high))).length));
             var targets = (low >= high) ? [] : (levelKey == '0' ? (_.filter(allStudentsPaperMap[pid], (obj) => ((low <= obj.score) && (obj.score <= high)))) : (_.filter(allStudentsPaperMap[pid], (obj) => ((low < obj.score) && (obj.score <= high)))));
-            // debugger;
             currentLevelSubjectsDisInfo[pid] = {
                 mean: obj.mean,
                 count: targets.length,
@@ -119,12 +116,23 @@ function makeCurrentSubjectSegmentCountInfo(subjectLevels, examPapersInfo, allSt
 }
 
 function fillSubjectSumInfo(originalResult, allStudentsPaperMap) {
-    _.each(originalResult, (subjectsInfo, levelKey) => {
+    //低档次应该是累计高的
+    var tempArr = [];
+    _.each(_.reverse(_.values(originalResult)), (subjectsInfo, index) => {
+        var sumSubjectsInfo = {};
         _.each(subjectsInfo, (obj, pid) => {
-            obj.sumCount = (levelKey == '0') ? (obj.count) : (originalResult[levelKey-1][pid].sumCount + obj.count);
-            obj.sumPercentage = _.round(_.divide(obj.sumCount, allStudentsPaperMap[pid].length), 2);
+            var sumCount = (index == 0) ? (obj.count) : (tempArr[index-1][pid].sumCount + obj.count);
+            var sumPercentage = _.round(_.divide(sumCount, allStudentsPaperMap[pid].length), 2);
+            var newSumObj = _.assign({}, obj, {sumCount: sumCount, sumPercentage: sumPercentage});
+            sumSubjectsInfo[pid] = newSumObj;
         });
+        tempArr.push(sumSubjectsInfo);
     });
+    var result = {}, levelLastIndex = tempArr.length - 1;
+    _.each(tempArr, (value, index) => {
+        result[(levelLastIndex - index) + ''] = value;
+    });
+    return result;
 }
 
 function getCurrentSubjectLevelInfo(subjectLevelDistribution, currentSubjectPid) {
@@ -181,38 +189,40 @@ function getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels) {
     return {classInfoTableHeaders: tableHeaders, classInfoTableData: tableData};
 }
 
-function getclassInfoSummary(currentSubjectLevelClassInfo) {
-    var summaryInfo = {}, levelLastIndex = _.size(currentSubjectLevelClassInfo) - 1;
-    var classSize = _.size(currentSubjectLevelClassInfo[0]) - 1;
-
-    //考虑只有一个班的情况
-    if (classSize === 1) {
-        _.forEach(_.range(_.size(currentSubjectLevelClassInfo)), num => {
-            summaryInfo[num] = [];
-        })
-        return summaryInfo;
-    }
-    _.forEach(currentSubjectLevelClassInfo, (levelInfo, levelNum) => {
-        var countClassMap = {}, currentSubjectLevelClassObj = currentSubjectLevelClassInfo[levelLastIndex - levelNum];
-        _.forEach(currentSubjectLevelClassObj, (count, className) => {
-            if (className === 'totalSchool')
-                return;
-            // 计算累计, 例如二档线要计算一、二档线的总和；
-            var countSum = 0;
-            _.forEach(_.range(levelNum - 0 + 1), num => {
-                countSum += currentSubjectLevelClassInfo[num][className];
-            })
-            if (countClassMap[countSum]) {
-                countClassMap[countSum].push(className + '班');
-            } else {
-                countClassMap[countSum] = [className + '班'];
+function getclassInfoSummary(classInfoTableData) {
+    //输入：高档次在前的count info
+    //输出：高档次在前，levelKey: classList
+    // var result = _.cloneDeep(classInfoTableData[0]);//各个班高档次的累计就是自身
+    //然后低档次的是累计
+    var classSumInfo = {};
+    _.each(classInfoTableData, (value, index) => {
+        //当前档次
+        if(index == 0) {
+            classSumInfo[index] = _.cloneDeep(value);
+        } else {
+            var temp = {};
+            _.each(value, (count, className) => {
+                var lastSumCount = classSumInfo[index - 1][className] || 0;
+                temp[className] = lastSumCount + count;
+            });
+            classSumInfo[index] = temp;
+        }
+    });
+    //求各个档次的classList
+    var result = {};
+    _.each(classSumInfo, (classSumInfo, levelKey) => {
+        var temp = _.map(classSumInfo, (sumCount, className) => {
+            return {
+                sumCount: sumCount,
+                className: className
             }
-        })
-        //var countSort = _.sortBy(_.values(_.omit(levelInfo, ['totalSchool'])));
-        var countSort = _.sortBy(_.keys(countClassMap).map(countStr => {return parseInt(countStr)}));
-        summaryInfo[levelNum] = _.flatten(_.reverse(classSize > 2 ? _.takeRight(countSort, 2) : _.takeRight(countSort, 1)).map(count => { return countClassMap[count]}));
-    })
-    return summaryInfo;
+        });
+        if(temp.length == 1) return result[levelKey] = [];
+        var baseLineCount = temp.length;
+        var targetCount = (baseLineCount == 2 || baseLineCount == 3) ? 1 : ((baseLineCount >= 4 && baseLineCount < 7) ? 2 : ((baseLineCount >= 7) ? 3 : 0));
+        result[levelKey] = _.map(_.take(_.orderBy(temp, ['sumCount'], ['desc']), targetCount), (obj) => obj.className);
+    });
+    return result;
 }
 
 function getCurrentSubjectLevelRank(subjectLevelDistribution, currentSubjectPid) {
@@ -242,10 +252,7 @@ function getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubjec
         // 按照classList来遍历班级，避免有的有的档次没有某些班；
         _.forEach(classList, className => {
             temp[className] = currentSubjectLevelStudentsGroup[className] ? currentSubjectLevelStudentsGroup[className].length : 0;
-        })
-        // _.each(currentSubjectLevelStudentsGroup, (cstudents, classKey) => {
-        //     temp[classKey] = cstudents.length;
-        // });
+        });
         result[levelKey] = temp;
     });
     return result;
