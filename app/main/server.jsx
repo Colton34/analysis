@@ -19,7 +19,7 @@ var client = {};
 client.hostname = hostname;
 
 function renderFullPage(renderedContent, initialState, head={
-    title: '云校分析',
+    title: '好分数-分析',
     meta: '<meta name="viewport" content="width=device-width, initial-scale=1" />',
     link: '<link rel="stylesheet" href="/assets/styles/main.css"/>'
 }) {

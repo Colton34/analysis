@@ -8,13 +8,13 @@ import {List} from 'immutable';
 
 import Table from '../../common/Table';
 
-import {makeSegmentsCount} from '../../api/exam';
+import {makeSegmentsCount, makeSegmentsCountInfo} from '../../api/exam';
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
 
 import styles from '../../common/common.css';
 import schoolReportStyles from './schoolReport.css';
-import TableView from './TableView';
-
+import TableView from '../../common/TableView';
+import EnhanceTable from '../../common/EnhanceTable';
 var {Header, Title, Body, Footer} = Modal;
 
 import {initParams} from '../../lib/util';
@@ -200,8 +200,18 @@ class GroupAnalysis extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            showDialog: false
+            showDialog: false, 
+            currentLevel: 0
         }
+        var {reportDS} = props;
+        var examStudentsInfo = reportDS.examStudentsInfo.toJS(),
+            studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
+            levels = reportDS.levels.toJS(),
+            levelBuffers = reportDS.levelBuffers.toJS(), 
+            headers = reportDS.headers.toJS(),
+            subjectLevels = reportDS.subjectLevels.toJS();
+        var classList = _.keys(studentsGroupByClass);
+        this.tableRenderData = getCriticalStudentsTableRenderData(examStudentsInfo, levels, levelBuffers, headers, classList, this.state.currentLevel, subjectLevels);
     }
     onShowDialog() {
         this.setState({
@@ -213,17 +223,24 @@ class GroupAnalysis extends React.Component {
             showDialog: false
         })
     }
-
+    switchTab(num) {
+        this.setState({
+            currentLevel: num
+        })
+    }
     render() {
-//Props数据结构：
+        //Props数据结构：
         var {reportDS} = this.props;
+        var {currentLevel} = this.state;
         var examInfo = reportDS.examInfo.toJS(),
             examStudentsInfo = reportDS.examStudentsInfo.toJS(),
             examPapersInfo = reportDS.examPapersInfo.toJS(),
             studentsGroupByClass = reportDS.studentsGroupByClass.toJS(),
             levels = reportDS.levels.toJS(),
-            levelBuffers = reportDS.levelBuffers.toJS();
-//算法数据结构：
+            levelBuffers = reportDS.levelBuffers.toJS(), 
+            headers = reportDS.headers.toJS(),
+            subjectLevels = reportDS.subjectLevels.toJS();
+        //算法数据结构：
         var {tableData, criticalLevelInfo} = criticalStudentsTable(examInfo, examStudentsInfo, studentsGroupByClass, levels, levelBuffers);
 
         var xAxis = _.map(levels, (levObj, levelKey) => numberMap[(levelKey-0)+1]+'档');
@@ -346,7 +363,19 @@ class GroupAnalysis extends React.Component {
                         设置临界分数
                     </a>
                 </div>
-                <TableView tableData={tableData} reserveRows={7}/>
+                {/****************** 切换标签 *************** */}
+                <div className='tab-ctn'>
+                    <ul>
+                        {
+                            _.range(_.size(levels)).map((num) => {
+                                return (
+                                    <li key={'levelInfo-li-' + num} onClick={this.switchTab.bind(this, num) } className={'fl ' + (num === this.state.currentLevel ? 'active' : '') } data-num={num}>{numberMap[num + 1]}档线临界生分析</li>
+                                )
+                            })
+                        }
+                    </ul>
+                </div>
+                <TableView hover tableHeaders={this.tableRenderData[currentLevel].tableHeaders} tableData={this.tableRenderData[currentLevel].tableData} TableComponent={EnhanceTable} reserveRows={7}/>
                 {/*****************临界生较多班级*************/}
                 <p style={{ marginBottom: 20, marginTop: 40 }}>
                     <span className={schoolReportStyles['sub-title']}>临界生较多班级</span>
@@ -514,3 +543,156 @@ let tableData = {
 }
 
  */
+function getCriticalStudentsTableRenderData(allStudents, levels, levelBuffers, headers, classList, currentLevel, subjectLevels) {
+    var renderData = {};
+    var studentsInfo = makeCriticalStudentsInfo(allStudents, levels, levelBuffers); // 其中0代表一档
+    //获取tableHeaders
+    var tableHeaders = getTableHeaders(headers);
+    var levelSize = _.size(levels);
+    _.forEach(studentsInfo, (students, levelNum) => {
+        var tableData = getOneLevelTableData(levels, subjectLevels, tableHeaders, students, classList, currentLevel);
+        renderData[levelNum] = {tableHeaders, tableData};
+    })
+    return renderData;
+
+}
+// 确定高档位的位置
+function makeCriticalStudentsInfo(students, levels, levelBuffers) {
+    var criticalLevelInfo = {};
+    _.forEach(_.range(_.size(levels)), (index) => {
+        criticalLevelInfo[index] = [];
+    });
+    var segments = makeCriticalSegments(levelBuffers, levels);
+    var classCountsInfoArr = makeSegmentsCountInfo(students, segments);
+    var classRow = _.filter(classCountsInfoArr, (countInfo, index) => (index % 2 == 0));//从低到高
+    classRow = _.reverse(classRow); //从高到底
+
+    _.forEach(classRow, (arr, index) => {
+        criticalLevelInfo[index] = arr;//这里是反转后的数据。
+    });
+
+    return criticalLevelInfo;
+}
+
+function makeCriticalSegments(levelBuffers, levels) {
+    var result = [];
+    _.forEach(levels, (levObj, levelKey) => {
+        result.push(levObj.score-levelBuffers[levelKey-0]);
+        result.push(levObj.score+levelBuffers[levelKey-0]);
+    });
+    return result;
+}
+
+function getTableHeaders(headers) {
+    var tableHeaders = [[{id: 'class', name: '班级'}, {id: 'count', name: '临界生人数'}]];
+    _.forEach(headers, headerInfo => {
+        var headerObj = {};
+        headerObj.id = headerInfo.id;
+        headerObj.name = headerInfo.subject + '平均分';
+        if (headerInfo.id !== 'class'  || headerInfo.id !== 'count') {
+            headerObj.columnStyle = getTableColumnStyle;
+        }
+        tableHeaders[0].push(headerObj);
+    })
+    return tableHeaders;
+}
+
+function getOneLevelTableData(levels, subjectLevels, tableHeaders, students, classList, currentLevel) {
+    var meanDataByClass = getMeanDataByClass(students);
+    var classNames = ['分档分数线', '全年级'].concat(classList);
+    var tableData = [];
+    _.forEach(classNames, (className, index) => {
+        var rowData = {};
+        if(index >= 1) {
+            _.forEach(tableHeaders[0], header => {
+                if (header.id === 'class') {
+                    rowData.class = index !== 1 ? className + '班' : '全年级';
+                } else if (header.id === 'count') {
+                    rowData.count = index !== 1 ? (meanDataByClass[className] ? meanDataByClass[className].totalScore.count : 0) : students.length;
+                } else {
+                    if (index !== 1){ // 各班级
+                        var subjectMeanInfo = meanDataByClass[className] && meanDataByClass[className][header.id] ? meanDataByClass[className][header.id]: 0; 
+                        rowData[header.id] = subjectMeanInfo ? _.round(subjectMeanInfo.scoreSum / subjectMeanInfo.count, 2) : 0;
+                    } else { // 全年级
+                        var subjectMeanInfo = meanDataByClass.totalGrade[header.id];
+                        rowData[header.id] = subjectMeanInfo ? _.round(subjectMeanInfo.scoreSum / subjectMeanInfo.count, 2) : 0;
+                    }
+                    
+                }
+            })
+        } else if (index === 0) { //分档分数线
+            var levelSize = _.size(levels);
+            _.forEach(tableHeaders[0], header => {
+                if (header.id === 'class') {
+                    rowData.class = '分档分数线';
+                } else if (header.id === 'count') {
+                    rowData.count = '--';
+                } else if (header.id === 'totalScore'){
+                    rowData.totalScore = levels[levelSize - currentLevel -1].score;
+                } else {
+                    rowData[header.id] = subjectLevels[levelSize - currentLevel - 1][header.id].mean;
+                }
+            })
+        }
+     tableData.push(rowData);
+    })
+    return tableData;
+}
+/**
+ * 获取的数据结构是：
+ * - {
+ * -     totalGrade: {
+ * -         totalScore: {count: , scoreSum: },
+ * -         paperid1: {count: , scoreSum: },
+ * -         ...
+ * -     },
+ * -     1: {...},
+ * -     ...
+ * - }
+ */
+function getMeanDataByClass(students) {
+    var meanDataInfo = {
+        totalGrade: {
+            totalScore: {count: 0, scoreSum: 0}
+        }
+    };
+    _.forEach(students, studentObj => {
+        //记录全年级总分数据
+        meanDataInfo.totalGrade.totalScore.count += 1;
+        meanDataInfo.totalGrade.totalScore.scoreSum += studentObj.score;
+
+        // 记录班级总分数据
+        if (!meanDataInfo[studentObj.class]) {
+            meanDataInfo[studentObj.class] = {
+                totalScore: {count: 0, scoreSum: 0}
+            }
+        } 
+        meanDataInfo[studentObj.class].totalScore.count += 1;
+        meanDataInfo[studentObj.class].totalScore.scoreSum += studentObj.score;
+        
+        // 遍历该生所有科目考试
+        _.forEach(studentObj.papers, paperObj => {
+            // 记录到全年级数据
+            if (!meanDataInfo.totalGrade[paperObj.paperid]) {
+                meanDataInfo.totalGrade[paperObj.paperid] = {count: 0, scoreSum: 0};
+            }
+            meanDataInfo.totalGrade[paperObj.paperid].count += 1;
+            meanDataInfo.totalGrade[paperObj.paperid].scoreSum += paperObj.score;
+            // 记录到班级数据里
+            if (!meanDataInfo[studentObj.class][paperObj.paperid]) {
+                meanDataInfo[studentObj.class][paperObj.paperid] = {count: 0, scoreSum: 0};
+            }
+            meanDataInfo[studentObj.class][paperObj.paperid].count += 1;
+            meanDataInfo[studentObj.class][paperObj.paperid].scoreSum += paperObj.score;
+        })
+    })
+    return meanDataInfo;
+}
+
+function getTableColumnStyle(cell, rowData, rowIndex, columnIndex, id, tableData){
+    if (cell < tableData[0][id]) {
+        return {color: colorsMap.B08}
+    } else {
+        return {}
+    }
+}

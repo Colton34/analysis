@@ -210,8 +210,10 @@ function getclassInfoSummary(classInfoTableData) {
     });
     //求各个档次的classList
     var result = {};
-    _.each(classSumInfo, (classSumInfo, levelKey) => {
-        var temp = _.map(classSumInfo, (sumCount, className) => {
+    _.each(classSumInfo, (value, levelKey) => {
+        delete value.level;
+        delete value.totalSchool;
+        var temp = _.map(value, (sumCount, className) => {
             return {
                 sumCount: sumCount,
                 className: className
