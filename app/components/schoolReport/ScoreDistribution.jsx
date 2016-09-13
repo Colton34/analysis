@@ -157,7 +157,7 @@ class Dialog extends React.Component {
 
         //分档只能是这几个数字
         if (!(_.includes([1, 2, 3, 4, 5], value))) {
-            this.setState({ 
+            this.setState({
                 levelNumWrong: true,
                 levelNumMsg: '分档值是1至5的整数'
             })
@@ -224,7 +224,7 @@ class Dialog extends React.Component {
         // //this.refs[('score-' + i)].value
         // //this.refs[('rate-'+ i)].value
         //         var isValid = true;
-        //         _.each(_.range(levelNum), (index) => {   
+        //         _.each(_.range(levelNum), (index) => {
         //             var temp = {}, score = this.refs[('score-' + i)].value, percentage = this.refs[('rate-'+ i)].value;
         //             if(!(_.isNumber(score) && _.isNumber(percentage))) {
         //                 isValid = false;
@@ -241,7 +241,7 @@ class Dialog extends React.Component {
         //             return;
         //         }
 
-        
+
         //this.levels的个数和input的值 {]是一样的；所有的input都不为空
         // NOTE：下面的关于分档数是正数的判断多此一举，输入的时候就控制在 1~5之间。
         // var levTotal = parseInt(this.refs.levelInput.value);
@@ -253,9 +253,9 @@ class Dialog extends React.Component {
         //     return;
         // }
 
-       
+
         //保证层级是正确的 --- TODO: 将临界生分析那里的上下浮动5分的判断也验证也加入到这里！！！
-        var {examInfo, examStudentsInfo} = this.props;
+        var {examInfo, examStudentsInfo, examPapersInfo} = this.props;
         var levLength = _.size(this.levels);
         var errorMsg = '';
         var isValid = _.every(_.range(_.size(this.levels) - 1), (index) => {
@@ -275,6 +275,18 @@ class Dialog extends React.Component {
             if (!isValid) errorMsg = '数值不合法，分档线须大于最低分';
         }
 
+        //当有levels变动则修改baseline；当有levelBuffer变动则修改baseline？能进入到这里就是有效的设置了，但是levelBuffer那里是否有valid的校验，否则一旦存储，以后获取的都是错的就会麻烦
+        //这里的grade走的是examInfo中的gradeName，而不是传递进来的url的query中的grade
+        //TODO:要保证格式同Schema的格式：'[levels]'等
+        var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
+//对学科平均分进行校验：保证所有level下的value都是和科目数相同的
+        var isValidSubjectMean = _.every(newBaseline['[subjectLevels]'], (subjectMeansObj) => _.size(subjectMeansObj.values) == _.size(examPapersInfo));
+        // debugger;
+        if(!isValidSubjectMean) {
+            isValid = false;
+            errorMsg = '分档线设置不正确导致无效的学科平均分';
+        }
+
         if (!isValid) {
             this.setState({
                 hasError: true,
@@ -289,10 +301,6 @@ class Dialog extends React.Component {
                 errorMsg: ''
             })
         }
-        //当有levels变动则修改baseline；当有levelBuffer变动则修改baseline？能进入到这里就是有效的设置了，但是levelBuffer那里是否有valid的校验，否则一旦存储，以后获取的都是错的就会麻烦
-        //这里的grade走的是examInfo中的gradeName，而不是传递进来的url的query中的grade
-        //TODO:要保证格式同Schema的格式：'[levels]'等
-        var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
         var params = initParams({ 'request': window.request, examId: this.props.examId, grade: this.props.grade, baseline: newBaseline });
         this.props.changeLevels({ levels: this.levels, subjectLevels: getSubjectLevelsFromBaseLine(newBaseline['[subjectLevels]']) });
         this.props.saveBaseline(params);

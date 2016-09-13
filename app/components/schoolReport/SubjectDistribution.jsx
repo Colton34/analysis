@@ -161,6 +161,9 @@ const SubjectDistribution = ({reportDS}) => {
         allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(),
         headers = reportDS.headers.toJS(),
         levels = reportDS.levels.toJS();
+
+        var subjectLevels = reportDS.subjectLevels.toJS();
+        // debugger;
     //算法数据结构：
     var levLastIndex = _.size(levels) - 1;
 
@@ -222,7 +225,10 @@ const SubjectDistribution = ({reportDS}) => {
 //Note:（坑）本来这里subjectsMean应该是全量的--即exam中有多少papers就会有多少paper的mean信息（这和前面通过班级找此班级下各科的paper mean的方式不同）--所以理论上
 //不会碰到从班级找paper时遇到因为“某班级没有考试某一科目那么就没有科目平均分的信息”的问题，但是因为走了"25算法"，此算法当遇到科目之间总分差距很大的时候，一样会导致求
 //不到某一科目的平均分。如果遇到这种情况则给出被过滤掉的科目的信息，让用户知道。
+
+//TODO:直接通过reportDS.subjectLevel就可以更简单的计算了！！！
         var {subjectLevelInfo, subjectsMean} = makeSubjectLevelInfo(currentLevel.score, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examInfo.fullMark);
+        // debugger;
 //设计：通过headers和subjectMean得到orderdValidSubjectMean：即，通过headers是有序的，并且避免了因为特殊原因而没有求到某些科目平均分而导致不能接着计算的问题。
 //这些因为特殊原因出问题的科目记录下来给你给提示。
         var {validOrderedSubjectMean, unvalids} = filterMakeOrderedSubjectMean(headers, subjectsMean);
