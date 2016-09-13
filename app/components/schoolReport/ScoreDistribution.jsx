@@ -135,7 +135,6 @@ const Table = ({tableData, levels}) => {
 //思路：当销毁dialog的时候把props.levels赋值给this.levels
 /*
 TODO: 如果没有点击确定，那么再次打开dialog的时候还是显示当前props.levels的数据
-
  */
 class Dialog extends React.Component {
     constructor(props) {
@@ -163,15 +162,19 @@ class Dialog extends React.Component {
                 levelNumMsg: '分档值是1至5的整数'
             })
             return;
+        } else if (this.state.levelNumWrong) {
+            this.setState({
+                levelNumWrong: false,
+                levelNumMsg: ''
+            })
         }
-
         var preLength = _.size(this.levels);
         var theDiff = Math.abs(preLength - value);
         if(theDiff === 0) return;
 
-//更新levLastIndex
+        //更新levLastIndex
         // this.levLastIndex = value - 1;
-//更新levels
+        //更新levels
         var tempLevels = {};
         if(value < preLength) {
             // if(value == 1) {
@@ -206,64 +209,88 @@ class Dialog extends React.Component {
         }
         this.levels = tempLevels;
         this.setState({ levelNum: value, levelNumWrong: false});
+
     }
 
     okClickHandler() {
-//         var levelNum = this.refs.levelInput.value;
-//         var levels = {};
+        //         var levelNum = this.refs.levelInput.value;
+        //         var levels = {};
 
-//         if(!(levelNum && _.isNumber(levelNum) && levelNum > 0)) {
-//             console.log('levelNum 分档个数必须是正数');
-//             return;
-//         } //显示Tips
-// //做校验--暂时先用Tips来给出Error信息；填充的时候是从后往前填充的
-// //this.refs[('score-' + i)].value
-// //this.refs[('rate-'+ i)].value
-//         var isValid = true;
-//         _.each(_.range(levelNum), (index) => {
-//             var temp = {}, score = this.refs[('score-' + i)].value, percentage = this.refs[('rate-'+ i)].value;
-//             if(!(_.isNumber(score) && _.isNumber(percentage))) {
-//                 isValid = false;
-//                 return;
-//             }
-//             temp.score = score;
-//             temp.percentage = percentage;
-//             temp.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
-//             levels[(levelNum-index)+''] = temp;
-//         });
+        //         if(!(levelNum && _.isNumber(levelNum) && levelNum > 0)) {
+        //             console.log('levelNum 分档个数必须是正数');
+        //             return;
+        //         } //显示Tips
+        // //做校验--暂时先用Tips来给出Error信息；填充的时候是从后往前填充的
+        // //this.refs[('score-' + i)].value
+        // //this.refs[('rate-'+ i)].value
+        //         var isValid = true;
+        //         _.each(_.range(levelNum), (index) => {
+        //             var temp = {}, score = this.refs[('score-' + i)].value, percentage = this.refs[('rate-'+ i)].value;
+        //             if(!(_.isNumber(score) && _.isNumber(percentage))) {
+        //                 isValid = false;
+        //                 return;
+        //             }
+        //             temp.score = score;
+        //             temp.percentage = percentage;
+        //             temp.count = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
+        //             levels[(levelNum-index)+''] = temp;
+        //         });
 
-//         if(!isValid) {
-//             console.log('分档线不符合规则，请修改');
-//             return;
-//         }
+        //         if(!isValid) {
+        //             console.log('分档线不符合规则，请修改');
+        //             return;
+        //         }
 
-        //this.levels的个数和input的值是一样的；所有的input都不为空
-        var levTotal = parseInt(this.refs.levelInput.value);
-        if (!(levTotal && _.isNumber(levTotal) && levTotal > 0)) {
-            this.setState({
-                levelNumWrong: true,
-                levelNumMsg: '分档数应是正数'
-            })
-            return;
-        }
 
-        // var isValid = _.every(_.range(levTotal), (index) => (!_.isUndefined(this.refs[('score-' + index)].value) && !_.isUndefined(this.refs[('rate-'+ index)].value)));
-        // if(_.keys(this.levels).length !== levTotal) isValid = false;
-
-        // if(!this.isValid) {
-        //     console.log('levels 表单验证不通过');
+        //this.levels的个数和input的值 {]是一样的；所有的input都不为空
+        // NOTE：下面的关于分档数是正数的判断多此一举，输入的时候就控制在 1~5之间。
+        // var levTotal = parseInt(this.refs.levelInput.value);
+        // if (!(levTotal && _.isNumber(levTotal) && levTotal > 0)) {
+        //     this.setState({
+        //         levelNumWrong: true,
+        //         levelNumMsg: '分档数应是正数'
+        //     })
         //     return;
         // }
 
-        //保证层级是正确的 --- TODO: 将临界生分析那里的上下浮动5分的判断也验证也加入到这里！！！
-        var isValid = _.every(_.range(_.size(this.levels) - 1), (index) => {
-            return this.levels[index+''].score < this.levels[(index+1)+''].score
-        });
 
-        if(!isValid) {
+        //保证层级是正确的 --- TODO: 将临界生分析那里的上下浮动5分的判断也验证也加入到这里！！！
+        var {examInfo, examStudentsInfo, examPapersInfo} = this.props;
+        var levLength = _.size(this.levels);
+        var errorMsg = '';
+        var isValid = _.every(_.range(_.size(this.levels) - 1), (index) => {
+            return this.levels[index + ''].score < this.levels[(index + 1) + ''].score
+        });
+        if (!isValid) errorMsg = '档位靠前分数必须比靠后的高';
+        //检查分档分数不能大于试卷总分
+        if (isValid) {
+            var levelOneScore = this.levels[levLength -1].score;
+            isValid = levelOneScore < _.last(examStudentsInfo).score;
+            if (!isValid) errorMsg = '数值不合法，分档线须小于最高分';
+        }
+        //note：不检查上线率，因为上线率不合法不会影响到this.levels;
+        // 检查分档分数不能低于最低分
+        if (isValid) {
+            isValid = this.levels[0].score > _.first(examStudentsInfo).score;
+            if (!isValid) errorMsg = '数值不合法，分档线须大于最低分';
+        }
+
+        //当有levels变动则修改baseline；当有levelBuffer变动则修改baseline？能进入到这里就是有效的设置了，但是levelBuffer那里是否有valid的校验，否则一旦存储，以后获取的都是错的就会麻烦
+        //这里的grade走的是examInfo中的gradeName，而不是传递进来的url的query中的grade
+        //TODO:要保证格式同Schema的格式：'[levels]'等
+        var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
+//对学科平均分进行校验：保证所有level下的value都是和科目数相同的
+        var isValidSubjectMean = _.every(newBaseline['[subjectLevels]'], (subjectMeansObj) => _.size(subjectMeansObj.values) == _.size(examPapersInfo));
+        // debugger;
+        if(!isValidSubjectMean) {
+            isValid = false;
+            errorMsg = '分档线设置不正确导致无效的学科平均分';
+        }
+
+        if (!isValid) {
             this.setState({
                 hasError: true,
-                errorMsg: '档位靠前分数必须比靠后的高'
+                errorMsg: errorMsg
             })
             return;
         }
@@ -274,16 +301,12 @@ class Dialog extends React.Component {
                 errorMsg: ''
             })
         }
-
-        //当有levels变动则修改baseline；当有levelBuffer变动则修改baseline？能进入到这里就是有效的设置了，但是levelBuffer那里是否有valid的校验，否则一旦存储，以后获取的都是错的就会麻烦
-        //这里的grade走的是examInfo中的gradeName，而不是传递进来的url的query中的grade
-        //TODO:要保证格式同Schema的格式：'[levels]'等
-        var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
-        var params = initParams({ 'request': window.request, examId: this.props.examId, grade:this.props.grade, baseline: newBaseline });
-        this.props.changeLevels({levels: this.levels, subjectLevels: getSubjectLevelsFromBaseLine(newBaseline['[subjectLevels]'])});
+        var params = initParams({ 'request': window.request, examId: this.props.examId, grade: this.props.grade, baseline: newBaseline });
+        this.props.changeLevels({ levels: this.levels, subjectLevels: getSubjectLevelsFromBaseLine(newBaseline['[subjectLevels]']) });
         this.props.saveBaseline(params);
 
         this.props.onHide();
+
     }
 
 /*
@@ -296,14 +319,14 @@ class Dialog extends React.Component {
         var type = arr[0];
         var num = arr[1]; //是第一个（高档次） 还是 最后一个（低档次），但是赋值给levels的时候就应该颠倒过来了
 
-//num = 0, 1, 2(levlTotal)
+        //num = 0, 1, 2(levlTotal)
         // var higherLevObj = this.levels[(this.levLastIndex-num+1)+''];
         // var lowerLevObj = this.levels[(this.levLastIndex-num-1)+''];
         var temp = {score: 0, percentage: 0, count: 0};
         var {examInfo, examStudentsInfo} = this.props;
         switch (type) {
             case 'score':
-            //根据给出的分数，计算在此分数以上的人数，然后求出百分比
+                //根据给出的分数，计算在此分数以上的人数，然后求出百分比
                 //要么没有，如果有则一定符合规则
 
                 //TODO:这里修改条件判断；前后挡最少相差10分；但是百分比也会相关联。。。修改百分比的时候要注意score的分差；但是10分又不科学，如果满分是
@@ -327,7 +350,6 @@ class Dialog extends React.Component {
                 } else {
                     targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > value);
                 }
-
                 if (targetIndex !== -1) {
                     var count = examStudentsInfo.length - targetIndex;
                     var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);
@@ -411,7 +433,7 @@ class Dialog extends React.Component {
                 <Body style={{padding: '30px 30px 0 30px'}}>
                     <div style={{ minHeight: 230 }}>
                         <div style={{ marginBottom: 20 }}>
-                            考试总分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分, 将整体成绩分档为：
+                            考试总分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分，最低分{_.first(examStudentsInfo).score}分，将整体成绩分档为：
                             <input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={localStyle.dialogInput} defaultValue={_this.state.levelNum} onChange={_this.onChange.bind(_this, 'levelInput') }/>档
                             <span style={_.assign({}, { color: A11 }, this.state.levelNumWrong ? { display: 'inline-block' } : { display: 'none' }) }>{this.state.levelNumMsg}</span>
                         </div>

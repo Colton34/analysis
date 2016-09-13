@@ -549,6 +549,7 @@ function getCriticalStudentsTableRenderData(allStudents, levels, levelBuffers, h
     //获取tableHeaders
     var tableHeaders = getTableHeaders(headers);
     var levelSize = _.size(levels);
+    //依次获取各档次的表格数据；
     _.forEach(studentsInfo, (students, levelNum) => {
         var tableData = getOneLevelTableData(levels, subjectLevels, tableHeaders, students, classList, levelNum);
         renderData[levelNum] = {tableHeaders, tableData};
@@ -640,15 +641,21 @@ function getOneLevelTableData(levels, subjectLevels, tableHeaders, students, cla
 }
 /**
  * 获取的数据结构是：
- * - {
- * -     totalGrade: {
- * -         totalScore: {count: , scoreSum: },
- * -         paperid1: {count: , scoreSum: },
- * -         ...
- * -     },
- * -     1: {...},
- * -     ...
- * - }
+ *  {
+ *      totalGrade: {
+ *          totalScore: {count: , scoreSum: },
+ *          paperid1: {count: , scoreSum: },
+ *          ...
+ *      },
+ *      className1: {
+ *         totalScore: {count: , scoreSum: },
+ *         paperid1: {count: , scoreSum: },
+ *         ...    
+ *     },
+ *      ...
+ *  }
+ * 遍历一遍临界生列表就可以获得全年级和各班的人数、分数数据；
+ * 
  */
 function getMeanDataByClass(students) {
     var meanDataInfo = {
