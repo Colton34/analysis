@@ -20,15 +20,15 @@ var modules = [
         name: '学科分档上线学生人数分布',
         id: 'subjectDistribution'
     }, {
+        name: '临界生群体分析',
+        id: 'groupAnalysis'
+    },{
         name: '班级考试基本表现',
         id: 'classPerformance'
     }, {
         name: '学科考试表现',
         id: 'subjectPerformance'
-    }, {
-        name: '临界生群体分析',
-        id: 'groupAnalysis'
-    }, {
+    },  {
         name: '分数排行榜',
         id: 'studentPerformance'
     }
