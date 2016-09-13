@@ -11,7 +11,7 @@ import {COLORS_MAP as colorsMap, B03, C07, C12} from '../../lib/constants';//TOD
 
 var modules = [
     {
-        name: '总分分布趋势',
+        name: '总分分布图',
         id: 'fullScoreTrend'
     }, {
         name: '总分分档上线学生人数分布',
