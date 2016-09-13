@@ -211,7 +211,7 @@ class GroupAnalysis extends React.Component {
             headers = reportDS.headers.toJS(),
             subjectLevels = reportDS.subjectLevels.toJS();
         var classList = _.keys(studentsGroupByClass);
-        this.tableRenderData = getCriticalStudentsTableRenderData(examStudentsInfo, levels, levelBuffers, headers, classList, this.state.currentLevel, subjectLevels);
+        this.tableRenderData = getCriticalStudentsTableRenderData(examStudentsInfo, levels, levelBuffers, headers, classList, subjectLevels);
     }
     onShowDialog() {
         this.setState({
@@ -543,14 +543,14 @@ let tableData = {
 }
 
  */
-function getCriticalStudentsTableRenderData(allStudents, levels, levelBuffers, headers, classList, currentLevel, subjectLevels) {
+function getCriticalStudentsTableRenderData(allStudents, levels, levelBuffers, headers, classList, subjectLevels) {
     var renderData = {};
     var studentsInfo = makeCriticalStudentsInfo(allStudents, levels, levelBuffers); // 其中0代表一档
     //获取tableHeaders
     var tableHeaders = getTableHeaders(headers);
     var levelSize = _.size(levels);
     _.forEach(studentsInfo, (students, levelNum) => {
-        var tableData = getOneLevelTableData(levels, subjectLevels, tableHeaders, students, classList, currentLevel);
+        var tableData = getOneLevelTableData(levels, subjectLevels, tableHeaders, students, classList, levelNum);
         renderData[levelNum] = {tableHeaders, tableData};
     })
     return renderData;
@@ -628,7 +628,7 @@ function getOneLevelTableData(levels, subjectLevels, tableHeaders, students, cla
                 } else if (header.id === 'count') {
                     rowData.count = '--';
                 } else if (header.id === 'totalScore'){
-                    rowData.totalScore = levels[levelSize - currentLevel -1].score;
+                    rowData.totalScore = levels[levelSize - currentLevel - 1].score;
                 } else {
                     rowData[header.id] = subjectLevels[levelSize - currentLevel - 1][header.id].mean;
                 }

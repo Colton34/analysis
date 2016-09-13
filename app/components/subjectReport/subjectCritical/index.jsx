@@ -194,7 +194,12 @@ function  getDeviationRowData(subjectMeanRowData, classList, subjectLevels, curr
     var meanData = subjectMeanRowData.slice(2);
     var subjectMean = subjectLevels[_.size(subjectLevels) - currentLevel - 1][currentSubject.pid].mean;
     // 全年级：
-    rowData.push(_.round(subjectMeanRowData[1] - subjectMean, 2));
+    if (subjectMeanRowData[1] === 0) {
+        rowData.push('--');
+    } else {
+        rowData.push(_.round(subjectMeanRowData[1] - subjectMean, 2));
+    }
+    
     // 各班级
     _.forEach(classList, (className, index) => {
         if (meanData[index] === 0) {

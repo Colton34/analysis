@@ -16,7 +16,7 @@ import {initParams} from '../lib/util';
 import {COLORS_MAP as colorsMap} from '../lib/constants';
 
 var localStyle = {
-    navItem: {display: 'inline-block', height: 60, lineHeight: '60px', margin: '0 30px', float: 'left', cursor: 'pointer'}
+    navItem: {display: 'inline-block', height: 60, lineHeight: '60px', margin: '0 10px', float: 'left', cursor: 'pointer'}
 }
 /**
  * props:
