@@ -164,21 +164,23 @@ function getSubjectMeanRowData(criticalLevelInfo, classList, currentSubject, cur
             })
         })
     })
-    rowData.push(_.round(sum / studentsNum, 2));
+    
+    rowData.push(sum !== 0 ? _.round(sum / studentsNum, 2) : 0);
 
     //各个班级：
     _.forEach(classList, className => {
+        // 需要判断是否有该班级
         if(criticalLevelInfo[currentLevel][className]) {
             var sum = 0;
-            var studentNum = criticalLevelInfo[currentLevel][className].length;
-            _.forEach(criticalLevelInfo[currentLevel][className], studentInfo => {
+            var studentList = criticalLevelInfo[currentLevel][className]; 
+            _.forEach(studentList, studentInfo => {
                 _.forEach(studentInfo.papers, paper => {
                     if (paper.paperid === currentSubject.pid) {
                         sum += paper.score;
                     }
                 })
             })
-            rowData.push(_.round(sum / studentNum, 2));
+            rowData.push(sum !== 0 ? _.round(sum / studentList.length, 2) : 0);
         } else {
             rowData.push(0);
         }
