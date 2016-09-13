@@ -21,7 +21,6 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
     var currentSubjectLevelClassInfo = getCurrentSubjectLevelClassInfo(subjectLevelDistribution, currentSubject.pid, classList);
     var {classInfoTableHeaders, classInfoTableData} = getClassInfoTableRenderData(currentSubjectLevelClassInfo, levels);
     var classInfoSummary = getclassInfoSummary(classInfoTableData);
-
     var levelNumString = _.join(_.range(_.size(levels)).map(num => {return numberMap[num + 1]}), '、');
     var levelSize = _.size(levels);
     return (
@@ -60,18 +59,20 @@ export default function SubjectLevelModule({reportDS, currentSubject}) {
             <TableView tableHeaders={classInfoTableHeaders} tableData={classInfoTableData} TableComponent={EnhanceTable}/>
             <div className={commonClass['analysis-conclusion']}>
                 <p>分析诊断：</p>
-                <p>
-                    对本学科而言，
-                    {
-                        _.map(classInfoSummary, (classList, levelNum) => {
-                            if (classList.length){
-                                return <span key={levelNum}>{numberMap[levelNum - 0 + 1]}档线学生人数<span style={{fontWeight: 'bold', margin: '0 2px'}}>累计</span>较多的班级是<span style={{color: colorsMap.B03}}>{_.join(classList, '、')}</span>{(levelNum - 0 !== levelSize -1 ? '，' : '。')}</span>
-                            } else {
-                                return numberMap[levelNum - 0 + 1] + '档线学生人数累计较多的班级是: 只有一个班级没有可比性。';
-                            }
-                        })
-                    }
-                </p>
+                {
+                    classInfoTableHeaders[0].length>3?(<p>
+                        对本学科而言，
+                        {
+                            _.map(classInfoSummary, (classList, levelNum) => {
+                                if (classList.length){
+                                    return <span key={levelNum}>{numberMap[levelNum - 0 + 1]}档线学生人数<span style={{fontWeight: 'bold', margin: '0 2px'}}>累计</span>较多的班级是<span style={{color: colorsMap.B03}}>{_.join(classList, '、')}</span>{(levelNum - 0 !== levelSize -1 ? '，' : '。')}</span>
+                                } else {
+                                    return numberMap[levelNum - 0 + 1] + '档线学生人数累计较多的班级是: 只有一个班级没有可比性。';
+                                }
+                            })
+                        }
+                    </p>):(<p>只有一个学科没有可比性</p>)
+                }
             </div>
 
         </div>
