@@ -433,7 +433,7 @@ class Dialog extends React.Component {
                 <Body style={{padding: '30px 30px 0 30px'}}>
                     <div style={{ minHeight: 230 }}>
                         <div style={{ marginBottom: 20 }}>
-                            考试总分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分, 将整体成绩分档为：
+                            考试总分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分，最低分{_.first(examStudentsInfo).score}分，将整体成绩分档为：
                             <input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={localStyle.dialogInput} defaultValue={_this.state.levelNum} onChange={_this.onChange.bind(_this, 'levelInput') }/>档
                             <span style={_.assign({}, { color: A11 }, this.state.levelNumWrong ? { display: 'inline-block' } : { display: 'none' }) }>{this.state.levelNumMsg}</span>
                         </div>
