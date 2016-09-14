@@ -12,7 +12,7 @@ export default function HeaderInfo({examInfo, subjects, currentExamClassInfo}) {
                 <p>您好</p>
                 <p>
                     本次考试，全校{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{examInfo.realClasses.length}</span>个班级，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试，缺考<span style={{ color: colorsMap.B03 }}>{examInfo.lostStudentsCount}</span>名。
-                    本班级<span style={{ color: colorsMap.B03 }}>{currentExamClassInfo.realStudentsCount}</span>名学生参加考试，缺考<span style={{ color: colorsMap.B03 }}>{currentExamClassInfo.lostStudentsCount}</span>名。
+                    本班级<span style={{ color: colorsMap.B03 }}>{currentExamClassInfo.realStudentsCount}</span>名学生参加考试。
                     考试学科：<span style={{ color: colorsMap.B03 }}> {_.join(subjects, '、') }</span>，{subjects.length}个学科。
                 </p>
                 <p style={{ marginBottom: 0 }}>
@@ -24,6 +24,6 @@ export default function HeaderInfo({examInfo, subjects, currentExamClassInfo}) {
     )
 }
 
-
+// 【暂时】，缺考<span style={{ color: colorsMap.B03 }}>{currentExamClassInfo.lostStudentsCount}</span>名
 
 //=================================================  分界线  =================================================

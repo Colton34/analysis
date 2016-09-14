@@ -141,7 +141,7 @@ class Header extends React.Component {
                     <div id='header' style={{borderRadius: 2, backgroundColor: '#fff', padding: 30}}>
                         <p>尊敬的校领导，您好:</p>
                         <p>
-                            本次考试（考试时间：{startTime}），全校{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{examInfo.realClasses.length}</span>个班，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试，缺考<span style={{ color: colorsMap.B03 }}>{examInfo.lostStudentsCount}</span>名。
+                            本次考试（考试时间：{startTime}），全校{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{examInfo.realClasses.length}</span>个班，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试。
                             考试学科：<span style={{ color: colorsMap.B03 }}> {_.join(examInfo.subjects, '、') }</span>，{examInfo.subjects.length}个学科。
                         </p>
                         <p style={{ marginBottom: 0 }}>
@@ -154,6 +154,8 @@ class Header extends React.Component {
         )
     }
 }
+
+//【暂时】 ，缺考<span style={{ color: colorsMap.B03 }}>{examInfo.lostStudentsCount}</span>名
 
 var localStyle={
     goBackLink: {
