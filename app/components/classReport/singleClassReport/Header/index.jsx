@@ -27,9 +27,6 @@ var modules = [
     }, {
         name: '重点学生信息',
         id: 'studentInfo'
-    }, {
-        name: '历史表现比较',
-        id: 'historyPerformance'
     }
 ];
 
