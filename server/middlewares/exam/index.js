@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-12 09:49:26
+* @Last Modified time: 2016-09-17 14:32:56
 */
 
 'use strict';
@@ -75,20 +75,22 @@ exports.home = function(req, res, next) {
     examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
     examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
 
-
+    var ifShowLiankaoReport = getLianKaoReportAuth(auth, gradeAuth, exam);
     var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
     var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
     var ifShowSubjectReport = (authSubjects.length > 0);
     try {
         var examInfoGuideResult = examInfoGuide(exam);
         var scoreRankResult = scoreRank(examScoreArr);
-        var schoolReportResult = (ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
-        var classReportResult = (ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
-        var subjectReportResult = (ifShowSubjectReport) ? authSubjects : null;
+        var liankaoReportResult = (ifShowLiankaoReport) ? liankaoReport(exam, examScoreArr) : null;
+        var schoolReportResult = (!ifShowLiankaoReport && ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
+        var classReportResult = (!ifShowLiankaoReport && ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
+        var subjectReportResult = (!ifShowLiankaoReport && ifShowSubjectReport) ? authSubjects : null; //TODO：补充联考权限。联考学科报告有，只不过名字不一样而已吧。。。
         // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
         res.status(200).json({
             examInfoGuide: examInfoGuideResult,
             scoreRank: scoreRankResult,
+            liankaoReport: liankaoReportResult,
             schoolReport: schoolReportResult,
             classReport: classReportResult,
             subjectReport: subjectReportResult
@@ -117,6 +119,7 @@ function getAuthSubjectsInfo(auth, exam, examScoreArr) {
         });
     }
 
+    // var ifIsLiankaoManager = true; //TODO: Mock联考权限 -- 或者单独弄一个lianKaoSujbectReport出来--就像虽然liankaoReprot像schoolReport，但是也是一个新的，独立的，隔离开。
     if((auth.isSchoolManager) || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])) {
         result.push({subject: '总分', meanRate: totalScoreMeanRate});
         result = _.concat(result, subjectMeanRates);
@@ -139,6 +142,12 @@ function getAuthScoreMap(examScoreMap, authClasses) {
 
 function ifAtLeastGradeManager(auth, gradeAuth, exam) {
     return (auth.isSchoolManager || (_.isBoolean(gradeAuth[exam.grade.name]) && gradeAuth[exam.grade.name]));
+}
+
+//TODO:联考权限
+function getLianKaoReportAuth(auth, gradeAuth, exam) {
+    //是？？？？
+    return true;
 }
 
 function ifAtLeastGroupManager(auth, gradeAuth, exam) {
@@ -844,7 +853,7 @@ function filterExamsByAuth(formatedExams, auth, uid) {
     _.each(formatedExams, (obj) => {
         var vaildExams = _.filter(obj.values, (examItem) => {
             //Note: 先过滤掉联考；只有自定义或者阅卷
-            return (((examItem.from != '20')) && ((examItem.from != '40') && (_.includes(authGrades, examItem.grade))) || ((examItem.from == '40') && (examItem.owner == uid)));
+            return (((examItem.from != '40') && (_.includes(authGrades, examItem.grade))) || ((examItem.from == '40') && (examItem.owner == uid)));
         });
         if(vaildExams.length > 0) result.push({timeKey: obj.timeKey, values: vaildExams});
     });
@@ -888,6 +897,17 @@ function scoreRank(examScoreArr) {
  * 和校级报告详情的总分趋势的接口相同
  */
 function schoolReport(exam, examScoreArr) {
+    var segments = makeSegments(exam.fullMark);
+    var xAxons = _.slice(segments, 1);
+    var yAxons = makeSegmentsStudentsCount(examScoreArr, segments);
+
+    return {
+        'x-axon': xAxons,
+        'y-axon': yAxons
+    }
+}
+
+function liankaoReport(exam, examScoreArr) {
     var segments = makeSegments(exam.fullMark);
     var xAxons = _.slice(segments, 1);
     var yAxons = makeSegmentsStudentsCount(examScoreArr, segments);

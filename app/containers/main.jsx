@@ -9,7 +9,7 @@ class Main extends React.Component {
     render() {
         return (
             <div>
-                <Link to={{pathname: '/subject/report', query: {examid: '23040', grade: '初二'}}}>【Mock】学科报告</Link>
+                <Link to={{pathname: '/subject/report', query: {examid: '00676', grade: '初二'}}}>【Mock】联考报告</Link>
                 <Link to={{pathname: '/home'}}>【正常】首页</Link>
             </div>
         );

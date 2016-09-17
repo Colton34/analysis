@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-12 13:43:05
+* @Last Modified time: 2016-09-17 14:04:53
 */
 'use strict';
 var _ = require('lodash');
@@ -34,7 +34,7 @@ var getSchoolById = exports.getSchoolById = function(schoolid) {
  * @return {[type]}        [description]
  */
 exports.getExamsBySchool = function(school) {
-    var examPromises = _.map(_.filter(school["[exams]"], (item) => (item.from != 40 && item.from != 20)), (obj) => examPromise(obj.id)); //既不是自定义又不是联考
+    var examPromises = _.map(_.filter(school["[exams]"], (item) => (item.from != 40)), (obj) => examPromise(obj.id)); //既不是自定义又不是联考
     return when.all(examPromises);
 }
 

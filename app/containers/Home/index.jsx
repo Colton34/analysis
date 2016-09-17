@@ -99,6 +99,7 @@ class TeacherHelper extends React.Component {
             videoLinkHover: false
         })
     }
+
     render(){
         var {videoLinkHover} = this.state
         return (
@@ -189,7 +190,7 @@ class ExamItem extends React.Component {
                             <i className={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? 'icon-fromzdy' : 'icon-fromks'} style={{color: '#fff', fontSize: 26}}></i>
                         </div>
                         <div style={{ display: 'inline-block', marginLeft: 20 }}>
-                            <div style={{ fontSize: 16, marginBottom: 8, color: '#3f3f3f' }}>{item.examName}</div>
+                            <div style={{ fontSize: 16, marginBottom: 8, color: '#3f3f3f' }}>{(item.from == 20) ? (item.examName + '（联考）') : (item.examName)}</div>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>创建时间: {item.eventTime}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
@@ -268,7 +269,7 @@ class ExamList extends React.Component {
                     })
                 }
         }
-    $('body').scrollTop(0);    
+    $('body').scrollTop(0);
     }
     render() {
         var {examList, errorInfo} = this.props;

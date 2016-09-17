@@ -15,6 +15,8 @@ import SubjectReport from '../components/dashboard/subject-report';
 import PaperComment from '../components/dashboard/paper-comment';
 import PaperQuality from '../components/dashboard/paper-quality';
 import StudentReport from '../components/dashboard/student-report';
+
+import LiankaoReport from '../components/dashboard/liankao-report';
 import SchoolReport from '../components/dashboard/school-report';
 
 import {initDashboardAction} from '../reducers/dashboard/actions';
@@ -98,6 +100,7 @@ class Dashboard extends React.Component {
     render() {
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
+        var liankaoReport = (Map.isMap(this.props.dashboard.liankaoReport)) ? this.props.dashboard.liankaoReport.toJS() : this.props.dashboard.liankaoReport;
         var schoolReport = (Map.isMap(this.props.dashboard.schoolReport)) ? this.props.dashboard.schoolReport.toJS() : this.props.dashboard.schoolReport;
         var classReport = (Map.isMap(this.props.dashboard.classReport)) ? this.props.dashboard.classReport.toJS() : this.props.dashboard.classReport;
         var subjectReport = (List.isList(this.props.dashboard.subjectReport)) ? this.props.dashboard.subjectReport.toJS() : this.props.dashboard.subjectReport;
@@ -134,12 +137,12 @@ class Dashboard extends React.Component {
                                 <div className='row' style={{ marginTop: 20 }}>
                                     {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} expand={_.size(schoolReport) === 0 ? true : false}/> : ''}
                                     {(schoolReport && _.size(schoolReport) > 0) ? <SchoolReport examid={examid} grade={grade} data={schoolReport}/> : ''}
+                                    {(liankaoReport && _.size(liankaoReport) > 0) ? <LiankaoReport examid={examid} grade={grade} data={liankaoReport}/> : ''}
                                 </div>
                                 {/* */}
                                 <div className='row' style={{ marginTop: 20 }}>
                                     {(classReport && _.size(classReport) > 0) ? <ClassReport data={classReport} grade={grade} examid={examid} /> : ''}
                                     {(subjectReport && _.size(subjectReport) > 0) ? <SubjectReport data={subjectReport} grade={grade} examid={examid} /> : ''}
-                                    <LevelReport />
                                 </div>
                                 <Dialog show={this.state.showConfirmDialog} onHide={this.onHideDialog.bind(this) } onConfirm={this.onDeleteAnalysis.bind(this) }/>
                         </div>
