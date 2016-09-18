@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import commonClass from '../../../../styles/common.css';
-import singleClassReportStyle from '../../../../styles/liankaoReport.css';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 import {makeSegmentsDistribution, makeSegments} from '../../../../sdk';
 import StatisticalLib from 'simple-statistics';
@@ -20,17 +19,62 @@ export default function Trend({reportDS}) {
         <div id='totalScoreTrend' className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
             <span className={commonClass['title']}>总分分布</span>
-            <span className={commonClass['title-desc']}>学生总分分布，可反映本次考试班级学生的综合学业水平分布状况。</span>
+            <span className={commonClass['title-desc']}>学生总分分布，可反映本次联考学生的综合学业水平分布状态</span>
 
             <InfoCards headerData={headerData}/>
-            <TrendChart chartDS={chartDS} examInfo={examInfo} examStudentsInfo={examStudentsInfo} />
-            <div className={singleClassReportStyle['analysis-conclusion']}>
-                <div>分析诊断：</div>
+            <div style={{marginTop: 30}}>
+                <TrendChart chartDS={chartDS} examInfo={examInfo} examStudentsInfo={examStudentsInfo}/>
+                <FullScoreInfo yData={chartDS['y-axon']}/>
+                <div style={{clear: 'both'}}></div>
+            </div>
+            <div className={commonClass['analysis-conclusion']}>
+                <p>分析诊断：</p>
                 <div>{skewnessInfo}</div>
             </div>
         </div>
     )
 }
+
+/**
+ * props:
+ * yData: highChart图数据的y轴数据
+ */
+class FullScoreInfo extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            showScroll : false,
+            needScroll: this.props.yData.length > 8 ? true : false  //列表超过8个就会需要滚动条
+        }
+    }
+    onMouseEnter() {
+        if (!this.state.needScroll) return;
+        this.setState({showScroll: true})
+    }
+    onMouseLeave() {
+        if (!this.state.needScroll) return ;
+        this.setState({showScroll: false});
+    }
+    render() {
+        var {yData} = this.props;
+        return (
+            <ul style={_.assign({ width: 240, height: 360, padding: '20px 0 40px 10px', marginBottom: 0, backgroundColor: colorsMap.C14, border: '1px solid ' + colorsMap.C04, float: 'right',listStyleType: 'none', fontSize: 12 }, this.state.showScroll ? { overflowY: 'scroll'}: {overflowY: 'hidden'})} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
+                {
+                    yData.map((data, index) => {
+                        return (
+                            <li key={'fullScoreTrend-li-' + index} style={{height: 40, lineHeight: '40px', display: 'table-row' }}>
+                                <span className={commonClass['list-dot']} style={{ width: 20, height: 40, lineHeight: '40px', textAlign: 'center', display: 'table-cell', verticalAlign: 'middle'}}></span>
+                                <span style={{ marginRight: 20, display: 'table-cell', width: 110, textAlign: 'left', borderBottom: '1px dashed ' + colorsMap.C04}}>{(index === 0 ? '[' + data.low : '(' + data.low) + ',' + data.high + ']分区间'}</span>
+                                <span style={{ marginRight: 20, display: 'table-cell', width: 50, textAlign: 'left',  borderBottom: '1px dashed ' + colorsMap.C04}}>{data.y}</span>
+                                <span style={{ display: 'table-cell', textAlign: 'left', borderBottom: '1px dashed ' + colorsMap.C04, }}>人</span>
+                            </li>
+                        )
+                    })
+                }
+            </ul>
+        )
+    }
+ }
 
 function getHeaderData(examStudentsInfo) {
     var avgScore = _.round(_.mean(_.map(examStudentsInfo, (obj) => obj.score)), 2);

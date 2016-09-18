@@ -98,6 +98,21 @@
     color: #6a6a6a;
 }
 
+/*------------------*/
+.list-dot:before {
+    content: "• ";
+    color: #999;
+    font-size: 18px;
+}
+
+/**************** 各个报告中的结论模块样式 ******************/
+
+.analysis-conclusion {
+    margin-top: 30px;
+    padding: 30px;
+    background-color: rgba(197, 233, 248, 0.2);
+}
+
 /*----------------------Test For Input Validate-------------------------------------*/
 input {
   font-size: 1.3em;

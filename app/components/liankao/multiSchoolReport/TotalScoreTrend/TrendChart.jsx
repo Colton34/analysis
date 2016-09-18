@@ -4,7 +4,7 @@ import ReactHighcharts from 'react-highcharts';
 
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
-export default function TrendChart({chartDS, examInfo,classStudents}) {
+export default function TrendChart({chartDS, examInfo, examStudentsInfo}) {
     var config = {
         colors: ['#00adfb'],
         title: {
@@ -50,7 +50,7 @@ export default function TrendChart({chartDS, examInfo,classStudents}) {
             },
             formatter: function () {
                 return (this.point.low > 0 ? '(' : '[') + this.point.low + '-' + this.point.high + ']区间人数<br />' + this.point.y + '人,占'
-                    + Math.round(((this.point.y / classStudents.length) * 100)) + '%';
+                    + Math.round(((this.point.y / examStudentsInfo.length) * 100)) + '%';
             }
         },
         legend: {
@@ -69,6 +69,6 @@ export default function TrendChart({chartDS, examInfo,classStudents}) {
         }
     }
     return (
-        <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
+        <ReactHighcharts config={config} style={{marginTop: 30, width: 870, height: 330, display: 'inline-block'}}/>
     )
 }
