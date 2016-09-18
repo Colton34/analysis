@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-17 17:17:00
+* @Last Modified time: 2016-09-18 10:53:23
 */
 
 'use strict';
@@ -1406,8 +1406,9 @@ function genearteExamClassInfo(exam) {
 function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo, examPapersInfo) {
     return generateStudentsPaperAndQuestionInfo(exam, examPapersInfo).then(function(result) {
         //遍历examScoreArr是为了保证有序
-        var studentsPaperInfo = result.studentsPaperInfo, studentQuestionsInfo = result.studentQuestionsInfo;
+        var studentsPaperInfo = result.studentsPaperInfo, studentQuestionsInfo = result.studentQuestionsInfo, studentSchoolInfo = result.studentSchoolInfo;
         _.each(examScoreArr, (scoreObj) => {
+            scoreObj.school = studentSchoolInfo[scoreObj.id];
             scoreObj.papers = studentsPaperInfo[scoreObj.id];
             scoreObj.questionScores = studentQuestionsInfo[scoreObj.id];
         });
@@ -1417,7 +1418,7 @@ function generateExamStudentsInfo(exam, examScoreArr, examClassesInfo, examPaper
 
 
 function generateStudentsPaperAndQuestionInfo(exam, examPapersInfo) {
-    var studentPaperArr = [], studentQuestionMap = {};
+    var studentPaperArr = [], studentQuestionMap = {}, studentSchoolInfo = {};
     return getPaperInstanceByExam(exam).then(function(papers) {
         //修改examPapersInfo中的实体--添加questions数据
         _.each(papers, (paperObj, index) => {
@@ -1426,11 +1427,12 @@ function generateStudentsPaperAndQuestionInfo(exam, examPapersInfo) {
                 studentPaperArr.push({id: student.id, class_name: student.class, paperid: paperObj.id, score: student.score});
                 if(!studentQuestionMap[student.id]) studentQuestionMap[student.id] = [];
                 studentQuestionMap[student.id].push({paperid: paperObj.id, scores: paperObj.matrix[index]}); //暂时可以先不添加： answers: paperObj.answers[index]
+                studentSchoolInfo[student.id] = student.school;
             });
         });
 
         var studentsPaperInfo = _.groupBy(studentPaperArr, 'id');
-        return when.resolve({studentsPaperInfo: studentsPaperInfo, studentQuestionsInfo: studentQuestionMap});
+        return when.resolve({studentsPaperInfo: studentsPaperInfo, studentQuestionsInfo: studentQuestionMap, studentSchoolInfo: studentSchoolInfo});
     });
 }
 
