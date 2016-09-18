@@ -109,7 +109,7 @@ class Table extends React.Component {
     }
     render() {
         var headSeq = [];
-        var {id, tableHeaders, data, bordered, striped, hover, headerStyle, options, tableSortable, style, canDownload} = this.props;
+        var {id, tableHeaders, tableData, data, bordered, striped, hover, headerStyle, options, tableSortable, style, canDownload} = this.props;
         bordered = bordered === undefined ? true : bordered;
         return (
             <div style={_.assign({}, {position: 'relative'}, style ? style : {})}>
@@ -186,7 +186,7 @@ class Table extends React.Component {
                                             var tdStyle = {};
                                             if (this.columnStyles[id]) {
                                                 if (_.isFunction(this.columnStyles[id])) {
-                                                    tdStyle = this.columnStyles[id](rowData[id], rowData, trindex, tdindex, id, this.state.showData);
+                                                    tdStyle = this.columnStyles[id](rowData[id], rowData, trindex, tdindex, id, tableData);
                                                 } else {
                                                     tdStyle = this.columnStyles[id];
                                                 }
