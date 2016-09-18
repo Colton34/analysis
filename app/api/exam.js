@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-17 12:11:35
+* @Last Modified time: 2016-09-18 08:59:00
 */
 
 
@@ -543,3 +543,27 @@ function makeSubjectMean(students, examPapersInfo) {
     });
     return result;
 }
+
+
+
+
+// export function initLiankaoReportDS(params) {
+//     var url = examPath + '/school/analysis?examid=' + params.examid + '&grade=' + encodeURI(params.grade);
+
+//     return params.request.get(url).then(function(res) {
+//         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, liankaoBaseline} = res.data;
+//         var levels = (examBaseline && examBaseline['[levels]']) ? _.keyBy(examBaseline['[levels]'], 'key') : makeDefaultLevles(examInfo, examStudentsInfo);
+//         var levelBuffers = (examBaseline && examBaseline['[levelBuffers]']) ? _.map(examBaseline['[levelBuffers]'], (obj) => obj.score) : _.map(levels, (value, key) => 5);
+//         var subjectLevels = (examBaseline && examBaseline['[subjectLevels]']) ? getSubjectLevelsFromBaseLine(examBaseline['[subjectLevels]']) : makeDefaultSubjectLevels(levels, examStudentsInfo, examPapersInfo, examInfo.fullMark);
+//         return Promise.resolve({
+//             haveInit: true,
+//             examInfo: examInfo,
+//             examStudentsInfo: examStudentsInfo,
+//             examPapersInfo: examPapersInfo,
+//             examClassesInfo: examClassesInfo,
+//             levels: levels,
+//             subjectLevels: subjectLevels,
+//             levelBuffers: levelBuffers
+//         });
+//     });
+// }

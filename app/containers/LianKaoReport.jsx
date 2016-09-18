@@ -10,9 +10,9 @@ import CommonErrorView from '../common/ErrorView';
 // import CommonLoadingView from '../common/LoadingView';
 import Spinkit from '../common/Spinkit';
 import ReportNavHeader from '../common/report/NavHeader';
-import ReportTabNav from '../components/classReport/ReportTabNav';
-import MultiClassReport from '../components/classReport/multiClassReport';
-import SingleClassReport from '../components/classReport/singleClassReport';
+// import ReportTabNav from '../components/liankaoReport/ReportTabNav';
+import MultiSchoolReport from '../components/liankao/multiSchoolReport';
+// import SingleClassReport from '../components/liankaoReport/singleClassReport';
 
 import {initReportDSAction} from '../reducers/reportDS/actions';
 
@@ -23,16 +23,20 @@ import {COLORS_MAP as colorsMap} from '../lib/constants';
 class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
+        //TODO: 要么看到所有学校，要么就是当前一个学校？
+        this.ifCanReviewMultiReport = ifCanReviewMultiReport(this.props.user.auth, this.props.grade, this.props.reportDS.examInfo.toJS());
+
+
         // var realClasses = this.props.reportDS.examInfo.toJS().realClasses;
         // this.ifCanReviewMultiReport = ifCanReviewMultiReport(this.props.user.auth, this.props.grade, this.props.reportDS.examInfo.toJS());
         // this.authClasses = getAuthClasses(this.props.user.auth, this.props.grade, this.props.gradeName, realClasses);
-        // this.state = {
+        // this.state =
         //     reportType: 'single',
         //     currentClass: this.authClasses[0].key
         // };
     }
 
-    changeClassReport(item) {
+    changeSchoolReport(item) {
         if(item.type == 'multi') {
             this.setState({
                 reportType: item.type
@@ -44,15 +48,20 @@ class ContentComponent extends React.Component {
             })
         }
     }
+
     render() {
         // var isSchoolManagerOrGradeManager = true;//TODO: 替换真实的判断
         var examName = this.props.reportDS.examInfo.toJS().name;
-        console.log('examName = ', examName);
-debugger;
+//         console.log('examName = ', examName);
+// debugger;
 
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                联考报告
+                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} reportName={'联考分析报告'}/>
+                {/* {(this.ifCanReviewMultiReport) ? <ReportTabNav changeSchoolReport={this.changeClassReport.bind(this)} schoolList={authSchoolsList} reportDS={this.props.reportDS} /> : ''}  //【暂时】没有单个学校联考报告 */}
+                <MultiSchoolReport reportDS={this.props.reportDS} />
+                {/* {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />
+            : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName} ifCanReviewMultiReport={this.ifCanReviewMultiReport}/>} */}
             </div>
         );
     }
@@ -70,17 +79,13 @@ class LianKaoReport extends React.Component {
     }
 
     render() {
-
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         var grade = this.props.location.query ? this.props.location.query.grade : '';
-        var gradeName = this.props.reportDS.examInfo.toJS().gradeName;
-        if (!examid) return;
-
-        var user = Map.isMap(this.props.user) ? this.props.user.toJS() : this.props.user;
+        if (!examid || !grade) return;
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <Spinkit /> : (
-                    <ContentComponent reportDS={this.props.reportDS} user={user} examid={examid} grade={grade} gradeName={gradeName}/>
+                    <ContentComponent examid={examid} grade={grade} reportDS={this.props.reportDS} user={this.props.user} />
                 ))}
             </div>
         );
@@ -106,31 +111,32 @@ function mapDispatchToProps(dispatch) {
 
 
 function ifCanReviewMultiReport(auth, gradeKey, examInfo) {
-    return ((!gradeKey && examInfo.from == '40') ||(gradeKey && (auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]))));
+    //TODO：如果是特殊教育局角色
+    return true;
 }
 
-function getAuthClasses(auth, gradeKey, gradeName, realClasses) {
-    if(gradeKey && (auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]))) {
-        return _.map(realClasses, (classKey) => {
-            return {
-                key: classKey,
-                value: gradeKey + classKey + '班'
-            }
-        })
-    }
-    if(!gradeKey || !auth.gradeAuth[gradeKey]) {
-        return _.map(realClasses, (classKey) => {
-            return {
-                key: classKey,
-                value: gradeName + classKey + '班'
-            }
-        })
-    }
+function getAuthSchool(auth, gradeKey, gradeName, realClasses) {
+    // if(gradeKey && (auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]))) {
+    //     return _.map(realClasses, (classKey) => {
+    //         return {
+    //             key: classKey,
+    //             value: gradeKey + classKey + '班'
+    //         }
+    //     })
+    // }
+    // if(!gradeKey || !auth.gradeAuth[gradeKey]) {
+    //     return _.map(realClasses, (classKey) => {
+    //         return {
+    //             key: classKey,
+    //             value: gradeName + classKey + '班'
+    //         }
+    //     })
+    // }
 
-    return _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => {
-        return {
-            key: obj.group,
-            value: gradeKey + obj.group + '班'
-        }
-    });
+    // return _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => {
+    //     return {
+    //         key: obj.group,
+    //         value: gradeKey + obj.group + '班'
+    //     }
+    // });
 }

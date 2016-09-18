@@ -6,6 +6,7 @@ import Home from '../containers/Home';
 import HelpCenter from '../components/HelpCenter';
 import Dashboard from '../containers/Dashboard';
 import RankReport from '../containers/RankReport';
+import LianKaoReport from '../containers/LianKaoReport';
 import SchoolReport from '../containers/SchoolReport';
 import ClassReport from '../containers/ClassReport';
 import SubjectReport from '../containers/SubjectReport';
@@ -20,9 +21,11 @@ import Main from '../containers/main';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Home} />
+            <IndexRoute component={Main} />
+            <Route path='home' component={Home}/>
             <Route path='faq' component={HelpCenter}/>
             <Route path='dashboard' component={Dashboard} />
+            <Route path='liankao/report' component={LianKaoReport} />
             <Route path='school/report' component={SchoolReport} />
             <Route path='rank/report' component={RankReport}/>
             <Route path='class/report' component={ClassReport} />
