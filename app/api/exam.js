@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-18 08:59:00
+* @Last Modified time: 2016-09-19 10:35:16
 */
 
 
@@ -225,9 +225,9 @@ export function initReportDS(params) {
 
     return params.request.get(url).then(function(res) {
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, examBaseline} = res.data;
-        debugger;
         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
+        var examStudentsInfoMap = _.keyBy(examStudentsInfo, 'id');
         //Note: 已经对paperStudents进行排序，这样到下面不用分别都再次排序了。
         var rankIndex;
         _.each(allStudentsPaperMap, (students, pid) => {
@@ -246,6 +246,7 @@ export function initReportDS(params) {
             _.each(orderedPaperStudentScoreInfo, (theObj, theRank) => {
                 var currentRankStudents = _.map(theObj.students, (stuObj) => {
                     stuObj.rank = (rankIndex);
+                    stuObj.school = examStudentsInfoMap[stuObj.id].school;
                     return stuObj;
                 });
                 finalRankStudentsInfo = _.concat(finalRankStudentsInfo, currentRankStudents);
