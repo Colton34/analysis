@@ -69,6 +69,6 @@ export default function TrendChart({chartDS, examInfo, examStudentsInfo}) {
         }
     }
     return (
-        <ReactHighcharts config={config} style={{marginTop: 30, width: 870, height: 330, display: 'inline-block'}}/>
+        <ReactHighcharts config={config} style={{marginTop: 30, width: 890, height: 330, display: 'inline-block'}}/>
     )
 }
