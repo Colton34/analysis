@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-06 20:17:35
+* @Last Modified time: 2016-09-18 17:45:17
 */
 
 'use strict';
@@ -103,4 +103,78 @@ export function makeFactor(originalMatrix) {
     });
 
     return resultMatrix;
+}
+
+/**
+ * 获取所给levels各个档次的每个学科的平均分信息
+ * @param  {[type]} levels           [description]
+ * @param  {[type]} examStudentsInfo [description]
+ * @param  {[type]} examPapersInfo   [description]
+ * @param  {[type]} examFullMark     [description]
+ * @return {[type]}
+ *  {
+ *      <levelKey>: {
+ *          <pid>: <subjectMean>,
+ *          ...(各个学科)
+ *      },
+ *      ...(各个档次)
+ *  }
+ */
+export function makeSubjectLevels(levels, examStudentsInfo, examPapersInfo, examFullMark) {
+    var result = {};
+    _.each(levels, (levObj, levelKey) => {
+        result[levelKey] = makeLevelSubjectMean(levObj.score, examStudentsInfo, examPapersInfo, examFullMark);
+    });
+    return result;
+}
+
+/**
+ * 获取某一档次各个科目的平均分
+ * @param  {[type]} levelScore       [description]
+ * @param  {[type]} examStudentsInfo [description]
+ * @param  {[type]} examPapersInfo   [description]
+ * @param  {[type]} examFullMark     [description]
+ * @return {[type]}                  [description]
+ */
+function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark) {
+    var result = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(levelScore));
+    var count = result.length;
+
+    var currentLowScore, currentHighScore;
+    currentLowScore = currentHighScore = _.round(levelScore);
+
+    while ((count < 25) && (currentLowScore >= 0) && (currentHighScore <= examFullMark)) {
+        currentLowScore = currentLowScore - 1;
+        currentHighScore = currentHighScore + 1;
+        var currentLowStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore));
+        var currentHighStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentHighScore));
+
+        var currentTargetCount = _.min([currentLowStudents.length, currentHighStudents.length]);
+        var currentTagretLowStudents = _.take(currentLowStudents, currentTargetCount);
+        var currentTargetHighStudents = _.take(currentHighStudents, currentTargetCount);
+        count += _.multiply(2, currentTargetCount);
+        result = _.concat(result, currentTagretLowStudents, currentTargetHighStudents);
+    }
+
+    return makeSubjectMean(result, examPapersInfo);
+}
+
+
+/**
+ * 返回所给学生各科成绩的平均分。注意这里没有没有包括总分(totalScore)的平均分信息
+ * @param  {[type]} students       [description]
+ * @param  {[type]} examPapersInfo [description]
+ * @return {[type]}                [description]
+ */
+function makeSubjectMean(students, examPapersInfo) {
+    var result = {};
+    _.each(_.groupBy(_.concat(..._.map(students, (student) => student.papers)), 'paperid'), (papers, pid) => {
+        var obj = {};
+        obj.mean = _.round(_.mean(_.map(papers, (paper) => paper.score)), 2);
+        obj.name = examPapersInfo[pid].subject; //TODO: 这里还是统一称作 'subject' 比较好
+        obj.id = pid;
+
+        result[pid] = obj;
+    });
+    return result;
 }

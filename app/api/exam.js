@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-19 10:35:16
+* @Last Modified time: 2016-09-19 10:36:51
 */
 
 
@@ -138,6 +138,7 @@ export function initRankReportdData(params) {
                 name:
                 class:
                 score:
+                school:（注意是school name而不是school id）
                 papers: [
                     {id: , paperid: , score: , class_name: }
                 ],

@@ -174,6 +174,11 @@ export const C09 = '#999999';
 export const C12 = '#333333';
 export const C14 = '#fdfdfd';
 
+export const DEFAULT_LEVELS = {
+
+}
+export const DEFAULT_LEVELBUFFER = 10;
+export const DEFAULT_LEVEL_RADIO_RANGE = [3, 4,5];//默认只提供这三个档次
 
 //============================  Test ===============================
 export const TEST_CHANGE_ONE = 'TEST_CHANGE_ONE';

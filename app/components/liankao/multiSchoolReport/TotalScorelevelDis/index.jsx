@@ -6,7 +6,7 @@ import TableContentModule from './TableContentModule';
 import SummaryInfoModule from './summaryInfoModule';
 
 /*
-Note: 1.保留记录分档参数。但是当查看此学校的校级报告的时候还是要有一个baseline，和这个不一样。
+Note:
 
  */
 class TotalScoreDisModule extends React.Component {
@@ -18,9 +18,9 @@ class TotalScoreDisModule extends React.Component {
     render() {
         return (
             <div>
-                <HeaderModule />
-                <TableContentModule />
-                <SummaryInfoModule />
+                <HeaderModule reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} />
+                <TableContentModule reportDS={this.props.reportDS} />
+                <SummaryInfoModule reportDS={this.props.reportDS}/>
             </div>
         );
     }
