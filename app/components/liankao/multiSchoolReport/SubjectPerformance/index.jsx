@@ -27,7 +27,21 @@ export default function({reportDS}) {
 
 
 /**
- * todo: 注释
+ * 按学校、科目统计人数与总分；
+ * @param 入参均来自reportDS
+ * @return {
+ *      total: { //全部学校总体信息
+ *          totalScore: {count: x, sum: x, fullMark: x}, //分别表示人数、分数和、该科目满分
+ *          pid1: {count: x, sum: x, fullMark: x},
+ *          ...
+ *      },
+ *      schoolName1: { //学校名
+ *          totalScore: {count: x, sum: x, fullMark: x}, //分别表示人数、分数和、该科目满分
+ *          pid1: {count: x, sum: x, fullMark: x},
+ *          ...
+ *      },
+ *      ...
+ *  }
  */
 function getSubjectInfoBySchool(examStudentsInfo, headers, examInfo) {
     var data = {};
@@ -68,7 +82,15 @@ function getSubjectInfoBySchool(examStudentsInfo, headers, examInfo) {
     return data;
 }
 
-
+/**
+ * @param:  headers\examInfo均来自 reportDS
+ * @return: 
+ *   {
+ *      totalScore: {id: , subject: , fullMark: } // 总分信息
+ *      pid1: {id: , subject: , fullMark: }       // 各个科目
+ *      ...
+ *   } 
+ */
 function getPaperidInfoMap(headers, examInfo) {
     var mapper = {};
     _.forEach(headers, headerInfo => {
