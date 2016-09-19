@@ -43,7 +43,7 @@ export default class ScoreLevel extends React.Component{
         return (
             <div>
                 <ScoreLevelBySubject levelPercentages={levelPercentages} reportDS={reportDS}/>
-                <ScoreLevelBySchool/>
+                <ScoreLevelBySchool levelPercentages={levelPercentages} reportDS={reportDS}/>
             </div>
         )
     }
