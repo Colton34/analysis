@@ -1,3 +1,4 @@
+// 联考报告：各学校的学科平均水平的贡献率
 import React from 'react';
 import _ from 'lodash';
 // style
@@ -37,7 +38,12 @@ function getTableRenderData(subjectInfoBySchool, headers) {
 
     return {tableHeaders, tableData};
 } 
-
+/**
+ * @param： subjectInfoBySchool: 父组件传下的对象；详情参考父组件getSubjectInfoBySchool()方法；
+ * @param:  headers: 来自reportDS；
+ * @param： seqList: 学校名组成的一个列表，决定了表格行渲染时出现的位置。其中‘total’（表示全体联考学校）放在最前。
+ * @return  originalMatrix
+ */
 function makeOriginalMatirx(subjectInfoBySchool, headers, seqList) {
     var matrix = [];
 
@@ -60,6 +66,12 @@ function getTableHeaders(headers) {
     return tableHeaders;
 }
 
+/**
+ * @param： factorMatrix;
+ * @param： seqList: 学校名组成的一个列表，决定了表格行渲染时出现的位置。其中‘total’（表示全体联考学校）放在最前。
+ * @param:  headers: 来自reportDS；
+ * @return  tableData: 对象数组;
+ */
 function getTableData(factorMatrix, seqList, headers){
     var tableData = [];
     _.forEach(factorMatrix, (fmRowData, rIndex) => {
@@ -73,6 +85,10 @@ function getTableData(factorMatrix, seqList, headers){
     return tableData;
 }
 
+/**
+ * 获取单元格样式。当单元格数据小于0时，标红；
+ * * @param:  cell: 当前单元格数据；
+ */
 function getColumnStyle(cell) {
     if (cell < 0) {
         return {color: colorsMap.B08};
