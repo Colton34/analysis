@@ -6,6 +6,7 @@ import commonClass from '../../../../styles/common.css';
 import SchoolSubjectPerformance from './SchoolSubjectPerformance';
 import SubjectContribution from './SubjectContri';
 import ScoreLevel from './ScoreLevel/index';
+import ScoreRateDiff from './ScoreRateDiff';
 
 export default function({reportDS}) {
     var headers = reportDS.headers.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examInfo = reportDS.examInfo.toJS();
@@ -19,6 +20,7 @@ export default function({reportDS}) {
             <SchoolSubjectPerformance subjectInfoBySchool={subjectInfoBySchool} headers={headers}/>
             <SubjectContribution subjectInfoBySchool={subjectInfoBySchool} headers={headers}/>
             <ScoreLevel reportDS={reportDS}/>
+            <ScoreRateDiff headers={headers}/>
         </div>
     )
 }
