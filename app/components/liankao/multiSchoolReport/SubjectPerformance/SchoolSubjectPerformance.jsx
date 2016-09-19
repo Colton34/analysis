@@ -66,7 +66,7 @@ function getTableData(subjectInfoBySchool, headers) {
                 if (index === 0) {
                     rowData[headerId] = subjectInfo ? _.round(subjectInfo.sum / subjectInfo.count, 2) : 0; 
                 } else {
-                    rowData[headerId] = subjectInfo ? _.round(subjectInfo.sum / (subjectInfo.count * subjectInfo.fullMark), 4) : 0;
+                    rowData[headerId] = subjectInfo ? _.round(subjectInfo.sum / (subjectInfo.count * subjectInfo.fullMark), 5) : 0;
                 }
             }) 
         })

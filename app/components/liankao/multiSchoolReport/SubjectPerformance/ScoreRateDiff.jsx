@@ -11,16 +11,25 @@ import ReactHighcharts from 'react-highcharts';
 
 /**
  * props:
- * headers,
+ * headers, subjectInfoBySchool
  */
 export default class ScoreRateDiff extends React.Component{
     constructor(props) {
         super(props);
         this.list = [{type: 0, value: '学科离差顺序'}, {type: 1, value: '相对离差顺序'}]
         this.state = {
-            currentType: this.list[0] 
+            currentType: this.list[0]
         }
         this.subjects = _.map(props.headers.slice(1), header => {return header.subject});
+
+        var {headers, subjectInfoBySchool} = props;
+        var {diffBySubject, relaDiffBySubject} = getDiffBySubject(subjectInfoBySchool, headers);
+        this.diffBySubject = diffBySubject;
+        this.relaDiffBySubject = relaDiffBySubject;
+        
+        var {diffSubjectOrder, relaDiffSubjectOrder} = getSubjectOrder(diffBySubject, relaDiffBySubject, headers);
+        this.diffSubjectOrder = diffSubjectOrder;
+        this.relaDiffSubjectOrder = relaDiffSubjectOrder;
     }
     onChangeType (item) {
         this.setState({
@@ -28,6 +37,8 @@ export default class ScoreRateDiff extends React.Component{
         })
     }
     render(){
+        var {currentType} = this.state;
+        var {headers} = this.props;
         var config = {
             chart: {
                 type: 'column'
@@ -90,14 +101,15 @@ export default class ScoreRateDiff extends React.Component{
                 }
             }
         };
-        config['series'] = [{name: '离差', data: _.range(config.xAxis.categories.length).map(num => {return Math.random()}), color: colorsMap.B03}]; //假数据
+        var seriesData = (currentType.type === 0 ? _.map(headers.slice(1), header => {return this.diffBySubject[header.id]}) : _.map(headers.slice(1), header => {return this.relaDiffBySubject[header.id]}));
+        config['series'] = [{name: '离差', data: seriesData, color: colorsMap.B03}];
         return (
             <div style={{ position: 'relative' }}>
                 <div style={{ margin: '30px 0 20px 0' }}>
                     <span className={commonClass['sub-title']}>学科的平均得分率差异</span>
                     <div className={commonClass['title-desc']} style={{marginTop: 20}}>
-                        从各学科的成绩表现看，每个学科的学校平均得分率最高的与最低之间的离差，从大到小的顺序是 语文、数学 、化学 、 英语、 生物 。
-                        如果联系到学科的命题难度，其相对离差从大到小的的顺序是 化学 、 英语、 生物、语文、数学 。
+                        从各学科的成绩表现看，每个学科的学校平均得分率最高的与最低之间的离差，从大到小的顺序是<span style={{color: colorsMap.B03}}>{_.join(this.diffSubjectOrder, '、')}。</span>。
+                        如果联系到学科的命题难度，其相对离差从大到小的的顺序是<span style={{color: colorsMap.B03}}>{_.join(this.relaDiffSubjectOrder, '、')}</span>。
                         离差较大的学科，反映出学校水平差距较大。离差较小的学科，反映出该学科教学效果比较整齐。（注：语文是母语，学生水平离差来得较小应是常态）
                     </div>
                 </div>
@@ -106,7 +118,47 @@ export default class ScoreRateDiff extends React.Component{
 
             </div>
         )
-    }
-    
+    }    
 }
 
+
+function getDiffBySubject(subjectInfoBySchool, headers) {
+    var diffBySubject = {};
+    var relaDiffBySubject = {};
+    _.forEach(headers.slice(1), header => {
+        var totalScoreRate = getTotalScoreRate(subjectInfoBySchool, header); 
+        var rateArr = [];
+        _.forEach(_.omit(subjectInfoBySchool, 'total'), (subjectsInfo , schoolName) => {
+            var subjectInfo = subjectsInfo[header.id];
+            var diffRate = subjectInfo ? _.round(subjectInfo.sum / (subjectInfo.count * subjectInfo.fullMark), 2) : null;
+            if (diffRate !== null) {
+                rateArr.push(diffRate)                
+            }
+        })
+        rateArr = _.sortBy(rateArr);
+        var diff = _.round(_.last(rateArr) - _.first(rateArr), 2);
+        diffBySubject[header.id] = diff;
+        relaDiffBySubject[header.id] = _.round(diff / totalScoreRate, 2);
+    })
+    return {diffBySubject, relaDiffBySubject};
+}
+
+function getTotalScoreRate(subjectInfoBySchool, header) {
+    var totalObj = subjectInfoBySchool.total[header.id];
+    return _.round(totalObj.sum / (totalObj.count * totalObj.fullMark), 2);
+}
+
+function getSubjectOrder(diffBySubject, relaDiffBySubject, headers){
+    var paperIdMap = {};
+    _.forEach(headers.slice(1), header => {paperIdMap[header.id] = header});
+
+    var diffList = _.map(diffBySubject, (diff, paperid) => {return {id: paperid, diff: diff}});
+    diffList = _.orderBy(diffList, ['diff'], ['desc']);
+    var diffSubjectOrder = _.map(diffList, item => {return paperIdMap[item.id].subject});
+
+    var relaDiffList = _.map(relaDiffBySubject, (relaDiff, paperid) => {return {id: paperid, relaDiff: relaDiff}});
+    relaDiffList = _.orderBy(relaDiffList, ['relaDiff'], ['desc']);
+    var relaDiffSubjectOrder = _.map(relaDiffList, item=> {return paperIdMap[item.id].subject});
+
+    return {diffSubjectOrder, relaDiffSubjectOrder};    
+}

@@ -20,7 +20,7 @@ export default function({reportDS}) {
             <SchoolSubjectPerformance subjectInfoBySchool={subjectInfoBySchool} headers={headers}/>
             <SubjectContribution subjectInfoBySchool={subjectInfoBySchool} headers={headers}/>
             <ScoreLevel reportDS={reportDS}/>
-            <ScoreRateDiff headers={headers}/>
+            <ScoreRateDiff subjectInfoBySchool={subjectInfoBySchool} headers={headers}/>
         </div>
     )
 }
