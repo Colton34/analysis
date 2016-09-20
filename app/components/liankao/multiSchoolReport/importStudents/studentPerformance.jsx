@@ -5,7 +5,7 @@ import Radium from 'radium';
 import TableView from '../../../../common/TableView';
 import {Table as BootTable} from 'react-bootstrap';
 import commonClass from '../../../../common/common.css';
-import {COLORS_MAP as colorsMap, A11, A12, B03, B04, B06, B07, B08, C09, C12, C05, C07} from '../../../../lib/constants';
+import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
 class StudentPerformanceTable extends React.Component {
     constructor(props) {
@@ -71,6 +71,7 @@ class StudentPerformanceTable extends React.Component {
         })
     }
     render() {
+        var {current} = this.state;
         //Props数据结构：
         var {allStudentsPaperMap,examStudentsInfo, isGood, headers} = this.props;
         var countFlag = (this.state.current.key == 'ranking') ? this.state.rankingNum : _.ceil(_.multiply(_.divide(this.state.percentageNum, 100), _.size(examStudentsInfo)));
@@ -79,16 +80,17 @@ class StudentPerformanceTable extends React.Component {
             <div style={{position: 'relative'}}>
                 {/*---------------------------------    switch按钮  ---------------------------------------------- */}
                 <div style={{position: 'absolute', top: -55, left: '50%', marginLeft: -80, width: 160, height: 30, borderRadius: 2, border: '1px solid ' + colorsMap.B03 }}>
-                {
-                    this.selectItems.map((item, index) => {
-                        return (
-                            <div key={'statisticType-' + index} style={_.assign({}, {display: 'inline-block', width: '50%', height: '100%', textAlign: 'center', lineHeight: '30px', cursor: 'pointer'}, this.state.current.key === item.key ? {backgroundColor: colorsMap.B03, color: '#fff'} : {backgroundColor: '#fff', color: colorsMap.B03})}
-                                 onClick={this.chooseItem.bind(this, item)}>
-                                {item.value}
-                            </div>
-                        )
-                    })
-                }
+                    <div style={_.assign({},{position: 'absolute', top: -1, width: 80, height: 30, zIndex: 0, borderRadius: 2, backgroundColor: colorsMap.B03, transition: 'left .2s linear'}, current.key === 'ranking' ? {left: 0} : {left: 80})}></div>
+                    {
+                        this.selectItems.map((item, index) => {
+                            return (
+                                <div key={'statisticType-' + index} style={_.assign({}, {position: 'relative', background: 'transparent', display: 'inline-block', width: '50%', height: '100%', textAlign: 'center', lineHeight: '30px', cursor: 'pointer', zIndex: 1, transition: 'color .2s linear'}, current.key === item.key ? {color: '#fff'} : {color: colorsMap.B03})}
+                                     onClick={this.chooseItem.bind(this, item)}>
+                                    {item.value}
+                                </div>
+                            )
+                        })
+                    }
                 </div>
                 {/* 名次/比例输入框  */}
                 <div style={{position: 'absolute', right: 0, top: -65 }}>
