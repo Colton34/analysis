@@ -1,3 +1,4 @@
+// 联考报告-学科基本表现-各学校平均水平；
 import React from 'react';
 import _ from 'lodash';
 // style
@@ -7,6 +8,11 @@ import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 import TableView from '../../../../common/TableView';
 import EnhanceTable from '../../../../common/EnhanceTable';
 
+/**
+ * props:
+ * subjectInfoBySchool: 父组件数据预处理后的数据结构，详见父组件说明；
+ * headers: 来自reportDS;
+ */
 export default function({subjectInfoBySchool, headers}) {
     var {tableHeaders, tableData} = getTableRenderData(subjectInfoBySchool, headers);
     return(
@@ -19,10 +25,8 @@ export default function({subjectInfoBySchool, headers}) {
         </div>
     )
 }
-/**
- * 
- * return {tableHeaders, tableData}
- */
+
+
 function getTableRenderData(subjectInfoBySchool, headers) {  
     var tableHeaders = getTableHeaders(headers);
     var tableData = getTableData(subjectInfoBySchool, headers);
@@ -74,7 +78,11 @@ function getTableData(subjectInfoBySchool, headers) {
     })
     return tableData;
 }
-
+/**
+ * 当单元格的值小于联考全体的值时标红；
+ * @params: cell: 单元格数据; rowData: 当前行数据; rowIndex: 行序号； columnIndex: 列序号；id: 当前数据所属的id值； tableData: 传入表格组件的整个tableData数据；
+ * @return: inline style对象；
+ */
 function getColumnStyle(cell, rowData, rowIndex, columnIndex, id, tableData) {
     if (rowData.school === '联考全体') return {};
     if (cell < tableData[0][id]) {
@@ -84,6 +92,11 @@ function getColumnStyle(cell, rowData, rowIndex, columnIndex, id, tableData) {
     }
 }
 
+/**
+ * 将单元格数据按照百分比显示；
+ * @param: cell: 单元格数据；rowData: 当前行数据；
+ * @return：计算后的百分比数值字符串；
+ */
 function getDataFormat(cell, rowData) {
     return _.round(cell * 100, 2) + '%';
 }
