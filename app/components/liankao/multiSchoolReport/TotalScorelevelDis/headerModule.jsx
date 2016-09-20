@@ -53,8 +53,8 @@ d.校验的结果作为form valid的输入
         //如果e.target.value==''？怎么处理？？？
         // var inputValue = parseFloat(e.target.value);
         var newFormLevelInfo = getNewChangeFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
-        // debugger;
-        var errorMsg = this.props.validation(e.target.value, newFormLevelInfo);
+        var errorMsg = this.props.validation(e.target.value, newFormLevelInfo, this.props.info.type);
+        debugger;
         this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !!errorMsg});
         this.props.setErrorMessage(errorMsg);//没有提到Form级别，通过form给errorMsg（就像通过inputGroup给每一个孩子input valid状态的思路），是因为需要判断是哪一个level出现了errorMsg（input不需要区分，两个都是同步valid的）
     }
@@ -64,7 +64,7 @@ d.校验的结果作为form valid的输入
         if (this.state.validationStarted) {
             // var inputValue = parseFloat(e.target.value);
             var newFormLevelInfo = getNewChangeFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
-            var errorMsg = this.props.validation(e.target.value, newFormLevelInfo);
+            var errorMsg = this.props.validation(e.target.value, newFormLevelInfo, this.props.info.type);
             this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !!errorMsg});
             this.props.setErrorMessage(errorMsg);//没有提到Form级别，通过form给errorMsg（就像通过inputGroup给每一个孩子input valid状态的思路），是因为需要判断是哪一个level出现了errorMsg（input不需要区分，两个都是同步valid的）
         }
@@ -188,9 +188,15 @@ class LevelForm extends React.Component {
         })
     }
 
-    validation(value, newFormLevelInfo) {
+    validation(value, newFormLevelInfo, valueType) {
+        var theValidationRules = (valueType == 'score') ? validateScoreRules : validatePercentageRules;
         var examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS(), examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), examFullMark = this.props.reportDS.examInfo.toJS().fullMark;
-        return _.every(validateRules, (validateRuleFun) => validateRuleFun({value: value, formLevelInfo: newFormLevelInfo, examStudentsInfo: examStudentsInfo, examPapersInfo: examPapersInfo, examFullMark: examFullMark}));
+        var errorMsg;
+        var isValid = _.every(theValidationRules, (validateRuleFun) => {
+            errorMsg = validateRuleFun({value: value, formLevelInfo: newFormLevelInfo, examStudentsInfo: examStudentsInfo, examPapersInfo: examPapersInfo, examFullMark: examFullMark});
+            return !(!!errorMsg);
+        });
+        return errorMsg;
     }
 
     handleSubmit() {//TODO:这里怎么获取；检查所有的bind函数是否传递了参数
@@ -300,12 +306,9 @@ function mapDispatchToProps(dispatch) {
 
 function getNewChangeFormLevelInfo(inputValue, inputInfo, oldFormLevelInfo, examStudentsInfo, examFullMark) {
     var newChangeFormLevelInfo = _.cloneDeep(oldFormLevelInfo);
-    // debugger;
     var otherInputType = (inputInfo.type == 'score') ? 'percentage' : 'score';
     var result = getOtherInputValue(otherInputType, inputValue, inputInfo.id, oldFormLevelInfo, examStudentsInfo, examFullMark);
-    // debugger
     newChangeFormLevelInfo[inputInfo.id] = result;
-    // debugger;
     return newChangeFormLevelInfo;
 }
 
@@ -322,16 +325,13 @@ function getOtherInputValue(otherInputType, inputValue, levelKey, formLevelInfo,
     }
     inputValue = parseFloat(inputValue);
     var levelLastIndex = _.size(formLevelInfo) - 1;
-    // debugger;
     if(otherInputType == 'percentage') {
-        // debugger;
         //根据score计算percentage和count。但是percentage是累积的percentage
         if(levelKey == '0') { // 【应该用不到此边界判断】 && levelKey != levelLastIndex+''
             var highLevelScore = formLevelInfo[(parseInt(levelKey)+1)+''].score;
             var count = _.filter(examStudentsInfo, (obj) => (obj.score >= inputValue) && (obj.score <= highLevelScore)).length;
             var sumCount = _.filter(examStudentsInfo, (obj) => obj.score >= inputValue).length;
             var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
-            // debugger;
             return {
                 count: count,
                 sumCount: sumCount,
@@ -452,19 +452,24 @@ function getNewCountFormLevelInfo(oldFormLevelInfo, count) {
         d.通过levels计算得到的subjectLevels要符合规则--1.首先各个档次的各个学科平均分都要有 2.其次高档次的某学科平均分要大于相应的低档次学科平均分
 */
 function validateIsNumber({value}) {
-    return !!value &&isNumber(value);}
+    var isValid = !!value &&isNumber(value);
+    return (isValid) ? '' : '只能填入数字';
+}
 
 function validateValueRange({value, examFullMark}) {
-    return (value > 0) && (value < examFullMark)
+    var isValid = (value > 0) && (value < examFullMark);
+    return (isValid) ? '' : '分数不能大于总分或小于零分';
 }
 
 function validatePercentageRange(value) {
-    return (value > 0) && (value <= 100);
+    var isValid = (value > 0) && (value <= 100);
+    return (isValid) ? '' : '百分比不能大于100或小于0';
 }
 
 function validateLevel({formLevelInfo}) {
     var levelScores = _.map(_.values(formLevelInfo), (levelObj) => levelObj.score);
-    return _.every(_.range(_.size(formLevelInfo)-1), (i) => levelScores[i+1] > levelScores[i]);
+    var isValid = _.every(_.range(_.size(formLevelInfo)-1), (i) => levelScores[i+1] > levelScores[i]);
+    return (isValid) ? '' : '分档线分值不合理（高分档线分值必须大于低分档线分值）';
 }
 
 function validateLevelBuffer({formLevelInfo, examFullMark}) {
@@ -477,23 +482,29 @@ function validateLevelBuffer({formLevelInfo, examFullMark}) {
     });
     //对levelBufferSegments进行校验
     var isValid = _.every(levelBufferSegments, (v) => (validateIsNumber(v) && validateValueRange(v, examFullMark)));
-    if(!isValid) return isValid;
-    return _.every(_.range(_.size(levelBufferSegments)-1), (i) => levelBufferSegments[i+1] > levelBufferSegments[i]);
+    // if(!isValid) return isValid;
+    if(isValid) {
+        isValid = _.every(_.range(_.size(levelBufferSegments)-1), (i) => levelBufferSegments[i+1] > levelBufferSegments[i]);
+    }
+    return (isValid) ? '' : '此分档线下的临界分档线不合理（默认临界区间是10）'
 }
 
 function validateSubjectLevel({formLevelInfo, examStudentsInfo, examPapersInfo, examFullMark}) {
     var newSubjectLevels = makeSubjectLevels(formLevelInfo, examStudentsInfo, examPapersInfo, examFullMark);
     var isValid = _.every(newSubjectLevels, (levelSubjectsObj, levelKey) => _.size(levelSubjectsObj) === _.size(examPapersInfo));
-    if(!isValid) return isValid;
+    // if(!isValid) return isValid;
     //找到每个学科的有序序列
-    var subjectLevelSegments = _.map(examPapersInfo, (obj, pid) => {
-        return _.map(newSubjectLevels, (levelSubjectsObj, levelKey) => levelSubjectsObj[pid]);
-    });
-    return _.every(subjectLevelSegments, (singleSubjectLevelSegments) => {
-        var ifValid = _.every(singleSubjectLevelSegments, (v) => (validateIsNumber(v) && validateValueRange(v, examFullMark)));
-        if(!ifValid) return ifValid;
-        return _.every(_.range(_.size(singleSubjectLevelSegments)-1), (i) => singleSubjectLevelSegments[i+1] > singleSubjectLevelSegments[i]);
-    })
+    if(isValid) {
+        var subjectLevelSegments = _.map(examPapersInfo, (obj, pid) => {
+            return _.map(newSubjectLevels, (levelSubjectsObj, levelKey) => levelSubjectsObj[pid]);
+        });
+        isValid = _.every(subjectLevelSegments, (singleSubjectLevelSegments) => {
+            var ifValid = _.every(singleSubjectLevelSegments, (v) => (validateIsNumber(v) && validateValueRange(v, examFullMark)));
+            if(!ifValid) return ifValid;
+            return _.every(_.range(_.size(singleSubjectLevelSegments)-1), (i) => singleSubjectLevelSegments[i+1] > singleSubjectLevelSegments[i]);
+        })
+    }
+    return (isValid) ? '' : '此分档线下的学科分档线不合理'
 }
 
 function getNewBaseline(newLevels, newSubjectLevels, examId, examInfo, defaultLevelBuffer) {
