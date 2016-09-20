@@ -17,9 +17,9 @@ export default function InfoCards ({headerData}) {
 
     return (
         <div style={{marginTop: 30}}>
-           <Card style={{marginRight: 20}} num={headerData.maxScore} desc={'班级总分最高分'} numStyle={{color: colorsMap.B04}}/>
-           <Card style={{marginRight: 20}} num={headerData.minScore} desc={'班级总分最低分'} numStyle={{color: colorsMap.B08}}/>
-           <Card num={headerData.avgScore} desc={'班级总分平均分'} numStyle={{color: colorsMap.B03}}/>
+           <Card style={{marginRight: 20}} num={headerData.maxScore} desc={'总分最高成绩'} numStyle={{color: colorsMap.B04}}/>
+           <Card style={{marginRight: 20}} num={headerData.minScore} desc={'总分最低成绩'} numStyle={{color: colorsMap.B08}}/>
+           <Card num={headerData.avgScore} desc={'总分平均分'} numStyle={{color: colorsMap.B03}}/>
         </div>
     )
 }

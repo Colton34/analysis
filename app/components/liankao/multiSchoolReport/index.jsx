@@ -4,20 +4,18 @@ import React, { PropTypes } from 'react';
 import Header from './Header';
 import Trender from './TotalScoreTrend';
 import TotalScoreDisModule from './TotalScorelevelDis';
-
-/*
-            <Header examInfo={reportDS.examInfo} />
-            <Trender reportDS={reportDS} />
-
- */
+import ImportStudentsModule from './importStudents';
+import SubjectPerformance from './SubjectPerformance';
 
 
 export default function MultiSchoolReport({reportDS, examId, grade}) {
     return (
         <div>
+            <Header examInfo={reportDS.examInfo} />
+            <Trender reportDS={reportDS} />
             <TotalScoreDisModule reportDS={reportDS} examId={examId} grade={grade} />
-
+            <SubjectPerformance reportDS={reportDS}/>
+            <ImportStudentsModule reportDS={reportDS}/>
         </div>
     )
 }
-
