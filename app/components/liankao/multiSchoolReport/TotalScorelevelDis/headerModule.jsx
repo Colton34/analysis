@@ -202,8 +202,10 @@ class LevelForm extends React.Component {
         var examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS(), examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), examInfo = this.props.reportDS.examInfo.toJS();
         var examFullMark = examInfo.fullMark;
         var newSubjectLevels = makeSubjectLevels(this.state.formLevelInfo, examStudentsInfo, examPapersInfo, examFullMark);
+        debugger;
         // var newLevelBuffers = _.map(_.range(_.size(this.state.formLevelInfo)), (i) => defaultLevelBuffer); TODO: 重构，在这里init new buffer，而不要到reducer那里
         var newBaseline = getNewBaseline(this.state.formLevelInfo, newSubjectLevels, this.props.examId, examInfo, defaultLevelBuffer);
+        debugger;
         var params = initParams({ 'request': window.request, examId: this.props.examId, grade: this.props.grade, baseline: newBaseline });
         debugger;
         this.props.changeLevels({ levels: this.state.formLevelInfo, subjectLevels: newSubjectLevels });
@@ -504,7 +506,7 @@ function validateSubjectLevel({formLevelInfo, examStudentsInfo, examPapersInfo, 
 function getNewBaseline(newLevels, newSubjectLevels, examId, examInfo, defaultLevelBuffer) {
     var result = {examid: examId, grade: examInfo.gradeName, '[levels]': [], '[subjectLevels]': [], '[levelBuffers]': []};
     _.each(newLevels, (levelObj, levelKey) => {
-        result['[subjectLevels]'].push({levelKey: levelKey, values: newSubjectLevels});
+        result['[subjectLevels]'].push({levelKey: levelKey, values: newSubjectLevels[levelKey]});
         result['[levels]'].push({key: levelKey, score: levelObj.score, percentage: levelObj.percentage, count: levelObj.count});
         result['[levelBuffers]'].push({key: levelKey, score: defaultLevelBuffer});
     });
