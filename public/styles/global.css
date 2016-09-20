@@ -193,8 +193,39 @@ p, div p {
     animation-name: caretListUp;
 }
 
+
+@-webkit-keyframes slideDown {
+     from {opacity:0;-webkit-transform-origin:50% 0;transform-origin:50% 0;-webkit-transform:scaleY(.8);transform:scaleY(.8)}
+     to{opacity:1;-webkit-transform-origin:50% 0;transform-origin:50% 0;-webkit-transform:scaleY(1);transform:scaleY(1)}
+}
+
+@keyframes slideDown {
+    from {opacity:0;-webkit-transform-origin:50% 0;transform-origin:50% 0;-webkit-transform:scaleY(.8);transform:scaleY(.8)}
+    to{opacity:1;-webkit-transform-origin:50% 0;transform-origin:50% 0;-webkit-transform:scaleY(1);transform:scaleY(1)}
+}
+
+.slide-down {
+    -webkit-animation-name: slideDown;
+    animation-name: slideDown; 
+}
+
+@-webkit-keyframes slideUp {
+    from {opacity:1;-webkit-transform-origin:50% 100%;transform-origin:50% 100%;-webkit-transform:scaleY(1);transform:scaleY(1)}
+    to{opacity:0;-webkit-transform-origin:50% 100%;transform-origin:50% 100%;-webkit-transform:scaleY(.8);transform:scaleY(.8)}
+}
+@keyframes slideUp {
+    from {opacity:1;-webkit-transform-origin:0 0;transform-origin:0 0;-webkit-transform:scaleY(1);transform:scaleY(1)}
+    to{opacity:0;-webkit-transform-origin:0 0;transform-origin:0 0;-webkit-transform:scaleY(.8);transform:scaleY(.8)}
+}
+.slide-up {
+    -webkit-animation-name: slideUp;
+    animation-name: slideUp;
+}
+
 .animated.caret-list-down,
-.animated.caret-list-up
+.animated.caret-list-up,
+.animated.slide-down, 
+.animated.slide-up
 {
     -webkit-animation-duration: .2s;
     animation-duration: .2s;
