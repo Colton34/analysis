@@ -11,7 +11,8 @@ import ReactHighcharts from 'react-highcharts';
 
 /**
  * props:
- * headers, subjectInfoBySchool
+ * subjectInfoBySchool: 父组件数据预处理后的数据结构，详见父组件说明；
+ * headers: 来自reportDS;
  */
 export default class ScoreRateDiff extends React.Component{
     constructor(props) {
