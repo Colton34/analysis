@@ -31,6 +31,7 @@
     font-size: 18px;
     margin: 0 10px;
 }
+
 .table-unit {
      text-align: left;
      vertical-align: middle !important;
@@ -59,10 +60,18 @@
     top: -16px;
     right: -15px;
 }
-
+/* ------------------- 错误信息图片------------------------------*/
 .blank-list {
     background-image: url(../images/noData.png);
     background-size: contain;
+    width: 159px;
+    height: 130px;
+    display: block;
+}
+.error-view {
+    background-image: url(../images/errorView.png); 
+    background-size: contain;
+    background-repeat: no-repeat;
     width: 159px;
     height: 130px;
     display: block;
@@ -112,6 +121,8 @@
     padding: 30px;
     background-color: rgba(197, 233, 248, 0.2);
 }
+
+
 
 /*----------------------Test For Input Validate-------------------------------------*/
 input {
