@@ -2,12 +2,13 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-10 20:35:32
+* @Last Modified time: 2016-09-20 10:16:03
 */
 
 'use strict';
 
 var development = {
+    "analysisServer"    : "http://fx-engine.yunxiao.com",
     "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://fx:fx123456@server4.yunxiao.com:8300/hfs-test',  //mongodb://localhost:27017/hfs-test
     'fxdb': 'mongodb://fx2:123456@ct.yunxiao.com:19000/fx2',
     "port": 3000,
@@ -23,6 +24,7 @@ var development = {
 };
 
 var test = {
+    "analysisServer"    : "http://fx-engine.yunxiao.com",
     "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://fx:fx123456@server4.yunxiao.com:8300/hfs-test',  //mongodb://localhost:27017/hfs-test
     'fxdb': 'mongodb://fx2:123456@ct.yunxiao.com:19000/fx2',
     "port": 8666,
@@ -38,6 +40,7 @@ var test = {
 };
 
 var production = {
+    "analysisServer"    : "http://fx-engine.yunxiao.com",
     "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://read:%3A_3IJon%3Cbb08@server4-ks.yunxiao.com:8300/analy4',  //mongodb://localhost:27017/hfs-test
     'fxdb': 'mongodb://hfsfenxi:%5D%237UXrz%5Bjq98@server4-ks.yunxiao.com:8300/hfsfenxi',
     "port": 8666,
