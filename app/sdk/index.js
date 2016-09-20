@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-18 17:45:17
+* @Last Modified time: 2016-09-20 17:32:30
 */
 
 'use strict';
@@ -143,7 +143,7 @@ function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, exam
     var currentLowScore, currentHighScore;
     currentLowScore = currentHighScore = _.round(levelScore);
 
-    while ((count < 25) && (currentLowScore >= 0) && (currentHighScore <= examFullMark)) {
+    while ((count < 35) && (currentLowScore >= 0) && (currentHighScore <= examFullMark)) {
         currentLowScore = currentLowScore - 1;
         currentHighScore = currentHighScore + 1;
         var currentLowStudents = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(currentLowScore));
@@ -156,6 +156,7 @@ function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, exam
         result = _.concat(result, currentTagretLowStudents, currentTargetHighStudents);
     }
 
+    // debugger;
     return makeSubjectMean(result, examPapersInfo);
 }
 

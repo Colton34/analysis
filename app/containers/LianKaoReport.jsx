@@ -13,7 +13,6 @@ import ReportNavHeader from '../common/report/NavHeader';
 // import ReportTabNav from '../components/liankaoReport/ReportTabNav';
 import MultiSchoolReport from '../components/liankao/multiSchoolReport';
 // import SingleClassReport from '../components/liankaoReport/singleClassReport';
-
 import {initReportDSAction} from '../reducers/reportDS/actions';
 
 import {initParams} from '../lib/util';

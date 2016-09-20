@@ -1,3 +1,10 @@
+//TODO: 1.当input的className是invalid的，但是没有体现
+//* 总是导致学科分档的验证过不去
+
+//是否可提交的状态
+//提交成功
+//刷新页面
+
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
@@ -7,7 +14,7 @@ import { Modal, Table as BootTable} from 'react-bootstrap';
 var {Header, Title, Body, Footer} = Modal;
 
 import {makeSubjectLevels} from '../../../../sdk';
-import {isNumber} from '../../../../lib/util';
+import {isNumber, initParams} from '../../../../lib/util';
 import {changeLevelAction, saveBaselineAction} from '../../../../reducers/reportDS/actions';
 import commonClass from '../../../../styles/common.css';
 import {DEFAULT_LEVELBUFFER as defaultLevelBuffer, NUMBER_MAP as numberMap, DEFAULT_LEVEL_RADIO_RANGE as defaultRadioRange} from '../../../../lib/constants';
@@ -27,8 +34,7 @@ d.校验的结果作为form valid的输入
         super(props);
         this.state = {
             validationStarted: false,
-            value: this.props.value,
-            isValid: true
+            value: this.props.value
         }
     }
 
@@ -50,22 +56,17 @@ d.校验的结果作为form valid的输入
         if (this.state.validationStarted) {
             this.prepareToValidate();
         }
-        //如果e.target.value==''？怎么处理？？？
-        // var inputValue = parseFloat(e.target.value);
         var newFormLevelInfo = getNewChangeFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
         var errorMsg = this.props.validation(e.target.value, newFormLevelInfo, this.props.info.type);
-        debugger;
-        this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !!errorMsg});
-        this.props.setErrorMessage(errorMsg);//没有提到Form级别，通过form给errorMsg（就像通过inputGroup给每一个孩子input valid状态的思路），是因为需要判断是哪一个level出现了errorMsg（input不需要区分，两个都是同步valid的）
+        this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !(!!errorMsg)});
+        this.props.setErrorMessage(errorMsg);
     }
 
-//验证：正在输入，光标没有离开input，但是通过鼠标直接点击submit那么会跳过handleBlur么？
     handleBlur(e) {
         if (this.state.validationStarted) {
-            // var inputValue = parseFloat(e.target.value);
             var newFormLevelInfo = getNewChangeFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
             var errorMsg = this.props.validation(e.target.value, newFormLevelInfo, this.props.info.type);
-            this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !!errorMsg});
+            this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !(!!errorMsg)});
             this.props.setErrorMessage(errorMsg);//没有提到Form级别，通过form给errorMsg（就像通过inputGroup给每一个孩子input valid状态的思路），是因为需要判断是哪一个level出现了errorMsg（input不需要区分，两个都是同步valid的）
         }
     }
@@ -104,18 +105,16 @@ class LevelInputGroup extends React.Component {
     render() {
         var formLevelInfo = this.props.formLevelInfo;
         var levelLastIndex = _.size(formLevelInfo) - 1;
-        // var currentLevel = formLevelInfo[(levelLastIndex-this.props.id)+''];
         var currentLevel = formLevelInfo[this.props.id];
 
         var examInfo = this.props.reportDS.examInfo.toJS();
         var examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS();
-        //设计：当formLevelInfo改变，走到这里（input持有setFormLevelInfo）那么，在这里调用validation--即可？否则input的valid不好设置（其实也可以，input的valid状态就是可以绑定到state.errorMsg）
         return (
             <div>
                 <div>
                     <label htmlFor={this.props.id+'-'+'input'}>{numberMap[(levelLastIndex-this.props.id)+1] + '档线'}</label>
-                    <LevelInput formLevelInfo={formLevelInfo} value={currentLevel.score} valid={!!this.state.errorMsg} info={{id: this.props.id, type: 'score'}} examStudentsInfo={examStudentsInfo} examInfo={examInfo} validation={this.props.validation} setFormLevelState={this.props.setFormLevelState} setErrorMessage={this.setErrorMessage.bind(this)} />
-                    <LevelInput formLevelInfo={formLevelInfo} value={currentLevel.percentage} valid={!!this.state.errorMsg} info={{id: this.props.id, type: 'percentage'}} examStudentsInfo={examStudentsInfo} examInfo={examInfo} validation={this.props.validation} setFormLevelState={this.props.setFormLevelState} setErrorMessage={this.setErrorMessage.bind(this)} />
+                    <LevelInput formLevelInfo={formLevelInfo} value={currentLevel.score} valid={!(!!this.state.errorMsg)} info={{id: this.props.id, type: 'score'}} examStudentsInfo={examStudentsInfo} examInfo={examInfo} validation={this.props.validation} setFormLevelState={this.props.setFormLevelState} setErrorMessage={this.setErrorMessage.bind(this)} />
+                    <LevelInput formLevelInfo={formLevelInfo} value={currentLevel.percentage} valid={!(!!this.state.errorMsg)} info={{id: this.props.id, type: 'percentage'}} examStudentsInfo={examStudentsInfo} examInfo={examInfo} validation={this.props.validation} setFormLevelState={this.props.setFormLevelState} setErrorMessage={this.setErrorMessage.bind(this)} />
                 </div>
                 {(this.state.errorMsg) ? (<div className={commonClass['validation-error']}>{this.state.errorMsg}</div>) : ''}
             </div>
@@ -199,14 +198,14 @@ class LevelForm extends React.Component {
         return errorMsg;
     }
 
-    handleSubmit() {//TODO:这里怎么获取；检查所有的bind函数是否传递了参数
-        //更新reportDS -- reducer  更新server -- action
+    handleSubmit() {
         var examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS(), examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), examInfo = this.props.reportDS.examInfo.toJS();
         var examFullMark = examInfo.fullMark;
         var newSubjectLevels = makeSubjectLevels(this.state.formLevelInfo, examStudentsInfo, examPapersInfo, examFullMark);
         // var newLevelBuffers = _.map(_.range(_.size(this.state.formLevelInfo)), (i) => defaultLevelBuffer); TODO: 重构，在这里init new buffer，而不要到reducer那里
         var newBaseline = getNewBaseline(this.state.formLevelInfo, newSubjectLevels, this.props.examId, examInfo, defaultLevelBuffer);
         var params = initParams({ 'request': window.request, examId: this.props.examId, grade: this.props.grade, baseline: newBaseline });
+        debugger;
         this.props.changeLevels({ levels: this.state.formLevelInfo, subjectLevels: newSubjectLevels });
         this.props.saveBaseline(params);
         this.props.hideModal();
@@ -223,7 +222,7 @@ class LevelForm extends React.Component {
 
         var levelLastIndex = _.size(formLevelInfo) - 1;
         return (
-            <form action={this.handleSubmit.bind(this)}>
+            <div>
                 <LevelRadioGroup levelKeys={_.keys(formLevelInfo)} changeLevelCount={this.changeLevelCount.bind(this)} examStudentsInfo={examStudentsInfo} />
                 {
                     _.map(formLevelInfo, (formLevObj, levelKey) => {
@@ -233,10 +232,10 @@ class LevelForm extends React.Component {
                     })
                 }
                 <div>
-                    <button type="submit" disabled={!formIsValid}>确认</button>
+                    <button onClick={this.handleSubmit.bind(this)} disabled={!formIsValid}>确认</button>
                     <button onClick={this.handleCancel.bind(this)}>取消</button>
                 </div>
-            </form>
+            </div>
         );
     }
 }
@@ -274,27 +273,20 @@ class HeaderModule extends React.Component {
                         </button>
                         设置分档线
                     </Header>
-                    <LevelForm reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)} />
+                    <LevelForm reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)}
+                        changeLevels={this.props.changeLevels.bind(this)} saveBaseline={this.props.saveBaseline.bind(this)} />
                 </Modal>
             </div>
         );
     }
 }
 
-// function LevelFormHeader() {
-//     return (
-//         <div style={{ marginBottom: 20 }}>
-//             考试总分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分，最低分{_.first(examStudentsInfo).score}分，将整体成绩分档为：
-//             <input  ref='levelInput' onBlur={this.adjustGrades.bind(this) } style={localStyle.dialogInput} defaultValue={_this.state.levelNum} onChange={_this.onChange.bind(_this, 'levelInput') }/>档
-//             <span style={_.assign({}, { color: A11 }, this.state.levelNumWrong ? { display: 'inline-block' } : { display: 'none' }) }>{this.state.levelNumMsg}</span>
-//         </div>
-//     )
-// }
-
-export default connect()(HeaderModule);
+export default connect(mapStateToProps, mapDispatchToProps)(HeaderModule);
 function mapStateToProps(state, ownProps) {
     return {
-        reportDS: ownProps.reportDS
+        reportDS: ownProps.reportDS,
+        examId: ownProps.examId,
+        grade: ownProps.grade
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -314,7 +306,6 @@ function getNewChangeFormLevelInfo(inputValue, inputInfo, oldFormLevelInfo, exam
 
 //TODO:在levels里添加sumCount，修改percentage为sumPercentage
 function getOtherInputValue(otherInputType, inputValue, levelKey, formLevelInfo, examStudentsInfo, examFullMark) {
-    //通过给的当前的值计算对应的input的值
     if(!isNumber(inputValue)) {
         return {
             count: 0,
@@ -414,7 +405,6 @@ function getOtherInputValue(otherInputType, inputValue, levelKey, formLevelInfo,
     }
 }
 
-//让isSubmit变为false
 function getNewCountFormLevelInfo(oldFormLevelInfo, count) {
     var newCountFormLevelInfo = {};
     var preLength = _.size(oldFormLevelInfo);
@@ -490,6 +480,7 @@ function validateLevelBuffer({formLevelInfo, examFullMark}) {
 }
 
 function validateSubjectLevel({formLevelInfo, examStudentsInfo, examPapersInfo, examFullMark}) {
+    return ''; //Mock
     var newSubjectLevels = makeSubjectLevels(formLevelInfo, examStudentsInfo, examPapersInfo, examFullMark);
     var isValid = _.every(newSubjectLevels, (levelSubjectsObj, levelKey) => _.size(levelSubjectsObj) === _.size(examPapersInfo));
     // if(!isValid) return isValid;
@@ -502,7 +493,10 @@ function validateSubjectLevel({formLevelInfo, examStudentsInfo, examPapersInfo, 
             var ifValid = _.every(singleSubjectLevelSegments, (v) => (validateIsNumber(v) && validateValueRange(v, examFullMark)));
             if(!ifValid) return ifValid;
             return _.every(_.range(_.size(singleSubjectLevelSegments)-1), (i) => singleSubjectLevelSegments[i+1] > singleSubjectLevelSegments[i]);
-        })
+        });
+        if(!isValid) {
+            debugger;
+        }
     }
     return (isValid) ? '' : '此分档线下的学科分档线不合理'
 }
