@@ -9,10 +9,14 @@ import SummaryInfoModule from './summaryInfoModule';
 Note:
 
  */
-class TotalScoreDisModule extends React.Component {
+export default class TotalScoreDisModule extends React.Component {
     constructor(props) {
         super(props);
 
+    }
+
+    componentDidMount() {
+        console.log('父亲comdid');
     }
 
     render() {

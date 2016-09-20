@@ -2,15 +2,19 @@ import _ from 'lodash';
 import React, { PropTypes } from 'react';
 
 //这里给的reportDS的levels中并没有studentsInfo而只是一个数字，所以需要在这里重新计算一下，重构的时候对这个数据结构添加targetStudents信息
-class SummaryInfoModule extends React.Component {
+export default class SummaryInfoModule extends React.Component {
     constructor(props) {
         super(props);
 
     }
 
     render() {
+        var examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS();
         var levelStudentsInfoBySchool = getLevelStudentsInfoBySchool(this.props.reportDS);
-        var allStudentBySchool = _.groupBy(this.props.examStudentsInfo.toJS(), 'school');
+        var allStudentBySchool = _.groupBy(examStudentsInfo, 'school');
+        var summaryCardInfo = getSummaryCard(levelStudentsInfoBySchool, examStudentsInfo, allStudentBySchool);
+        var summayrChartInfo = getSummaryChart(levelStudentsInfoBySchool, allStudentBySchool);
+        debugger;
         return (
             <div>待填充</div>
         );
@@ -73,13 +77,13 @@ function getLevelStudentsInfoBySchool(reportDS) {
 
 
 function getLevelStudentsInfo(levelKey, levels, examStudentsInfo, examFullMark) {
-    var currentLevelScore = levels[levelKey].score, targetStudents;
+    var currentLevelScore = levels[levelKey].score, levelLastIndex = _.size(levels)-1, targetStudents;
     if(levelKey == '0') {
         var highLevelScore = levels[(parseInt(levelKey)+1)+''].score;
         targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score <= highLevelScore));
     } else if(levelKey == levelLastIndex+'') {
         var highLevelScore = examFullMark;
-        targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score > currentLowScore) && (obj.score <= highLevelScore));
+        targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore));
     } else {
         var highLevelScore = levels[(parseInt(levelKey)+1)+''].score;
         targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore));

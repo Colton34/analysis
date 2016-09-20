@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
-* @Last Modified by:   liucong
-* @Last Modified time: 2016-08-04 15:15:47
+* @Last Modified by:   HellMagic
+* @Last Modified time: 2016-09-20 16:01:08
 */
 
 'use strict';
@@ -70,4 +70,8 @@ export function downloadTable(headSeq, headSelect, headerMapper, renderRows, exp
     var tableName = exportTableName ? "<input type='hidden' name='" + 'exportTableName' + "' value='" + exportTableName + "' />" : '';
     $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + tableName + '</form>')
         .appendTo('body').submit().remove();
+}
+
+export function isNumber(val) {
+    return /^\d+$/.test(val);
 }
