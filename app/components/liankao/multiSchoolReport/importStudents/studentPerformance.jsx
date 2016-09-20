@@ -12,12 +12,12 @@ class StudentPerformanceTable extends React.Component {
         super(props);
         this.selectItems = [{ key: 'ranking', value: '名次统计' }, { key: 'percentage', value: '比例统计' }];
         this.isValid = true;
-        this.default = 10;
+        this.default = 30;
         this.state = {
             current: this.selectItems[0], //默认按照名词排列
-            rankingNum: 10, //默认是 名词排列 的 前30名
-            percentageNum: 10,
-            inputNum: 10
+            rankingNum: 30, //默认是 名词排列 的 前30名
+            percentageNum: 30,
+            inputNum: 30
         }
     }
 
@@ -72,9 +72,9 @@ class StudentPerformanceTable extends React.Component {
     }
     render() {
         //Props数据结构：
-        var {examStudentsInfo, isGood, headers} = this.props;
+        var {allStudentsPaperMap,examStudentsInfo, isGood, headers} = this.props;
         var countFlag = (this.state.current.key == 'ranking') ? this.state.rankingNum : _.ceil(_.multiply(_.divide(this.state.percentageNum, 100), _.size(examStudentsInfo)));
-        var tableData = getTableData({examStudentsInfo,isGood,countFlag,headers});
+        var tableData = getTableDataInfo({allStudentsPaperMap,examStudentsInfo,isGood,countFlag,headers});
         return (
             <div style={{position: 'relative'}}>
                 {/*---------------------------------    switch按钮  ---------------------------------------------- */}
@@ -108,6 +108,7 @@ class StudentPerformanceTable extends React.Component {
 const StudentPerformanceModule = ({reportDS}) => {
     var examStudentsInfo = reportDS.examStudentsInfo.toJS();
     var headers = reportDS.headers.toJS();
+    var allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
     return (
     <div>
      {/*--------------------------------  优秀学生人数表格 -------------------------------------*/}
@@ -118,6 +119,7 @@ const StudentPerformanceModule = ({reportDS}) => {
         examStudentsInfo={examStudentsInfo}
         isGood={true}
         headers={headers}
+        allStudentsPaperMap={allStudentsPaperMap}
         />
      {/*--------------------------------  待提高学生人数表格 -------------------------------------*/}
     <p style={{ marginBottom: 30, marginTop: 50 }}>
@@ -127,33 +129,57 @@ const StudentPerformanceModule = ({reportDS}) => {
         examStudentsInfo={examStudentsInfo}
         isGood={false}
         headers={headers}
+        allStudentsPaperMap={allStudentsPaperMap}
         />
 </div>
     )
 }
 export default StudentPerformanceModule;
 
-function getTableData({examStudentsInfo,isGood,countFlag,headers}){
+// function getTableData({examStudentsInfo,isGood,countFlag,headers}){
+//     var tableHeader = _.map(headers,function(obj){
+//             return obj.subject;
+//          })
+//          tableHeader.unshift('学校') ;
+//
+//     var allShowStudent = isGood?_.reverse(_.takeRight(examStudentsInfo,countFlag)):_.take(examStudentsInfo,countFlag);
+//     var tableData = [];
+//     _.forEach(allShowStudent,function(student){
+//         var low = [];
+//         low.push(student.school);
+//         low.push(student.score);
+//         for (let i=1;i<headers.length;i++){
+//         var result = _.find(student.papers,function(paper){
+//             return paper.paperid==headers[i].id;
+//         }) ;
+//         low.push(_.size(result)>0?result.score:0);
+//         }
+//         tableData.push(low);
+//     });
+//
+//      tableData.unshift(tableHeader);
+//         return tableData;
+// }
+function getTableDataInfo({allStudentsPaperMap,examStudentsInfo,isGood,countFlag,headers}){
+    var schools = _.map(_.groupBy(examStudentsInfo,'school'),function(value,key){
+        return key;
+    });
+    var tableData = [];
+    _.forEach(schools,function(school){
+        var low = [];
+        low.push(school);
+        var studentsInfo = isGood?_.takeRight(examStudentsInfo,countFlag):_.take(examStudentsInfo,countFlag);
+        low.push(_.size(_.groupBy(studentsInfo,'school')[school]));
+    _.forEach(headers.slice(1),function(paper){
+        var studentsGroup = isGood?_.takeRight(allStudentsPaperMap[paper.id],countFlag):_.take(allStudentsPaperMap[paper.id],countFlag);
+            low.push(_.size(_.groupBy(studentsGroup,'school')[school]));
+    } )
+        tableData.push(low);
+    });
     var tableHeader = _.map(headers,function(obj){
             return obj.subject;
          })
          tableHeader.unshift('学校') ;
-
-    var allShowStudent = isGood?_.reverse(_.takeRight(examStudentsInfo,countFlag)):_.take(examStudentsInfo,countFlag);
-    var tableData = [];
-    _.forEach(allShowStudent,function(student){
-        var low = [];
-        low.push(student.school);
-        low.push(student.score);
-        for (let i=1;i<headers.length;i++){
-        var result = _.find(student.papers,function(paper){
-            return paper.paperid==headers[i].id;
-        }) ;
-        low.push(_.size(result)>0?result.score:0);
-        }
-        tableData.push(low);
-    });
-
-     tableData.unshift(tableHeader);
-        return tableData;
+         tableData.unshift(tableHeader);
+            return tableData;
 }
