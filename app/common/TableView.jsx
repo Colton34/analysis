@@ -1,7 +1,7 @@
 import React from 'react';
 import Table from './Table.jsx';
 import {COLORS_MAP as colorsMap} from '../lib/constants';
-
+import classNames from 'classnames';
 
 let localStyle = {
     tableShowAllBtn: { 
@@ -43,11 +43,6 @@ class TableView extends React.Component {
         this.setState({
             showAll: !this.state.showAll,
             showData: !this.state.showAll ? this.props.tableData : this.props.tableData.slice(0,reserveRows)
-        }, ()=> {
-            // if (!this.state.showAll){
-            //     var top = $(document).scrollTop();
-            //     $(document).scrollTop(top - 400);    
-            // }
         })
     }
     // 这个方法将全部数据都展示，否则下载的时候只能下载到收缩时的数据；
@@ -64,17 +59,18 @@ class TableView extends React.Component {
     render() {
         var TableComponent = this.props.TableComponent ? this.props.TableComponent : Table;
         var {style} = this.props;
+        var {showAllEnable, showAll} = this.state;
         return (
             <div style={_.assign({}, style ? style : {})}>
                 <div style={{ width: '100%'}}>
                     <TableComponent  {...this.props} tableData={this.state.showData}  onDownloadTable={this.onDownloadTable.bind(this)}/>
                 </div>
                 {
-                    this.state.showAllEnable ?
-                        (this.state.showAll ?
-                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击收缩表格数据 <i style={{color: colorsMap.B03}} className='icon-up-open-2'></i></a> :
-                            <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>点击查看更多数据 <i style={{color: colorsMap.B03}} className='icon-down-open-2'></i> </a>
-                        ) : ''
+                    showAllEnable ?
+                        <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>
+                            {showAll ? '点击收缩表格数据' : '点击查看更多数据'} 
+                            <i style={{color: colorsMap.B03}} className={classNames('animated', 'icon-down-open-2', {'caret-list-down': showAll, 'caret-list-up': !showAll})} style={{display: 'inline-block', color: colorsMap.B03}}></i>
+                        </a> : ''
                 }
             </div>
         )

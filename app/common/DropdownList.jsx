@@ -1,8 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
 import Radium from 'radium';
-import {COLORS_MAP as colorsMap} from '../lib/constants';
+import classNames from 'classnames';
 
+import {COLORS_MAP as colorsMap} from '../lib/constants';
 let localStyle = {
     hide: {
         display: 'none'
@@ -135,13 +136,14 @@ class DropdownList extends React.Component {
         this.props.onClickDropdownList && this.props.onClickDropdownList(item);
     }
     render() {
+        var {active} = this.state;
         var {surfaceBtnStyle, style} = this.props;
         var _this = this;
         return (
             <div id='dropdownList' style={_.assign({textAlign: 'center'}, style ? style : {})}>
                 <a style={_.assign({}, localStyle.btn, localStyle.surfaceBtn, surfaceBtnStyle? surfaceBtnStyle : {})} href="javascript:void(0)" onClick={this.toggleList.bind(this)}>
                     <span style={{}}>{this.state.current.value}</span>
-                    <i className='icon-down-open-3'></i>
+                    <i className={classNames('icon-down-open-3', 'animated', {'caret-list-down': active, 'caret-list-up': !active})} style={{display: 'inline-block'}}></i>
                 </a >
                 {this.props.list ? (
                     <ul style={this.state.active? localStyle.list : localStyle.hide}>
