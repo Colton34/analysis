@@ -2,8 +2,8 @@ import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {RadioGroup, Radio} from 'react-radio-group';
-var Modal = require('boron/DropModal');
+// import {RadioGroup, Radio} from 'react-radio-group';
+var Modal;
 
 
 import {makeSubjectLevels} from '../../../../sdk';
@@ -202,7 +202,7 @@ class LevelForm extends React.Component {
         newChildValidState[levelValidSate.levelKey] = levelValidSate.isValid;
         this.setState({
             formLevelInfo: newFormLevelInfo,
-            childValidState: newChildValidState;
+            childValidState: newChildValidState
         })
     }
 
@@ -295,7 +295,12 @@ Input 改变，调用【formLevelInfo】改变，所有组件的render方法会�
 class HeaderModule extends React.Component {
     constructor(props) {
         super(props);
+        this.initModal = false;
+    }
 
+    componentWillMount() {
+        // Modal = require('../../../../common/YDialog');
+        this.initModal = true;
     }
 
     // onClickChangeLevel() {
@@ -311,6 +316,8 @@ class HeaderModule extends React.Component {
         this.refs.modal.hide();
     }
 
+
+
 // keyboard={this.callback} -- 是否支持通过esc键hide modal--即handleCancel
     // callback(e) {
     //     console.log(e);
@@ -321,9 +328,13 @@ class HeaderModule extends React.Component {
             <div>
                 <span>分档分数线</span>
                 <button onClick={this.showModal.bind(this)}>设置分档</button>
-                <Modal ref="modal">
-                    <LevelForm reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)} />
-                </Modal>
+                {
+                    (this.initModal) ? (
+                            <Modal ref="modal">
+                                <LevelForm reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)} />
+                            </Modal>
+                            ) : ('')
+                }
             </div>
         );
     }
@@ -540,45 +551,45 @@ function getNewBaseline(newLevels, newSubjectLevels, examId, examInfo, defaultLe
 }
 
 
-var App = React.createClass({
-  getInitialState: function(){
-    return {value: "", price: ""};
-  },
-  handleChange: function(e){
-    this.setState({
-      value: e.target.value
-    })
-  },
-  handlePriceChange: function(e){
-    this.setState({
-      price: e.target.value
-    })
-  },
-  validate: function(state){
-    return {
-      value: state.value.indexOf('react') !== -1,
-      price: /^\$\d+\.\d+$/.test(state.price)
-    }
-  },
-  render: function(){
-    var valid = this.validate(this.state);
-    return (
-      <div>
-        <Input valid={valid.value}
-               className='foobar'
-               value={this.state.value}
-               onChange={this.handleChange}
-               placeholder="something with 'react'"/>
-        <Input valid={valid.price}
-              value={this.state.price}
-              onChange={this.handlePriceChange}
-              placeholder="$0.00" />
-      </div>
-    );
-  }
-});
+// var App = React.createClass({
+//   getInitialState: function(){
+//     return {value: "", price: ""};
+//   },
+//   handleChange: function(e){
+//     this.setState({
+//       value: e.target.value
+//     })
+//   },
+//   handlePriceChange: function(e){
+//     this.setState({
+//       price: e.target.value
+//     })
+//   },
+//   validate: function(state){
+//     return {
+//       value: state.value.indexOf('react') !== -1,
+//       price: /^\$\d+\.\d+$/.test(state.price)
+//     }
+//   },
+//   render: function(){
+//     var valid = this.validate(this.state);
+//     return (
+//       <div>
+//         <Input valid={valid.value}
+//                className='foobar'
+//                value={this.state.value}
+//                onChange={this.handleChange}
+//                placeholder="something with 'react'"/>
+//         <Input valid={valid.price}
+//               value={this.state.price}
+//               onChange={this.handlePriceChange}
+//               placeholder="$0.00" />
+//       </div>
+//     );
+//   }
+// });
 
-React.render(<App />, document.body);
+// React.render(<App />, document.body);
 
 
 
