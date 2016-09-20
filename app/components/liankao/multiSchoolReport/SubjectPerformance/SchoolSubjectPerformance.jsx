@@ -51,6 +51,7 @@ function getTableHeaders(headers) {
             subHeader.columnStyle = getColumnStyle;
             if (index === 1) {
                 subHeader.dataFormat = getDataFormat;
+                subHeader.headerStyle = {minWidth: 120};
             }
             tableHeaders[1].push(subHeader);
         })
