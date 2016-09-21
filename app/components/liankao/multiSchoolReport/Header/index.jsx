@@ -13,13 +13,13 @@ var modules = [
         id: 'totalScoreTrend'
     }, {
         name: '总分分档上线人数分布',
-        id: 'empty1'
+        id: 'scoreDistribution'
     }, {
         name: '学科分档上线情况',
         id: 'subjectLevelDistribution'
     }, {
         name: '临界生群体分析',
-        id: 'empty2'
+        id: 'criticalStudent'
     }, {
         name: '学科考试表现',
         id: 'subjectPerformance'

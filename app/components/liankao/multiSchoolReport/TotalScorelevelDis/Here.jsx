@@ -5,7 +5,6 @@ export default function TableContentModule({reportDS, allStudentBySchool, levelS
     // var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS();
     var levels = reportDS.levels.toJS(), allStudentsCount = reportDS.examStudentsInfo.toJS().length;
     var theTableDS = getTableDS(levels, allStudentsCount, levelStudentsInfoBySchool, allStudentBySchool);
-    debugger;
     return (
         <div>待填充</div>
    )
