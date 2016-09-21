@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React, { PropTypes } from 'react';
 
 import HeaderModule from './headerModule';
-import TableContentModule from './TableContentModule';
+import TableContentModule from './Here';
 import SummaryInfoModule from './summaryInfoModule';
 
 /*
@@ -20,27 +20,32 @@ export default class TotalScoreDisModule extends React.Component {
     }
 
     render() {
-        var levelStudentsInfoBySchool = getLevelStudentsInfoBySchool(this.props.reportDS);
+        var allStudentBySchool = _.groupBy(this.props.reportDS.examStudentsInfo.toJS(), 'school');
+        var {levelStudentsInfo, levelStudentsInfoBySchool} = getLevelStudentsInfoBySchool(this.props.reportDS, allStudentBySchool);
+        debugger;
         return (
             <div>
                 <HeaderModule reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} />
-                <TableContentModule reportDS={this.props.reportDS} levelStudentsInfoBySchool={levelStudentsInfoBySchool} />
-                <SummaryInfoModule reportDS={this.props.reportDS} levelStudentsInfoBySchool={levelStudentsInfoBySchool} />
+                <TableContentModule reportDS={this.props.reportDS} allStudentBySchool={allStudentBySchool} levelStudentsInfoBySchool={levelStudentsInfoBySchool} />
+                <SummaryInfoModule reportDS={this.props.reportDS} allStudentBySchool={allStudentBySchool} levelStudentsInfo={levelStudentsInfo} levelStudentsInfoBySchool={levelStudentsInfoBySchool} />
             </div>
         );
     }
 }
 
-function getLevelStudentsInfoBySchool(reportDS) {
+function getLevelStudentsInfoBySchool(reportDS, allStudentBySchool) {
     //通过每一档的count和score得到每一档所拥有的学生信息
-    var result = {}, levels = reportDS.levels.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examFullMark = reportDS.examInfo.toJS().fullMark;
+    var levelStudentsInfo = {}, levels = reportDS.levels.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examFullMark = reportDS.examInfo.toJS().fullMark;
     _.each(levels, (levelObj, levelKey) => {
         var currentLevelStudentsInfo = getLevelStudentsInfo(levelKey, levels, examStudentsInfo, examFullMark);
-        result[levelKey] = _.groupBy(currentLevelStudentsInfo, 'school'); //注意这里的key是学校名称
+        levelStudentsInfo[levelKey] = _.groupBy(currentLevelStudentsInfo, 'school'); //注意这里的key是学校名称
     })
-    return result;
+    var levelStudentsInfoBySchool = getSchoolLevelMap(levelStudentsInfo, allStudentBySchool);
+    return {
+        levelStudentsInfo: levelStudentsInfo,
+        levelStudentsInfoBySchool: levelStudentsInfoBySchool
+    }
 }
-
 
 function getLevelStudentsInfo(levelKey, levels, examStudentsInfo, examFullMark) {
     var currentLevelScore = levels[levelKey].score, levelLastIndex = _.size(levels)-1, targetStudents;
@@ -55,4 +60,22 @@ function getLevelStudentsInfo(levelKey, levels, examStudentsInfo, examFullMark) 
         targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore));
     }
     return targetStudents;
+}
+
+function getSchoolLevelMap(levelStudentsInfoBySchool, allStudentBySchool) {
+    var result = {};
+    _.each(levelStudentsInfoBySchool, (levelSchoolStudents, levelKey) => {
+        _.each(levelSchoolStudents, (students, schoolName) => {
+            if(!result[schoolName]) result[schoolName] = {};
+            result[schoolName][levelKey] = students.length;
+        })
+    });
+    _.each(result, (schoolLevelCountInfo, schoolName) => {
+        var schoolLevelCounts = _.values(schoolLevelCountInfo);
+        var schoolAllExistStudentCount = allStudentBySchool[schoolName].length;
+        var otherCount = schoolAllExistStudentCount - _.sum(schoolLevelCounts);
+        schoolLevelCountInfo.other = otherCount;
+        schoolLevelCountInfo.all = schoolAllExistStudentCount;
+    });
+    return result;
 }
