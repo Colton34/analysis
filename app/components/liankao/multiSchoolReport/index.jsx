@@ -14,9 +14,9 @@ export default function MultiSchoolReport({reportDS, examId, grade}) {
             <Header examInfo={reportDS.examInfo} />
             <Trender reportDS={reportDS} />
             <TotalScoreDisModule reportDS={reportDS} examId={examId} grade={grade} />
+            <SubjectLevelDistribution reportDS={reportDS}/>
             <SubjectPerformance reportDS={reportDS}/>
             <ImportStudentsModule reportDS={reportDS}/>
-            <SubjectLevelDistribution reportDS={reportDS}/>
         </div>
     )
 }
