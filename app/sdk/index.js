@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-20 17:32:30
+* @Last Modified time: 2016-09-21 18:43:22
 */
 
 'use strict';
@@ -176,6 +176,17 @@ function makeSubjectMean(students, examPapersInfo) {
         obj.id = pid;
 
         result[pid] = obj;
+    });
+    return result;
+}
+
+//根据当前reportDS数据来format baseline格式--不进行任何计算baseline的过程，只是format
+export function formatNewBaseline(examId, grade, levels, subjectLevels, levelBuffers) {
+    var result = {examid: examId, grade: grade, '[subjectLevels]': [], '[levelBuffers]': []};
+    result['[levels]'] = _.values(levels);
+    _.each(levels, (levObj, levelKey) => {
+        result['[subjectLevels]'].push({levelKey: levelKey, values: subjectLevels[levelKey]});
+        result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
     });
     return result;
 }

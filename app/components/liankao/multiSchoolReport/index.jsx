@@ -7,6 +7,7 @@ import TotalScoreDisModule from './TotalScorelevelDis';
 import ImportStudentsModule from './importStudents';
 import SubjectPerformance from './SubjectPerformance';
 
+import CriticalStudentModule from './CriticalStudent';
 
 export default function MultiSchoolReport({reportDS, examId, grade}) {
     return (
@@ -14,6 +15,7 @@ export default function MultiSchoolReport({reportDS, examId, grade}) {
             <Header examInfo={reportDS.examInfo} />
             <Trender reportDS={reportDS} />
             <TotalScoreDisModule reportDS={reportDS} examId={examId} grade={grade} />
+            <CriticalStudentModule reportDS={reportDS} examId={examId} grade={grade} />
             <SubjectPerformance reportDS={reportDS}/>
             <ImportStudentsModule reportDS={reportDS}/>
         </div>

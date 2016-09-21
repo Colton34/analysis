@@ -10,10 +10,8 @@ export default class SummaryInfoModule extends React.Component {
 
     render() {
         var examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS();
-        // var this.props.levelStudentsInfoBySchool = getLevelStudentsInfoBySchool(this.props.reportDS);
-        var allStudentBySchool = _.groupBy(examStudentsInfo, 'school');
-        var summaryCardInfo = getSummaryCard(this.props.levelStudentsInfoBySchool, examStudentsInfo, allStudentBySchool);
-        var summayrChartInfo = getSummaryChart(this.props.levelStudentsInfoBySchool, allStudentBySchool);
+        var summaryCardInfo = getSummaryCard(this.props.levelStudentsInfo, examStudentsInfo, this.props.allStudentBySchool);
+        var summayrChartInfo = this.props.levelStudentsInfoBySchool;
         debugger;
         return (
             <div>待填充</div>

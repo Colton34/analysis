@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-19 10:36:51
+* @Last Modified time: 2016-09-21 18:38:00
 */
 
 
@@ -277,7 +277,7 @@ export function initReportDS(params) {
         });
         headers = _.concat(headers, restPapers);
         var levels = (examBaseline && examBaseline['[levels]']) ? _.keyBy(examBaseline['[levels]'], 'key') : makeDefaultLevles(examInfo, examStudentsInfo);
-        var levelBuffers = (examBaseline && examBaseline['[levelBuffers]']) ? _.map(examBaseline['[levelBuffers]'], (obj) => obj.score) : _.map(levels, (value, key) => 5);
+        var levelBuffers = (examBaseline && examBaseline['[levelBuffers]']) ? _.map(examBaseline['[levelBuffers]'], (obj) => obj.score) : _.map(levels, (value, key) => 10);
 //设计：虽然把subjectLevels挂到state树上--其实是借用reportDS来存储，在校级报告里不直接用，而是在其他报告中直接用，校级报告中等于多算一遍。这个设计可能需要重构。
         var subjectLevels = (examBaseline && examBaseline['[subjectLevels]']) ? getSubjectLevelsFromBaseLine(examBaseline['[subjectLevels]']) : makeDefaultSubjectLevels(levels, examStudentsInfo, examPapersInfo, examInfo.fullMark);
         return Promise.resolve({
@@ -450,17 +450,20 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
         '0': {
             score: 0,
             count: 0,
-            percentage: 60
+            percentage: 60,
+            key: '0'
         },
         '1': {
             score: 0,
             count: 0,
-            percentage: 35
+            percentage: 35,
+            key: '1'
         },
         '2': {
             score: 0,
             count: 0,
-            percentage: 15
+            percentage: 15,
+            key: '2'
         }
     };
 
