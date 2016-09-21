@@ -33,15 +33,15 @@ export default class StudentCountDistribution extends React.Component {
         var {currentLevel} = this.state;
         var {tableHeadersByLevel} = this.props;
         return (
-            <div style={{marginTop: 20}}>
+            <div style={{marginTop: 30}}>
                 <div className={commonClass['sub-title']}>学科分档上线学生人数分布</div>
-                <div style={{marginTop: 10}}>
+                <div style={{margin: '10px 0 20px'}}>
                    对每个档次而言，学科提供的上线人数越多，该学科就为联考总分上线提供了更大的可能性。
                    这可以视为该学科对总分上线提供了更大的可能性，促进作用大。反 之，学科上线人数越少，该学科对总分上线提供的促进作用较小。
                     下面三个表分别显示{_.join(_.range(this.levelSize).map(num => {return numberMap[num + 1]}), '、')}档各个学科的上线人数。
                 </div>
                 {/* tab */}
-                <div className='tab-ctn'>
+                <div className='tab-ctn' style={{marginBottom: 10}}>
                     <ul>
                     {
                         _.range(this.levelSize).map((num) => {

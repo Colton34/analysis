@@ -21,7 +21,6 @@ export default class TotalScoreDisModule extends React.Component {
 
     render() {
         var levelStudentsInfoBySchool = getLevelStudentsInfoBySchool(this.props.reportDS);
-        debugger;
         return (
             <div>
                 <HeaderModule reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} />

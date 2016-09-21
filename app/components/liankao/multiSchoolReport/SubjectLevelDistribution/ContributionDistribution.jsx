@@ -33,15 +33,15 @@ export default class ContributionDis extends React.Component {
     render () {
         var {currentLevel} = this.state;
         return (
-            <div style={{marginTop: 20}}>
+            <div style={{marginTop: 30}}>
                 <div className={commonClass['sub-title']}>学科分档上线学科贡献率</div>
-                <div style={{marginTop: 10}}>
+                <div style={{margin: '10px 0 20px'}}>
                     各个学校由于各自实际的客观原因（比如有示范校与普通校之分），学生的学业层次表现有较大的差异。对各学校自身水平而言，存在学科贡献的非均衡性。 
                     我们基于学校所有学科实际综合水平的表现来考虑某学科对分档上线的贡献，并联系联考总体的对应情况进行综合分析，提炼出促进分批上线的“学科贡献率”指标。
                     一个学校的“学科贡献率”有正值或者负值。正值数值越大越好，负值的绝对值越大越不好。
                 </div>
                 {/* tab */}
-                <div className='tab-ctn'>
+                <div className='tab-ctn' style={{marginBottom: 10}}>
                     <ul>
                     {
                         _.range(this.levelSize).map((num) => {
