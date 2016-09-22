@@ -2,8 +2,10 @@ import _ from 'lodash';
 import React, { PropTypes } from 'react';
 
 import HeaderModule from './headerModule';
-import TableContentModule from './Here';
+//import TableContentModule from './Here';
 import SummaryInfoModule from './summaryInfoModule';
+import TableContentModule from './TableContentModule';
+
 
 /*
 Note:
@@ -22,7 +24,7 @@ export default class TotalScoreDisModule extends React.Component {
     render() {
         var allStudentBySchool = _.groupBy(this.props.reportDS.examStudentsInfo.toJS(), 'school');
         var {levelStudentsInfo, levelStudentsInfoBySchool} = getLevelStudentsInfoBySchool(this.props.reportDS, allStudentBySchool);
-        debugger;
+        
         return (
             <div>
                 <HeaderModule reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} />

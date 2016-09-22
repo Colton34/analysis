@@ -13,6 +13,7 @@ import {RadioGroup, Radio} from 'react-radio-group';
 import { Modal, Table as BootTable} from 'react-bootstrap';
 var {Header, Title, Body, Footer} = Modal;
 
+import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 import {makeSubjectLevels} from '../../../../sdk';
 import {isNumber, initParams} from '../../../../lib/util';
 import {changeLevelAction, saveBaselineAction} from '../../../../reducers/reportDS/actions';
@@ -74,7 +75,7 @@ d.校验的结果作为form valid的输入
     render() {
         var className = (this.props.isValid) ? 'valid' : 'invalid';
         return (
-            <div className={className}>
+            <div className={className} style={{display:'inline-block'}}>
                 <input
                   type='text'
                   placeholder={this.props.value}
@@ -82,6 +83,7 @@ d.校验的结果作为form valid的输入
                   value={this.props.value}
                   onChange={this.handleChange.bind(this)}
                   onBlur={this.handleBlur.bind(this)}
+                  style={{display:'inline-block',width: 166, height: 34,border: '1px solid #e7e7e7', borderRadius: 2, paddingLeft: 12, margin: '0 10px 0 0'}}
                 />
             </div>
         );
@@ -111,12 +113,15 @@ class LevelInputGroup extends React.Component {
         var examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS();
         return (
             <div>
-                <div>
-                    <label htmlFor={this.props.id+'-'+'input'}>{numberMap[(levelLastIndex-this.props.id)+1] + '档线'}</label>
-                    <LevelInput formLevelInfo={formLevelInfo} value={currentLevel.score} valid={!(!!this.state.errorMsg)} info={{id: this.props.id, type: 'score'}} examStudentsInfo={examStudentsInfo} examInfo={examInfo} validation={this.props.validation} setFormLevelState={this.props.setFormLevelState} setErrorMessage={this.setErrorMessage.bind(this)} />
-                    <LevelInput formLevelInfo={formLevelInfo} value={currentLevel.percentage} valid={!(!!this.state.errorMsg)} info={{id: this.props.id, type: 'percentage'}} examStudentsInfo={examStudentsInfo} examInfo={examInfo} validation={this.props.validation} setFormLevelState={this.props.setFormLevelState} setErrorMessage={this.setErrorMessage.bind(this)} />
+                <div style={{marginBottom:'30px'}}>
+                    <label  style={{display:'inline-block',marginRight:'10px'}} htmlFor={this.props.id+'-'+'input'} >{numberMap[(levelLastIndex-this.props.id)+1] + '档'}</label>
+                    <LevelInput  formLevelInfo={formLevelInfo} value={currentLevel.score} valid={!(!!this.state.errorMsg)} info={{id: this.props.id, type: 'score'}} examStudentsInfo={examStudentsInfo} examInfo={examInfo} validation={this.props.validation} setFormLevelState={this.props.setFormLevelState} setErrorMessage={this.setErrorMessage.bind(this)} />
+                    <span>分</span>
+                    <i className={'icon-link-1'} style={{ margin: '0 25px', color: colorsMap.C07 }}></i>
+                    <LevelInput  formLevelInfo={formLevelInfo} value={currentLevel.percentage} valid={!(!!this.state.errorMsg)} info={{id: this.props.id, type: 'percentage'}} examStudentsInfo={examStudentsInfo} examInfo={examInfo} validation={this.props.validation} setFormLevelState={this.props.setFormLevelState} setErrorMessage={this.setErrorMessage.bind(this)} />
+                    <span>%上线率</span>
                 </div>
-                {(this.state.errorMsg) ? (<div className={commonClass['validation-error']}>{this.state.errorMsg}</div>) : ''}
+                 {(this.state.errorMsg) ? (<div className={commonClass['validation-error']} style={{marginBottom:'10px',marginLeft:'20px'}}>{this.state.errorMsg}</div>) : ''}
             </div>
         );
     }
@@ -141,16 +146,18 @@ class LevelRadioGroup extends React.Component {
                 name="levels"
                 selectedValue={this.state.selectedValue}
                 onChange={this.handleChange.bind(this)}>
-                <span>本场最高分{_.last(this.props.examStudentsInfo).score}分。当前设置为</span>
+                <div style={{padding:'0 30px 30px 0'}}>
+                <span>本场最高分{_.last(this.props.examStudentsInfo).score}分。当前设置为</span >
                 {
                     _.map(defaultRadioRange, (levelCount) => {
                         return (
-                            <label id={levelCount}>
+                            <label  key={'label'+levelCount} id={levelCount} style={{paddingLeft:'20px'}}>
                                 <Radio value={levelCount} />{numberMap[levelCount]+'档'}
                             </label>
                         )
                     })
                 }
+            </div>
             </RadioGroup>
         );
     }
@@ -202,12 +209,12 @@ class LevelForm extends React.Component {
         var examStudentsInfo = this.props.reportDS.examStudentsInfo.toJS(), examPapersInfo = this.props.reportDS.examPapersInfo.toJS(), examInfo = this.props.reportDS.examInfo.toJS();
         var examFullMark = examInfo.fullMark;
         var newSubjectLevels = makeSubjectLevels(this.state.formLevelInfo, examStudentsInfo, examPapersInfo, examFullMark);
-        debugger;
+
         // var newLevelBuffers = _.map(_.range(_.size(this.state.formLevelInfo)), (i) => defaultLevelBuffer); TODO: 重构，在这里init new buffer，而不要到reducer那里
         var newBaseline = getNewBaseline(this.state.formLevelInfo, newSubjectLevels, this.props.examId, examInfo, defaultLevelBuffer);
-        debugger;
+
         var params = initParams({ 'request': window.request, examId: this.props.examId, grade: this.props.grade, baseline: newBaseline });
-        debugger;
+
         this.props.changeLevels({ levels: this.state.formLevelInfo, subjectLevels: newSubjectLevels });
         this.props.saveBaseline(params);
         this.props.hideModal();
@@ -224,7 +231,7 @@ class LevelForm extends React.Component {
 
         var levelLastIndex = _.size(formLevelInfo) - 1;
         return (
-            <div>
+            <div style={{padding:'30px'}}>
                 <LevelRadioGroup levelKeys={_.keys(formLevelInfo)} changeLevelCount={this.changeLevelCount.bind(this)} examStudentsInfo={examStudentsInfo} />
                 {
                     _.map(formLevelInfo, (formLevObj, levelKey) => {
@@ -233,9 +240,9 @@ class LevelForm extends React.Component {
                         )
                     })
                 }
-                <div>
-                    <button onClick={this.handleSubmit.bind(this)} disabled={!formIsValid}>确认</button>
-                    <button onClick={this.handleCancel.bind(this)}>取消</button>
+                <div style={{textAlign:'center'}}>
+                    <button onClick={this.handleSubmit.bind(this)} disabled={!formIsValid} style={{backgroundColor: '#59bde5', color: '#fff', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',padding:0,borderWidth:0,marginRight:'20px',borderRadius:'2px'}}>确认</button>
+                    <button onClick={this.handleCancel.bind(this)} style={{backgroundColor: '#f2f2f2', color: '#fff', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',padding:0,borderWidth:0,borderRadius:'2px'}}>取消</button>
                 </div>
             </div>
         );
@@ -264,10 +271,38 @@ class HeaderModule extends React.Component {
     }
 
     render() {
+        var reportDS = this.props.reportDS.toJS();
+        var examInfo = reportDS.examInfo;
+        var examStudentsInfo = reportDS.examStudentsInfo;
+        var levels = reportDS.levels;
+        var examId = this.props.examId;
+        var grade = this.props.grade;
+        var levTotal = _.size(levels);
+        
         return (
             <div>
-                <span>分档分数线</span>
-                <button onClick={this.showModal.bind(this)}>设置分档</button>
+                <div style={{position: 'relative', padding: 30, backgroundColor: colorsMap.B03, color: '#fff', marginBottom: 20,borderRadius:'2px'}}>
+                    <p style={{marginRight: 20, fontSize: 18, marginBottom: 25}}>
+                        <span style={{marginRight: 20}}>分档分数线</span>
+                        <span style={{fontSize: 12}}>分档分数线默认分为三档，分别对应学生总数的15%，35%，60%，如需修改请点击右侧按钮</span>
+                        <span onClick={this.showModal.bind(this)} style={{ cursor: 'pointer', color: colorsMap.B03, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30}}>
+                            <i className='icon-cog-2' style={{fontSize: 12}}></i>
+                            设置分档参数
+                        </span>
+
+                    </p>
+                    <p>本次考试满分{examInfo.fullMark}分，最高分{_.last(examStudentsInfo).score}分，
+                    {
+                            _.map(levels, (levObj, levelKey) => {
+                                return (
+                                    <span key={'basicInfo-level-' + levelKey}>
+                                        {numberMap[(+levelKey + 1)]} 档线 {levels[(levTotal - 1 - levelKey) + ''].score}分{levelKey == levTotal - 1 ? '' : '，'}
+                                    </span>
+                                )
+                            })
+                    }。
+                    </p>
+                </div>
                 <Modal show={ this.state.isDisplay } ref="dialog"  onHide={this.hideModal.bind(this)}>
                     <Header closeButton={false} style={{position: 'relative', textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
                         <button className={commonClass['dialog-close']} onClick={this.hideModal.bind(this)}>
@@ -497,7 +532,7 @@ function validateSubjectLevel({formLevelInfo, examStudentsInfo, examPapersInfo, 
             return _.every(_.range(_.size(singleSubjectLevelSegments)-1), (i) => singleSubjectLevelSegments[i+1] > singleSubjectLevelSegments[i]);
         });
         if(!isValid) {
-            debugger;
+
         }
     }
     return (isValid) ? '' : '此分档线下的学科分档线不合理'
@@ -581,4 +616,3 @@ function getNewBaseline(newLevels, newSubjectLevels, examId, examInfo, defaultLe
         </label>
       </RadioGroup>
 */
-

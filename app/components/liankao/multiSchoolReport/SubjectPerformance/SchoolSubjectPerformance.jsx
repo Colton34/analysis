@@ -20,10 +20,10 @@ export default function({subjectInfoBySchool, headers}) {
     )
 }
 /**
- * 
+ *
  * return {tableHeaders, tableData}
  */
-function getTableRenderData(subjectInfoBySchool, headers) {  
+function getTableRenderData(subjectInfoBySchool, headers) {
     var tableHeaders = getTableHeaders(headers);
     var tableData = getTableData(subjectInfoBySchool, headers);
     return {tableHeaders, tableData};
@@ -61,14 +61,14 @@ function getTableData(subjectInfoBySchool, headers) {
         rowData.school = schoolName !== 'total' ? schoolName : '联考全体';
         _.forEach(headers, header => {
             _.forEach(['avg', 'avgPercentage'], (subHeaderStr, index) => {
-                var headerId = subHeaderStr + '_' + header.id; 
+                var headerId = subHeaderStr + '_' + header.id;
                 var subjectInfo = schoolInfo[header.id]; // 要检查该学校是否参与了某科的考试
                 if (index === 0) {
-                    rowData[headerId] = subjectInfo ? _.round(subjectInfo.sum / subjectInfo.count, 2) : 0; 
+                    rowData[headerId] = subjectInfo ? _.round(subjectInfo.sum / subjectInfo.count, 2) : 0;
                 } else {
                     rowData[headerId] = subjectInfo ? _.round(subjectInfo.sum / (subjectInfo.count * subjectInfo.fullMark), 5) : 0;
                 }
-            }) 
+            })
         })
         tableData.push(rowData);
     })
