@@ -10,7 +10,7 @@ export default function TrendChart({chartDS, examInfo, examStudentsInfo}) {
         title: {
             text: '(人数)',
             floating: true,
-            x: -515,
+            x: -375,
             y: 5,
             style: {
                 "color": "#767676",
@@ -23,7 +23,7 @@ export default function TrendChart({chartDS, examInfo, examStudentsInfo}) {
             categories: chartDS['x-axon'],
             title:{
                 align:'high',
-                text:'分数段',
+                text:'分数',
                 margin:0,
                 offset:7
             }
@@ -50,7 +50,7 @@ export default function TrendChart({chartDS, examInfo, examStudentsInfo}) {
             },
             formatter: function () {
                 return (this.point.low > 0 ? '(' : '[') + this.point.low + '-' + this.point.high + ']区间人数<br />' + this.point.y + '人,占'
-                    + Math.round(((this.point.y / examStudentsInfo.length) * 100)) + '%';
+                    + (((this.point.y / examStudentsInfo.length) * 100)).toFixed(2) + '%';
             }
         },
         legend: {

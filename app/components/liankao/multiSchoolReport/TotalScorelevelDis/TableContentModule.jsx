@@ -22,13 +22,13 @@ export default function TableContentModule({reportDS, allStudentBySchool, levelS
                 <div style={{padding:' 30px 0'}}>
                 <span>联考全体学生
                 {
-                    (_.map(levels,(value,key) => {return numberMap[key-0+1];})).join(',')
+                    (_.map(levels,(value,key) => {return numberMap[key-0+1];})).join('、')
                 }档上线人数分别为
                 {
-                    _.reverse((_.map(levels,(level) => {return level.count+'人';}))).join(',')
+                    _.reverse((_.map(levels,(level) => {return level.count+'人';}))).join('、')
                 }，上线率分别为：
                 {
-                    _.reverse((_.map(levels,(level) => {return level.percentage+'%';}))).join(',')
+                    _.reverse((_.map(levels,(level) => {return level.percentage+'%';}))).join('、')
                 }。
                 </span>
                 </div>
@@ -86,7 +86,7 @@ function getTableHeader(levels){
         tableHeader[0].push({
             name:numberMap[index-0+1]+'档（'+levels[lastIndex-index].score+'分)',
             colSpan:3,
-            headerStyle: {textAlign: 'center'}
+            headerStyle : {textAlign: 'center'}
         })
     });
     _.forEach(_.range(_.size(levels)),function(index){
