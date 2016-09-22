@@ -66,7 +66,7 @@ export default function ImportStudentsModule({reportDS}) {
     var topStudentsInfo = getTopStudentsInfo(examStudentsInfo);
     var lowStudentsInfo = getLowStudentsInfo(examStudentsInfo);
     return (
-        <div id='importStudentsModule' className={commonClass['section']}>
+        <div id='importantStudents' className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
             <span className={commonClass['title']}>重点学生信息</span>
             <span className={commonClass['title-desc']}></span>

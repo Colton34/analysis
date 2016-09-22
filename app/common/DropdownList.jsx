@@ -1,8 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
 import Radium from 'radium';
-import {COLORS_MAP as colorsMap} from '../lib/constants';
+import classNames from 'classnames';
 
+import {COLORS_MAP as colorsMap} from '../lib/constants';
 let localStyle = {
     hide: {
         display: 'none'
@@ -102,6 +103,8 @@ class DropdownList extends React.Component {
         this.clickHandlerRef = this.handleBodyClick.bind(this);
         $('body').bind('click', this.clickHandlerRef);
 
+        this.refs.list.className += ' hide'; // 配合下拉菜单的动画，需要先把列表隐藏；
+
     }
     componentWillUnmount() {
         $('body').unbind('click', this.clickHandlerRef);
@@ -134,17 +137,24 @@ class DropdownList extends React.Component {
         }
         this.props.onClickDropdownList && this.props.onClickDropdownList(item);
     }
+    onAnimationEnd(e) {
+        // 动画只能处理透明度，最终还要加一个 display: none
+        if (e.animationName !== 'slideUp') return;
+        
+        this.refs.list.className += ' hide';
+    }
     render() {
+        var {active} = this.state;
         var {surfaceBtnStyle, style} = this.props;
         var _this = this;
         return (
             <div id='dropdownList' style={_.assign({textAlign: 'center'}, style ? style : {})}>
                 <a style={_.assign({}, localStyle.btn, localStyle.surfaceBtn, surfaceBtnStyle? surfaceBtnStyle : {})} href="javascript:void(0)" onClick={this.toggleList.bind(this)}>
                     <span style={{}}>{this.state.current.value}</span>
-                    <i className='icon-down-open-3'></i>
+                    <i className={classNames('icon-down-open-3', 'animated', {'caret-list-down': active, 'caret-list-up': !active})} style={{display: 'inline-block'}}></i>
                 </a >
                 {this.props.list ? (
-                    <ul style={this.state.active? localStyle.list : localStyle.hide}>
+                    <ul ref='list' onAnimationEnd={this.onAnimationEnd.bind(this)} style={localStyle.list} className={classNames('animated', {'slide-down': active, 'slide-up': !active})}>
                         {
                             _.map(_this.state.coveredItems, (item,index) => {
                                 var selectedStyle = item.selected ? {backgroundColor: colorsMap.C03}: {};

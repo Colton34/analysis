@@ -22,9 +22,8 @@ export default class TotalScoreDisModule extends React.Component {
     render() {
         var allStudentBySchool = _.groupBy(this.props.reportDS.examStudentsInfo.toJS(), 'school');
         var {levelStudentsInfo, levelStudentsInfoBySchool} = getLevelStudentsInfoBySchool(this.props.reportDS, allStudentBySchool);
-        debugger;
         return (
-            <div>
+            <div id='scoreDistribution'>
                 <HeaderModule reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} />
                 <TableContentModule reportDS={this.props.reportDS} allStudentBySchool={allStudentBySchool} levelStudentsInfoBySchool={levelStudentsInfoBySchool} />
                 <SummaryInfoModule reportDS={this.props.reportDS} allStudentBySchool={allStudentBySchool} levelStudentsInfo={levelStudentsInfo} levelStudentsInfoBySchool={levelStudentsInfoBySchool} />

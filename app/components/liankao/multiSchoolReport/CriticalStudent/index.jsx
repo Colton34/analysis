@@ -173,7 +173,7 @@ class CriticalStudentModule extends React.Component {
 
     render() {
         return (
-            <div>
+            <div id='criticalStudent' className={commonClass['section']}>
                 <div>
                     <span>临界生群体分析</span><button onClick={this.showModal.bind(this)}>设置临界分数线</button>
                     <Modal show={ this.state.isDisplay } ref="dialog"  onHide={this.hideModal.bind(this)}>

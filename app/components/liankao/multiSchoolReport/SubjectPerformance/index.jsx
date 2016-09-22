@@ -12,7 +12,7 @@ export default function({reportDS}) {
     var headers = reportDS.headers.toJS(), examStudentsInfo = reportDS.examStudentsInfo.toJS(), examInfo = reportDS.examInfo.toJS();
     var subjectInfoBySchool = getSubjectInfoBySchool(examStudentsInfo, headers, examInfo);
     return (
-        <div className={commonClass['section']}>
+        <div id='subjectPerformance' className={commonClass['section']}>
             <div>
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>学科考试基本表现</span>

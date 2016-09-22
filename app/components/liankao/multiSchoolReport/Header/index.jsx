@@ -9,20 +9,23 @@ import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
 var modules = [
     {
-        name: '学科平均分排名',
-        id: 'subjectMeanRank'
+        name: '总分分布',
+        id: 'totalScoreTrend'
     }, {
-        name: '班级成绩概况',
-        id: 'classScoreGuide'
+        name: '总分分档上线人数分布',
+        id: 'scoreDistribution'
     }, {
-        name: '自定义成绩等级的人数比例对比',
-        id: 'customScoreLevel'
+        name: '学科分档上线情况',
+        id: 'subjectLevelDistribution'
     }, {
-        name: '自定义分数段的人数分布',
-        id: 'customScoreSegment'
+        name: '临界生群体分析',
+        id: 'criticalStudent'
     }, {
-        name: '学科小分得分率对比',
-        id: 'subjectSmallScore'
+        name: '学科考试表现',
+        id: 'subjectPerformance'
+    }, {
+        name: '重点学生信息',
+        id: 'importantStudents'
     }
 ];
 

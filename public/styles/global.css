@@ -120,6 +120,7 @@ p, div p {
     animation-fill-mode: both;
 }
 
+
 @-webkit-keyframes fadeIn {
     from {
         opacity: 0;
@@ -141,5 +142,92 @@ p, div p {
 .fadeIn {
     -webkit-animation-name: fadeIn;
     animation-name: fadeIn;
+}
+
+/*-------------------------------------*/
+@-webkit-keyframes caretListDown {
+     from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(-180deg);
+    }
+}
+
+@keyframes caretListDown {
+     from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(-180deg);
+    }
+}
+
+
+.caret-list-down {
+    -webkit-animation-name: caretListDown;
+    animation-name: caretListDown;
+}
+
+
+@-webkit-keyframes caretListUp {
+     from {
+        transform: rotate(-180deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes caretListUp {
+     from {
+        transform: rotate(-180deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.caret-list-up {
+    -webkit-animation-name: caretListUp;
+    animation-name: caretListUp;
+}
+
+
+@-webkit-keyframes slideDown {
+     from {opacity:0;-webkit-transform-origin:50% 0;transform-origin:50% 0;-webkit-transform:scaleY(.8);transform:scaleY(.8)}
+     to{opacity:1;-webkit-transform-origin:50% 0;transform-origin:50% 0;-webkit-transform:scaleY(1);transform:scaleY(1)}
+}
+
+@keyframes slideDown {
+    from {opacity:0;-webkit-transform-origin:50% 0;transform-origin:50% 0;-webkit-transform:scaleY(.8);transform:scaleY(.8)}
+    to{opacity:1;-webkit-transform-origin:50% 0;transform-origin:50% 0;-webkit-transform:scaleY(1);transform:scaleY(1)}
+}
+
+.slide-down {
+    -webkit-animation-name: slideDown;
+    animation-name: slideDown; 
+}
+
+@-webkit-keyframes slideUp {
+    from {opacity:1;-webkit-transform-origin:50% 100%;transform-origin:50% 100%;-webkit-transform:scaleY(1);transform:scaleY(1)}
+    to{opacity:0;-webkit-transform-origin:50% 100%;transform-origin:50% 100%;-webkit-transform:scaleY(.8);transform:scaleY(.8)}
+}
+@keyframes slideUp {
+    from {opacity:1;-webkit-transform-origin:0 0;transform-origin:0 0;-webkit-transform:scaleY(1);transform:scaleY(1)}
+    to{opacity:0;-webkit-transform-origin:0 0;transform-origin:0 0;-webkit-transform:scaleY(.8);transform:scaleY(.8)}
+}
+.slide-up {
+    -webkit-animation-name: slideUp;
+    animation-name: slideUp;
+}
+
+.animated.caret-list-down,
+.animated.caret-list-up,
+.animated.slide-down, 
+.animated.slide-up
+{
+    -webkit-animation-duration: .2s;
+    animation-duration: .2s;
 }
 /*--------------------------animation end-----------------------------------------------------------*/

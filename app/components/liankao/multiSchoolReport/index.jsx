@@ -6,7 +6,7 @@ import Trender from './TotalScoreTrend';
 import TotalScoreDisModule from './TotalScorelevelDis';
 import ImportStudentsModule from './importStudents';
 import SubjectPerformance from './SubjectPerformance';
-
+import SubjectLevelDistribution from './SubjectLevelDistribution';
 import CriticalStudentModule from './CriticalStudent';
 
 export default function MultiSchoolReport({reportDS, examId, grade}) {
@@ -15,6 +15,7 @@ export default function MultiSchoolReport({reportDS, examId, grade}) {
             <Header examInfo={reportDS.examInfo} />
             <Trender reportDS={reportDS} />
             <TotalScoreDisModule reportDS={reportDS} examId={examId} grade={grade} />
+            <SubjectLevelDistribution reportDS={reportDS}/>
             <CriticalStudentModule reportDS={reportDS} examId={examId} grade={grade} />
             <SubjectPerformance reportDS={reportDS}/>
             <ImportStudentsModule reportDS={reportDS}/>

@@ -3,7 +3,6 @@ import React, { PropTypes } from 'react';
 
 export default function TableContentModule({reportDS}) {
     var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS();
-    debugger;
     return (
         <div>待填充</div>
    )
