@@ -11,11 +11,11 @@ export default  function MultiHeaderInfo({examInfo}) {
             <div id='header' style={{borderRadius: 2, backgroundColor: '#fff', padding: 30,borderBottom: '1px solid rgb(238, 238, 238)'}}>
                 <p>您好</p>
                 <p>
-                    本次考试（考试时间： {startTime}），全校{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{examInfo.realClasses.length}</span>个班级，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试。
-                    考试学科：<span style={{ color: colorsMap.B03 }}> {_.join(examInfo.subjects, '、') }</span>，{examInfo.subjects.length}个学科。
+                    本次考试（考试时间： {startTime}），全区{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{examInfo.realClasses.length}</span>所学校，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试。
+                    考试学科：<span style={{ color: colorsMap.B03 }}> {_.join(examInfo.subjects, '、') }</span>，{examInfo.subjects.length}门学科。
                 </p>
                 <p style={{ marginBottom: 0 }}>
-                    此次分析是从各班级平均分、分数段人数、分组人数及试题得分率来对比分析各班级本次考试的表现情况，请结合各班级自身情况，与相关学科老师、班主任一起分析总结，提高整体教学质量。
+                    此次分析是从总分、学科成绩、学科考试表现等多层面分析本次联考多考试表现。其中，在总分分布、学科分档分布、临界生、学科考试基本表现、重点学生信息。
                 </p>
             </div>
         </div>
