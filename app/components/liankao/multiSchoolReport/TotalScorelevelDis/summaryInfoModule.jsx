@@ -42,10 +42,11 @@ export default class SummaryInfoModule extends React.Component {
 
         let config = {
             chart: {
-                plotBackgroundColor: null,
+                plotBackgroundColor: 'rgb(251,253,254)',
                 plotBorderWidth: null,
                 plotShadow: false,
-                type: 'pie'
+                type: 'pie',
+                backgroundColor:'rgb(251,253,254)'
             },
             colors:[
              '#0099ff',
@@ -115,18 +116,18 @@ export default class SummaryInfoModule extends React.Component {
             <div  className={commonClass['section']} style={{marginTop:0}}>
                 <div className={commonClass['analysis-conclusion']} style={{marginTop:0}}>
                     <p>分析诊断：</p>
-                    <div>各校{(_.map(levels,(value,key) => {return numberMap[key-0+1];})).join(',')}
+                    <div>各校{(_.map(levels,(value,key) => {return numberMap[key-0+1];})).join('、')}
                         档上线人数分布所示，基本上反映出各个学校总分较高学生的人数分布情况。下面重点列出各档上线率最高和最低的学校：
                     </div>
                     <div style={{padding:'10px 0 0 0 ',margin:'20px 0 0 0'}}>
                         <OnlineInfo  levels={levels} summaryCardInfo={summaryCardInfo}></OnlineInfo>
-                            <div style={{ display: 'inline-block', width: 380, height:240, position: 'relative', float: 'right'}}>
-                                <ReactHighcharts config={config} style={{ display: 'inline-block', width: 380, height: 240, border: '1px solid ' + colorsMap.C04 }}></ReactHighcharts>
-                        <span style={{ position: 'absolute', right: 30, top: 30 }}>
-                            <DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } list={_this.dropListData}/>
-                        </span>
+                            <div style={{ display: 'inline-block', width: 380, height:240, position: 'relative', float: 'right',backgroundColor:'rgb(251,253,254)'}}>
+                                <ReactHighcharts config={config} style={{ display: 'inline-block', width: 380, height: 240, border: '1px solid ' + colorsMap.C04 ,backgroundColor:'rgb(251,253,254)'}}></ReactHighcharts>
+                                <span style={{ position: 'absolute', right: 30, top: 30 }}>
+                                    <DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } list={_this.dropListData}/>
+                                </span>
 
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -176,7 +177,7 @@ class OnlineInfo extends React.Component {
         var disTotal = _.size(summaryCardInfo);
         return (
             <div style={_.assign({}, { display: 'inline-block' }) }>
-                <div id='high' className='online-block' style={_.assign({}, { width: 680, minHeight: 110, border: '1px solid ' + colorsMap.C04, padding: '30px 0 0 0', marginBottom: 20 ,backgroundColor:'#fff'}, disTotal > 3 && this.state.showScroll === 'high' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
+                <div id='high' className='online-block' style={_.assign({}, { width: 680, minHeight: 110, border: '1px solid ' + colorsMap.C04, padding: '30px 0 0 0', marginBottom: 20 ,backgroundColor:'rgb(251,253,254)'}, disTotal > 3 && this.state.showScroll === 'high' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
                     onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
                     <div style={_.assign({}, { width: disTotal !== 0 ? 215 * disTotal + 95 : '100%'}) }>
                         {
@@ -195,7 +196,7 @@ class OnlineInfo extends React.Component {
                         }
                     </div>
                 </div>
-                <div id='low' className='online-block' style={_.assign({}, { width: 680, minHeight: 110, border: '1px solid ' + colorsMap.C04, padding: '30px 0 0 0', marginBottom: 20 ,backgroundColor:'#fff'}, disTotal > 3 && this.state.showScroll === 'low' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
+                <div id='low' className='online-block' style={_.assign({}, { width: 680, minHeight: 110, border: '1px solid ' + colorsMap.C04, padding: '30px 0 0 0', marginBottom: 20 ,backgroundColor:'rgb(251,253,254)'}, disTotal > 3 && this.state.showScroll === 'low' ? { overflowX: 'scroll' } : { overflowX: 'hidden' }) }
                     onMouseEnter={this.onMouseEnter.bind(this) } onMouseLeave={this.onMouseLeave.bind(this) }>
                     <div style={_.assign({}, { width: disTotal !== 0 ? 215 * disTotal + 95 : '100%'}) }>
                         {
