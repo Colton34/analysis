@@ -119,29 +119,17 @@ function getPaperSchoolLevelMap(studentsPaperMapByGroup, levels, subjectLevels) 
     _.forEach(paperSchoolLevelMap, (subjectInfo, paperid)  => {
         _.forEach(subjectInfo, (schoolStudents, schoolName) => {
             var studentsByLevel = {};
-            _.forEach(schoolStudents, studentInfo =>{
-                if(paperid === 'totalScore') {
-                    for(let i = 0; i < levelSize; i++){
-                        if (studentInfo.score >= levels[levelSize - i -1].score){
-                            if(!studentsByLevel[i]){ // 让高档次放在前
-                                studentsByLevel[i] = [];
-                            }
-                            studentsByLevel[i].push(studentInfo);
-                            break;
-                        }     
-                    }
+            var locations = []; // 记录slice时候的end值；
+            for (let i = 0; i < levelSize; i++) {
+                locations.push(_.sortedIndexBy(schoolStudents, { score: paperid === 'totalScore' ? levels[i].score : subjectLevels[i][paperid].mean}, 'score'));
+            }
+            for (let i = 0; i < levelSize; i++) {
+                if (i !== levelSize - 1) {
+                    studentsByLevel[levelSize - i - 1] = schoolStudents.slice(locations[i], locations[i + 1]);
                 } else {
-                    for(let i=0; i < levelSize; i++) {
-                        if(studentInfo.score >= subjectLevels[levelSize - i -1][paperid].mean){
-                            if(!studentsByLevel[i]) {
-                                studentsByLevel[i] = [];
-                            }
-                            studentsByLevel[i].push(studentInfo);
-                            break;
-                        }
-                    }
+                    studentsByLevel[levelSize - i - 1] = schoolStudents.slice(locations[i]);
                 }
-            })
+            }
             paperSchoolLevelMap[paperid][schoolName] = studentsByLevel;
         })
     })
