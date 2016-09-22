@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-21 18:38:00
+* @Last Modified time: 2016-09-22 12:12:22
 */
 
 
@@ -467,21 +467,11 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
         }
     };
 
-    var totalStudentCount = examInfo.realStudentsCount;
-    _.each(levels, (levObj, levelKey) => {
-
-        var flagCount = _.ceil(_.multiply(_.divide(levObj.percentage, 100), totalStudentCount));
-        var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
-
-        levObj.score = targetStudent.score;
-        var targetIndex;
-        if(levelKey == '0') {
-            targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= levObj.score);
-        } else {
-            targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > levObj.score);
-        }
-        var targetCount = examStudentsInfo.length - targetIndex;
-        levObj.count = targetCount;
+    _.each(levels, (levelObj, levelKey) => {
+        var {count, score, percentage} = getLevelsByPercentage(levels, levelKey, levelObj.percentage, examStudentsInfo, examInfo.fullMark);
+        levelObj.count = count;
+        levelObj.score = score;
+        levelObj.percentage = percentage;
     });
     return levels;
 }
@@ -547,6 +537,63 @@ function makeSubjectMean(students, examPapersInfo) {
         result[pid] = obj;
     });
     return result;
+}
+
+function getLevelsByPercentage(levels, levelKey, defalutPercentage, examStudentsInfo, examFullMark) {
+    var levelLastIndex = _.size(levels) - 1;
+    if(levelKey == '0') {//低档次
+        var flagCount = _.ceil(_.multiply(_.divide(defalutPercentage, 100), examStudentsInfo.length));
+        var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
+        var currentLevelScore = targetStudent.score;
+
+        var highFlagCount = _.ceil(_.multiply(_.divide(levels[(parseInt(levelKey)+1)+''].percentage, 100), examStudentsInfo.length));
+        var highTargetStudent = _.takeRight(examStudentsInfo, highFlagCount)[0];
+        var highLevelScore = highTargetStudent.score;
+
+        var count = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score <= highLevelScore)).length;
+        var sumCount = _.filter(examStudentsInfo, (obj) => obj.score >= currentLevelScore).length;
+        var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
+        return {
+            count: count,
+            sumCount: sumCount,
+            score: currentLevelScore,
+            percentage: sumPercentage
+        }
+    } else if(levelKey == levelLastIndex+'') {
+        var flagCount = _.ceil(_.multiply(_.divide(defalutPercentage, 100), examStudentsInfo.length));
+        var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
+        var currentLevelScore = targetStudent.score;
+
+        var highLevelScore = examFullMark;
+        var count = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore)).length;
+        var sumCount = count;
+        var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
+        return {
+            count: count,
+            sumCount: sumCount,
+            score: currentLevelScore,
+            percentage: sumPercentage
+        }
+    } else {
+        var flagCount = _.ceil(_.multiply(_.divide(defalutPercentage, 100), examStudentsInfo.length));
+        var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
+        var currentLevelScore = targetStudent.score;
+
+        var highFlagCount = _.ceil(_.multiply(_.divide(levels[(parseInt(levelKey)+1)+''].percentage, 100), examStudentsInfo.length));
+        var highTargetStudent = _.takeRight(examStudentsInfo, highFlagCount)[0];
+        var highLevelScore = highTargetStudent.score;
+
+        // var highLevelScore = levels[(parseInt(levelKey)+1)+''].score;
+        var count = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore)).length;
+        var sumCount = _.filter(examStudentsInfo, (obj) => obj.score > currentLevelScore).length;
+        var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
+        return {
+            count: count,
+            sumCount: sumCount,
+            score: currentLevelScore,
+            percentage: sumPercentage
+        }
+    }
 }
 
 
