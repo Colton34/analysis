@@ -127,7 +127,6 @@ class CriticalForm extends React.Component {
 
     handleSubmit() {
         var newBaseline = formatNewBaseline(this.props.examId, this.props.grade, this.props.reportDS.levels.toJS(), this.props.reportDS.subjectLevels.toJS(), this.state.formLevelBufferInfo);
-        debugger;
         var params = initParams({ 'request': window.request, examId: this.props.examId, grade: this.props.grade, baseline: newBaseline });
         this.props.saveBaseline(params);
         this.props.updateLevelBuffers(this.state.formLevelBufferInfo);
@@ -178,6 +177,20 @@ class CriticalForm extends React.Component {
     }
 }
 
+const Dialog = (props) => {
+    return (
+        <Modal show={ props.isDisplay } onHide={props.hideModal}>
+            <Header closeButton={false} style={{ position: 'relative', textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee' }}>
+                <button className={commonClass['dialog-close']} onClick={props.hideModal}>
+                    <i className='icon-cancel-3'></i>
+                </button>
+                设置分档线
+            </Header>
+            <CriticalForm {...props}/>
+        </Modal>
+    )
+}
+
 class CriticalStudentModule extends React.Component {
     constructor(props) {
         super(props);
@@ -218,6 +231,7 @@ class CriticalStudentModule extends React.Component {
                     <i className='icon-cog-2'></i>
                     设置临界分数
                 </a>
+                {/*
                 <div>
                     <Modal show={ this.state.isDisplay } ref="dialog"  onHide={this.hideModal.bind(this)}>
                         <Header closeButton={false} style={{position: 'relative', textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
@@ -229,8 +243,9 @@ class CriticalStudentModule extends React.Component {
                         <CriticalForm reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)} saveBaseline={this.props.saveBaseline}
                             updateLevelBuffers={this.props.updateLevelBuffers.bind(this)} />
                     </Modal>
-                </div>
-                
+                </div>*/}
+                <Dialog isDisplay={this.state.isDisplay} hideModal={this.hideModal.bind(this)} reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)} saveBaseline={this.props.saveBaseline}
+                            updateLevelBuffers={this.props.updateLevelBuffers.bind(this)}/>
                 <TableView hover tableHeaders={this.tableHeaders} tableData={this.tableData} TableComponent={EnhanceTable}/>
             </div>
         );
