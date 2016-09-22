@@ -84,14 +84,15 @@ function getTableHeader(levels){
     });
     _.forEach(_.range(_.size(levels)),function(index){
         tableHeader[0].push({
-            name:numberMap[index-0+1]+'档（'+levels[lastIndex-index].score+')',
-            colSpan:3
+            name:numberMap[index-0+1]+'档（'+levels[lastIndex-index].score+'分)',
+            colSpan:3,
+            headerStyle: {textAlign: 'center'}
         })
     });
     _.forEach(_.range(_.size(levels)),function(index){
         tableHeader[1].push({name:'人数',id:'count_'+index});
         tableHeader[1].push({name:'累计人数',id:'sumCount_'+index});
-        tableHeader[1].push({name:'累计上线率',id:'sumPercentage_'+index});
+        tableHeader[1].push({name:'累计上线率',id:'sumPercentage_'+index, dataFormat: getPercentageFormat, headerStyle: {minWidth: 115}});
     });
 
     return tableHeader;
@@ -107,7 +108,9 @@ function matchTableBodyData(theTableDS,tableHeader){
     return lowData;
 
     });
+    return tableBodyData;
+}
 
-return tableBodyData;
-
+function getPercentageFormat(cell) {
+    return cell + '%';
 }
