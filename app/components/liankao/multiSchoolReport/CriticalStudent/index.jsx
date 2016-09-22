@@ -8,9 +8,13 @@ var {Header, Title, Body, Footer} = Modal;
 
 import {isNumber, initParams} from '../../../../lib/util';
 import {formatNewBaseline} from '../../../../sdk';
+import {makeSegmentsCount} from '../../../../api/exam';
 import {updateLevelBuffersAction, saveBaselineAction} from '../../../../reducers/reportDS/actions';
 import commonClass from '../../../../styles/common.css';
 import {DEFAULT_LEVELBUFFER as defaultLevelBuffer, NUMBER_MAP as numberMap, DEFAULT_LEVEL_RADIO_RANGE as defaultRadioRange} from '../../../../lib/constants';
+
+import TableView from '../../../../common/TableView';
+import EnhanceTable from '../../../../common/EnhanceTable';
 
 var validateRules = [validateIsNumber, validateLevelBuffer];
 
@@ -103,7 +107,7 @@ class CriticalForm extends React.Component {
         })
     }
 
-//校验规则：数字；保证level高大于低；所有其他指标都是跟着levels和subjectLevels走--这是对比准则数据
+    //校验规则：数字；保证level高大于低；所有其他指标都是跟着levels和subjectLevels走--这是对比准则数据
     validation(value, newFormLevelBufferInfo) {
         var levels = this.props.reportDS.levels.toJS(), examFullMark = this.props.reportDS.examInfo.toJS().fullMark;
         var errorMsg;
@@ -157,6 +161,10 @@ class CriticalStudentModule extends React.Component {
         this.state = {
             isDisplay: false
         }
+
+        var {tableHeaders, tableData} = getTableRenderData(props.reportDS);
+        this.tableHeaders = tableHeaders;
+        this.tableData = tableData;
     }
 
     showModal() {
@@ -173,9 +181,18 @@ class CriticalStudentModule extends React.Component {
 
     render() {
         return (
-            <div id='criticalStudent' className={commonClass['section']}>
+            <div id='criticalStudent' className={commonClass['section']} style={{position: 'relative'}}>
                 <div>
-                    <span>临界生群体分析</span><button onClick={this.showModal.bind(this)}>设置临界分数线</button>
+                    <span className={commonClass['title-bar']}></span>
+                    <span className={commonClass['title']}>临界生群体分析</span>
+                    <span className={commonClass['title-desc']}>临界生群体分析，通过设置临界分数线来计算全校及各班的总分在不同分档分数线左右徘徊的人数分布。</span>
+                </div>
+                <div style={{marginTop: 10}}>
+                    <p>将临近总分各分数线上下的群体视为“临界生”，联考可以给他们多一点关注，找到他们的薄弱点、有针对性促进一下，他们就可能稳定、甚至提升总分档次。这无论是对学生个人，还是对联考整体的教学成就，都有显著的积极作用。</p>
+                    <p>系统默认临界分值为 10分，可点击右侧设置按钮进行修改。联考全体临界生群体规模，见下表：</p>
+                </div>
+                <button onClick={this.showModal.bind(this)} style={{position: 'absolute', right: 30, top: 30}}>设置临界分数线</button>
+                <div>
                     <Modal show={ this.state.isDisplay } ref="dialog"  onHide={this.hideModal.bind(this)}>
                         <Header closeButton={false} style={{position: 'relative', textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
                             <button className={commonClass['dialog-close']} onClick={this.hideModal.bind(this)}>
@@ -185,11 +202,10 @@ class CriticalStudentModule extends React.Component {
                         </Header>
                         <CriticalForm reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)} saveBaseline={this.props.saveBaseline}
                             updateLevelBuffers={this.props.updateLevelBuffers.bind(this)} />
-                        }
                     </Modal>
                 </div>
-                <p>巴拉巴拉。。。</p>
-            {/*TODO: TableView*/}
+                
+                <TableView hover tableHeaders={this.tableHeaders} tableData={this.tableData} TableComponent={EnhanceTable}/>
             </div>
         );
     }
@@ -242,3 +258,53 @@ function getNewChangeFormLevelBufferInfo(inputValue, levelKey, oldFormLevelBuffe
     newChangeFormLevelBufferInfo[parseInt(levelKey)] = result;
     return newChangeFormLevelBufferInfo;
 }
+
+function getTableRenderData(reportDS) {
+    var examStudentsInfo = reportDS.examStudentsInfo.toJS(), levels = reportDS.levels.toJS(), levelBuffers = reportDS.levelBuffers.toJS();
+    var studentsInfoBySchool = _.groupBy(examStudentsInfo, 'school');
+    var schoolNames = ['联考全体'].concat(_.keys(studentsInfoBySchool));
+    studentsInfoBySchool['联考全体'] = examStudentsInfo;
+
+    var tableHeaders = getTableHeaders(levels);
+    var tableData = getTableData(studentsInfoBySchool, levels, levelBuffers, schoolNames);
+
+    return {tableHeaders, tableData};
+}
+
+function getTableHeaders(levels) {
+    var levelSize = _.size(levels);
+    var tableHeaders = [[{id: 'school', name: '学校'}]];
+    for(let i=0; i<levelSize; i++) {
+        let header = {};
+        header.id = i;
+        header.name = numberMap[i + 1] + '档临界生人数';
+        tableHeaders[0].push(header);        
+    }
+    return tableHeaders;
+
+}
+
+function getTableData(studentsInfoBySchool, levels, levelBuffers, schoolNames) {
+    var tableData = [];
+    var levelSize = _.size(levels);
+    var segments = makeCriticalSegments(levelBuffers, levels);
+    _.forEach(schoolNames, schoolName => {
+        var rowData = {school: schoolName};
+        var segmentsCount = makeSegmentsCount(studentsInfoBySchool[schoolName], segments); //从低到高
+        _.forEach(levels, (levelInfo, levelNum) => {
+            rowData[levelNum] = segmentsCount[levelSize - levelNum -1];    
+        })
+        tableData.push(rowData);
+    })
+    return tableData;
+}
+
+function makeCriticalSegments(levelBuffers, levels) {
+    var result = [];
+    _.each(levels, (levObj, levelKey) => {
+        result.push(levObj.score-levelBuffers[levelKey-0]);
+        result.push(levObj.score+levelBuffers[levelKey-0]);
+    });
+    return result;
+}
+
