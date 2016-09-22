@@ -62,9 +62,7 @@ class TableView extends React.Component {
         var {showAllEnable, showAll} = this.state;
         return (
             <div style={_.assign({}, style ? style : {})}>
-                <div style={{ width: '100%'}}>
-                    <TableComponent  {...this.props} tableData={this.state.showData}  onDownloadTable={this.onDownloadTable.bind(this)}/>
-                </div>
+                <TableComponent  {...this.props} tableData={this.state.showData}  onDownloadTable={this.onDownloadTable.bind(this)}/>
                 {
                     showAllEnable ?
                         <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import commonClassName from './common.css';
 import _ from 'lodash';
@@ -42,10 +43,37 @@ const SortDirection = ({sortInfo, id}) => {
     )
 }
 /**
- * props:
- * tableData: 渲染表格的数据
- * tipConfig: 有些表头需要添加一个问号，鼠标悬停时弹出提示。结构是{表头名:{content: '提示内容'}}
- * colorCallback: 颜色回调函数，有时候需要根据数值调整显示的颜色
+ * - props：
+    - id： String，如果需要下载，则这个值必须设置。
+    - tableHeaders: 可能包含多个列表的列表。内含的列表单元表示一行表头。形式：
+        - id、name：表头的基本信息。如果tabledata中没有数据和某个表头相对应，则不需要id。
+        - columnSortable: Bool, 表示某一列是否能够排序，针对该列。该列有id值才可以排序。默认false。
+        - columnStyle: Object或者Function，返回单元格的样式（Object），作用在该列的td上。
+            - 如果是Function，传入参数是： cell（单元格数据）, rowData（行数据）, rowIndex（行次序）, columnIndex（列次序）, id（当前数据的id）, tableData(全部表格数据)。
+            - 注意：cell有可能是对象（当存在overlayData时),此时数值数据应该存在‘value’属性中；
+        - headerStyle:Object或者Function, 作用在具体的th上；
+        - dataFormat: Function, 传入参数是 cell（单元格数据）, rowData（表格整体数据）。
+            - 注意：cell有可能是对象（当存在overlayData时）,此时数值数据应该从‘value’属性中读取。
+        - tipContent：String, 非undefined则表示要显示tip
+        - rowSpan
+        - colSpan
+    - tableData：对象列表，形式如： [{id1: data1, id2: data2 ...}, {id1: data1, id2: data2...}, ...], 每个对象表示表格中的一行, 此处的id对应tableHeaders中的id。
+            - 每个属性下除了数值，还可以添加 overLayData:{”title”:, ‘content’:’’}，使鼠标移过该数据时显示悬浮窗。数据组织方式：相应的数值放在value属性里。例如：{a: 1, b: {value: 2, overLayData: {title: '学生名单’, content: ‘王二小，李思， 张三'} }}
+            - 可以指定某个td的colSpan\rowSpan， 此时格式为 {id值: {value: , colSpan\rowSpan: }}
+
+    - bordered（默认有边框）、striped(表格行背景颜色交替的效果)、hover；
+    - headerStyle , Object（作用在表头的tr元素上）
+    - options
+        - defaultSortId: 默认排序的表头id
+        - defaultSortOrder： 默认排序的表头的排序顺序，若没有指定，默认是’asc’。
+        - canDownload: Bool,是否可以下载表格，若是，则表格右上角会显示下载按钮；
+        - downLoadBtnStyle: Object, 下载按钮的具体样式.
+        - fileName: String，下载文件的名字，不带后缀名。默认叫“tableExport”；
+        - worksheetName: excel工作表的名字， 默认为xlsWorksheetName；
+        - overlayProps:  {placement: ‘’, trigger: ''}
+            - placement: 可以选 'top','right', 'bottom',’left’， 默认是’right'
+            - trigger：默认是’hover’ + ‘focus’（两者得并存，否则会会有警报），还可以选择’click’表示点击后触发popover；
+    - tableSortable ： Bool， 针对全部表头，是否能排序。如果表头配置里没有id，则不能排序。
  */
 class Table extends React.Component {
     constructor(props){
