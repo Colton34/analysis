@@ -148,7 +148,7 @@ input.invalid, input.invalid:focus {
 }
 
 .validation-error {
-  color: red;
-  margin: 5px 0;
+  color: #ee6b52;
+  margin: 10px 160px;
   display: inline-block;
 }
