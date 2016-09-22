@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-18 10:53:23
+* @Last Modified time: 2016-09-22 19:26:23
 */
 
 'use strict';
@@ -146,8 +146,7 @@ function ifAtLeastGradeManager(auth, gradeAuth, exam) {
 
 //TODO:联考权限
 function getLianKaoReportAuth(auth, gradeAuth, exam) {
-    //是？？？？
-    return true;
+    return exam.from == '20' && !!auth.isSchoolManager;
 }
 
 function ifAtLeastGroupManager(auth, gradeAuth, exam) {

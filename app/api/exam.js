@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-22 12:12:22
+* @Last Modified time: 2016-09-22 19:22:08
 */
 
 
@@ -63,6 +63,7 @@ export function initDashboardData(params) {
     var url = (params.grade) ? examPath + '/dashboard?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/dashboard?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
+        debugger;
         return Promise.resolve(res.data);
     });
 }
