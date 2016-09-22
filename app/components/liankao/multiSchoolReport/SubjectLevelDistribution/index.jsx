@@ -11,6 +11,7 @@ export default function ({reportDS}) {
     var allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), headers = reportDS.headers.toJS(), levels = reportDS.levels.toJS(), subjectLevels=reportDS.subjectLevels.toJS(), examStudentsInfo=reportDS.examStudentsInfo.toJS();
     var tableHeadersByLevel = getTableHeadersByLevel(headers, levels, subjectLevels);
     var studentsPaperMapByGroup = getStudentsPaperMapByGroup(examStudentsInfo, allStudentsPaperMap);
+    var paperSchoolLevelMap = getPaperSchoolLevelMap(studentsPaperMapByGroup, levels, subjectLevels);
     return (
         <div id='subjectLevelDistribution' className={commonClass['section']}>
             <div>
@@ -18,8 +19,8 @@ export default function ({reportDS}) {
                 <span className={commonClass['title']}>学科分档上线情况</span>
                 <span className={commonClass['title-desc']}>运用大数据算法将总分的分档分数精确的分解到各学科中，得出各学科的分档分数线及分档上线人数分布，可反映出联考学生在各学科的上线情况。</span>
             </div>
-            <StudentCountDistribution reportDS={reportDS} tableHeadersByLevel={tableHeadersByLevel} studentsPaperMapByGroup={studentsPaperMapByGroup}/>
-            <ContributionDistribution reportDS={reportDS } tableHeadersByLevel={tableHeadersByLevel} studentsPaperMapByGroup ={studentsPaperMapByGroup}/>
+            <StudentCountDistribution reportDS={reportDS} tableHeadersByLevel={tableHeadersByLevel}  paperSchoolLevelMap={paperSchoolLevelMap}/>
+            <ContributionDistribution reportDS={reportDS } tableHeadersByLevel={tableHeadersByLevel} studentsPaperMapByGroup ={studentsPaperMapByGroup} paperSchoolLevelMap={paperSchoolLevelMap}/>
         </div>
     )
 }
@@ -75,4 +76,74 @@ function getStudentsPaperMapByGroup(examStudentsInfo, allStudentsPaperMap) {
         allStudentsPaperMap[paperid]['联考全体'] = studentList;
     })
     return allStudentsPaperMap;
+}
+
+
+/**
+ * @param: studentsPaperMapByGroup: 由父组件传递的结构；
+ * @return:
+ * {
+ *      totalScore: {
+ *          '联考全体': {
+ *              0: [], //第一档（高分档）的学生列表；
+ *              1: [],
+ *              ...
+ *           }
+ *          'xx学校'：{
+ *              0: [], //第一档（高分档）的学生列表；
+ *              1: [],
+ *              ...
+ *           }
+ *          ...
+ *      },
+ *      paperid1: {
+ *          '联考全体': {
+ *              0: [], //第一档（高分档）的学生列表；
+ *              1: [],
+ *              ...
+ *           }
+ *          'xx学校'：{
+ *              0: [], //第一档（高分档）的学生列表；
+ *              1: [],
+ *              ...
+ *           }
+ *          ...
+ *      },
+ *      ...
+ * }
+ */
+function getPaperSchoolLevelMap(studentsPaperMapByGroup, levels, subjectLevels) {
+    var paperSchoolLevelMap = _.cloneDeep(studentsPaperMapByGroup); 
+
+    var levelSize = _.size(levels);
+    _.forEach(paperSchoolLevelMap, (subjectInfo, paperid)  => {
+        _.forEach(subjectInfo, (schoolStudents, schoolName) => {
+            var studentsByLevel = {};
+            _.forEach(schoolStudents, studentInfo =>{
+                if(paperid === 'totalScore') {
+                    for(let i = 0; i < levelSize; i++){
+                        if (studentInfo.score >= levels[levelSize - i -1].score){
+                            if(!studentsByLevel[i]){ // 让高档次放在前
+                                studentsByLevel[i] = [];
+                            }
+                            studentsByLevel[i].push(studentInfo);
+                            break;
+                        }     
+                    }
+                } else {
+                    for(let i=0; i < levelSize; i++) {
+                        if(studentInfo.score >= subjectLevels[levelSize - i -1][paperid].mean){
+                            if(!studentsByLevel[i]) {
+                                studentsByLevel[i] = [];
+                            }
+                            studentsByLevel[i].push(studentInfo);
+                            break;
+                        }
+                    }
+                }
+            })
+            paperSchoolLevelMap[paperid][schoolName] = studentsByLevel;
+        })
+    })
+    return paperSchoolLevelMap;
 }

@@ -17,12 +17,12 @@ export default class ContributionDis extends React.Component {
             currentLevel : 0
         }
         
-        var {studentsPaperMapByGroup, reportDS, tableHeadersByLevel} = this.props;
+        var {reportDS, studentsPaperMapByGroup, tableHeadersByLevel, paperSchoolLevelMap} = this.props;
         var headers = reportDS.headers.toJS(),levels = reportDS.levels.toJS(), subjectLevels=reportDS.subjectLevels.toJS(), headers=reportDS.headers.toJS();
 
         this.levelSize = _.size(levels);
         this.tableHeadersByLevel = getTableHeadersByLevel(tableHeadersByLevel);
-        this.tableDataByLevel = getTableDataByLevel(studentsPaperMapByGroup, headers, levels, subjectLevels)
+        this.tableDataByLevel = getTableDataByLevel(studentsPaperMapByGroup, paperSchoolLevelMap, headers, levels, subjectLevels)
     }
 
     switchTab(levelNum) {
@@ -77,12 +77,9 @@ function getTableHeadersByLevel(tableHeadersByLevel) {
 /**
  * 
  */
-function getTableDataByLevel(studentsPaperMapByGroup, headers, levels, subjectLevels) {
+function getTableDataByLevel(studentsPaperMapByGroup, paperSchoolLevelMap, headers, levels, subjectLevels) {
     var schoolNames = ['联考全体'].concat(_.keys(_.omit(studentsPaperMapByGroup.totalScore, '联考全体')));//为了让’联考全体‘放在第一位
     var tableDataByLevel = {};
-
-    var clone = _.cloneDeep(studentsPaperMapByGroup);
-    var paperSchoolLevelMap = getPaperSchoolLevelMap(clone, levels, subjectLevels);
 
     var oriMatrixByLevel = getOriginalMatrixByLevel(paperSchoolLevelMap, studentsPaperMapByGroup, headers, schoolNames, _.size(levels));
     var factorMatrixByLevel = getFactorMatrixByLevel(oriMatrixByLevel);

@@ -15,13 +15,13 @@ export default class StudentCountDistribution extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentLevel : 0 // 表示第一档；
+            currentLevel : 0 // 表示高分档；
         }
-        var {reportDS, studentsPaperMapByGroup} = props;
+        var {reportDS, paperSchoolLevelMap} = props;
         var allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS(), headers = reportDS.headers.toJS(), levels = reportDS.levels.toJS(), subjectLevels=reportDS.subjectLevels.toJS(), examStudentsInfo=reportDS.examStudentsInfo.toJS();
         this.levelSize = _.size(levels);
         this.examPapersInfo = reportDS.examPapersInfo.toJS();
-        this.tableDataByLevel = getTableDataByLevel(studentsPaperMapByGroup,headers, levels, subjectLevels);
+        this.tableDataByLevel = getTableDataByLevel(paperSchoolLevelMap, headers, levels, subjectLevels);
         this.summaryInfo = getSummaryInfo(this.tableDataByLevel);
     }
     switchTab(levelNum) {
@@ -81,11 +81,11 @@ export default class StudentCountDistribution extends React.Component {
 }
 
 /**
- * @params: studentsPaperMapByGroup来自父组件，其余来自reportDS;
+ * @params: paperSchoolLevelMap来自父组件，其余来自reportDS;
  * @return: Object, 其中：key为分档档次，value为相应的tableData。 注意： 0为一档，1为二挡，以此类推。
  */
-function getTableDataByLevel(studentsPaperMapByGroup, headers, levels, subjectLevels) {
-    var schoolNames = ['联考全体'].concat(_.keys(_.omit(studentsPaperMapByGroup.totalScore, '联考全体'))); //为了让’联考全体‘放在第一位
+function getTableDataByLevel(paperSchoolLevelMap, headers, levels, subjectLevels) {
+    var schoolNames = ['联考全体'].concat(_.keys(_.omit(paperSchoolLevelMap.totalScore, '联考全体'))); //为了让’联考全体‘放在第一位
 
     var tableDataByLevel = {};
     var levelSize = _.size(levels);
@@ -95,15 +95,8 @@ function getTableDataByLevel(studentsPaperMapByGroup, headers, levels, subjectLe
         _.forEach(schoolNames, schoolName => {
             var rowData = {school: schoolName};
             _.forEach(headers, headerInfo => {
-                if (headerInfo.id === 'totalScore') {
-                    var levelScore = levels[levelSize - levelNum -1].score;
-                    var qualifiedStudents = _.filter(studentsPaperMapByGroup['totalScore'][schoolName], studentInfo => {return studentInfo.score >= levelScore});
-                } else {
-                    var subjectLevelScore = subjectLevels[levelSize - levelNum -1][headerInfo.id].mean;
-                    var schoolStudents = studentsPaperMapByGroup[headerInfo.id][schoolName];
-                    var qualifiedStudents = schoolStudents ?  _.filter(schoolStudents, studentInfo => {return studentInfo.score >= subjectLevelScore}) : []; //考虑学校没参加某科目考试的情况
-                }
-                rowData[headerInfo.id]  = qualifiedStudents.length; 
+                var schoolLevelStudents = paperSchoolLevelMap[headerInfo.id][schoolName];
+                rowData[headerInfo.id]  = schoolLevelStudents ? schoolLevelStudents[levelNum].length : 0;
             })
             tableData.push(rowData);
         })
