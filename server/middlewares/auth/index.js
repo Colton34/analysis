@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-26 10:03:12
+* @Last Modified time: 2016-09-22 21:09:46
 */
 
 'use strict';
@@ -65,12 +65,28 @@ exports.authenticate = function(req, res, next) {
     }).then(function(auth) {
         var authInfo = getUserAuthInfo(auth);
         req.user.auth = authInfo;
+        return getSchoolById(req.user.schoolId)
+    }).then(function(school) {
+        var isLianKaoSchool = _.includes(school.name, '联考');
+
+console.log('isLianKaoSchool = ', isLianKaoSchool, '  isSchoolManager = ', req.user.auth.isSchoolManager);
+
+        req.user.auth.isLianKaoManager = (isLianKaoSchool) && (req.user.auth.isSchoolManager);
         var token = jsonwebtoken.sign({ user: req.user }, config.secret);
         req.user.token = token;
         next();
     }).catch(function(err) {
         next(err);
     })
+}
+
+function getSchoolById(schoolId) {
+    return when.promise(function(resolve, reject) {
+        peterHFS.get('@School.'+schoolId, function(err, school) {
+            if(err || !school) return reject(new errors.data.MongoDBError('find school:'+schoolId+' error', err));
+            resolve(school);
+        });
+    });
 }
 
 /**

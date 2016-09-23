@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-17 14:04:53
+* @Last Modified time: 2016-09-23 09:09:07
 */
 'use strict';
 var _ = require('lodash');
@@ -53,6 +53,9 @@ exports.getExamsBySchool = function(school) {
  */
 //TODO: 其实如果这里只是获取exam的相关信息，那么直接走DB就可以，没必要通过服务获取。
 exports.generateExamInfo = function(examid, gradeName, schoolid) {
+
+console.log('schoolid = ', schoolid);
+
     var data = {};
     //fetchExamById
     return getExamById(examid).then(function(exam) {
