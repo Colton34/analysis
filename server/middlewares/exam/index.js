@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 10:55:01
+* @Last Modified time: 2016-09-26 11:43:14
 */
 
 'use strict';
@@ -49,33 +49,6 @@ exports.home = function(req, res, next) {
         next(err);
     });
 }
-
-// exports.home = function(req, res, next) {
-//     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
-//         req.school = school;
-//         return examUitls.getExamsBySchool(school);
-//     }).then(function(originalExams) {
-//         req.originalExams = originalExams;
-//         return getCustomExams(req.user.id);
-//     }).then(function(customExams) {
-//         try {
-//             var validExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
-//             var formatedExams = formatExams(validExams);
-//             return when.resolve(formatedExams);
-//         } catch(e) {
-//             return when.reject(new errors.Error('格式化exams错误', e));
-//         }
-//     }).then(function(formatedExams) {
-//         formatedExams = filterExamsByAuth(formatedExams, req.user.auth, req.user.id, req.school);
-//         var errorInfo = {};
-//         if(req.originalExams.length == 0) errorInfo.msg = '此学校没有考试';
-//         if(req.originalExams.length > 0 && formatedExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
-
-//         res.status(200).json({examList: formatedExams, errorInfo: errorInfo});
-//     }).catch(function(err) {
-//         next(err);
-//     })
-// }
 
 /**
  * 对获取exam API的参数进行校验：examid 和 grade。只是做了参数的校验--因为比较common且独立所以抽取出来作为单独的middleware。
@@ -141,24 +114,14 @@ exports.dashboard = function(req, res, next) {
         var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
         var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
         var ifShowSubjectReport = (authSubjects.length > 0);
-console.log('---------');
 
         try {
-            console.log('0');
-
-console.log('========  length ================= ', exam['[papers]'].length);
             var examInfoGuideResult = examInfoGuide(exam, realClasses, examScoreArr.length);
-            console.log('1');
             var scoreRankResult = scoreRank(examScoreArr);
-            console.log('2');
             var liankaoReportResult = (ifShowLiankaoReport) ? liankaoReport(exam, examScoreArr) : null;
-            console.log('3');
             var schoolReportResult = (!ifShowLiankaoReport && ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
-            console.log('4');
             var classReportResult = (!ifShowLiankaoReport && ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
-            console.log('5');
             var subjectReportResult = (!ifShowLiankaoReport && ifShowSubjectReport) ? authSubjects : null; //TODO：补充联考权限。联考学科报告有，只不过名字不一样而已吧。。。
-            console.log('6');
             res.status(200).json({
                 examInfoGuide: examInfoGuideResult,
                 scoreRank: scoreRankResult,
@@ -174,46 +137,6 @@ console.log('========  length ================= ', exam['[papers]'].length);
         next(err);
     })
 }
-
-//  exports.dashboard = function(req, res, next) {
-//     var exam = req.exam,
-//         examScoreMap = req.classScoreMap,
-//         examScoreArr = req.orderedScoresArr;
-
-//     var auth = req.user.auth;
-//     var gradeAuth = auth.gradeAuth;
-
-//     var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
-//     var authClasses = getAuthClasses(auth, exam.grade.name, exam);
-
-//     examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
-//     examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
-
-//     var ifShowLiankaoReport = getLianKaoReportAuth(auth, gradeAuth, exam);
-//     var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
-//     var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
-//     var ifShowSubjectReport = (authSubjects.length > 0);
-//     try {
-//         var examInfoGuideResult = examInfoGuide(exam);
-//         var scoreRankResult = scoreRank(examScoreArr);
-//         var liankaoReportResult = (ifShowLiankaoReport) ? liankaoReport(exam, examScoreArr) : null;
-//         var schoolReportResult = (!ifShowLiankaoReport && ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
-//         var classReportResult = (!ifShowLiankaoReport && ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
-//         var subjectReportResult = (!ifShowLiankaoReport && ifShowSubjectReport) ? authSubjects : null; //TODO：补充联考权限。联考学科报告有，只不过名字不一样而已吧。。。
-//         // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
-//         res.status(200).json({
-//             examInfoGuide: examInfoGuideResult,
-//             scoreRank: scoreRankResult,
-//             liankaoReport: liankaoReportResult,
-//             schoolReport: schoolReportResult,
-//             classReport: classReportResult,
-//             subjectReport: subjectReportResult
-//             // levelScoreReport: levelScoreReportResult,
-//         });
-//     } catch (e) {
-//         next(new errors.Error('format dashboard error : ', e));
-//     }
-// }
 
 function getAuthSubjectsInfo(auth, exam, examScoreArr) {
     var result = [], subjectMeanRates = [], gradeKey = exam.grade.name;
@@ -287,7 +210,6 @@ exports.customDashboard = function(req, res, next) {
             var customSchoolReportResult = customExamSchoolReport(exam);
             var customClassReportResult = customClassReport(exam);
             var customSubjectReportResult = customSubjectReport(exam);
-            // var customLevelScoreReportResult = customLevelScoreReport(exam);
 
             res.status(200).json({
                 examInfoGuide: customExamInfoGuideResult,
@@ -295,7 +217,6 @@ exports.customDashboard = function(req, res, next) {
                 schoolReport: customSchoolReportResult,
                 classReport: customClassReportResult,
                 subjectReport: customSubjectReportResult
-                // levelScoreReport: customLevelScoreReportResult,
             })
         } catch(e) {
             next(new errors.Error('format custom dashboard error: ', e));
@@ -358,6 +279,102 @@ exports.rankReport = function(req, res, next) {
     }).catch(function(err) {
         next(err);
     })
+}
+
+function getExamWithGradePapers(examid, gradeName) {
+    var examName;
+    return examUitls.getExamById(examid).then(function(exam) {
+        examName = exam.name;
+        var validPapers = _.filter(exam['[papers]'], (paper) => paper.grade == gradeName);
+        var paperIds = _.map(validPapers, (paperObj) => paperObj.paper);
+        var paperPromises = _.map(paperIds, (pObjId) => examUitls.getPaperById(pObjId));
+        return when.all(paperPromises);
+    }).then(function(papers) {
+        return {
+            papers: papers,
+            examName: examName
+        }
+    });
+}
+
+function getOriginalRankCache(papers) {
+    var perStudentPerPaperArr = _.concat(..._.map(papers, (paper) => {
+        var scoreMatrix = paper.matrix;
+        return _.map(paper['[students]'], (student, index) => {
+            var paperScore = _.sum(scoreMatrix[index]);
+            return _.assign({score: paperScore, paper: paper._id, pid: paper.id }, student);
+        });
+    }));
+    var paperStudentMap = _.groupBy(perStudentPerPaperArr, 'id');
+    var perStudentTotalScoreArr = _.map(paperStudentMap, (studentPapersArr, studentId) => {
+        var totalScore = _.sum(_.map(studentPapersArr, (s) => s.score));
+        var studentBaseInfo = _.pick(studentPapersArr[0], ['id', 'kaohao', 'name', 'class', 'school', 'xuehao']);
+        return _.assign({score: totalScore, paper: 'totalScore', id: 'totalScore'}, studentBaseInfo);
+    });
+
+    var studentScoresArr = _.concat(perStudentPerPaperArr, perStudentTotalScoreArr);
+    var studentScoresPaperMap = _.groupBy(studentScoresArr, 'paper');
+    var rankCache = {};
+    _.each(studentScoresPaperMap, (studentsScoreItemArr, paperId) => {
+        rankCache[paperId] = _.groupBy(studentsScoreItemArr, 'class');
+    });
+    return rankCache;
+}
+
+function filterAuthRankCache(auth, rankCache, papers, grade) {
+    var authRankCache = {}, allPaperIds = _.keys(rankCache), authClasses = [];
+    //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
+    if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
+        var gradeAuthObj = auth.gradeAuth[grade];
+        //Note: 过滤有效科目
+        _.each(gradeAuthObj.subjectManagers, (obj) => {
+            var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
+            if(targetAuthPaper) {
+                authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
+            }
+        });
+        //Note: 过滤有效科目下的有效班级。
+        _.each(gradeAuthObj.groupManagers, (obj) => {
+            _.each(allPaperIds, (paperId) => {
+                if(paperId == 'totalScore') return;
+                //要么是上面学科组长已经把当前学科所需要的所有classes已经添加进来了，要么是个空数组--之前还没有遇到某一学科
+                var authExistClasses = (authRankCache[paperId]) ? _.keys(authRankCache[paperId]) : [];
+                authClasses = _.union(authClasses, authExistClasses);
+                //Note: 如果当前authExistClasses还没有添加此班级的数据，并且此班级是有效的（即在原来的数据中能找到），则添加对应的班级数据到authRankCache中
+                if(!_.includes(authExistClasses, obj.group) && (_.includes(_.keys(rankCache[paperId]), obj.group))) {
+                    if(!authRankCache[paperId]) authRankCache[paperId] = {};
+                    // if(!authRankCache.totalScore) authRankCache.totalScore = {};
+                    authRankCache[paperId][obj.group] = rankCache[paperId][obj.group];
+                    authClasses = _.union(authClasses, [obj.group]);
+                    // authRankCache.totalScore[obj.group] = rankCache.totalScore[obj.group];
+                }
+            });
+        });
+        //Note: 因为auth中已经做了冗余的排查，所以如果这里有subjectTeachers那么就一定是前面所没有包含的
+
+        //Test Case: 一个教初二2，4两个班级的语文老师，查看一个只考了生物一门学科的考试--能看到dashboard中排行榜总分，进入排行榜详情中能看到对应班级的总分
+        //5班的班主任，此考试只有4班考试的生物
+        _.each(gradeAuthObj.subjectTeachers, (obj) => {
+            var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
+            authClasses = _.union(authClasses, [obj.group]);//Note: 无论是不是当前所考试科目的任课考试，他都能看到所对应班级的总分--authClasses是为了totalScore的数据结构
+            if(targetAuthPaper) {
+                if(!authRankCache[targetAuthPaper._id]) authRankCache[targetAuthPaper._id] = {};
+                authRankCache[targetAuthPaper._id][obj.group] = rankCache[targetAuthPaper._id][obj.group];
+            }
+        });
+    } else {
+        authRankCache = rankCache;
+    }
+
+    if(!authRankCache.totalScore) {
+        //Note: 如果没有totalScore，则添加进来，但是也有走过滤班级
+        // authClasses = _.uniq(authClasses); -- Note: 没必要，因为前面使用的union
+        authRankCache.totalScore = {};
+        _.each(authClasses, (className) => {
+            authRankCache.totalScore[className] = rankCache.totalScore[className];
+        })
+    }
+    return authRankCache;
 }
 
 /**
@@ -483,29 +500,48 @@ exports.customRankReport = function(req, res, next) {
             }
         }
  */
+
 exports.schoolAnalysis = function(req, res, next) {
-    var exam = req.exam,
-        examScoreMap = req.classScoreMap,
-        examScoreArr = req.orderedScoresArr;
-    try {
-        req.examInfo = formatExamInfo(exam);
-        req.examPapersInfo = generateExamPapersInfo(exam);
-        req.examClassesInfo = genearteExamClassInfo(exam);
-    } catch (e) {
-        next(new errors.Error('schoolAnalysis 同步错误', e));
-    }
-    generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo, req.examPapersInfo).then(function(examStudentsInfo) { //这里需要多传递一个参数 req.examPapersInfo
+    examUitls.generateExamReportInfo(req.exam).then(function(result) {
+        var {examStudentsInfo, examPapersInfo, examClassesInfo} = result;
+        req.exam.realClasses = _.keys(_.groupBy(examStudentsInfo, 'class'));
+        req.exam.realStudentsCount = examStudentsInfo.length;
         res.status(200).json({
-            examInfo: req.examInfo,
-            examPapersInfo: req.examPapersInfo,
-            examClassesInfo: req.examClassesInfo,
+            examInfo: req.exam,
             examStudentsInfo: examStudentsInfo,
+            examPapersInfo: examPapersInfo,
+            examClassesInfo: examClassesInfo,
             examBaseline: req.exam.baseline
-        });
+        })
     }).catch(function(err) {
         next(new errors.Error('schoolAnalysis Error', err));
-    });
+    })
 }
+
+
+// exports.schoolAnalysis = function(req, res, next) {
+//     var exam = req.exam,
+//         examScoreMap = req.classScoreMap,
+//         examScoreArr = req.orderedScoresArr;
+//     try {
+//         req.examInfo = formatExamInfo(exam);
+//         req.examPapersInfo = generateExamPapersInfo(exam);
+//         req.examClassesInfo = genearteExamClassInfo(exam);
+//     } catch (e) {
+//         next(new errors.Error('schoolAnalysis 同步错误', e));
+//     }
+//     generateExamStudentsInfo(exam, examScoreArr, req.examClassesInfo, req.examPapersInfo).then(function(examStudentsInfo) { //这里需要多传递一个参数 req.examPapersInfo
+//         res.status(200).json({
+//             examInfo: req.examInfo,
+//             examPapersInfo: req.examPapersInfo,
+//             examClassesInfo: req.examClassesInfo,
+//             examStudentsInfo: examStudentsInfo,
+//             examBaseline: req.exam.baseline
+//         });
+//     }).catch(function(err) {
+//         next(new errors.Error('schoolAnalysis Error', err));
+//     });
+// }
 
 /**
  * 自定义分析校级报告详情API：
@@ -1245,137 +1281,8 @@ function customSubjectReport(exam) {
     return result;
 }
 
-/**
- * 根据examid获取到一个exam。并保证此exam种所有的papers来自同一个grade。
- * @param  {[type]} examid    目标exam的id
- * @param  {[type]} gradeName  过滤条件grade value
- * @return {[type]}           {papers: <所查找的exam下的，并且同属于一个年级的，并且是paper对象>, examName: <exam name>}
- */
-function getExamWithGradePapers(examid, gradeName) {
-    var targetExam;
-    return when.promise(function(resolve, reject) {
-        peterHFS.get('@Exam.'+examid, function(err, exam) {
-            if(err) return reject(new errors.data.MongoDBError('[getExamWithGradePapers] Error ', err));
-            targetExam = exam;
-            resolve(_.filter(exam['[papers]'], (paper) => paper.grade == gradeName));
-        });
-    }).then(function(validPapers) {
-        var paperIds = _.map(validPapers, (paperObj) => paperObj.paper);
-        var paperPromises = _.map(paperIds, (pObjId) => {
-            return when.promise(function(resolve, reject) {
-                peterHFS.get(pObjId, function(err, paper) {
-                    if(err) return reject(new errors.data.MongoDBError('find paper error: ', err));
-                    resolve(paper);
-                });
-            });
-        });
-        return when.all(paperPromises);
-    }).then(function(papers) {
-        return {
-            papers: papers,
-            examName: targetExam.name
-        }
-    })
-}
 
-/**
- * 获取普通全量的rankCache
- * @param  {[type]} papers [description]
- * @return {[type]}       rankCache--以每一个paper.ObjectId为key，value是一个Object--以每个班级className为key，value是某科目，某班级的学生分数数据数组
- */
-function getOriginalRankCache(papers) {
-    var perStudentPerPaperArr = _.concat(..._.map(papers, (paper) => {
-        var scoreMatrix = paper.matrix;
-        return _.map(paper['[students]'], (student, index) => {
-            var paperScore = _.sum(scoreMatrix[index]);
-            return _.assign({score: paperScore, paper: paper._id, pid: paper.id }, student);
-        });
-    }));
-    var paperStudentMap = _.groupBy(perStudentPerPaperArr, 'id');
-    var perStudentTotalScoreArr = _.map(paperStudentMap, (studentPapersArr, studentId) => {
-        var totalScore = _.sum(_.map(studentPapersArr, (s) => s.score));
-        var studentBaseInfo = _.pick(studentPapersArr[0], ['id', 'kaohao', 'name', 'class', 'school', 'xuehao']);
-        return _.assign({score: totalScore, paper: 'totalScore', id: 'totalScore'}, studentBaseInfo);
-    });
 
-    var studentScoresArr = _.concat(perStudentPerPaperArr, perStudentTotalScoreArr);
-    var studentScoresPaperMap = _.groupBy(studentScoresArr, 'paper');
-    var rankCache = {};
-    _.each(studentScoresPaperMap, (studentsScoreItemArr, paperId) => {
-        rankCache[paperId] = _.groupBy(studentsScoreItemArr, 'class');
-    });
-    return rankCache;
-}
-
-/**
- * 根据rankCache获取匹配此用户权限的对应数据
- * @param  {[type]} auth      [description]
- * @param  {[type]} rankCache [description]
- * @return {[type]}           [description]
- */
-//Test Case: 2、4班的语文老师，2班的班主任；语文科目下有2、4班；其他科目下面只有2班
-function filterAuthRankCache(auth, rankCache, papers, grade) {
-    var authRankCache = {}, allPaperIds = _.keys(rankCache), authClasses = [];
-    //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
-    if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
-        var gradeAuthObj = auth.gradeAuth[grade];
-        //Note: 过滤有效科目
-        _.each(gradeAuthObj.subjectManagers, (obj) => {
-            var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
-            if(targetAuthPaper) {
-                authRankCache[targetAuthPaper.id] = rankCache[targetAuthPaper.id];
-            }
-        });
-        //Note: 过滤有效科目下的有效班级。
-        _.each(gradeAuthObj.groupManagers, (obj) => {
-            _.each(allPaperIds, (paperId) => {
-                if(paperId == 'totalScore') return;
-                //要么是上面学科组长已经把当前学科所需要的所有classes已经添加进来了，要么是个空数组--之前还没有遇到某一学科
-                var authExistClasses = (authRankCache[paperId]) ? _.keys(authRankCache[paperId]) : [];
-                authClasses = _.union(authClasses, authExistClasses);
-                //Note: 如果当前authExistClasses还没有添加此班级的数据，并且此班级是有效的（即在原来的数据中能找到），则添加对应的班级数据到authRankCache中
-                if(!_.includes(authExistClasses, obj.group) && (_.includes(_.keys(rankCache[paperId]), obj.group))) {
-                    if(!authRankCache[paperId]) authRankCache[paperId] = {};
-                    // if(!authRankCache.totalScore) authRankCache.totalScore = {};
-                    authRankCache[paperId][obj.group] = rankCache[paperId][obj.group];
-                    authClasses = _.union(authClasses, [obj.group]);
-                    // authRankCache.totalScore[obj.group] = rankCache.totalScore[obj.group];
-                }
-            });
-        });
-        //Note: 因为auth中已经做了冗余的排查，所以如果这里有subjectTeachers那么就一定是前面所没有包含的
-
-        //Test Case: 一个教初二2，4两个班级的语文老师，查看一个只考了生物一门学科的考试--能看到dashboard中排行榜总分，进入排行榜详情中能看到对应班级的总分
-        //5班的班主任，此考试只有4班考试的生物
-        _.each(gradeAuthObj.subjectTeachers, (obj) => {
-            var targetAuthPaper = _.find(papers, (paperObj) => paperObj.subject == obj.subject);
-            authClasses = _.union(authClasses, [obj.group]);//Note: 无论是不是当前所考试科目的任课考试，他都能看到所对应班级的总分--authClasses是为了totalScore的数据结构
-            if(targetAuthPaper) {
-                if(!authRankCache[targetAuthPaper._id]) authRankCache[targetAuthPaper._id] = {};
-                authRankCache[targetAuthPaper._id][obj.group] = rankCache[targetAuthPaper._id][obj.group];
-            }
-        });
-    } else {
-        authRankCache = rankCache;
-    }
-
-    if(!authRankCache.totalScore) {
-        //Note: 如果没有totalScore，则添加进来，但是也有走过滤班级
-        // authClasses = _.uniq(authClasses); -- Note: 没必要，因为前面使用的union
-        authRankCache.totalScore = {};
-        _.each(authClasses, (className) => {
-            authRankCache.totalScore[className] = rankCache.totalScore[className];
-        })
-    }
-    return authRankCache;
-}
-
-/**
- * 根据authRankCache组织examInfo的信息
- * @param  {[type]} authRankCache [description]
- * @param  {[type]} examName      [description]
- * @return {[type]}               {name: xxx, papers: xxx, classes: xxx}
- */
 function getAuthExamInfo(authRankCache, examName, papers) {
     var authPaperIds = _.keys(authRankCache);
     var examPapers = [];
@@ -1385,16 +1292,6 @@ function getAuthExamInfo(authRankCache, examName, papers) {
         examPapers.push({paper: targetPaper._id, pid: targetPaper.id, name: targetPaper.subject});
     });
     var examClasses = _.keys(authRankCache.totalScore);
-    // var tempAuthObjs = [], examClasses = [];
-    // _.each(authRankCache, (obj, pid) => {
-    //     if(pid != 'totalScore') {
-    //         tempAuthObjs.push(_.keys(obj));
-    //     }
-    // })
-    // _.each(tempAuthObjs, (authArr) => {
-    //     examClasses = _.concat(examClasses, authArr);
-    // })
-    // examClasses = _.uniq(examClasses);
     return {
         name: examName,
         papers: examPapers,

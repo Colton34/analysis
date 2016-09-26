@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-09-23 09:54:29
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 09:47:44
+* @Last Modified time: 2016-09-26 11:25:48
 */
 
 'use strict';
@@ -190,6 +190,7 @@ function fetchExamScoresById(examId) {
 exports.generateExamReportInfo = function(exam) {//**TODO:需要排序！！！
     return getPaperInstancesByExam(exam).then(function(papers) {
         var {examPapersInfo, examStudentsInfo} = generatePaperStudentsInfo(papers);
+        examStudentsInfo = _.sortBy(_.values(examStudentsInfo), 'score');
         var examClassesInfo = generateExamClassesInfo(paperStudentsInfo);//TODO: Warning--这里本意是获取班级的【基本信息】，但是这又依赖于school.grade.class，所以这里【暂时】使用参考信息。
         return when.resolve({
             examStudentsInfo: examStudentsInfo,
