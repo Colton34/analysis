@@ -38,10 +38,12 @@ const GlobalGuideCom = ({data}) => {
                     <span>考试学生数</span>
                     <span style={localStyle.borderBox}></span>
                 </div>
+{/*
                 <div style={localStyle.inlineBox}>
                     <span style={_.assign({}, localStyle.numStyle, {color: '#f4664b'})}>{data.lostStudentsCount}</span>
                     <span>缺考学生数</span>
                 </div>
+*/}
             </div>
         </div>
     )

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-23 09:09:07
+* @Last Modified time: 2016-09-26 10:34:34
 */
 'use strict';
 var _ = require('lodash');
@@ -14,29 +14,146 @@ var errors = require('common-errors');
 
 var peterHFS = require('peter').getManager('hfs');
 var peterFX = require('peter').getManager('fx');
+
+
+var getExamById = exports.getExamById = function(examid, fromType) {
+    var url = config.analysisServer + '/exam?id=' + examid;
+
+    return when.promise(function(resolve, reject) {
+        client.get(url, {}, function(err, res, body) {
+            if (err) return reject(new errors.URIError('查询analysis server(getExamById) Error: ', err));
+            var data = JSON.parse(body);
+            if(data.error) return reject(new errors.Error('查询analysis server(getExamById)失败, examid = ' + examid));
+            data.fetchId = examid;
+            if(fromType) data.from = fromType;
+            resolve(data);
+        });
+    })
+}
+
+exports.getExamsBySchoolId = function(schoolId) {
+    var url = config.analysisServer + '/school?id=' + schoolId;
+
+    return when.promise(function(resolve, reject) {
+        client.get(url, {}, function(err, res, body) {
+            if (err) return reject(new errors.URIError('查询analysis server(getExamsBySchool) Error: ', err));
+            var data = JSON.parse(body);
+            if(data.error) reject(new errors.URIError('查询analysis server(getExamsBySchool)失败, schoolId = ', schoolId));
+            resolve(data);
+        });
+    }).then(function(data) {
+        //Note:去掉40的是为了去掉1.7旧的创建的自定义分析，不适合新的分析系统，所以走了自己一个新的分析。后面会统一使用analysis server进行save(custom analysis)
+        var examPromises = _.map(_.filter(data["[exams]"], (item) => (item.from != 40)), (obj) => getExamById(obj.exam, obj.from));
+        return when.all(examPromises);
+    });
+}
+
+exports.generateDashboardInfo = function(exam) {//这里依然没有对auth进行判断
+    //走total paper好了--这样就绕开了
+    var getPapersTotalInfoPromises = _.map(exam['[papers]'], (obj) => getPaperTotalInfo(obj.paper));
+    return when.all(getPapersTotalInfoPromises).then(function(papers) {
+        return when.resolve(generateStudentsTotalInfo(papers));
+    });
+}
+
+function getPaperTotalInfo(paperId) {
+    var url = config.analysisServer + '/total?p=' + paperId;
+
+    return when.promise(function(resolve, reject) {
+        client.get(url, {}, function(err, res, body) {
+            if (err) return reject(new errors.URIError('查询analysis server(getPaperTotalInfo) Error: ', err));
+            var data = JSON.parse(body);
+            if(data.error) return reject(new errors.Error('查询analysis server(getPaperTotalInfo)失败, paperId = ' + paperId));
+            resolve(data);
+        });
+    });
+}
+
+function generateStudentsTotalInfo(papers) {
+    var studentsTotalInfo = {}, paperStudentObj;
+    _.each(papers, (paperObj) => {
+        var studentsPaperInfo = paperObj.y;// matrix = paperObj.matrix, paperStudentObj, answers = paperObj.answers;
+        _.each(studentsPaperInfo, (studentObj) => {
+            paperStudentObj = studentsTotalInfo[studentObj.id];
+            if(!paperStudentObj) {
+                paperStudentObj = _.pick(studentObj, ['id', 'name', 'class', 'school']);
+                paperStudentObj.score = 0;
+                studentsTotalInfo[studentObj.id] = paperStudentObj;
+            }
+            paperStudentObj.score = paperStudentObj.score + studentObj.score;
+        });
+    });
+    return _.sortBy(_.values(studentsTotalInfo), 'score');
+    // return studentsTotalInfo;
+}
+
+var getGradeExamBaseline = exports.getGradeExamBaseline = function(examId, grade) {
+    return when.promise(function(resolve, reject) {
+        var config = (grade) ? {examid: examId, grade: grade} : {examid: examId};
+        peterFX.query('@ExamBaseline', config, function(err, results) {
+            if(err) return reject(new errors.data.MongoDBError('getGradeExamBaseline Mongo Error: ', err));
+            resolve(results[0]);
+        });
+    });
+}
+
+exports.generateExamInfo = function(examId, gradeName, schoolId) {
+    var result;
+    return getExamById(examId).then(function(exam) {
+        result = exam;
+        result.id = examId;
+        result['[papers]'] = _.filter(result['[papers]'], (paper) => paper.grade == gradeName);//【设计】TODO:analysis server提供grade的参数，没必要在这里在过滤区分--或者analysis的exam的[papers]就不会存在有不同年级的paper的情况
+        result.fullMark = _.sum(_.map(result['[papers]'], (paper) => paper.manfen));
+        return when.all([getValidSchoolGrade(schoolId, gradeName), getGradeExamBaseline(examId, gradeName)]);
+    }).then(function(results) {
+        result.grade = results[0], result.baseline = results[1];
+        return when.resolve(result);
+    })
+}
+
+//TODO: 这里最好还是通过analysis server来返回学校的基本信息（添加grade等需要的字段），这样就完全避免查询数据库.
+function getValidSchoolGrade(schoolId, gradeName) {
+    return when.promise(function(resolve, reject) {
+        peterHFS.get('@School.'+schoolId, function(err, school) {
+            if(err || !school) {
+                console.log('不存在此学校，请确认：schoolId = ', schoolId);
+                return reject(new errors.data.MongoDBError('find school:'+schoolId+' error', err));
+            }
+            var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
+            if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) {
+                console.log('此学校没有对应的年假或从属此年级的班级：【schoolid = ' + schoolid + '  schoolName = ' + school.name + '  gradeName = ' + gradeName + '】');
+                return when.reject(new errors.Error('学校没有找到对应的年级或者从属此年级的班级：【schoolid = ' +schoolid + '  schoolName = ' +school.name + '  gradeName = ' + gradeName + '】'));
+            }
+            resolve(targetGrade);
+        });
+    });
+}
+
+
+
 /**
  * 通过schoolid获取学校
  * @param  {[type]} schoolid [description]
  * @return {[type]}          [description]
 */
-var getSchoolById = exports.getSchoolById = function(schoolid) {
-    return when.promise(function(resolve, reject) {
-        peterHFS.get('@School.'+schoolid, function(err, school) {
-            if(err || !school) return reject(new errors.data.MongoDBError('find school:'+schoolid+' error', err));
-            resolve(school);
-        });
-    });
-};
+// var getSchoolById = exports.getSchoolById = function(schoolid) {
+//     return when.promise(function(resolve, reject) {
+//         peterHFS.get('@School.'+schoolid, function(err, school) {
+//             if(err || !school) return reject(new errors.data.MongoDBError('find school:'+schoolid+' error', err));
+//             resolve(school);
+//         });
+//     });
+// };
 
 /**
  * 获取此学校所发生过的所有exam的具体实例
  * @param  {[type]} school [description]
  * @return {[type]}        [description]
  */
-exports.getExamsBySchool = function(school) {
-    var examPromises = _.map(_.filter(school["[exams]"], (item) => (item.from != 40)), (obj) => examPromise(obj.id)); //既不是自定义又不是联考
-    return when.all(examPromises);
-}
+// exports.getExamsBySchool = function(school) {
+//     var examPromises = _.map(_.filter(school["[exams]"], (item) => (item.from != 40)), (obj) => examPromise(obj.id)); //既不是自定义又不是联考
+//     return when.all(examPromises);
+// }
 
 /**
  * 根据examid--找到一个exam、根据gradeName--过滤此exam中只属于此年级的papers、根据schoolid--获取此exam相关的班级信息
@@ -52,46 +169,46 @@ exports.getExamsBySchool = function(school) {
     }
  */
 //TODO: 其实如果这里只是获取exam的相关信息，那么直接走DB就可以，没必要通过服务获取。
-exports.generateExamInfo = function(examid, gradeName, schoolid) {
+// exports.generateExamInfo = function(examid, gradeName, schoolid) {
 
-console.log('schoolid = ', schoolid);
+// console.log('schoolid = ', schoolid);
 
-    var data = {};
-    //fetchExamById
-    return getExamById(examid).then(function(exam) {
-        try {
-            exam['[papers]'] = _.filter(exam['[papers]'], (paper) => paper.grade == gradeName);
-            exam.fullMark = _.sum(_.map(exam['[papers]'], (paper) => paper.manfen));
-            data.exam = exam;
-        } catch (e) {
-            return when.reject(new errors.Error('generateExamInfo Error: ', e));
-        }
-        return getSchoolById(schoolid);
-    }).then(function(school) {
-        var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
-        if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.Error('学校没有找到对应的年级或者从属此年级的班级：【schoolid = ' +schoolid + '  schoolName = ' +school.name + '  gradeName = ' + gradeName + '】'));
+//     var data = {};
+//     //fetchExamById
+//     return getExamById(examid).then(function(exam) {
+//         try {
+//             exam['[papers]'] = _.filter(exam['[papers]'], (paper) => paper.grade == gradeName);
+//             exam.fullMark = _.sum(_.map(exam['[papers]'], (paper) => paper.manfen));
+//             data.exam = exam;
+//         } catch (e) {
+//             return when.reject(new errors.Error('generateExamInfo Error: ', e));
+//         }
+//         return getSchoolById(schoolid);
+//     }).then(function(school) {
+//         var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
+//         if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) return when.reject(new errors.Error('学校没有找到对应的年级或者从属此年级的班级：【schoolid = ' +schoolid + '  schoolName = ' +school.name + '  gradeName = ' + gradeName + '】'));
 
-        data.exam.grade = targetGrade;
-        data.exam.fetchId = examid;
+//         data.exam.grade = targetGrade;
+//         data.exam.fetchId = examid;
 
-//获取此grade exam对应的baseline
-        return getGradeExamBaseline(examid, targetGrade.name);
-    }).then(function(baseline) {
-        data.exam.baseline = baseline;
-        return when.resolve(data.exam);
-    })
-};
+// //获取此grade exam对应的baseline
+//         return getGradeExamBaseline(examid, targetGrade.name);
+//     }).then(function(baseline) {
+//         data.exam.baseline = baseline;
+//         return when.resolve(data.exam);
+//     })
+// };
 
-exports.getGradeExamBaseline = getGradeExamBaseline;
+// exports.getGradeExamBaseline = getGradeExamBaseline;
 
-function getExamById(examid) {
-    return when.promise(function(resolve, reject) {
-        peterHFS.get('@Exam.'+examid, function(err, exam) {
-            if(err || !exam) return reject(new errors.data.MongoDBError('find exam = '+ examid + 'Error: ', err));
-            resolve(exam);
-        });
-    });
-}
+// function getExamById(examid) {
+//     return when.promise(function(resolve, reject) {
+//         peterHFS.get('@Exam.'+examid, function(err, exam) {
+//             if(err || !exam) return reject(new errors.data.MongoDBError('find exam = '+ examid + 'Error: ', err));
+//             resolve(exam);
+//         });
+//     });
+// }
 
 /**
  * 获取examid和grade对应的gradeExam的baseline
@@ -99,16 +216,16 @@ function getExamById(examid) {
  * @param  {[type]} grade  [description]
  * @return {[type]}        [description]
  */
-function getGradeExamBaseline(examId, grade) {
-    // var targetObjId = paddingObjectId(examId); 设计：都存储短id好了！
-    return when.promise(function(resolve, reject) {
-        var config = (grade) ? {examid: examId, grade: grade} : {examid: examId};
-        peterFX.query('@ExamBaseline', config, function(err, results) {
-            if(err) return reject(new errors.data.MongoDBError('getGradeExamBaseline Mongo Error: ', err));
-            resolve(results[0]);
-        });
-    });
-}
+// function getGradeExamBaseline(examId, grade) {
+//     // var targetObjId = paddingObjectId(examId); 设计：都存储短id好了！
+//     return when.promise(function(resolve, reject) {
+//         var config = (grade) ? {examid: examId, grade: grade} : {examid: examId};
+//         peterFX.query('@ExamBaseline', config, function(err, results) {
+//             if(err) return reject(new errors.data.MongoDBError('getGradeExamBaseline Mongo Error: ', err));
+//             resolve(results[0]);
+//         });
+//     });
+// }
 
 /**
  * 向exam中补充examInfo所需要的信息。生成orderedScoresArr数据结构--用来构成examStudentsInfo。生成classScoreMap数据结构，用来

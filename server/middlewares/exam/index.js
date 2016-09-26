@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-23 09:37:31
+* @Last Modified time: 2016-09-26 10:55:01
 */
 
 'use strict';
@@ -27,10 +27,7 @@ var peterFX = require('peter').getManager('fx');
  * @return {[type]}        [description]
  */
 exports.home = function(req, res, next) {
-    examUitls.getSchoolById(req.user.schoolId).then(function(school) {
-        req.school = school;
-        return examUitls.getExamsBySchool(school);
-    }).then(function(originalExams) {
+    examUitls.getExamsBySchoolId(req.user.schoolId).then(function(originalExams) {
         req.originalExams = originalExams;
         return getCustomExams(req.user.id);
     }).then(function(customExams) {
@@ -47,10 +44,70 @@ exports.home = function(req, res, next) {
         if(req.originalExams.length == 0) errorInfo.msg = '此学校没有考试';
         if(req.originalExams.length > 0 && formatedExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
 
-        res.status(200).json({examList: formatedExams, errorInfo: errorInfo});
+        res.status(200).json({examList: formatedExams, errorInfo: errorInfo});//TODO:这里的error机制需要重新设计
     }).catch(function(err) {
         next(err);
-    })
+    });
+}
+
+// exports.home = function(req, res, next) {
+//     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
+//         req.school = school;
+//         return examUitls.getExamsBySchool(school);
+//     }).then(function(originalExams) {
+//         req.originalExams = originalExams;
+//         return getCustomExams(req.user.id);
+//     }).then(function(customExams) {
+//         try {
+//             var validExams = _.filter(_.concat(req.originalExams, customExams), (examObj) => examObj['[papers]'].length > 0);
+//             var formatedExams = formatExams(validExams);
+//             return when.resolve(formatedExams);
+//         } catch(e) {
+//             return when.reject(new errors.Error('格式化exams错误', e));
+//         }
+//     }).then(function(formatedExams) {
+//         formatedExams = filterExamsByAuth(formatedExams, req.user.auth, req.user.id, req.school);
+//         var errorInfo = {};
+//         if(req.originalExams.length == 0) errorInfo.msg = '此学校没有考试';
+//         if(req.originalExams.length > 0 && formatedExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
+
+//         res.status(200).json({examList: formatedExams, errorInfo: errorInfo});
+//     }).catch(function(err) {
+//         next(err);
+//     })
+// }
+
+/**
+ * 对获取exam API的参数进行校验：examid 和 grade。只是做了参数的校验--因为比较common且独立所以抽取出来作为单独的middleware。
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.validateExam = function(req, res, next) {
+    req.checkQuery('examid', '无效的examids').notEmpty();
+    req.checkQuery('grade', '无效的grade').notEmpty();
+    if (req.validationErrors()) return next(req.validationErrors());
+    if (req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err));
+
+    next();
+}
+
+/**
+ * 初始化exam。得到的exam、orderedScoresArr、classScoreMap三个信息，为基本的examPapersInfo、examClassesInfo、examPapersInfo、examClassesInfo数据结构做准备。
+ * @param  {[type]}   req  [description]
+ * @param  {[type]}   res  [description]
+ * @param  {Function} next [description]
+ * @return {[type]}        [description]
+ */
+exports.initExam = function(req, res, next) {
+    var grade = decodeURI(req.query.grade);
+    examUitls.generateExamInfo(req.query.examid, grade, req.user.schoolId).then(function(exam) {
+        req.exam = exam;
+        next();
+    }).catch(function(err) {
+        next(err);
+    });
 }
 
 /**
@@ -62,45 +119,101 @@ exports.home = function(req, res, next) {
  * @param  {Function} next [description]
  * @return {[type]}        [description]
  */
- exports.dashboard = function(req, res, next) {
-    var exam = req.exam,
-        examScoreMap = req.classScoreMap,
-        examScoreArr = req.orderedScoresArr;
 
-    var auth = req.user.auth;
-    var gradeAuth = auth.gradeAuth;
+exports.dashboard = function(req, res, next) {
+    //获取到dashboard info，需要对class group得到数据进行二次format
+    var exam = req.exam;
+    examUitls.generateDashboardInfo(exam).then(function(studentsTotalInfo) {
+        var examScoreArr = studentsTotalInfo;
+        var examScoreMap = _.groupBy(studentsTotalInfo, 'class');
+        var realClasses = _.keys(examScoreMap);
 
-    var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
-    var authClasses = getAuthClasses(auth, exam.grade.name, exam);
+        var auth = req.user.auth;
+        var gradeAuth = auth.gradeAuth;
 
-    examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
-    examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
+        var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
+        var authClasses = getAuthClasses(auth, exam.grade);
 
-    var ifShowLiankaoReport = getLianKaoReportAuth(auth, gradeAuth, exam);
-    var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
-    var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
-    var ifShowSubjectReport = (authSubjects.length > 0);
-    try {
-        var examInfoGuideResult = examInfoGuide(exam);
-        var scoreRankResult = scoreRank(examScoreArr);
-        var liankaoReportResult = (ifShowLiankaoReport) ? liankaoReport(exam, examScoreArr) : null;
-        var schoolReportResult = (!ifShowLiankaoReport && ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
-        var classReportResult = (!ifShowLiankaoReport && ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
-        var subjectReportResult = (!ifShowLiankaoReport && ifShowSubjectReport) ? authSubjects : null; //TODO：补充联考权限。联考学科报告有，只不过名字不一样而已吧。。。
-        // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
-        res.status(200).json({
-            examInfoGuide: examInfoGuideResult,
-            scoreRank: scoreRankResult,
-            liankaoReport: liankaoReportResult,
-            schoolReport: schoolReportResult,
-            classReport: classReportResult,
-            subjectReport: subjectReportResult
-            // levelScoreReport: levelScoreReportResult,
-        });
-    } catch (e) {
-        next(new errors.Error('format dashboard error : ', e));
-    }
+        examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
+        examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
+
+        var ifShowLiankaoReport = getLianKaoReportAuth(auth, exam);
+        var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
+        var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
+        var ifShowSubjectReport = (authSubjects.length > 0);
+console.log('---------');
+
+        try {
+            console.log('0');
+
+console.log('========  length ================= ', exam['[papers]'].length);
+            var examInfoGuideResult = examInfoGuide(exam, realClasses, examScoreArr.length);
+            console.log('1');
+            var scoreRankResult = scoreRank(examScoreArr);
+            console.log('2');
+            var liankaoReportResult = (ifShowLiankaoReport) ? liankaoReport(exam, examScoreArr) : null;
+            console.log('3');
+            var schoolReportResult = (!ifShowLiankaoReport && ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
+            console.log('4');
+            var classReportResult = (!ifShowLiankaoReport && ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
+            console.log('5');
+            var subjectReportResult = (!ifShowLiankaoReport && ifShowSubjectReport) ? authSubjects : null; //TODO：补充联考权限。联考学科报告有，只不过名字不一样而已吧。。。
+            console.log('6');
+            res.status(200).json({
+                examInfoGuide: examInfoGuideResult,
+                scoreRank: scoreRankResult,
+                liankaoReport: liankaoReportResult,
+                schoolReport: schoolReportResult,
+                classReport: classReportResult,
+                subjectReport: subjectReportResult
+            });
+        } catch (e) {
+            next(new errors.Error('format dashboard error : ', e));
+        }
+    }).catch(function(err) {
+        next(err);
+    })
 }
+
+//  exports.dashboard = function(req, res, next) {
+//     var exam = req.exam,
+//         examScoreMap = req.classScoreMap,
+//         examScoreArr = req.orderedScoresArr;
+
+//     var auth = req.user.auth;
+//     var gradeAuth = auth.gradeAuth;
+
+//     var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
+//     var authClasses = getAuthClasses(auth, exam.grade.name, exam);
+
+//     examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
+//     examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
+
+//     var ifShowLiankaoReport = getLianKaoReportAuth(auth, gradeAuth, exam);
+//     var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
+//     var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
+//     var ifShowSubjectReport = (authSubjects.length > 0);
+//     try {
+//         var examInfoGuideResult = examInfoGuide(exam);
+//         var scoreRankResult = scoreRank(examScoreArr);
+//         var liankaoReportResult = (ifShowLiankaoReport) ? liankaoReport(exam, examScoreArr) : null;
+//         var schoolReportResult = (!ifShowLiankaoReport && ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
+//         var classReportResult = (!ifShowLiankaoReport && ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
+//         var subjectReportResult = (!ifShowLiankaoReport && ifShowSubjectReport) ? authSubjects : null; //TODO：补充联考权限。联考学科报告有，只不过名字不一样而已吧。。。
+//         // var levelScoreReportResult = levelScoreReport(exam, examScoreArr);
+//         res.status(200).json({
+//             examInfoGuide: examInfoGuideResult,
+//             scoreRank: scoreRankResult,
+//             liankaoReport: liankaoReportResult,
+//             schoolReport: schoolReportResult,
+//             classReport: classReportResult,
+//             subjectReport: subjectReportResult
+//             // levelScoreReport: levelScoreReportResult,
+//         });
+//     } catch (e) {
+//         next(new errors.Error('format dashboard error : ', e));
+//     }
+// }
 
 function getAuthSubjectsInfo(auth, exam, examScoreArr) {
     var result = [], subjectMeanRates = [], gradeKey = exam.grade.name;
@@ -145,7 +258,7 @@ function ifAtLeastGradeManager(auth, gradeAuth, exam) {
 }
 
 //TODO:联考权限
-function getLianKaoReportAuth(auth, gradeAuth, exam) {
+function getLianKaoReportAuth(auth, exam) {
     return exam.from == '20' && !!auth.isSchoolManager;
 }
 
@@ -498,41 +611,6 @@ exports.inValidCustomAnalysis = function(req, res, next) {
     })
 }
 
-/**
- * 对获取exam API的参数进行校验：examid 和 grade。只是做了参数的校验--因为比较common且独立所以抽取出来作为单独的middleware。
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
- * @return {[type]}        [description]
- */
-exports.validateExam = function(req, res, next) {
-    req.checkQuery('examid', '无效的examids').notEmpty();
-    req.checkQuery('grade', '无效的grade').notEmpty();
-    if (req.validationErrors()) return next(req.validationErrors());
-    if (req.query.examid.split(',').length > 1) return next(new errors.ArgumentError('只能接收一个examid', err));
-
-    next();
-}
-
-/**
- * 初始化exam。得到的exam、orderedScoresArr、classScoreMap三个信息，为基本的examPapersInfo、examClassesInfo、examPapersInfo、examClassesInfo数据结构做准备。
- * @param  {[type]}   req  [description]
- * @param  {[type]}   res  [description]
- * @param  {Function} next [description]
- * @return {[type]}        [description]
- */
-exports.initExam = function(req, res, next) {
-    var grade = decodeURI(req.query.grade);
-    examUitls.generateExamInfo(req.query.examid, grade, req.user.schoolId).then(function(exam) {
-        req.exam = exam;
-        return examUitls.generateExamScoresInfo(req.exam, req.user.auth);
-    }).then(function(result) {
-        req = _.assign(req, result);
-        next();
-    }).catch(function(err) {
-        next(err);
-    });
-}
 
 /**
  * 更新对应的实例的exam中对应的某一grade的levels等相关数据
@@ -804,7 +882,7 @@ function formatExams(exams) {
                 obj.examName = (justOneGrade) ? value.exam.name : value.exam.name + "(年级：" + gradeKey + ")";
                 obj.examid = value.exam._id + '_' + gradeKey;
                 obj.grade = gradeKey;
-                obj.id = key;
+                obj.id = value.exam.fetchId;
                 obj.time = moment(value.exam['event_time']).valueOf();
                 obj.eventTime = moment(value.exam['event_time']).format('ll');
                 obj.subjectCount = papers.length;
@@ -872,14 +950,13 @@ function filterExamsByAuth(formatedExams, auth, uid, school) {
  * @param  {[type]} exam [description]
  * @return {[type]}      [description]
  */
-function examInfoGuide(exam) {
+function examInfoGuide(exam, realClasses, realStudentsCount) {
     return {
         name: exam.name,
         from: exam.from,
         subjectCount: exam['[papers]'].length,
-        realClassesCount: exam.realClasses.length,
-        realStudentsCount: exam.realStudentsCount,
-        lostStudentsCount: exam.lostStudentsCount
+        realClassesCount: realClasses.length,
+        realStudentsCount: realStudentsCount
     };
 }
 
@@ -1580,14 +1657,14 @@ function updateNewExamBaseline(targetObjId, newBaseline) {
         // }
 
 
-function getAuthClasses(auth, gradeKey, exam) {
+function getAuthClasses(auth, grade) {
 //Note: 如果是schoolManager或者是此年级的年级主任或者是此年级某一学科的学科组长，那么都是给出全部此年级的班级。否则就要判断具体管理的是那些班级
-    var allClasses = _.map(exam.grade['[classes]'], (obj) => obj.name);
+    var allClasses = _.map(grade['[classes]'], (obj) => obj.name);
     if(auth.isSchoolManager) return allClasses;
-    if(_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey]) return allClasses;
-    if(_.isObject(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey].subjectManagers.length > 0) return allClasses;
-    var groupManagersClasses = _.map(auth.gradeAuth[gradeKey].groupManagers, (obj) => obj.group);
-    var subjectTeacherClasses = _.map(auth.gradeAuth[gradeKey].subjectTeachers, (obj) => obj.group);
+    if(_.isBoolean(auth.gradeAuth[grade.name]) && auth.gradeAuth[grade.name]) return allClasses;
+    if(_.isObject(auth.gradeAuth[grade.name]) && auth.gradeAuth[grade.name].subjectManagers.length > 0) return allClasses;
+    var groupManagersClasses = _.map(auth.gradeAuth[grade.name].groupManagers, (obj) => obj.group);
+    var subjectTeacherClasses = _.map(auth.gradeAuth[grade.name].subjectTeachers, (obj) => obj.group);
     return _.union(groupManagersClasses, subjectTeacherClasses);
 }
 

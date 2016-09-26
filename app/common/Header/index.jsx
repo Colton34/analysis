@@ -58,8 +58,6 @@ class HeaderComponent extends React.Component {
     render() {
         var _this = this;
         var temp = this.props.user.auth.isLianKaoManager;
-        console.log('temp = ', temp);
-        debugger;
         return (
             <div className={style.header}>
                 <div className={style.wrapper}>
