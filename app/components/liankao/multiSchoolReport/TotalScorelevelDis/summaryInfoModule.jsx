@@ -28,10 +28,11 @@ export default class SummaryInfoModule extends React.Component {
         var summayrChartInfo = this.props.levelStudentsInfoBySchool;
 
         var chartData = summayrChartInfo[this.state.currentSchool.key];
+        var lastIndex = _.size(chartData)-3;
         var chartDataInfo = _.map(_.range(_.size(levels)),function(index){
             return {
                 name:numberMap[index-0+1]+'档上线率',
-                y:chartData[index]
+                y:chartData[lastIndex-index]
             }
         });
         chartDataInfo.push({
