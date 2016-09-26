@@ -12,7 +12,7 @@ class Main extends React.Component {
                 <form action="">
                     <input type="text" placeholder="Hello" />
                 </form>
-                <Link to={{pathname: '/liankao/report', query: {examid: '1008720', grade: '初三'}}}>【Mock】联考报告</Link>
+                <Link to={{pathname: '/liankao/report', query: {examid: '1009016-1647', grade: '初一'}}}>【Mock】联考报告</Link>
                 <Link to={{pathname: '/home'}}>【正常】首页</Link>
             </div>
         );

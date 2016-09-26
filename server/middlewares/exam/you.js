@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-09-23 09:54:29
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 11:25:48
+* @Last Modified time: 2016-09-26 12:30:18
 */
 
 'use strict';
@@ -182,9 +182,6 @@ function fetchExamScoresById(examId) {
         });
     });
 }
-
-
-
 
 //TODO:注意这里也没有用到auth--本来设计为从服务端传递的都是符合auth的数据，但是一些牵涉到【对比】的分析内容则需要不仅限于自己auth下的数据，所以这里就给了全部，需要二次设计重构。
 exports.generateExamReportInfo = function(exam) {//**TODO:需要排序！！！

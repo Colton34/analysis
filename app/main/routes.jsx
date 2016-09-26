@@ -21,7 +21,7 @@ import Main from '../containers/main';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Home} />
+            <IndexRoute component={Main} />
             <Route path='faq' component={HelpCenter}/>
             <Route path='dashboard' component={Dashboard} />
             <Route path='liankao/report' component={LianKaoReport} />
