@@ -47,7 +47,7 @@ class LianKaoReportCard extends React.Component {
    }
    toViewLiankaoAnalysis() {
         var {grade, examid} = this.props;
-        var targetUrl = '/school/report?examid=' + examid + '&grade=' + grade;
+        var targetUrl = '/liankao/report?examid=' + examid + '&grade=' + grade;
         browserHistory.push(targetUrl);
     }
     render() {

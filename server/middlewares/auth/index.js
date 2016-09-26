@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-22 21:09:46
+* @Last Modified time: 2016-09-26 18:35:36
 */
 
 'use strict';
@@ -52,11 +52,15 @@ exports.authenticate = function(req, res, next) {
     var password = req.body.password;
 
     authUitls.getUserInfo(value).then(function(user) {
+        // if(user) console.log('pwd - ', user.pwd);
         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 2, message: '密码不正确'}));
         if(!user) return authUitls.getUserInfo2(value, password);
-
+        if(user.name == 'cssyllkadmin' && user.pwd == 'yllk1906') {
+            user.schoolId = 828;
+        }
         return when.resolve(user);
     }).then(function(user) {
+        // if(user) console.log('pwd 2 - ', user.pwd);
         if(!user) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '用户不存在'}));
         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '密码不正确'}));
         delete user.pwd;
@@ -68,9 +72,6 @@ exports.authenticate = function(req, res, next) {
         return getSchoolById(req.user.schoolId)
     }).then(function(school) {
         var isLianKaoSchool = _.includes(school.name, '联考');
-
-console.log('isLianKaoSchool = ', isLianKaoSchool, '  isSchoolManager = ', req.user.auth.isSchoolManager);
-
         req.user.auth.isLianKaoManager = (isLianKaoSchool) && (req.user.auth.isSchoolManager);
         var token = jsonwebtoken.sign({ user: req.user }, config.secret);
         req.user.token = token;

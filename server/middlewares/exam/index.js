@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 16:18:27
+* @Last Modified time: 2016-09-26 18:14:49
 */
 
 'use strict';
@@ -504,6 +504,7 @@ function formatExams(exams) {
                 obj.id = value.exam.fetchId;
                 obj.time = moment(value.exam['event_time']).valueOf();
                 obj.eventTime = moment(value.exam['event_time']).format('ll');
+                if(!papers) console.log('没有papers');
                 obj.subjectCount = papers.length;
                 obj.papers = _.map(papers, (obj) => {
                     return {
