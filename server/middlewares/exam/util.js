@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 13:11:28
+* @Last Modified time: 2016-09-26 16:20:35
 */
 'use strict';
 var _ = require('lodash');
@@ -43,9 +43,8 @@ var getPaperById = exports.getPaperById = function(paperId) {//Warning: 不是pi
     })
 }
 
-exports.getExamsBySchoolId = function(schoolId) {
+function getSchoolById(schoolId) {
     var url = config.analysisServer + '/school?id=' + schoolId;
-
     return when.promise(function(resolve, reject) {
         client.get(url, {}, function(err, res, body) {
             if (err) return reject(new errors.URIError('查询analysis server(getExamsBySchool) Error: ', err));
@@ -53,7 +52,11 @@ exports.getExamsBySchoolId = function(schoolId) {
             if(data.error) reject(new errors.URIError('查询analysis server(getExamsBySchool)失败, schoolId = ', schoolId));
             resolve(data);
         });
-    }).then(function(data) {
+    });
+}
+
+exports.getExamsBySchoolId = function(schoolId) {
+    return getSchoolById(schoolId).then(function(data) {
         //Note:去掉40的是为了去掉1.7旧的创建的自定义分析，不适合新的分析系统，所以走了自己一个新的分析。后面会统一使用analysis server进行save(custom analysis)
         var examPromises = _.map(_.filter(data["[exams]"], (item) => (item.from != 40)), (obj) => getExamById(obj.exam, obj.from));
         return when.all(examPromises);
@@ -108,7 +111,7 @@ var getGradeExamBaseline = exports.getGradeExamBaseline = function(examId, grade
     });
 }
 
-exports.generateExamInfo = function(examId, gradeName, schoolId) {
+exports.generateExamInfo = function(examId, gradeName, schoolId, isLianKao) {
     var result;
     return getExamById(examId).then(function(exam) {
         result = exam;
@@ -118,9 +121,12 @@ exports.generateExamInfo = function(examId, gradeName, schoolId) {
         result.startTime = exam.event_time;
         result.gradeName = gradeName;
         result.subjects = _.map(result['[papers]'], (obj) => obj.subject);
-        return when.all([getValidSchoolGrade(schoolId, gradeName), getGradeExamBaseline(examId, gradeName)]);
+        var resultPromises = isLianKao ? [getGradeExamBaseline(examId, gradeName)] : [getGradeExamBaseline(examId, gradeName), getValidSchoolGrade(schoolId, gradeName)];
+        return when.all(resultPromises);
+        // return getSchoolById(schoolId);
     }).then(function(results) {
-        result.grade = results[0], result.baseline = results[1];
+        result.baseline = results[0];
+        if(!isLianKao) result.grade = results[1];
         return when.resolve(result);
     })
 }
@@ -135,8 +141,8 @@ function getValidSchoolGrade(schoolId, gradeName) {
             }
             var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
             if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) {
-                console.log('此学校没有对应的年假或从属此年级的班级：【schoolid = ' + schoolid + '  schoolName = ' + school.name + '  gradeName = ' + gradeName + '】');
-                return when.reject(new errors.Error('学校没有找到对应的年级或者从属此年级的班级：【schoolid = ' +schoolid + '  schoolName = ' +school.name + '  gradeName = ' + gradeName + '】'));
+                console.log('此学校没有对应的年假或从属此年级的班级：【schoolId = ' + schoolId + '  schoolName = ' + school.name + '  gradeName = ' + gradeName + '】');
+                return when.reject(new errors.Error('学校没有找到对应的年级或者从属此年级的班级：【schoolId = ' +schoolId + '  schoolName = ' +school.name + '  gradeName = ' + gradeName + '】'));
             }
             resolve(targetGrade);
         });
@@ -149,16 +155,16 @@ exports.generateExamReportInfo = function(exam) {
     return getPaperInstancesByExam(exam).then(function(papers) {
         console.timeEnd('fetch papers');
         console.time('generate');
-        var {examPapersInfo, examStudentsInfo} = generatePaperStudentsInfo(papers);
+        var result = generatePaperStudentsInfo(papers);
         console.timeEnd('generate');
         console.time('other');
-        examStudentsInfo = _.sortBy(_.values(examStudentsInfo), 'score');
-        var examClassesInfo = generateExamClassesInfo(examStudentsInfo);//TODO: Warning--这里本意是获取班级的【基本信息】，但是这又依赖于school.grade.class，所以这里【暂时】使用参考信息。
+        result.examStudentsInfo = _.sortBy(_.values(result.examStudentsInfo), 'score');
+        var examClassesInfo = generateExamClassesInfo(result.examStudentsInfo);//TODO: Warning--这里本意是获取班级的【基本信息】，但是这又依赖于school.grade.class，所以这里【暂时】使用参考信息。
         console.timeEnd('other');
         console.timeEnd('all');
         return when.resolve({
-            examStudentsInfo: examStudentsInfo,
-            examPapersInfo: examPapersInfo,
+            examStudentsInfo: result.examStudentsInfo,
+            examPapersInfo: result.examPapersInfo,
             examClassesInfo: examClassesInfo
         })
     });

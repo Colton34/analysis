@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-09-23 09:51:38
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 09:46:43
+* @Last Modified time: 2016-09-26 16:06:49
 */
 
 'use strict';
@@ -191,11 +191,18 @@ exports.dashboard = function(req, res, next) {
         var auth = req.user.auth;
         var gradeAuth = auth.gradeAuth;
 
-        var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
-        var authClasses = getAuthClasses(auth, exam.grade.name, exam);
+        if(!auth.isLianKaoManager) {
+            var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
+            var authClasses = getAuthClasses(auth, exam.grade.name, exam);
 
-        examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
-        examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
+console.log('authClasses = ', authClasses);
+
+            examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
+            examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
+
+console.log(JSON.stringify(examScoreArr[30]));
+
+        }
 
         var ifShowLiankaoReport = getLianKaoReportAuth(auth, gradeAuth, exam);
         var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);

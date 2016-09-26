@@ -105,6 +105,7 @@ class Dashboard extends React.Component {
         var classReport = (Map.isMap(this.props.dashboard.classReport)) ? this.props.dashboard.classReport.toJS() : this.props.dashboard.classReport;
         var subjectReport = (List.isList(this.props.dashboard.subjectReport)) ? this.props.dashboard.subjectReport.toJS() : this.props.dashboard.subjectReport;
         // var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
+debugger;
 
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) location.href = '/';

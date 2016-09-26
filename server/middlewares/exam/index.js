@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 13:12:03
+* @Last Modified time: 2016-09-26 16:18:27
 */
 
 'use strict';
@@ -52,7 +52,7 @@ exports.validateExam = function(req, res, next) {
 
 exports.initExam = function(req, res, next) {
     var grade = decodeURI(req.query.grade);
-    examUitls.generateExamInfo(req.query.examid, grade, req.user.schoolId).then(function(exam) {
+    examUitls.generateExamInfo(req.query.examid, grade, req.user.schoolId, req.user.auth.isLianKaoManager).then(function(exam) {
         req.exam = exam;
         next();
     }).catch(function(err) {
@@ -61,7 +61,7 @@ exports.initExam = function(req, res, next) {
 }
 
 exports.dashboard = function(req, res, next) {
-    var exam = req.exam;
+    var exam = req.exam, result = {};
     examUitls.generateDashboardInfo(exam).then(function(studentsTotalInfo) {
         var examScoreArr = studentsTotalInfo;
         var examScoreMap = _.groupBy(studentsTotalInfo, 'class');
@@ -70,39 +70,39 @@ exports.dashboard = function(req, res, next) {
         var auth = req.user.auth;
         var gradeAuth = auth.gradeAuth;
 
-        var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
-        var authClasses = getAuthClasses(auth, exam.grade);
-
-        examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
-        examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
-
-        var ifShowLiankaoReport = getLianKaoReportAuth(auth, exam);
-        var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
-        var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
-        var ifShowSubjectReport = (authSubjects.length > 0);
-
         try {
             var examInfoGuideResult = examInfoGuide(exam, realClasses, examScoreArr.length);
             var scoreRankResult = scoreRank(examScoreArr);
-            var liankaoReportResult = (ifShowLiankaoReport) ? liankaoReport(exam, examScoreArr) : null;
-            var schoolReportResult = (!ifShowLiankaoReport && ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
-            var classReportResult = (!ifShowLiankaoReport && ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;//TODO Note:可是对于各个班级有可能考试的科目不同，所以这个分值没有多大参考意义！！！
-            var subjectReportResult = (!ifShowLiankaoReport && ifShowSubjectReport) ? authSubjects : null; //TODO：补充联考权限。联考学科报告有，只不过名字不一样而已吧。。。
-            res.status(200).json({
-                examInfoGuide: examInfoGuideResult,
-                scoreRank: scoreRankResult,
-                liankaoReport: liankaoReportResult,
-                schoolReport: schoolReportResult,
-                classReport: classReportResult,
-                subjectReport: subjectReportResult
-            });
+            result.examInfoGuide = examInfoGuideResult, result.scoreRank = scoreRankResult;
+            if(auth.isLianKaoManager) {
+                var liankaoReportResult = liankaoReport(exam, examScoreArr);
+                result.liankaoReport = liankaoReportResult;
+            } else {
+                var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
+                var authClasses = getAuthClasses(auth, exam.grade);
+
+                examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
+                examScoreArr = getAuthScoreArr(examScoreArr, authClasses);
+
+                var ifShowSchoolReport = ifAtLeastGradeManager(auth, gradeAuth, exam);
+                var ifShowSubjectReport = (authSubjects.length > 0);
+                var ifShowClassReport = ifAtLeastGroupManager(auth, gradeAuth, exam);
+
+                var schoolReportResult = (ifShowSchoolReport) ? schoolReport(exam, examScoreArr) : null;
+                var subjectReportResult = (ifShowSubjectReport) ? authSubjects : null; //TODO：补充联考权限。联考学科报告有，只不过名字不一样而已吧。。。
+                var classReportResult = (ifShowClassReport) ? classReport(exam, examScoreArr, examScoreMap) : null;
+
+                result.schoolReport = schoolReportResult, result.subjectReport = subjectReportResult, result.classReport = classReportResult;
+            }
+            res.status(200).json(result);
         } catch (e) {
             next(new errors.Error('format dashboard error : ', e));
         }
     }).catch(function(err) {
         next(err);
-    })
+    });
 }
+
 
 function getAuthSubjectsInfo(auth, exam, examScoreArr) {
     var result = [], subjectMeanRates = [], gradeKey = exam.grade.name;
@@ -344,16 +344,17 @@ exports.customRankReport = function(req, res, next) {
 
 exports.schoolAnalysis = function(req, res, next) {
     examUitls.generateExamReportInfo(req.exam).then(function(result) {
-        var {examStudentsInfo, examPapersInfo, examClassesInfo} = result;
+        // var {examStudentsInfo, examPapersInfo, examClassesInfo} = result;
+        // var examStudentsInfo
         console.time('keys');
-        req.exam.realClasses = _.keys(_.groupBy(examStudentsInfo, 'class'));
+        req.exam.realClasses = _.keys(_.groupBy(result.examStudentsInfo, 'class'));
         console.timeEnd('keys');
-        req.exam.realStudentsCount = examStudentsInfo.length;
+        req.exam.realStudentsCount = result.examStudentsInfo.length;
         res.status(200).json({
             examInfo: req.exam,
-            examStudentsInfo: examStudentsInfo,
-            examPapersInfo: examPapersInfo,
-            examClassesInfo: examClassesInfo,
+            examStudentsInfo: result.examStudentsInfo,
+            examPapersInfo: result.examPapersInfo,
+            examClassesInfo: result.examClassesInfo,
             examBaseline: req.exam.baseline
         })
     }).catch(function(err) {
