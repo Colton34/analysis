@@ -36,9 +36,8 @@ export default class StudentCountDistribution extends React.Component {
             <div style={{marginTop: 30}}>
                 <div className={commonClass['sub-title']}>学科分档上线学生人数分布</div>
                 <div style={{margin: '10px 0 20px'}}>
-                   对每个档次而言，学科提供的上线人数越多，该学科就为联考总分上线提供了更大的可能性。
-                   这可以视为该学科对总分上线提供了更大的可能性，促进作用大。反 之，学科上线人数越少，该学科对总分上线提供的促进作用较小。
-                    下面三个表分别显示{_.join(_.range(this.levelSize).map(num => {return numberMap[num + 1]}), '、')}档各个学科的上线人数。
+                    对每个档次而言，学科提供的上线人数越多，这可以视为该学科对总分上线提供了更大的可能性，促进作用大。反之，学科上线人数越少，该学科对总分上线提供的促进作用较小。
+                    下面三个表分别显示{_.join(_.range(this.levelSize).map(num => {return numberMap[num + 1]}), '、')}档各个学科的上线人数：
                 </div>
                 {/* tab */}
                 <div className='tab-ctn' style={{marginBottom: 10}}>
@@ -65,7 +64,7 @@ export default class StudentCountDistribution extends React.Component {
                                             num !== 0 ? numberMap[num + 1] + '档上线，' : ''
                                         }
                                         <span style={{color: colorsMap.B03}}>{_.join(_.map(this.summaryInfo[num], paperid => {return this.examPapersInfo[paperid].subject}), '、')}</span>
-                                        {   
+                                        {
                                             num !== 0 ? '学科的促进作用来得较大。' : '学科一档线上线人数较多，它们对促使更多学生总分达到一档水平带来的可能性更大，可以说它们对一档上线的促进作用来得较大。'
                                         }
                                     </span>
@@ -106,7 +105,7 @@ function getTableDataByLevel(paperSchoolLevelMap, headers, levels, subjectLevels
 
 /**
  * 根据联考全体中各学科上档人数，获取各档人数最多的学科。
- * @return: 
+ * @return:
  *  {
  *      0: [paperid1, paperid2...], //0表示第一档（高分档）
  *      1：[paperidx...],
