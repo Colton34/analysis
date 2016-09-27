@@ -27,7 +27,7 @@ export default class ScoreRateDiff extends React.Component{
         var {diffBySubject, relaDiffBySubject} = getDiffBySubject(subjectInfoBySchool, headers);
         this.diffBySubject = diffBySubject;
         this.relaDiffBySubject = relaDiffBySubject;
-        
+
         var {diffSubjectOrder, relaDiffSubjectOrder} = getSubjectOrder(diffBySubject, relaDiffBySubject, headers);
         this.diffSubjectOrder = diffSubjectOrder;
         this.relaDiffSubjectOrder = relaDiffSubjectOrder;
@@ -109,7 +109,7 @@ export default class ScoreRateDiff extends React.Component{
                 <div style={{ margin: '30px 0 20px 0' }}>
                     <span className={commonClass['sub-title']}>学科的平均得分率差异</span>
                     <div className={commonClass['title-desc']} style={{marginTop: 20}}>
-                        从各学科的成绩表现看，每个学科的学校平均得分率最高的与最低之间的离差，从大到小的顺序是<span style={{color: colorsMap.B03}}>{_.join(this.diffSubjectOrder, '、')}。</span>。
+                        从各学科的成绩表现看，每个学科的学校平均得分率最高的与最低之间的离差，从大到小的顺序是<span style={{color: colorsMap.B03}}>{_.join(this.diffSubjectOrder, '、')}。</span>
                         如果联系到学科的命题难度，其相对离差从大到小的的顺序是<span style={{color: colorsMap.B03}}>{_.join(this.relaDiffSubjectOrder, '、')}</span>。
                         离差较大的学科，反映出学校水平差距较大。离差较小的学科，反映出该学科教学效果比较整齐。（注：语文是母语，学生水平离差来得较小应是常态）
                     </div>
@@ -119,7 +119,7 @@ export default class ScoreRateDiff extends React.Component{
 
             </div>
         )
-    }    
+    }
 }
 
 
@@ -127,13 +127,13 @@ function getDiffBySubject(subjectInfoBySchool, headers) {
     var diffBySubject = {};
     var relaDiffBySubject = {};
     _.forEach(headers.slice(1), header => {
-        var totalScoreRate = getTotalScoreRate(subjectInfoBySchool, header); 
+        var totalScoreRate = getTotalScoreRate(subjectInfoBySchool, header);
         var rateArr = [];
         _.forEach(_.omit(subjectInfoBySchool, 'total'), (subjectsInfo , schoolName) => {
             var subjectInfo = subjectsInfo[header.id];
             var diffRate = subjectInfo ? _.round(subjectInfo.sum / (subjectInfo.count * subjectInfo.fullMark), 2) : null;
             if (diffRate !== null) {
-                rateArr.push(diffRate)                
+                rateArr.push(diffRate)
             }
         })
         rateArr = _.sortBy(rateArr);
@@ -161,5 +161,5 @@ function getSubjectOrder(diffBySubject, relaDiffBySubject, headers){
     relaDiffList = _.orderBy(relaDiffList, ['relaDiff'], ['desc']);
     var relaDiffSubjectOrder = _.map(relaDiffList, item=> {return paperIdMap[item.id].subject});
 
-    return {diffSubjectOrder, relaDiffSubjectOrder};    
+    return {diffSubjectOrder, relaDiffSubjectOrder};
 }
