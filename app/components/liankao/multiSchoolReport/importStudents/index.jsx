@@ -12,9 +12,9 @@ const Table = ({tableData,isGood}) => {
             <thead>
                 <tr style={{fontSize:'14px'}}>
                     <th style={{width:100,textAlign:'left'}}>名次</th>
-                    <th style={{width:130,textAlign:'left'}}>姓名</th>
-                    <th style={{width:110,textAlign:'left'}}>总分</th>
-                    <th style={{width:150,textAlign:'left',height:40,overflow:'hidden',textOverflow:'ellipsis'}}>学校</th>
+                    <th style={{width:120,textAlign:'left'}}>姓名</th>
+                    <th style={{width:120,textAlign:'left'}}>总分</th>
+                    <th style={{width:180,textAlign:'left'}}>学校</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,10 +48,10 @@ const Table = ({tableData,isGood}) => {
                                 <td style={{width:100,textAlign:'left'}}>
                                     <div style={localStyle}>{student.rank?student.rank:''}</div>
                                 </td>
-                                <td style={{width:120,textAlign:'left'}}>{student.name?student.name:''}</td>
+                                <td style={{width:120,textAlign:'left',height:40,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'block'}} title={student.name}>{student.name?student.name:''}</td>
 
-                                <td style={{width:100,textAlign:'left'}}>{student.score?student.score:''}</td>
-                                <td style={{width:160,textAlign:'left'}}>{student.school?student.school:''}</td>
+                                <td style={{width:120,textAlign:'left'}}>{student.score?student.score:''}</td>
+                                <td style={{width:180,textAlign:'left',height:40,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'block'}}  title={student.school}>{student.school?student.school:''}</td>
                             </tr>
                         )
                     })
