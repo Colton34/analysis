@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 18:14:49
+* @Last Modified time: 2016-09-27 09:48:41
 */
 
 'use strict';
@@ -183,12 +183,13 @@ exports.customDashboard = function(req, res, next) {
     })
 }
 
+//当如果是liankao的话，把【学校】当做【班级】处理
 exports.rankReport = function(req, res, next) {
     var grade = decodeURI(req.query.grade);
     var auth = req.user.auth;
     getExamWithGradePapers(req.query.examid, grade).then(function(result) {
         var papers = result.papers, examName = result.examName;
-        var rankCache = getOriginalRankCache(papers);
+        var rankCache = getOriginalRankCache(papers, req.user.auth.isLianKaoManager);
         var authRankCache = filterAuthRankCache(auth, rankCache, papers, grade);
         var examInfo = getAuthExamInfo(authRankCache, examName, papers);
         res.status(200).json({
@@ -216,7 +217,7 @@ function getExamWithGradePapers(examid, gradeName) {
     });
 }
 
-function getOriginalRankCache(papers) {
+function getOriginalRankCache(papers, isLianKao) {
     var perStudentPerPaperArr = _.concat(..._.map(papers, (paper) => {
         var scoreMatrix = paper.matrix;
         return _.map(paper['[students]'], (student, index) => {
@@ -235,7 +236,7 @@ function getOriginalRankCache(papers) {
     var studentScoresPaperMap = _.groupBy(studentScoresArr, 'paper');
     var rankCache = {};
     _.each(studentScoresPaperMap, (studentsScoreItemArr, paperId) => {
-        rankCache[paperId] = _.groupBy(studentsScoreItemArr, 'class');
+        rankCache[paperId] = (isLianKao) ? _.groupBy(studentsScoreItemArr, 'school') : _.groupBy(studentsScoreItemArr, 'class');
     });
     return rankCache;
 }
@@ -243,7 +244,7 @@ function getOriginalRankCache(papers) {
 function filterAuthRankCache(auth, rankCache, papers, grade) {
     var authRankCache = {}, allPaperIds = _.keys(rankCache), authClasses = [];
     //Note: 如果是校级领导或者年级主任则不需要清理--返回还是此年级的全部数据，否则需要过滤出有效的科目和班级
-    if(!(auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
+    if(!(auth.isLianKaoManager || auth.isSchoolManager || (_.isBoolean(auth.gradeAuth[grade]) && auth.gradeAuth[grade]))) {
         var gradeAuthObj = auth.gradeAuth[grade];
         //Note: 过滤有效科目
         _.each(gradeAuthObj.subjectManagers, (obj) => {

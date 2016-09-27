@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 18:15:05
+* @Last Modified time: 2016-09-26 18:52:53
 */
 'use strict';
 var _ = require('lodash');
@@ -31,6 +31,7 @@ var getExamById = exports.getExamById = function(examid, fromType) {
 }
 
 var getPaperById = exports.getPaperById = function(paperId) {//Warning: 不是pid，而是paperId-即mongoID
+    console.time('解析paper');
     var url = config.analysisServer + '/paper?p=' + paperId;
 
     return when.promise(function(resolve, reject) {
@@ -38,6 +39,7 @@ var getPaperById = exports.getPaperById = function(paperId) {//Warning: 不是pi
             if (err) return reject(new errors.URIError('查询analysis server(getPaperById) Error: ', err));
             var temp = JSON.parse(body);
             if(temp.error) return reject(new errors.Error('查询analysis server(getPaperById)失败, paperId = ' + paperId));
+            console.timeEnd('解析paper');
             resolve(temp);
         });
     })
