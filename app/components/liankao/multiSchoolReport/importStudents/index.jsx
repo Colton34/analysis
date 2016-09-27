@@ -89,23 +89,12 @@ export default function ImportStudentsModule({reportDS}) {
 
 function  getTopStudentsInfo(examStudentsInfo){
     var topStudents = _.reverse(_.takeRight(examStudentsInfo,10));//前十个人
-    //var topStudentsGroupByScore = _.groupBy(topStudents,'score');
-    // var topStudentsInfo = [];
-    // _.forEach(topStudentsGroupByScore,function(studentGroup,index){
-    //     _.forEach(studentGroup,function(student){
-    //         topStudentsInfo.push({
-    //             rank:index+1,
-    //             name:student.name,
-    //             score:student.score,
-    //             school:student.school
-    //         });
-    //     });
-    // });
+
     var topStudentsInfo = _.map(topStudents,function(student,index){
     return {
         rank:index+1,
         name:student.name,
-        score:student.score,
+        score:student.score+'',
         school:student.school
     }
     });
@@ -117,7 +106,7 @@ function  getLowStudentsInfo(examStudentsInfo){
     return {
         rank:index+1,
         name:student.name,
-        score:student.score,
+        score:student.score+'',
         school:student.school
     }
     });
