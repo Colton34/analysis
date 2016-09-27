@@ -190,13 +190,16 @@ class ExamItem extends React.Component {
                             <i className={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? 'icon-fromzdy' : 'icon-fromks'} style={{color: '#fff', fontSize: 26}}></i>
                         </div>
                         <div style={{ display: 'inline-block', marginLeft: 20 }}>
-                            <div style={{ fontSize: 16, marginBottom: 8, color: '#3f3f3f' }}>{(item.from == 20) ? (item.examName + '（联考）') : (item.examName)}</div>
+                            <div style={{ fontSize: 16, marginBottom: 8, color: '#3f3f3f',display:'inline' }}>{item.examName}</div>
+                            {item.from==20?(<div className={commonStyles['liankao-mark']} style={{width:36,height:18,marginLeft:8,display:'inline-block',marginTop:'2px'}}></div>):''}
+                            <div style={{marginTop:8}}>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>创建时间: {item.eventTime}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>
                                 来自：<span style={fromFlag[item['from']] === FROM_CUSTOM_TEXT ? {color: '#77bfef'}: {}}>{fromFlag[item['from']]}</span>
                             </span>
+                            </div>
                         </div>
                         <Link to={{ pathname: '/dashboard', query: queryOptions }}
                               style={this.state.hoverLink ? localStyle.linkAnalysisBtnHover : localStyle.linkAnalysisBtn}

@@ -29,8 +29,8 @@ var modules = [
     }
 ];
 
-export default function ReportHeader({examInfo, user}) {
-    var examInfo = examInfo.toJS();
+export default function ReportHeader({reportDS, user}) {
+    var examInfo = reportDS.examInfo.toJS();
     return (
         <div>
             <div style={{ width: 1200, height: 152, backgroundColor: colorsMap.B03, textAlign: 'center', color: '#fff', display: 'table-cell', verticalAlign: 'middle', borderTopLeftRadius: 3, borderTopRightRadius: 3 }}>
@@ -38,7 +38,7 @@ export default function ReportHeader({examInfo, user}) {
                 <p style={{ fontSize: 18 }}>联考总体分析报告</p>
             </div>
             <div style={{ position: 'relative', marginBottom: 20 }}>
-                <HeaderInfo examInfo={examInfo} user={user} />
+                <HeaderInfo reportDS={reportDS} user={user} />
                 <ModuleNav modules={modules}/>
             </div>
         </div>

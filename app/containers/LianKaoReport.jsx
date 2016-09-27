@@ -56,7 +56,7 @@ class ContentComponent extends React.Component {
 
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} reportName={'联考分析报告'}/>
+                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} reportName={'联考总体分析报告'}/>
                 {/* {(this.ifCanReviewMultiReport) ? <ReportTabNav changeSchoolReport={this.changeClassReport.bind(this)} schoolList={authSchoolsList} reportDS={this.props.reportDS} /> : ''}  //【暂时】没有单个学校联考报告 */}
                 <MultiSchoolReport user={this.props.user} reportDS={this.props.reportDS} examId={this.props.examid} grade={this.props.grade} />
                 {/* {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />

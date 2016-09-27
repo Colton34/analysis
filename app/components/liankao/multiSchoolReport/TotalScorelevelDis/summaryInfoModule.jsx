@@ -174,7 +174,6 @@ class OnlineInfo extends React.Component {
     render() {
         var {levels, summaryCardInfo} = this.props;
         var levTotal = _.size(levels);
-
         var disTotal = _.size(summaryCardInfo);
         return (
             <div style={_.assign({}, { display: 'inline-block' }) }>
@@ -241,7 +240,7 @@ function getSummaryCard(levelStudentsInfoBySchool, examStudentsInfo, allStudentB
         var notExistSchools = _.difference(allSchools, existSchools);
         var temp = _.map(levelSchoolStudents, (students, schoolName) => {
             return {
-                count: students.length,
+                count: _.round(_.divide(students.length,allStudentBySchool[schoolName]),4),
                 school: schoolName
             }
         });
