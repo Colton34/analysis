@@ -117,6 +117,7 @@ debugger;
                     <Spinkit/>
                  </div>
             );
+        var user = this.props.user.toJS();
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
                 {
@@ -136,7 +137,7 @@ debugger;
                                 </div>
                                 {(examInfoGuide && _.size(examInfoGuide) > 0) ? <ExamGuideComponent data={examInfoGuide} /> : ''}
                                 <div className='row' style={{ marginTop: 20 }}>
-                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} expand={_.size(schoolReport) === 0 ? true : false}/> : ''}
+                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank user={user} data={scoreRank} examid={examid} grade={grade} expand={_.size(schoolReport) === 0 ? true : false}/> : ''}
                                     {(schoolReport && _.size(schoolReport) > 0) ? <SchoolReport examid={examid} grade={grade} data={schoolReport}/> : ''}
                                     {(liankaoReport && _.size(liankaoReport) > 0) ? <LiankaoReport examid={examid} grade={grade} data={liankaoReport}/> : ''}
                                 </div>
@@ -157,6 +158,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Dashboard
 
 function mapStateToProps(state) {
     return {
+        user: state.global.user,
         dashboard: state.dashboard,
         isLoading: state.global.isLoading
     }

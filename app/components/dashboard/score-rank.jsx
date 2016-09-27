@@ -93,7 +93,7 @@ class ScoreRank extends React.Component {
                             <tr>
                                 <th style={_.assign({}, styles.tableCell, {paddingLeft: 30})}>名次</th>
                                 <th style={styles.tableCell}>姓名</th>
-                                <th style={styles.tableCell}>班级</th>
+                                <th style={styles.tableCell}>{this.props.user.auth.isLianKaoManager ? '学校' : '班级'}</th>
                                 <th style={styles.tableCell}>分数</th>
                             </tr>
                         </thead>
@@ -110,7 +110,7 @@ class ScoreRank extends React.Component {
                                                         case 1:
                                                             return <td key={'name-' + num} style={styles.tableCell}>{studentInfo.name}</td>
                                                         case 2:
-                                                            return <td key={'class-' + num} style={styles.tableCell}>{studentInfo.class}</td>
+                                                            return <td key={'class-' + num} style={styles.tableCell}>{(this.props.user.auth.isLianKaoManager) ? studentInfo.school : studentInfo.class}</td>
                                                         case 3:
                                                             return <td key={'socre-' + num} style={styles.tableCell}>{studentInfo.score}</td>
                                                     }
