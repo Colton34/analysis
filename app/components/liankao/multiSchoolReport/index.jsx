@@ -12,7 +12,7 @@ import CriticalStudentModule from './CriticalStudent';
 export default function MultiSchoolReport({reportDS, examId, grade, user}) {
     return (
         <div>
-            <Header examInfo={reportDS.examInfo} user={user} />
+            <Header reportDS={reportDS} user={user} />
             <Trender reportDS={reportDS} />
             <TotalScoreDisModule reportDS={reportDS} examId={examId} grade={grade} />
             <SubjectLevelDistribution reportDS={reportDS}/>

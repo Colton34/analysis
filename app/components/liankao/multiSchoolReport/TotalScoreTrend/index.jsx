@@ -110,7 +110,7 @@ function getYAxonsDS(segmentDistribution) {
 function getSummaryInfo(examStudentsInfo) {
     var skewness = _.round(StatisticalLib.sampleSkewness(_.map(examStudentsInfo, (obj) => obj.score)), 2);
     if(skewness < -0.3) {
-        return '以联考总分平均分来衡量，这次考试本年级高于平均分的学生人数较多，相应高分段的学生人数密度来的较大，而低分段学生的成绩拉扯联考总分平均分较为显著，请提醒各学校多关注底端的学生。';
+        return '以联考总分平均分来衡量，这次考试联考总体高于平均分的学生人数较多，相应高分段的学生人数密度来的较大，而低分段学生的成绩拉扯联考总分平均分较为显著，请提醒各学校多关注底端的学生。';
     } else if(skewness < -0.05) {
         return '以联考总平均分来衡量，这次考试联考总体高于平均分的学生人数稍多一点，相应高分段的学生密度还是大一些。低分段学生的成绩对联考总体总分水平有一定的影响，鼓励他们提高总分水平，有利于提高本联考区域的总平均水平。';
     } else if(skewness < 0.05) {
