@@ -105,8 +105,6 @@ class Dashboard extends React.Component {
         var classReport = (Map.isMap(this.props.dashboard.classReport)) ? this.props.dashboard.classReport.toJS() : this.props.dashboard.classReport;
         var subjectReport = (List.isList(this.props.dashboard.subjectReport)) ? this.props.dashboard.subjectReport.toJS() : this.props.dashboard.subjectReport;
         // var levelScoreReport = (Map.isMap(this.props.dashboard.levelScoreReport)) ? this.props.dashboard.levelScoreReport.toJS() : this.props.dashboard.levelScoreReport;
-debugger;
-
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) location.href = '/';
         var grade = this.props.location.query.grade || '';
@@ -136,7 +134,7 @@ debugger;
                                 </div>
                                 {(examInfoGuide && _.size(examInfoGuide) > 0) ? <ExamGuideComponent data={examInfoGuide} /> : ''}
                                 <div className='row' style={{ marginTop: 20 }}>
-                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} expand={_.size(schoolReport) === 0 ? true : false}/> : ''}
+                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} expand={_.size(schoolReport) === 0 && _.size(liankaoReport) === 0? true : false}/> : ''}
                                     {(schoolReport && _.size(schoolReport) > 0) ? <SchoolReport examid={examid} grade={grade} data={schoolReport}/> : ''}
                                     {(liankaoReport && _.size(liankaoReport) > 0) ? <LiankaoReport examid={examid} grade={grade} data={liankaoReport}/> : ''}
                                 </div>
