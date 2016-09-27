@@ -4,7 +4,8 @@ import React, { PropTypes } from 'react';
 import moment from 'moment';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
-export default  function MultiHeaderInfo({examInfo}) {
+export default  function MultiHeaderInfo({examInfo, user}) {
+    debugger;
     var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
     return (
         <div>

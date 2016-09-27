@@ -115,6 +115,7 @@ class Dashboard extends React.Component {
                     <Spinkit/>
                  </div>
             );
+        var user = this.props.user.toJS();
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
                 {
@@ -155,6 +156,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Dashboard
 
 function mapStateToProps(state) {
     return {
+        user: state.global.user,
         dashboard: state.dashboard,
         isLoading: state.global.isLoading
     }

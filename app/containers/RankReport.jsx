@@ -17,7 +17,7 @@ import {B03} from '../lib/constants';
 
 var headerMapper = {
     kaohao: '考号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '排名', classRank: '班级排名', score: '分数'
-}
+};
 
 /***
  * props：
@@ -26,7 +26,7 @@ var headerMapper = {
  * renderRows:
  * onSort: 排序的函数
  */
-const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, onSort, sortInfo}) => {
+const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, onSort, sortInfo, user}) => {
     //todo: 处理一遍renderHead, 找出各个两行表头的列数，方便遍历；
     var counter = {};
     var secondLineHeadMap = {};
@@ -522,7 +522,7 @@ class RankReportTableView extends React.Component {
                         }
                     </div>
                     <div style={{heigth: 50, lineHeight: '50px'}}>
-                        <span style={{color: '#d0d0d0', float: 'left', marginRight: 10}}>班级：</span>
+                        <span style={{color: '#d0d0d0', float: 'left', marginRight: 10}}>{this.props.user.auth.isLianKaoManager ? ('学校') : ('班级')}：</span>
                         <span style={{float: 'left', width: 800}}>
                             <span style={{display: 'inline-block', marginRight: 30, minWidth: 50}}>
                                 <input value='全部' style={{ marginRight: 5}} onChange={this.onSelectClass.bind(this) } type='checkbox' checked={this.state.currentClasses.length === this.props.examInfo.classes.length}/>
@@ -574,6 +574,7 @@ class RankReportTableView extends React.Component {
 
 
                 <Table
+                    user={this.props.user}
                     firstLineHead = {firstLineHead}
                     secondLineHead = {secondLineHead}
                     renderRows ={theRowDatas}
@@ -922,6 +923,7 @@ class RankReport extends React.Component {
             <div style={{ width: 1200, minHeight: 830, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 }}>
                 <PageHeader examInfo={examInfo} targetUrl={targetUrl}/>
                 <RankReportTableView
+                    user={this.props.user.toJS()}
                     examInfo={examInfo}
                     rankCache={rankCache}
                     studentInfos={this.studentInfos}
@@ -936,6 +938,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(RankReport);
 
 function mapStateToProps(state) {
     return {
+        user: state.global.user,
         haveInit: state.rankReport.haveInit,
         examInfo: state.rankReport.examInfo,
         rankCache: state.rankReport.rankCache
