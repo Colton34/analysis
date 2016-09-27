@@ -135,7 +135,7 @@ class Dashboard extends React.Component {
                                 </div>
                                 {(examInfoGuide && _.size(examInfoGuide) > 0) ? <ExamGuideComponent data={examInfoGuide} /> : ''}
                                 <div className='row' style={{ marginTop: 20 }}>
-                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} expand={_.size(schoolReport) === 0 && _.size(liankaoReport) === 0? true : false}/> : ''}
+                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} user={user} expand={_.size(schoolReport) === 0 && _.size(liankaoReport) === 0? true : false}/> : ''}
                                     {(schoolReport && _.size(schoolReport) > 0) ? <SchoolReport examid={examid} grade={grade} data={schoolReport}/> : ''}
                                     {(liankaoReport && _.size(liankaoReport) > 0) ? <LiankaoReport examid={examid} grade={grade} data={liankaoReport}/> : ''}
                                 </div>

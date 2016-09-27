@@ -335,7 +335,6 @@ class ExamList extends React.Component {
 }
 
 const Content = ({examList, errorInfo}) => {
-    debugger;
 
     return (
         <div style={{ width: 1200, margin: '0 auto', minHeight: 900, backgroundColor: '#eff1f4', position:'relative', paddingBottom: 80}}>

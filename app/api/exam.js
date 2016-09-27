@@ -63,7 +63,6 @@ export function initDashboardData(params) {
     var url = (params.grade) ? examPath + '/dashboard?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/dashboard?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
-        debugger;
         return Promise.resolve(res.data);
     });
 }
