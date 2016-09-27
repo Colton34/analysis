@@ -58,7 +58,7 @@ class ContentComponent extends React.Component {
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
                 <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} reportName={'联考分析报告'}/>
                 {/* {(this.ifCanReviewMultiReport) ? <ReportTabNav changeSchoolReport={this.changeClassReport.bind(this)} schoolList={authSchoolsList} reportDS={this.props.reportDS} /> : ''}  //【暂时】没有单个学校联考报告 */}
-                <MultiSchoolReport reportDS={this.props.reportDS} examId={this.props.examid} grade={this.props.grade} />
+                <MultiSchoolReport user={this.props.user} reportDS={this.props.reportDS} examId={this.props.examid} grade={this.props.grade} />
                 {/* {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />
             : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName} ifCanReviewMultiReport={this.ifCanReviewMultiReport}/>} */}
             </div>
@@ -84,7 +84,7 @@ class LianKaoReport extends React.Component {
         return (
             <div>
                 {(this.props.ifError) ? <CommonErrorView /> : ((this.props.isLoading || !this.props.reportDS.haveInit) ? <Spinkit /> : (
-                    <ContentComponent examid={examid} grade={grade} reportDS={this.props.reportDS} user={this.props.user} />
+                    <ContentComponent examid={examid} grade={grade} reportDS={this.props.reportDS} user={this.props.user.toJS()} />
                 ))}
             </div>
         );
