@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-27 09:48:41
+* @Last Modified time: 2016-09-27 19:41:41
 */
 
 'use strict';
@@ -356,7 +356,8 @@ exports.schoolAnalysis = function(req, res, next) {
             examStudentsInfo: result.examStudentsInfo,
             examPapersInfo: result.examPapersInfo,
             examClassesInfo: result.examClassesInfo,
-            examBaseline: req.exam.baseline
+            examBaseline: req.exam.baseline,
+            isLianKao: req.user.auth.isLianKaoManager
         })
     }).catch(function(err) {
         next(new errors.Error('schoolAnalysis Error', err));

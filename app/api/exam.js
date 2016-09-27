@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 12:22:32
+* @Last Modified time: 2016-09-27 19:59:58
 */
 
 
@@ -31,6 +31,8 @@ import {
     NUMBER_MAP as numberMap,
     LETTER_MAP as letterMap
 } from '../lib/constants';
+
+import {addRankInfo} from '../sdk';
 
 var examPath = "/exam";
 var paperPath = '/papers';
@@ -227,11 +229,13 @@ export function initReportDS(params) {
 
     return params.request.get(url).then(function(res) {
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, examBaseline} = res.data;
-        debugger;
-        var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
+        // debugger;
+        addRankInfo(examStudentsInfo);
+        // debugger;
+        var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class'); //TODO：联考studentsGroupBySchool，然后在所有联考里都使用这一个。
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
         var examStudentsInfoMap = _.keyBy(examStudentsInfo, 'id');
-        debugger;
+        // debugger;
         //Note: 已经对paperStudents进行排序，这样到下面不用分别都再次排序了。
         var rankIndex;
         _.each(allStudentsPaperMap, (students, pid) => {

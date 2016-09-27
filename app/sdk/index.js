@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-21 18:43:22
+* @Last Modified time: 2016-09-27 19:57:23
 */
 
 'use strict';
@@ -189,4 +189,22 @@ export function formatNewBaseline(examId, grade, levels, subjectLevels, levelBuf
         result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
     });
     return result;
+}
+
+
+export function addRankInfo(studentObjs) {
+    var rankIndex = 1;
+    var orderedStudentScoreInfo = _.orderBy(_.map(_.groupBy(studentObjs, 'score'), (v, k) => {
+        return {
+            score: parseFloat(k),
+            students: v
+        }
+    }), ['score'], ['desc']);
+    _.each(orderedStudentScoreInfo, (theObj, theRank) => {
+        _.each(theObj.students, (stuObj) => {
+            stuObj.rank = rankIndex;
+            return stuObj;
+        });
+        rankIndex += theObj.students.length;
+    });
 }
