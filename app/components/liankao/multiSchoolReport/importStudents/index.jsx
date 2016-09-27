@@ -8,13 +8,13 @@ var tablethStyle = {lineHeight:'40px',verticalAlign:'left'};
 
 const Table = ({tableData,isGood}) => {
     return (
-        <table  style={_.assign({}, { width: '531px',  margin: '30px auto',fontSize:'12px',color:'#333'}) }>
+        <table  style={_.assign({}, { width: '521px',  margin: '30px auto',fontSize:'12px',color:'#333'}) }>
             <thead>
                 <tr style={{fontSize:'14px'}}>
-                    <th style={tabletdStyle}>名次</th>
-                    <th style={tabletdStyle}>姓名</th>
-                    <th style={tabletdStyle}>总分</th>
-                    <th style={tabletdStyle}>学校</th>
+                    <th style={{width:100,textAlign:'left'}}>名次</th>
+                    <th style={{width:130,textAlign:'left'}}>姓名</th>
+                    <th style={{width:110,textAlign:'left'}}>总分</th>
+                    <th style={{width:150,textAlign:'left',height:40,overflow:'hidden',textOverflow:'ellipsis'}}>学校</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,13 +45,13 @@ const Table = ({tableData,isGood}) => {
                 }}
                         return (
                             <tr key={index} style={tablethStyle}>
-                                <td style={tabletdStyle}>
+                                <td style={{width:100,textAlign:'left'}}>
                                     <div style={localStyle}>{student.rank?student.rank:''}</div>
                                 </td>
-                                <td style={tabletdStyle}>{student.name?student.name:''}</td>
+                                <td style={{width:120,textAlign:'left'}}>{student.name?student.name:''}</td>
 
-                                <td style={tabletdStyle}>{student.score?student.score:''}</td>
-                                <td style={tabletdStyle}>{student.school?student.school:''}</td>
+                                <td style={{width:100,textAlign:'left'}}>{student.score?student.score:''}</td>
+                                <td style={{width:160,textAlign:'left'}}>{student.school?student.school:''}</td>
                             </tr>
                         )
                     })
