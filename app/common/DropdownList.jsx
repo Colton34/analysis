@@ -4,12 +4,13 @@ import Radium from 'radium';
 import classNames from 'classnames';
 
 import {COLORS_MAP as colorsMap} from '../lib/constants';
+let btnMaxWidth = 120, btnMinWidth = 90, textWidth = 90;
 let localStyle = {
     hide: {
         display: 'none'
     },
     btn: {
-        display: 'inline-block', minWidth:90, height:30,color:'#fff',lineHeight: '30px',textDecoration: 'none',textAlign:'center',borderRadius:2
+        display: 'inline-block', height:30,color:'#fff',lineHeight: '30px',textDecoration: 'none',textAlign:'center',borderRadius:2 
     },
     dropDownBtn: {
         display: 'inline-block', width:'100%',height:'100%',lineHeight: '30px',textDecoration: 'none',textAlign:'center',borderRadius: 3, backgroundColor:'#fff',color: '#333',
@@ -18,7 +19,7 @@ let localStyle = {
     list: {
         listStyleType: 'none',
         padding: 0,
-        margin: 0,
+        margin: '-5px 0 0 0',
         lineHeight:'30px',
         borderRight: '1px solid ' + colorsMap.C04,
         borderLeft: '1px solid ' + colorsMap.C04,
@@ -29,6 +30,7 @@ let localStyle = {
     }
 
 }
+
 /**
  * props:
  * list: 下拉菜单显示项目
@@ -42,6 +44,7 @@ let localStyle = {
  * needRefresh：在componentWillReceiveProps时是否更新列表；
  * dropdownListRefreshHandler： 更新props中的needRefresh字段的回调函数；
  * handleSelectedItems: 下拉菜单收缩时返回当前选中元素的回调函数；
+ * fixWidth: Bool: 下拉菜单宽度是否固定（超出款的显示省略号）;
  */
 @Radium
 class DropdownList extends React.Component {
@@ -143,26 +146,39 @@ class DropdownList extends React.Component {
         
         this.refs.list.className += ' hide';
     }
+    shouldShowTitle(boxStyle, showStr) {
+        var maxWidth  = boxStyle.minWidth || boxStyle.maxWidth || boxStyle.width || textWidth;
+        var $tmp = $('<span>' + showStr + '</span>').appendTo('body');
+        $tmp.hide();
+        var width = $tmp.width();
+        $tmp.remove();
+        if (width > maxWidth) return true;
+        else return false;
+    }
     render() {
-        var {active} = this.state;
-        var {surfaceBtnStyle, style} = this.props;
+        var {active, current} = this.state;
+        var {surfaceBtnStyle, style, fixWidth} = this.props;
         var _this = this;
+        var showTitle = !!(fixWidth && this.shouldShowTitle(surfaceBtnStyle ? surfaceBtnStyle : {}, current.value));
         return (
             <div id='dropdownList' style={_.assign({textAlign: 'center'}, style ? style : {})}>
-                <a style={_.assign({}, localStyle.btn, localStyle.surfaceBtn, surfaceBtnStyle? surfaceBtnStyle : {})} href="javascript:void(0)" onClick={this.toggleList.bind(this)}>
-                    <span style={{}}>{this.state.current.value}</span>
-                    <i className={classNames('icon-down-open-3', 'animated', {'caret-list-down': active, 'caret-list-up': !active})} style={{display: 'inline-block'}}></i>
+                <a style={_.assign({}, localStyle.btn, localStyle.surfaceBtn, surfaceBtnStyle? surfaceBtnStyle : {},  showTitle ? {width: btnMaxWidth} : {minWidth: btnMinWidth})} href="javascript:void(0)" onClick={this.toggleList.bind(this)} data-title={showTitle ? current.value : ''} className={showTitle ? 'ellipsis-title':''}>
+                    <span style={_.assign({},{position: 'relative', width: textWidth}, showTitle ?  {overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', display: 'inline-block'} : {})}>{this.state.current.value}</span>
+                    <i className={classNames('icon-down-open-3', 'animated', {'caret-list-down': active, 'caret-list-up': !active})} style={{display: 'inline-block', float: 'right'}}></i>
                 </a >
                 {this.props.list ? (
-                    <ul ref='list' onAnimationEnd={this.onAnimationEnd.bind(this)} style={localStyle.list} className={classNames('animated', {'slide-down': active, 'slide-up': !active})}>
+                    <ul ref='list' onAnimationEnd={this.onAnimationEnd.bind(this)} style={_.assign({},localStyle.list, showTitle ? {margin: '-5px 0 0 0 ' }: {margin: 0})} className={classNames('animated', {'slide-down': active, 'slide-up': !active})}>
                         {
                             _.map(_this.state.coveredItems, (item,index) => {
                                 var selectedStyle = item.selected ? {backgroundColor: colorsMap.C03}: {};
+                                var showTitle = !!(fixWidth && this.shouldShowTitle({}, item.value));
                                 return (
-                                    <li key={index} style={{minWidth: 90, height: 30, backgroundColor: '#fff'}}>
+                                    <li key={index} style={_.assign({}, {height: 30, backgroundColor: '#fff', position: 'relative'}, showTitle ? {width: btnMaxWidth} : {minWidth: btnMinWidth})}>
                                         <a  key={'ddAtag-' + index}
-                                            style={[localStyle.dropDownBtn, selectedStyle]}
-                                            href="javascript:void(0)" onClick={this.chooseItem.bind(this,item)}>
+                                            style={_.assign({},localStyle.dropDownBtn, selectedStyle, showTitle ? {overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis'} : {})}
+                                            href="javascript:void(0)" onClick={this.chooseItem.bind(this,item)}
+                                            data-title={showTitle ? item.value : ''}
+                                            className={showTitle ? 'ellipsis-title':''}>
                                             {item.value}
                                         </a>
                                     </li>

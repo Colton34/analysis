@@ -231,3 +231,16 @@ p, div p {
     animation-duration: .2s;
 }
 /*--------------------------animation end-----------------------------------------------------------*/
+/* 下拉菜单*/
+.ellipsis-title:hover:after {
+    content: attr(data-title);
+    position: absolute;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 3px 6px;
+    color: #FFF;
+    border-radius: 3px;
+    left: 125px;
+}
+
+/**/

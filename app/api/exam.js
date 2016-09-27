@@ -226,11 +226,9 @@ export function initReportDS(params) {
 
     return params.request.get(url).then(function(res) {
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, examBaseline} = res.data;
-        debugger;
         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class');
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
         var examStudentsInfoMap = _.keyBy(examStudentsInfo, 'id');
-        debugger;
         //Note: 已经对paperStudents进行排序，这样到下面不用分别都再次排序了。
         var rankIndex;
         _.each(allStudentsPaperMap, (students, pid) => {
