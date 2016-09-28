@@ -131,7 +131,7 @@ class LevelRadioGroup extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedValue: defaultRadioRange[0]
+            selectedValue: defaultRadioRange[this.props.initLevelCount-3]
         }
     }
 
@@ -232,7 +232,7 @@ class LevelForm extends React.Component {
         var levelLastIndex = _.size(formLevelInfo) - 1;
         return (
             <div style={{padding:'30px'}}>
-                <LevelRadioGroup levelKeys={_.keys(formLevelInfo)} changeLevelCount={this.changeLevelCount.bind(this)} examStudentsInfo={examStudentsInfo} />
+                <LevelRadioGroup initLevelCount={_.keys(formLevelInfo).length} changeLevelCount={this.changeLevelCount.bind(this)} examStudentsInfo={examStudentsInfo} />
                 {
                     _.map(formLevelInfo, (formLevObj, levelKey) => {
                         return (
