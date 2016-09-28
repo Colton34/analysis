@@ -124,8 +124,8 @@ export default class SummaryInfoModule extends React.Component {
                         <OnlineInfo  levels={levels} summaryCardInfo={summaryCardInfo}></OnlineInfo>
                             <div style={{ display: 'inline-block', width: 380, height:240, position: 'relative', float: 'right',backgroundColor:'rgb(251,253,254)'}}>
                                 <ReactHighcharts config={config} style={{ display: 'inline-block', width: 380, height: 240, border: '1px solid ' + colorsMap.C04 ,backgroundColor:'rgb(251,253,254)'}}></ReactHighcharts>
-                                <span style={{ position: 'absolute', right: 30, top: 30 }}>
-                                    <DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } list={_this.dropListData}/>
+                                <span style={{ position: 'absolute', right: 20, top: 30 }}>
+                                    <DropdownList onClickDropdownList={_this.onClickDropdownList.bind(_this) } list={_this.dropListData} fixWidth/>
                                 </span>
 
                             </div>
@@ -174,7 +174,6 @@ class OnlineInfo extends React.Component {
     render() {
         var {levels, summaryCardInfo} = this.props;
         var levTotal = _.size(levels);
-
         var disTotal = _.size(summaryCardInfo);
         return (
             <div style={_.assign({}, { display: 'inline-block' }) }>
@@ -241,7 +240,7 @@ function getSummaryCard(levelStudentsInfoBySchool, examStudentsInfo, allStudentB
         var notExistSchools = _.difference(allSchools, existSchools);
         var temp = _.map(levelSchoolStudents, (students, schoolName) => {
             return {
-                count: students.length,
+                count: _.round(_.divide(students.length,allStudentBySchool[schoolName]),4),
                 school: schoolName
             }
         });

@@ -13,12 +13,11 @@ import commonStyle from '../common/common.css';
 import Spinkit from '../common/Spinkit';
 
 import Radium from 'radium';
-import {B03} from '../lib/constants';
+import {COLORS_MAP as colorsMap} from '../lib/constants';
 
 var headerMapper = {
-    kaohao: '考号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '排名', classRank: '班级排名', score: '分数'
+    kaohao: '考号', name: '姓名', class: '班级', totalScore: '总分', groupRank: '排名', classRank: '班级排名', score: '分数', school: '学校'
 };
-
 /***
  * props：
  * firstLineHead: ['kaohao', 'ts', '123456'...]
@@ -48,7 +47,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                     {
 
                         firstLineHead.map((headType, index) => {
-                            if (_.indexOf(['kaohao', 'name', 'class'], headType) !== -1) {
+                            if (_.indexOf(['kaohao', 'name', 'class', 'school'], headType) !== -1) {
                                 return (
                                     <th key={headType} rowSpan='2' data-headtype={headType} className={commonStyle['table-unit']} style={{minHeight: 40, minWidth: 80, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
                                         <span>{headerMapper[headType]}</span>
@@ -86,8 +85,8 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                 }
                                 if (index === 1 && secondLineHeadMap['groupRank_' + headType]) {
                                     return (
-                                        <th key={'headType-' + index} data-headtype={'groupRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 50, height: 40, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
-                                            {headerMapper[headType] + '排名'}
+                                        <th key={'headType-' + index} data-headtype={'groupRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: !user.auth.isLianKaoManager ? 50 : 130, height: 40, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
+                                            {headerMapper[headType] + (!user.auth.isLianKaoManager ? '排名' : '联考排名')}
                                             <span style={localStyle.sortDirection}>
                                                 <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('groupRank_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
                                                     <span className='caret' style={{ width: '100%' }} data-order='asc' data-headtype={'groupRank_' + headType}></span>
@@ -100,8 +99,8 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                 }
                                 if (index === 2 && secondLineHeadMap['classRank_' + headType]) {
                                     return (
-                                        <th key={'headType-' + index} data-headtype={'classRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: 50, height: 40, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
-                                            {headerMapper[headType] + '班级排名'}
+                                        <th key={'headType-' + index} data-headtype={'classRank_' + headType} className={commonStyle['table-unit']} style={{ minWidth: !user.auth.isLianKaoManager ? 50 : 130, height: 40, position: 'relative', cursor: 'pointer', borderBottomWidth: 1}} onClick={onSort}>
+                                            {headerMapper[headType] + (!user.auth.isLianKaoManager ? '班级排名' : '学校排名')}
                                             <span style={localStyle.sortDirection}>
                                                 <div className='dropup'  style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.head !== ('classRank_' + headType) ? {visibility: 'visible', color: '#dcdcdc'} : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
                                                     <span className='caret' style={{ width: '100%' }}></span>
@@ -125,7 +124,7 @@ const Table = ({renderRows, firstLineHead, secondLineHead, headSeq, headSelect, 
                                 {
                                     headSeq.map((seqHead, dIndex) => {
                                         if (headSelect[seqHead] === true) {
-                                            return <td key={'tableData-' + index + dIndex} className={commonStyle['table-unit']} style={{height: 40}}>{rowData[seqHead] === Number.NEGATIVE_INFINITY || rowData[seqHead] === Number.POSITIVE_INFINITY ?  '--' : rowData[seqHead]}</td>
+                                            return <td key={'tableData-' + index + dIndex} className={commonStyle['table-unit']} style={{height: 40, whiteSpace: 'nowrap'}}>{rowData[seqHead] === Number.NEGATIVE_INFINITY || rowData[seqHead] === Number.POSITIVE_INFINITY ?  '--' : rowData[seqHead]}</td>
                                         }
                                     })
                                 }
@@ -525,14 +524,14 @@ class RankReportTableView extends React.Component {
                         <span style={{color: '#d0d0d0', float: 'left', marginRight: 10}}>{this.props.user.auth.isLianKaoManager ? ('学校') : ('班级')}：</span>
                         <span style={{float: 'left', width: 800}}>
                             <span style={{display: 'inline-block', marginRight: 30, minWidth: 50}}>
-                                <input value='全部' style={{ marginRight: 5}} onChange={this.onSelectClass.bind(this) } type='checkbox' checked={this.state.currentClasses.length === this.props.examInfo.classes.length}/>
+                                <input value='全部' style={{ marginRight: 5, cursor: 'pointer'}} onChange={this.onSelectClass.bind(this) } type='checkbox' checked={this.state.currentClasses.length === this.props.examInfo.classes.length}/>
                                 <span>全部</span>
                             </span>
                             {
                                 examInfo.classes.map((className, index) => {
                                     return (
                                         <span key={'classNames-' + index} style={{display: 'inline-block', marginRight: 30, minWidth: 50}} >
-                                            <input value={className} style={{ marginRight: 5 }}onChange={this.onSelectClass.bind(this) } type='checkbox' checked={_.indexOf(this.state.currentClasses, className) !== -1}/>
+                                            <input value={className} style={{ marginRight: 5, cursor: 'pointer' }}onChange={this.onSelectClass.bind(this) } type='checkbox' checked={_.indexOf(this.state.currentClasses, className) !== -1}/>
                                             <span>{className}</span>
                                         </span>
                                     )
@@ -560,7 +559,7 @@ class RankReportTableView extends React.Component {
                                 }
                                 return (
                                     <li key={'headSelect-' + index}>
-                                        <input onChange={this.onHeadSelect.bind(this)} type='checkbox' style={{ margin: '0 10px' }} checked={this.state.headSelect[head]} value={head}/>
+                                        <input onChange={this.onHeadSelect.bind(this)} type='checkbox' style={{ margin: '0 10px', cursor: 'pointer'}} checked={this.state.headSelect[head]} value={head}/>
                                         <span>{headName}</span>
                                     </li>
                                 )
@@ -763,7 +762,9 @@ class RankReport extends React.Component {
     constructor(props) {
         super(props);
         this.studentInfos = {}; // {kaohao: {kaohao: , name:, className: , score_ts, groupRank_ts: ,....}}
-        this.headSeq = ['kaohao', 'name', 'class', 'score_totalScore', 'groupRank_totalScore', 'classRank_totalScore'];
+        var user = props.user.toJS();
+        this.headSeq = !user.auth.isLianKaoManager ? ['kaohao', 'name', 'class', 'score_totalScore', 'groupRank_totalScore', 'classRank_totalScore'] : ['kaohao', 'name', 'school', 'class', 'score_totalScore', 'groupRank_totalScore', 'classRank_totalScore'];
+
     }
 
     componentDidMount() {
@@ -819,6 +820,7 @@ class RankReport extends React.Component {
     }
     // 生成所有学生的待显示数据
     generateStudentInfos(rankCache) {
+        var user = this.props.user.toJS();
          _.forEach(rankCache, (classGroup, scoreType) => {
             var scoreMap = {};
             var allStudents = [];
@@ -844,7 +846,7 @@ class RankReport extends React.Component {
                     classStudents.push({kaohao: studentObj.kaohao, score: studentObj.score});
 
                     if (!this.studentInfos[studentObj.kaohao]) {
-                        this.studentInfos[studentObj.kaohao] = _.pick(studentObj, ['kaohao','name','class']);
+                        this.studentInfos[studentObj.kaohao] = !user.auth.isLianKaoManager ? _.pick(studentObj, ['kaohao','name','class']) : _.pick(studentObj, ['kaohao','name','class', 'school']);
                     }
                     // 学生分数赋值
                     this.studentInfos[studentObj.kaohao]['score_' + scoreType] = studentObj.score;
@@ -969,7 +971,7 @@ var localStyle = {
     sortDirection: { width: 10, height: 20, position: 'absolute', top: '50%', right: '10%', marginTop: -14},
     examName: {
         color: '#b4b4b4', cursor: 'pointer',
-        ':hover': {color: B03}
+        ':hover': {color: colorsMap.B03}
     }
 }
 //根据当前选中的班级，科目，搜索，隐藏列，显示多少条记录，currentPage的时候要重新渲染table

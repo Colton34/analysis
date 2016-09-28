@@ -26,7 +26,7 @@ export default function TableContentModule({reportDS, allStudentBySchool, levelS
                 }档上线人数分别为
                 {
                     _.reverse((_.map(levels,(level) => {return level.count+'人';}))).join('、')
-                }，上线率分别为：
+                }，累计上线率分别为：
                 {
                     _.reverse((_.map(levels,(level) => {return level.percentage+'%';}))).join('、')
                 }。
