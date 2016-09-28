@@ -332,6 +332,7 @@ function getTableData(studentsInfoBySchool, levels, levelBuffers, schoolNames) {
     _.forEach(schoolNames, schoolName => {
         var rowData = {school: schoolName};
         var segmentsCount = makeSegmentsCount(studentsInfoBySchool[schoolName], segments); //从低到高
+        segmentsCount = _.filter(segmentsCount, (countInfo, index) => (index % 2 == 0)); //过滤出区间段内的学生人数,从低到高； 
         _.forEach(levels, (levelInfo, levelNum) => {
             rowData[levelNum] = segmentsCount[levelSize - levelNum -1];    
         })
