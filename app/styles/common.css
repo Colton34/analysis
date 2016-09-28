@@ -69,7 +69,7 @@
     display: block;
 }
 .error-view {
-    background-image: url(../images/errorView.png); 
+    background-image: url(../images/errorView.png);
     background-size: contain;
     background-repeat: no-repeat;
     width: 159px;
@@ -129,7 +129,7 @@ input {
   font-size: 1.3em;
   display: inline-block;
   margin: auto;
-  border-radius: 0.6em;
+  border-radius: 2px;
   border: none;
   outline: none;
   box-shadow: 0 0 2px black;
