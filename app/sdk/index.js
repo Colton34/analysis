@@ -2,7 +2,11 @@
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-27 19:57:23
+<<<<<<< Updated upstream
+* @Last Modified time: 2016-09-28 10:49:48
+=======
+* @Last Modified time: 2016-09-27 18:59:02
+>>>>>>> Stashed changes
 */
 
 'use strict';
@@ -191,7 +195,6 @@ export function formatNewBaseline(examId, grade, levels, subjectLevels, levelBuf
     return result;
 }
 
-
 export function addRankInfo(studentObjs) {
     var rankIndex = 1;
     var orderedStudentScoreInfo = _.orderBy(_.map(_.groupBy(studentObjs, 'score'), (v, k) => {
@@ -207,4 +210,99 @@ export function addRankInfo(studentObjs) {
         });
         rankIndex += theObj.students.length;
     });
+}
+
+export function getLevelInfo(levels, baseStudents, examFullMark, isByScore=true) {
+    var levelScoreRel = getLevelScoreRel(levels, baseStudents, examFullMark, isByScore);
+    var targets, count, sumCount, sumPercentage, result = {}, temp = {}, levelLastIndex = _.size(levels) - 1;
+    _.each(levels, (levelObj, levelKey) => {
+        var currentLevelRel = levelScoreRel[levelKey];
+        targets = (levelKey == '0') ? _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score <= currentLevelRel.highLevelScore)) : _.filter(baseStudents, (obj) => (obj.score > currentLevelRel.currentLevelScore) && (obj.score <= currentLevelRel.highLevelScore));
+        count = targets.length;
+        temp[levelKey] = count;
+        sumCount = (levelKey == levelLastIndex + '') ? (count) : (_.sum(_.values(_.pickBy(temp, (v, k) => k >= levelKey))));
+        sumPercentage = _.round(_.multiply(_.divide(sumCount, baseStudents.length), 100), 2);
+        result[levelKey] = {
+            targets: targets,
+            count: count,
+            sumCount: sumCount,
+            score: currentLevelRel.currentLevelScore,
+            percentage: sumPercentage
+        }
+    })
+    return result;
+}
+
+//返回每个层级的currentLevleScore, highLevelScore
+function getLevelScoreRel(levels, baseStudents, examFullMark, isByScore=true) {
+    var levelLastIndex = _.size(levels) - 1;
+    var result = {};
+    _.each(levels, (levelObj, levelKey) => {
+        if(isByScore) {
+            var highLevelScore = (levelKey == levelLastIndex + '') ? examFullMark : levels[(parseInt(levelKey)+1)+''].score;
+            result[levelKey] = {
+                currentLevelScore: levelObj.score,
+                highLevelScore: highLevelScore
+            }
+        } else {
+            result[levelKey] = getScoreInfoByPercentage(levels, levelKey, levelObj.percentage, baseStudents);
+        }
+    });
+    return result;
+}
+
+function getScoreInfoByPercentage(levels, levelKey, currentPercentage, baseStudents) {
+    var flagCount = _.ceil(_.multiply(_.divide(currentPercentage, 100), baseStudents.length));
+    var targetStudent = _.takeRight(baseStudents, flagCount)[0];
+    var currentLevelScore = targetStudent.score;
+
+    var highFlagCount = _.ceil(_.multiply(_.divide(levels[(parseInt(levelKey)+1)+''].percentage, 100), baseStudents.length));
+    var highTargetStudent = _.takeRight(baseStudents, highFlagCount)[0];
+    var highLevelScore = highTargetStudent.score;
+    return {
+        currentLevelScore: currentLevelScore,
+        highLevelScore: highLevelScore
+    }
+}
+
+export function getSubjectLevelInfo(subjectLevels, papersStudents, papersFullMark) {
+    var subjectLevelRel = getSubjectLevelRel(subjectLevels, papersFullMark);
+    var targets, count, temp, result = {};
+    _.each(subjectLevels, (papersLevelObj, levelKey) => {
+        temp = {};
+        _.each(papersLevelObj, (v, pid) => {
+            var currentPaperRel = subjectLevelRel[levelKey][pid];
+            var currentPaperStudents = papersStudents[pid];
+            if(!currentPaperStudents || currentPaperStudents.length == 0) {
+                temp[pid] = { targets: [], count: 0};
+                return;
+            }
+            targets = (levelKey == '0') ? _.filter(papersStudents[pid], (obj) => (obj.score >= currentPaperRel.currentLevelPaperMean) && (obj.score <= currentPaperRel.highLevelPaperMean)) : _.filter(papersStudents[pid], (obj) => (obj.score > currentPaperRel.currentLevelPaperMean) && (obj.score <= currentPaperRel.highLevelPaperMean));
+            count = targets.length;
+            temp[pid] = {
+                targets: targets,
+                count: targets.length
+            }
+        });
+        result[levelKey] = temp;
+    });
+    return result;
+}
+
+function getSubjectLevelRel(subjectLevels, papersFullMark) {
+    //每一个档次下每一个paperid对应的currentLevelScore和highScore
+    var levelLastIndex = _.size(subjectLevels) - 1;
+    var result = {}, temp, highLevelPaperMean;
+    _.each(subjectLevels, (papersLevelObj, levelKey) => {
+        temp = {};
+        _.each(papersLevelObj, (paperMean, pid) => {
+            highLevelPaperMean = (levelKey == levelLastIndex + '') ? papersFullMark[pid] : subjectLevels[(parseInt(levelKey)+1)+''][pid];
+            temp[pid] = {
+                currentLevelPaperMean: paperMean,
+                highLevelPaperMean: highLevelPaperMean
+            }
+        });
+        result[levelKey] = temp;
+    });
+    return result;
 }

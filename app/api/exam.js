@@ -2,7 +2,11 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-27 19:59:58
+<<<<<<< Updated upstream
+* @Last Modified time: 2016-09-27 20:08:04
+=======
+* @Last Modified time: 2016-09-27 14:26:29
+>>>>>>> Stashed changes
 */
 
 
@@ -65,7 +69,6 @@ export function initDashboardData(params) {
     var url = (params.grade) ? examPath + '/dashboard?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/dashboard?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
-        debugger;
         return Promise.resolve(res.data);
     });
 }
@@ -229,13 +232,10 @@ export function initReportDS(params) {
 
     return params.request.get(url).then(function(res) {
         var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, examBaseline} = res.data;
-        // debugger;
         addRankInfo(examStudentsInfo);
-        // debugger;
         var studentsGroupByClass = _.groupBy(examStudentsInfo, 'class'); //TODO：联考studentsGroupBySchool，然后在所有联考里都使用这一个。
         var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
         var examStudentsInfoMap = _.keyBy(examStudentsInfo, 'id');
-        // debugger;
         //Note: 已经对paperStudents进行排序，这样到下面不用分别都再次排序了。
         var rankIndex;
         _.each(allStudentsPaperMap, (students, pid) => {

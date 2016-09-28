@@ -61,6 +61,7 @@ export default class LevelDistribution extends React.Component {
         var headerDS = getHeaderDS(totalScoreLevelInfoByLevel, currentClass); //{0:3, 1:5, 2:4}
         var tableHeaderDS = getTableHeaderDS(levels);
         var tableBodyDS = getTableBodyDS(totalScoreLevelInfoByClass, currentClass, levels, examInfo.gradeName);
+        debugger;
 
         var levelSize = _.size(levels);
         return (
@@ -141,6 +142,8 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
         });
         resultByClass[className] = temp;
     });
+
+    debugger;
 
     return {totalScoreLevelInfoByClass: resultByClass, totalScoreLevelInfoByLevel: resultByLevel};
 }

@@ -9,10 +9,12 @@ import Table from '../../common/Table.jsx';
 import DropdownList from '../../common/DropdownList';
 
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap, A11, A12, B03, B04, B08, C12, C05, C07} from '../../lib/constants';
-import {makeFactor} from '../../api/exam';
 import TableView from './TableView';
 import Radium from 'radium';
 import {Tabs, Tab} from 'react-bootstrap';
+
+import {makeFactor} from '../../api/exam';
+import {getLevelInfo, getSubjectLevelInfo} from '../../sdk';
 
 var localStyle= {
     expanBtn: {
@@ -164,7 +166,6 @@ const SubjectDistribution = ({reportDS}) => {
         levels = reportDS.levels.toJS();
 
         var subjectLevels = reportDS.subjectLevels.toJS();
-        // debugger;
     //算法数据结构：
     var levLastIndex = _.size(levels) - 1;
 
@@ -221,15 +222,15 @@ const SubjectDistribution = ({reportDS}) => {
     };
 
     var resultData = _.map(levels, (levObj, levelKey) => {
-        var currentLevel = levels[(levLastIndex - levelKey) + ''];
+        var currentLevelKey = (levLastIndex - levelKey) + '';
+        var currentLevel = levels[currentLevelKey];
 
 //Note:（坑）本来这里subjectsMean应该是全量的--即exam中有多少papers就会有多少paper的mean信息（这和前面通过班级找此班级下各科的paper mean的方式不同）--所以理论上
 //不会碰到从班级找paper时遇到因为“某班级没有考试某一科目那么就没有科目平均分的信息”的问题，但是因为走了"25算法"，此算法当遇到科目之间总分差距很大的时候，一样会导致求
 //不到某一科目的平均分。如果遇到这种情况则给出被过滤掉的科目的信息，让用户知道。
 
 //TODO:直接通过reportDS.subjectLevel就可以更简单的计算了！！！
-        var {subjectLevelInfo, subjectsMean} = makeSubjectLevelInfo(currentLevel.score, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examInfo.fullMark);
-        // debugger;
+        var {subjectLevelInfo, subjectsMean} = makeSubjectLevelInfo(levels, currentLevelKey, currentLevel.score, subjectLevels, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examInfo.fullMark);
 //设计：通过headers和subjectMean得到orderdValidSubjectMean：即，通过headers是有序的，并且避免了因为特殊原因而没有求到某些科目平均分而导致不能接着计算的问题。
 //这些因为特殊原因出问题的科目记录下来给你给提示。
         var {validOrderedSubjectMean, unvalids} = filterMakeOrderedSubjectMean(headers, subjectsMean);
@@ -499,34 +500,44 @@ function makeSubjectLevelOriginalMatirx(subjectLevelInfo, examClassesInfo, examI
  *     ...
  * }
  */
-function makeSubjectLevelInfo(levelScore, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examFullMark) {
-    var subjectsMean = makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark);//这里有可能拿不到全科。。。
-    // var schoolTotalScoreMean = _.round(_.mean(_.map(_.filter(examStudentsInfo, (student) => student.score > levelScore), (student) => student.score)), 2); //总分的平均分 = （scope下所有学生中，分数大于此档线的所有学生成绩的平均分）== 不正确，此处总分的平均分即为设置的此档的分档线的分数
+//makeSubjectLevelInfo(currentLevel.score, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examInfo.fullMark);
+function makeSubjectLevelInfo(levels, currentLevelKey, currentLevelScore, subjectLevels, examStudentsInfo, studentsGroupByClass, allStudentsPaperMap, examPapersInfo, examFullMark) {
+    var papersFullMark = {};
+    _.each(examPapersInfo, (obj, pid) => papersFullMark[pid] = obj.fullMark);
+    var subjectsMean = _.cloneDeep(subjectLevels[currentLevelKey]);   //makeLevelSubjectMean(currentLevelScore, examStudentsInfo, examPapersInfo, examFullMark);//这里有可能拿不到全科--TODO：在最开始就做校验！！！。
+    var tempSubjectMeanMap = {};
+    _.each(subjectLevels, (subjectLevelObj, levelKey) => {
+        var temp = {};
+        _.each(subjectLevelObj, (v, pid) => {
+            temp[pid] = v.mean;
+        });
+        tempSubjectMeanMap[levelKey] = temp;
+    });
 
-    subjectsMean.totalScore = { id: 'totalScore', mean: levelScore, name: '总分' };
-
+    subjectsMean.totalScore = { id: 'totalScore', mean: currentLevelScore, name: '总分' };
     var result = {};
     result.totalSchool = {};
-
-    result.totalSchool.totalScore = _.filter(examStudentsInfo, (student) => student.score > levelScore).length;//TODO:这里使用">"没有问题么？
+    var totalSchoolLevelInfo = getLevelInfo(levels, examStudentsInfo, examFullMark);
+    var totalSchoolSubjectLevelInfo = getSubjectLevelInfo(tempSubjectMeanMap, allStudentsPaperMap, papersFullMark);
+    result.totalSchool.totalScore = totalSchoolLevelInfo[currentLevelKey].count;
 
     _.each(subjectsMean, (subMean, pid) => {
         if (pid == 'totalScore') return;
-
-        result.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score > subMean.mean).length;
+        result.totalSchool[pid] = totalSchoolSubjectLevelInfo[currentLevelKey][pid].count;
     });
-
     _.each(studentsGroupByClass, (classStudents, className) => {
-        var temp = {};
-        temp.totalScore = _.filter(classStudents, (student) => student.score > levelScore).length;
+        var temp = {}, currentClassStudentsPaperMap = _.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid');
+        var currentClassLevelInfo = getLevelInfo(levels, classStudents, examFullMark);
+        var currentClassSubjectLevelInfo = getSubjectLevelInfo(tempSubjectMeanMap, currentClassStudentsPaperMap, papersFullMark);
+
+        temp.totalScore = currentClassLevelInfo[currentLevelKey].count;
         //Note: 这里的算法没有问题：subjectsMean是全部有效的，而这里遍历的pid是跟着当前班级所考的科目走的
-        _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
-            temp[pid] = _.filter(papers, (paper) => paper.score > subjectsMean[pid].mean).length;
+        _.each(currentClassSubjectLevelInfo[currentLevelKey], (obj, pid) => {
+            temp[pid] = obj.count;
         });
 
         result[className] = temp;
     });
-
     return { subjectLevelInfo: result, subjectsMean: subjectsMean }
 }
 

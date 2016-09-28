@@ -8,13 +8,16 @@ import commonClass from '../../../common/common.css';
 import singleClassReportStyle from './singleClassReport.css';
 import {NUMBER_MAP as numberMap, COLORS_MAP as colorsMap} from '../../../lib/constants';
 
+import {getLevelInfo, getSubjectLevelInfo} from '../../../sdk';
+
 class SubjectLevelDisribution extends React.Component {
     constructor(props) {
         super(props);
         var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = this.props;
         var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
+        var examFullMark = reportDS.examInfo.toJS().fullMark, examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS();
         this.levels = levels;
-        this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
+        this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap, examFullMark, examPapersInfo, examStudentsInfo);
 
         this.state = {
             activeTab: 0
@@ -24,8 +27,9 @@ class SubjectLevelDisribution extends React.Component {
     componentWillReceiveProps(nextProps) {
         var {classStudents, classStudentsPaperMap, classHeadersWithTotalScore, currentClass, reportDS} = nextProps;
         var levels = reportDS.levels.toJS(), subjectLevels = reportDS.subjectLevels.toJS(), gradeName = reportDS.examInfo.toJS().gradeName, allStudentsPaperMap = reportDS.allStudentsPaperMap.toJS();
+        var examFullMark = reportDS.examInfo.toJS().fullMark, examStudentsInfo = reportDS.examStudentsInfo.toJS(), examPapersInfo = reportDS.examPapersInfo.toJS();
         this.levels = levels;
-        this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
+        this.theDS = getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap, examFullMark, examPapersInfo, examStudentsInfo);
 
         this.state = {
             activeTab: 0
@@ -86,13 +90,13 @@ export default SubjectLevelDisribution;
 
 //=================================================  分界线  =================================================
 //各个档次的table数据以及各个档次的文案数据
-function getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
+function getDS(levels, subjectLevels, classHeadersWithTotalScore, gradeName, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap, examFullMark, examPapersInfo, examStudentsInfo) {
     var result = {};
     _.each(levels, (levObj, levelKey) => {
         var subjectLevelMeanInfo = subjectLevels[levelKey];   //_.find(subjectLevels, (obj) => obj.levelKey == levelKey);
         if(!subjectLevelMeanInfo) return;
 
-        var currentSubjectLevelInfo = makeCurrentSubjectLevelInfo(subjectLevelMeanInfo, levObj, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
+        var currentSubjectLevelInfo = makeCurrentSubjectLevelInfo(levels, subjectLevels, examFullMark, examStudentsInfo, examPapersInfo, subjectLevelMeanInfo, levelKey, levObj, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap);
         var {validOrderedSubjectMean} = filterMakeOrderedSubjectMean(levObj, classHeadersWithTotalScore, subjectLevelMeanInfo);
         var tableDS = getTableDS(currentSubjectLevelInfo, validOrderedSubjectMean, gradeName, currentClass);
         var bestAndWorst = getBestAndWorst(currentSubjectLevelInfo, currentClass, subjectLevelMeanInfo);
@@ -196,20 +200,56 @@ function getCurrentClassPercentageRow(currentClassCountRow, totalSchoolRow) {
  *     ...
  * }
  */
-function makeCurrentSubjectLevelInfo(subjectLevelMeanInfo, levObj, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
-    var currentSubjectLevelInfo = {};
-    currentSubjectLevelInfo.totalSchool = {};
-    currentSubjectLevelInfo.totalSchool.totalScore = levObj.count;
-    _.each(subjectLevelMeanInfo, (subMeanInfo, pid) => {
-        currentSubjectLevelInfo.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score > subMeanInfo.mean).length;
+function makeCurrentSubjectLevelInfo(levels, subjectLevels, examFullMark, examStudentsInfo, examPapersInfo, subjectLevelMeanInfo, currentLevelKey, levObj, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
+    var papersFullMark = {};
+    _.each(examPapersInfo, (obj, pid) => papersFullMark[pid] = obj.fullMark);
+    var tempSubjectMeanMap = {};
+    _.each(subjectLevels, (subjectLevelObj, levelKey) => {
+        var temp = {};
+        _.each(subjectLevelObj, (v, pid) => {
+            temp[pid] = v.mean;
+        });
+        tempSubjectMeanMap[levelKey] = temp;
     });
-    var temp = {};
-    temp.totalScore = _.filter(classStudents, (student) => student.score > levObj.score).length;
-    _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
-        temp[pid] = _.filter(papers, (paper) => paper.score > subjectLevelMeanInfo[pid].mean).length;
+
+    var result = {};
+    result.totalSchool = {};
+    var totalSchoolLevelInfo = getLevelInfo(levels, examStudentsInfo, examFullMark);
+    var totalSchoolSubjectLevelInfo = getSubjectLevelInfo(tempSubjectMeanMap, allStudentsPaperMap, papersFullMark);
+    result.totalSchool.totalScore = totalSchoolLevelInfo[currentLevelKey].count;
+    _.each(totalSchoolSubjectLevelInfo[currentLevelKey], (obj, pid) => {
+        result.totalSchool[pid] = obj.count;
     });
-    currentSubjectLevelInfo[currentClass] = temp;
-    return currentSubjectLevelInfo;
+
+    var temp = {}, currentClassStudentsPaperMap = _.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid');
+    var currentClassLevelInfo = getLevelInfo(levels, classStudents, examFullMark);
+    var currentClassSubjectLevelInfo = getSubjectLevelInfo(tempSubjectMeanMap, currentClassStudentsPaperMap, papersFullMark);
+
+    temp.totalScore = currentClassLevelInfo[currentLevelKey].count;
+    _.each(currentClassSubjectLevelInfo[currentLevelKey], (obj, pid) => {
+        temp[pid] = obj.count;
+    });
+
+    result[currentClass] = temp;
+    return result;
+
+
+
+    // var currentSubjectLevelInfo = {};
+    // currentSubjectLevelInfo.totalSchool = {};
+    // currentSubjectLevelInfo.totalSchool.totalScore = levObj.count;
+    // _.each(subjectLevelMeanInfo, (subMeanInfo, pid) => {
+    //     currentSubjectLevelInfo.totalSchool[pid] = _.filter(allStudentsPaperMap[pid], (paper) => paper.score > subMeanInfo.mean).length;
+    // });
+
+
+    // var temp = {};
+    // temp.totalScore = _.filter(classStudents, (student) => student.score > levObj.score).length;
+    // _.each(_.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid'), (papers, pid) => {
+    //     temp[pid] = _.filter(papers, (paper) => paper.score > subjectLevelMeanInfo[pid].mean).length;
+    // });
+    // currentSubjectLevelInfo[currentClass] = temp;
+    // return currentSubjectLevelInfo;
 }
 
 //TODO:抽取出来，作为Common Report Util
