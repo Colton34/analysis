@@ -517,11 +517,9 @@ function validateLevelBuffer({formLevelInfo, examFullMark}) {
 }
 
 function validateSubjectLevel({formLevelInfo, examStudentsInfo, examPapersInfo, examFullMark}) {
-    return ''; //Mock
+    // return ''; //Mock
     var newSubjectLevels = makeSubjectLevels(formLevelInfo, examStudentsInfo, examPapersInfo, examFullMark);
     var isValid = _.every(newSubjectLevels, (levelSubjectsObj, levelKey) => _.size(levelSubjectsObj) === _.size(examPapersInfo));
-    // if(!isValid) return isValid;
-    //找到每个学科的有序序列
     if(isValid) {
         var subjectLevelSegments = _.map(examPapersInfo, (obj, pid) => {
             return _.map(newSubjectLevels, (levelSubjectsObj, levelKey) => levelSubjectsObj[pid]);
@@ -531,9 +529,6 @@ function validateSubjectLevel({formLevelInfo, examStudentsInfo, examPapersInfo, 
             if(!ifValid) return ifValid;
             return _.every(_.range(_.size(singleSubjectLevelSegments)-1), (i) => singleSubjectLevelSegments[i+1] > singleSubjectLevelSegments[i]);
         });
-        if(!isValid) {
-
-        }
     }
     return (isValid) ? '' : '此分档线下的学科分档线不合理'
 }
