@@ -19,6 +19,8 @@ import StudentReport from '../components/dashboard/student-report';
 import LiankaoReport from '../components/dashboard/liankao-report';
 import SchoolReport from '../components/dashboard/school-report';
 
+import LiankaoSchoolReport from '../components/dashboard/liankao_school_report';
+
 import {initDashboardAction} from '../reducers/dashboard/actions';
 import {initParams} from '../lib/util';
 
@@ -143,6 +145,7 @@ class Dashboard extends React.Component {
                                 <div className='row' style={{ marginTop: 20 }}>
                                     {(classReport && _.size(classReport) > 0) ? <ClassReport data={classReport} grade={grade} examid={examid} /> : ''}
                                     {(subjectReport && _.size(subjectReport) > 0) ? <SubjectReport data={subjectReport} grade={grade} examid={examid} /> : ''}
+                                    {user.auth.isLianKaoManager?<LiankaoSchoolReport />:''}
                                 </div>
                                 <Dialog show={this.state.showConfirmDialog} onHide={this.onHideDialog.bind(this) } onConfirm={this.onDeleteAnalysis.bind(this) }/>
                         </div>

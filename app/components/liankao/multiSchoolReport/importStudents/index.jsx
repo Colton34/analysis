@@ -65,6 +65,7 @@ export default function ImportStudentsModule({reportDS}) {
     var headers = reportDS.headers.toJS();
     var topStudentsInfo = getTopStudentsInfo(examStudentsInfo);
     var lowStudentsInfo = getLowStudentsInfo(examStudentsInfo);
+    debugger
     return (
         <div id='importantStudents' className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
@@ -92,7 +93,7 @@ function  getTopStudentsInfo(examStudentsInfo){
 
     var topStudentsInfo = _.map(topStudents,function(student,index){
     return {
-        rank:index+1,
+        rank:student.rank,
         name:student.name,
         score:student.score+'',
         school:student.school
@@ -100,15 +101,38 @@ function  getTopStudentsInfo(examStudentsInfo){
     });
     return topStudentsInfo;
 }
-function  getLowStudentsInfo(examStudentsInfo){
+// function  getLowStudentsInfo(examStudentsInfo){
+//     var lowStudents = _.take(examStudentsInfo,10);
+//     var lowStudentsInfo = _.map(lowStudents,function(student,index){
+//     return {
+//         rank:index+1,
+//         name:student.name,
+//         score:student.score+'',
+//         school:student.school
+//     }
+//     });
+//     return lowStudentsInfo;
+// }
+
+
+function getLowStudentsInfo(examStudentsInfo){
     var lowStudents = _.take(examStudentsInfo,10);
-    var lowStudentsInfo = _.map(lowStudents,function(student,index){
-    return {
-        rank:index+1,
-        name:student.name,
-        score:student.score+'',
-        school:student.school
-    }
+    var lowStudentsRank = _.map(lowStudents,function(obj){
+        return obj.rank;
     });
+    var lowStudentsInfo = _.map(lowStudentsRank,function(value,index){
+        var currentRank = 1;
+        var currentScore = lowStudentsRank[0];
+        if(value!=currentScore){
+            currentRank = index+1;
+            currentScore = lowStudentsRank[index];
+        }
+        return {
+            rank:currentRank,
+            name:examStudentsInfo[index].name,
+            score:examStudentsInfo[index].score+'',
+            school:examStudentsInfo[index].school
+        }
+    })
     return lowStudentsInfo;
 }

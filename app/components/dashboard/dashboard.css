@@ -44,7 +44,7 @@
 .card-image {
     width: 85%;
     height: 65%;
-    margin: 0 auto; 
+    margin: 0 auto;
 }
 
 .detail-btn {
@@ -75,12 +75,12 @@
     background-image: url(../../images/levelReport.png);
 }
 
-.subject-report-img {
+.liankao-report-img {
     width: 390px;
     height: 317px;
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    background-image: url(../../images/subjectReport.png);
+    background-image: url(../../images/liankao_zanweitu.png);
 }
 
 .class-report-img {
