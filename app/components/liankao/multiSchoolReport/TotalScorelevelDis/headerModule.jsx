@@ -236,7 +236,7 @@ class LevelForm extends React.Component {
                 {
                     _.map(formLevelInfo, (formLevObj, levelKey) => {
                         return (
-                            <LevelInputGroup id={levelLastIndex-levelKey} reportDS={this.props.reportDS} formLevelInfo={formLevelInfo} setFormLevelState={this.setFormLevelState.bind(this)} validation={this.validation.bind(this)} />
+                            <LevelInputGroup  key={'levelInput'+levelKey}  id={levelLastIndex-levelKey} reportDS={this.props.reportDS} formLevelInfo={formLevelInfo} setFormLevelState={this.setFormLevelState.bind(this)} validation={this.validation.bind(this)} />
                         )
                     })
                 }
@@ -285,7 +285,7 @@ class HeaderModule extends React.Component {
                     <p style={{marginRight: 20, fontSize: 18, marginBottom: 25}}>
                         <span style={{marginRight: 20}}>分档分数线</span>
                         <span style={{fontSize: 12}}>分档分数线默认分为三档，分别对应学生总数的15%，35%，60%，如需修改请点击右侧按钮</span>
-                        <span onClick={this.showModal.bind(this)} style={{ cursor: 'pointer', color: colorsMap.B03, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30}}>
+                        <span onClick={this.showModal.bind(this)} style={{ cursor: 'pointer', color: colorsMap.B03, textAlign: 'center', display: 'inline-block', width: 110, height: 30, lineHeight: '30px', backgroundColor: '#fff', fontSize: 12, position: 'absolute', top: 20, right: 30,borderRadius:'2px'}}>
                             <i className='icon-cog-2' style={{fontSize: 12}}></i>
                             设置分档参数
                         </span>
