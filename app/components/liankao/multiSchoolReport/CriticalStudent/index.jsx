@@ -177,7 +177,7 @@ class CriticalForm extends React.Component {
     }
 }
 
-const Dialog = (props) => {
+const CriticalDialog = (props) => {
     return (
         <Modal show={ props.isDisplay } onHide={props.hideModal}>
             <Header closeButton={false} style={{ position: 'relative', textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee' }}>
@@ -231,21 +231,8 @@ class CriticalStudentModule extends React.Component {
                     <i className='icon-cog-2'></i>
                     设置临界分数
                 </a>
-                {/*
-                <div>
-                    <Modal show={ this.state.isDisplay } ref="dialog"  onHide={this.hideModal.bind(this)}>
-                        <Header closeButton={false} style={{position: 'relative', textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
-                            <button className={commonClass['dialog-close']} onClick={this.hideModal.bind(this)}>
-                                <i className='icon-cancel-3'></i>
-                            </button>
-                            设置分档线
-                        </Header>
-                        <CriticalForm reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)} saveBaseline={this.props.saveBaseline}
+                <CriticalDialog isDisplay={this.state.isDisplay} hideModal={this.hideModal.bind(this)} reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)} saveBaseline={this.props.saveBaseline}
                             updateLevelBuffers={this.props.updateLevelBuffers.bind(this)} />
-                    </Modal>
-                </div>*/}
-                <Dialog isDisplay={this.state.isDisplay} hideModal={this.hideModal.bind(this)} reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)} saveBaseline={this.props.saveBaseline}
-                            updateLevelBuffers={this.props.updateLevelBuffers.bind(this)}/>
                 <TableView hover tableHeaders={this.tableHeaders} tableData={this.tableData} TableComponent={EnhanceTable}/>
             </div>
         );
@@ -319,7 +306,7 @@ function getTableHeaders(levels) {
         let header = {};
         header.id = i;
         header.name = numberMap[i + 1] + '档临界生人数';
-        tableHeaders[0].push(header);        
+        tableHeaders[0].push(header);
     }
     return tableHeaders;
 
@@ -333,7 +320,7 @@ function getTableData(studentsInfoBySchool, levels, levelBuffers, schoolNames) {
         var rowData = {school: schoolName};
         var segmentsCount = makeSegmentsCount(studentsInfoBySchool[schoolName], segments); //从低到高
         _.forEach(levels, (levelInfo, levelNum) => {
-            rowData[levelNum] = segmentsCount[levelSize - levelNum -1];    
+            rowData[levelNum] = segmentsCount[levelSize - levelNum -1];
         })
         tableData.push(rowData);
     })

@@ -17,7 +17,11 @@ export default class ScoreLevel extends React.Component{
         }
     }
 
-    updateLevelPercentages(newLevelPercentages) {
+    changeLevelPercentages(newLevelPercentages) {
+        newLevelPercentages = _.map(newLevelPercentages, (v) => parseFloat(v));
+        newLevelPercentages.unshift(0);
+        newLevelPercentages.push(100);
+        debugger;
         this.setState({
             levelPercentages: newLevelPercentages
         })
@@ -29,7 +33,7 @@ export default class ScoreLevel extends React.Component{
 
         return (
             <div>
-                <ScoreLevelBySubject levelPercentages={levelPercentages} reportDS={reportDS}/>
+                <ScoreLevelBySubject levelPercentages={levelPercentages} reportDS={reportDS} changeLevelPercentages={this.changeLevelPercentages.bind(this)} />
                 <ScoreLevelBySchool levelPercentages={levelPercentages} reportDS={reportDS}/>
             </div>
         )
