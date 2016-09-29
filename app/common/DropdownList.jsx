@@ -146,20 +146,14 @@ class DropdownList extends React.Component {
         
         this.refs.list.className += ' hide';
     }
-    shouldShowTitle(boxStyle, showStr) {
-        var maxWidth  = boxStyle.minWidth || boxStyle.maxWidth || boxStyle.width || textWidth;
-        var $tmp = $('<span>' + showStr + '</span>').appendTo('body');
-        $tmp.hide();
-        var width = $tmp.width();
-        $tmp.remove();
-        if (width > maxWidth) return true;
-        else return false;
+    shouldShowTitle(showStr) {
+        return showStr.length > 5; 
     }
     render() {
         var {active, current} = this.state;
         var {surfaceBtnStyle, style, fixWidth} = this.props;
         var _this = this;
-        var showTitle = !!(fixWidth && this.shouldShowTitle(surfaceBtnStyle ? surfaceBtnStyle : {}, current.value));
+        var showTitle = !!(fixWidth && this.shouldShowTitle(current.value));
         return (
             <div id='dropdownList' style={_.assign({textAlign: 'center'}, style ? style : {})}>
                 <a style={_.assign({}, localStyle.btn, localStyle.surfaceBtn, surfaceBtnStyle? surfaceBtnStyle : {},  showTitle ? {width: btnMaxWidth} : {minWidth: btnMinWidth})} href="javascript:void(0)" onClick={this.toggleList.bind(this)} data-title={showTitle ? current.value : ''} className={showTitle ? 'ellipsis-title':''}>
@@ -171,7 +165,7 @@ class DropdownList extends React.Component {
                         {
                             _.map(_this.state.coveredItems, (item,index) => {
                                 var selectedStyle = item.selected ? {backgroundColor: colorsMap.C03}: {};
-                                var showTitle = !!(fixWidth && this.shouldShowTitle({}, item.value));
+                                var showTitle = !!(fixWidth && this.shouldShowTitle(item.value));
                                 return (
                                     <li key={index} style={_.assign({}, {height: 30, backgroundColor: '#fff', position: 'relative'}, showTitle ? {width: btnMaxWidth} : {minWidth: btnMinWidth})}>
                                         <a  key={'ddAtag-' + index}
