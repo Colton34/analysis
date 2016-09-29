@@ -36,7 +36,7 @@ const GlobalGuideCom = ({data}) => {
                 <div style={localStyle.inlineBox}>
                     <span style={localStyle.numStyle}>{data.realStudentsCount}</span>
                     <span>考试学生数</span>
-                    <span style={localStyle.borderBox}></span>
+                    
                 </div>
 {/*
                 <div style={localStyle.inlineBox}>
@@ -50,7 +50,7 @@ const GlobalGuideCom = ({data}) => {
 }
 
 var localStyle = {
-    inlineBox: {width: 275, height: 45, lineHeight: '45px', float: 'left', display: 'inline-block', marginLeft: 25, position: 'relative'},
+    inlineBox: {width: 375, height: 45, lineHeight: '45px', float: 'left', display: 'inline-block', marginLeft: 25, position: 'relative'},
     borderBox: {display: 'inline-block', height: 27,borderRight: '1px solid #efefef', position: 'absolute', top: '50%', marginTop: -13.5, right: 0},
     numStyle:  {color: '#1daef8', fontSize: 36, marginRight: 10 },
     descStyle: {fontSize: 14}

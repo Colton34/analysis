@@ -281,7 +281,6 @@ class Dialog extends React.Component {
         var newBaseline = getNewBaseline(this.levels, this.props.examStudentsInfo, this.props.examPapersInfo, this.props.examId, this.props.examInfo, this.props.levelBuffers);
 //对学科平均分进行校验：保证所有level下的value都是和科目数相同的
         var isValidSubjectMean = _.every(newBaseline['[subjectLevels]'], (subjectMeansObj) => _.size(subjectMeansObj.values) == _.size(examPapersInfo));
-        // debugger;
         if(!isValidSubjectMean) {
             isValid = false;
             errorMsg = '分档线设置不正确导致无效的学科平均分';

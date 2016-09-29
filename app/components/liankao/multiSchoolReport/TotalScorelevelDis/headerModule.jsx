@@ -147,17 +147,17 @@ class LevelRadioGroup extends React.Component {
                 selectedValue={this.state.selectedValue}
                 onChange={this.handleChange.bind(this)}>
                 <div style={{padding:'0 30px 30px 0'}}>
-                <span>本场最高分{_.last(this.props.examStudentsInfo).score}分。当前设置为</span >
-                {
-                    _.map(defaultRadioRange, (levelCount) => {
-                        return (
-                            <label  key={'label'+levelCount} id={levelCount} style={{paddingLeft:'20px'}}>
-                                <Radio value={levelCount} />{numberMap[levelCount]+'档'}
-                            </label>
-                        )
-                    })
-                }
-            </div>
+                    <span>本场最高分{_.last(this.props.examStudentsInfo).score}分。当前设置为</span>
+                    {
+                        _.map(defaultRadioRange, (levelCount) => {
+                            return (
+                                <label  key={'label'+levelCount} id={levelCount} style={{paddingLeft:'20px'}}>
+                                    <Radio value={levelCount} />{numberMap[levelCount]+'档'}
+                                </label>
+                            )
+                        })
+                    }
+                </div>
             </RadioGroup>
         );
     }
@@ -278,7 +278,7 @@ class HeaderModule extends React.Component {
         var examId = this.props.examId;
         var grade = this.props.grade;
         var levTotal = _.size(levels);
-        
+
         return (
             <div>
                 <div style={{position: 'relative', padding: 30, backgroundColor: colorsMap.B03, color: '#fff', marginBottom: 20,borderRadius:'2px'}}>

@@ -338,7 +338,6 @@ class ExamList extends React.Component {
 }
 
 const Content = ({examList, errorInfo}) => {
-
     return (
         <div style={{ width: 1200, margin: '0 auto', minHeight: 900, backgroundColor: '#eff1f4', position:'relative', paddingBottom: 80}}>
             <ExamList examList={examList} errorInfo={errorInfo}/>
@@ -362,13 +361,6 @@ class Home extends React.Component {
     render() {
         var examList = (List.isList(this.props.home.examList)) ? this.props.home.examList.toJS() : this.props.home.examList;
         var errorInfo = (Map.isMap(this.props.home.errorInfo)) ? this.props.home.errorInfo.toJS() : this.props.home.errorInfo;
-        // if(!examList || examList.length == 0)
-        //     return (
-        //         <div style={{width: '100%', minHeight: 900, position: 'relative'}}>
-        //             <HomeBlank message="exam.length == 0" />
-        //         </div>
-        //     );
-
 
         return (
             <div >

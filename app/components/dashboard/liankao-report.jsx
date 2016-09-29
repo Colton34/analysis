@@ -75,16 +75,27 @@ class LianKaoReportCard extends React.Component {
                 x: -20 //center
             },
             xAxis: {
+                tickWidth: '0px',//不显示刻度
+                title:{//x轴标签
+                    align:'high',
+                    text:'分数',
+                    margin:0,
+                    offset:7
+                },
                 categories: data['x-axon']
             },
             yAxis: {
+                allowDecimals:false,//不允许为小数
+                lineWidth: 1,
+                gridLineDashStyle: 'Dash',
+                gridLineColor: '#f2f2f3',
                 title: {
-                    text: '人数'
+                    text: '人数',
                 },
                 plotLines: [{
                     value: 0,
                     width: 1,
-                    color: '#808080'
+                    color: '#f2f2f3'
                 }]
             },
             tooltip: {
