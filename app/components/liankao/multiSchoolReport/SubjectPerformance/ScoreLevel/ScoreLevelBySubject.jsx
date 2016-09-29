@@ -92,17 +92,18 @@ class ScoreLevelInput extends React.Component {
         console.log(this.state.value);
         debugger;
         return (
-            <div style={{marginBottom: this.props.levelIndex == 0 ? 0 : 30}}>
-                <div>
-                    <label htmlFor={this.props.levelIndex+'-'+'input'}>{letterMap[levelLastIndex - this.props.levelIndex] + '档线'}</label>
+            <div style={{marginBottom: 30}}>
+                <div >
+                    <label htmlFor={this.props.levelIndex+'-'+'input'} style={{fontWeight:400}}>{letterMap[levelLastIndex - this.props.levelIndex] + '等：'}</label>
                     <input
                       type='text'
                       placeholder={this.props.value}
                       value={this.state.value}
                       onChange={this.handleChange.bind(this)}
                       onBlur={this.handleBlur.bind(this)}
-                      style={{ width: 280, height: 34, display: 'inline-block', textAlign: 'left', paddingLeft: 20, margin: '0 20px'}}
-                    />分
+                      style={{ width: 148, height: 34, display: 'inline-block', textAlign: 'left', paddingLeft: 20, margin: '0 0 0 10px'}}
+                    />%
+                    <span style={{paddingLeft:10}}>表示在总分×{this.state.value}%的分数以上学生为{letterMap[levelLastIndex - this.props.levelIndex]}等</span>
                 </div>
                 {(this.state.errorMsg) ? (<div className={commonClass['validation-error']}>{this.state.errorMsg}</div>) : ''}
             </div>
@@ -129,7 +130,7 @@ class ScoreLevelRadioGroup extends React.Component {
                 name="levels"
                 selectedValue={this.state.selectedValue}
                 onChange={this.handleChange.bind(this)}>
-                <div style={{padding:'0 30px 30px 0'}}>
+                <div style={{padding:'0 30px 30px 0',paddingLeft:150}}>
                     {/*<span>本场最高分{_.last(this.props.examStudentsInfo).score}分。当前设置为</span>*/}
                     {
                         _.map(defaultRadioRange, (levelCount) => {
@@ -191,13 +192,13 @@ class ScoreLevelForm extends React.Component {
                 {
                     _.map(this.state.levelPercentages, (percentageValue, index) => {
                         return (
-                            <ScoreLevelInput key={index} levelIndex={levelLastIndex-index} value={percentageValue} levelPercentages={this.state.levelPercentages} setFormIsValid={this.setFormIsValid.bind(this)} />
+                            <ScoreLevelInput  key={index} levelIndex={levelLastIndex-index} value={percentageValue} levelPercentages={this.state.levelPercentages} setFormIsValid={this.setFormIsValid.bind(this)} />
                         )
                     })
                 }
                 <div style={{textAlign:'center'}}>
                     <button onClick={this.handleSubmit.bind(this)} disabled={!this.state.formIsValid} style={{backgroundColor: '#59bde5', color: '#fff', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',padding:0,borderWidth:0,marginRight:'20px',borderRadius:'2px'}}>确认</button>
-                    <button onClick={this.props.hideModal} style={{backgroundColor: '#f2f2f2', color: '#fff', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',padding:0,borderWidth:0,borderRadius:'2px'}}>取消</button>
+                    <button onClick={this.props.hideModal} style={{backgroundColor: '#f2f2f2', color: 'rgb(106,106,106)', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',padding:0,borderWidth:0,borderRadius:'2px'}}>取消</button>
                 </div>
             </div>
         );
@@ -247,8 +248,9 @@ export default class ScoreLevelBySubject extends React.Component {
             <div>
                 <div style={{margin: '30px 0 20px 0'}}>
                     <span className={commonClass['sub-title']}>各学科成绩的等级结构比例</span>
-                    <span onClick={this.showModal.bind(this)}>
-                        <i className='icon-cog-2' style={{fontSize: 12}}></i>
+
+                    <span onClick={this.showModal.bind(this)} style={{color:'#fff',backgroundColor:'rgb(29,174,248)',width:120,height:30,float:'right',borderRadius:'2px',lineHeight:'30px',cursor:'pointer'}}>
+                        <i className='icon-cog-2' style={{fontSize: 12,paddingLeft:10}}></i>
                         设置分档参数
                     </span>
                 </div>
