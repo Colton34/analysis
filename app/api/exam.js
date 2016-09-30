@@ -2,11 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-<<<<<<< Updated upstream
-* @Last Modified time: 2016-09-27 20:08:04
-=======
-* @Last Modified time: 2016-09-27 14:26:29
->>>>>>> Stashed changes
+* @Last Modified time: 2016-09-30 12:03:55
 */
 
 

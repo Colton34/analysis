@@ -16,13 +16,18 @@ export default class ContributionDis extends React.Component {
         this.state = {
             currentLevel : 0
         }
-        
+
         var {reportDS, studentsPaperMapByGroup, tableHeadersByLevel, paperSchoolLevelMap} = this.props;
+        // debugger;
         var headers = reportDS.headers.toJS(),levels = reportDS.levels.toJS(), subjectLevels=reportDS.subjectLevels.toJS(), headers=reportDS.headers.toJS();
 
         this.levelSize = _.size(levels);
         this.tableHeadersByLevel = getTableHeadersByLevel(tableHeadersByLevel);
+        // console.log('1');
+        // debugger;
         this.tableDataByLevel = getTableDataByLevel(studentsPaperMapByGroup, paperSchoolLevelMap, headers, levels, subjectLevels)
+        // console.log('2');
+        // debugger;
     }
 
     switchTab(levelNum) {
@@ -36,7 +41,7 @@ export default class ContributionDis extends React.Component {
             <div style={{marginTop: 30}}>
                 <div className={commonClass['sub-title']}>学科分档上线学科贡献率</div>
                 <div style={{margin: '10px 0 20px'}}>
-                    各个学校由于各自实际的客观原因（比如有示范校与普通校之分），学生的学业层次表现有较大的差异。对各学校自身水平而言，存在学科贡献的非均衡性。 
+                    各个学校由于各自实际的客观原因（比如有示范校与普通校之分），学生的学业层次表现有较大的差异。对各学校自身水平而言，存在学科贡献的非均衡性。
                     我们基于学校所有学科实际综合水平的表现来考虑某学科对分档上线的贡献，并联系联考总体的对应情况进行综合分析，提炼出促进分批上线的“学科贡献率”指标。
                     一个学校的“学科贡献率”有正值或者负值。正值数值越大越好，负值的绝对值越大越不好。
                 </div>
@@ -75,15 +80,16 @@ function getTableHeadersByLevel(tableHeadersByLevel) {
 }
 
 /**
- * 
+ *
  */
 function getTableDataByLevel(studentsPaperMapByGroup, paperSchoolLevelMap, headers, levels, subjectLevels) {
     var schoolNames = ['联考全体'].concat(_.keys(_.omit(studentsPaperMapByGroup.totalScore, '联考全体')));//为了让’联考全体‘放在第一位
     var tableDataByLevel = {};
 
     var oriMatrixByLevel = getOriginalMatrixByLevel(paperSchoolLevelMap, studentsPaperMapByGroup, headers, schoolNames, _.size(levels));
+    // debugger;
     var factorMatrixByLevel = getFactorMatrixByLevel(oriMatrixByLevel);
-    
+// debugger;
     var levelSize = _.size(levels);
     _.forEach(_.range(levelSize), levelNum => {
         var tableData = [];
@@ -91,6 +97,11 @@ function getTableDataByLevel(studentsPaperMapByGroup, paperSchoolLevelMap, heade
         _.forEach(schoolNames.slice(1), (schoolName, rowIndex) => { // 没有“联考全体”一项
             var rowData = {school: schoolName};
             _.forEach(headers.slice(1), (headerInfo, colIndex) => { // 没有“总分”一项
+
+// if(!factorMatrixByLevel[levelNum][rowIndex]) {
+//     debugger;
+// }
+
                 rowData[headerInfo.id] = factorMatrixByLevel[levelNum][rowIndex][colIndex];
             })
             tableData.push(rowData);
@@ -98,7 +109,7 @@ function getTableDataByLevel(studentsPaperMapByGroup, paperSchoolLevelMap, heade
         tableDataByLevel[levelNum] = tableData;
     })
     return tableDataByLevel;
-} 
+}
 
 /**
  * @param: studentsPaperMapByGroup: 由父组件传递的结构；
@@ -149,7 +160,7 @@ function getPaperSchoolLevelMap(studentsPaperMapByGroup, levels, subjectLevels) 
                             }
                             studentsByLevel[levelSize - i -1].push(studentInfo);
                             break;
-                        }     
+                        }
                     }
                 } else {
                     for(let i=0; i < levelSize; i++) {
@@ -170,10 +181,11 @@ function getPaperSchoolLevelMap(studentsPaperMapByGroup, levels, subjectLevels) 
 }
 
 /**
- * 
+ *
  * @return: Object, 其中key为档次（0代表高分档）， value是相应的originalMatrix;
  */
 function getOriginalMatrixByLevel(paperSchoolLevelMap, studentsPaperMapByGroup, headers, schoolNames, levelSize) {
+    debugger;
     var oriMatrixByLevel = {};
     _.forEach(_.range(levelSize), levelNum => {
         var oriMatrix = [];
@@ -181,21 +193,25 @@ function getOriginalMatrixByLevel(paperSchoolLevelMap, studentsPaperMapByGroup, 
             var rowData = [];
             _.forEach(headers, headerInfo => {
                 var levelStudentsMap = paperSchoolLevelMap[headerInfo.id][schoolName]; // 考虑某些学校没参加某科目的情况;
-                var levelRate = levelStudentsMap ? _.round(levelStudentsMap[levelNum].length / studentsPaperMapByGroup[headerInfo.id][schoolName].length, 2) : '--'; 
-                //var scoreRate = levelStudentsMap ? _.round(_.meanBy(paperSchoolLevelMap[headerInfo.id][schoolName][levelNum], studentInfo => {return studentInfo.score}) / headerInfo.fullMark, 2) : '--'; 
+                if(!levelStudentsMap[levelNum] || !studentsPaperMapByGroup[headerInfo.id][schoolName]) {
+                    debugger;
+                }
+                var levelRate = levelStudentsMap ? _.round(levelStudentsMap[levelNum].length / studentsPaperMapByGroup[headerInfo.id][schoolName].length, 2) : '--';
+                //var scoreRate = levelStudentsMap ? _.round(_.meanBy(paperSchoolLevelMap[headerInfo.id][schoolName][levelNum], studentInfo => {return studentInfo.score}) / headerInfo.fullMark, 2) : '--';
                 rowData.push(levelRate);
             })
             oriMatrix.push(rowData);
         })
         oriMatrixByLevel[levelNum] = oriMatrix;
     })
+    debugger;
     return oriMatrixByLevel;
 }
 
 /**
- * 
+ *
  * @return: Object, 其中key为档次（0代表高分档）， value是相应的factorMatrix;
- * 
+ *
  */
 function getFactorMatrixByLevel(oriMatrixByLevel) {
     var factorMatrixByLevel = {};

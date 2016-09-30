@@ -1,12 +1,7 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified by:   HellMagic
-<<<<<<< Updated upstream
-* @Last Modified time: 2016-09-28 10:49:48
-=======
-* @Last Modified time: 2016-09-27 18:59:02
->>>>>>> Stashed changes
+* @Last Modified time: 2016-09-30 14:27:17
 */
 
 'use strict';
@@ -212,6 +207,7 @@ export function addRankInfo(studentObjs) {
     });
 }
 
+//TODO:这里设计的时候能不能考虑format的难易程度--遵从方便横向扫描的原则
 export function getLevelInfo(levels, baseStudents, examFullMark, isByScore=true) {
     var levelScoreRel = getLevelScoreRel(levels, baseStudents, examFullMark, isByScore);
     var targets, count, sumCount, sumPercentage, result = {}, temp = {}, levelLastIndex = _.size(levels) - 1;
@@ -295,10 +291,10 @@ function getSubjectLevelRel(subjectLevels, papersFullMark) {
     var result = {}, temp, highLevelPaperMean;
     _.each(subjectLevels, (papersLevelObj, levelKey) => {
         temp = {};
-        _.each(papersLevelObj, (paperMean, pid) => {
-            highLevelPaperMean = (levelKey == levelLastIndex + '') ? papersFullMark[pid] : subjectLevels[(parseInt(levelKey)+1)+''][pid];
+        _.each(papersLevelObj, (paperMeanObj, pid) => {
+            highLevelPaperMean = (levelKey == levelLastIndex + '') ? papersFullMark[pid] : subjectLevels[(parseInt(levelKey)+1)+''][pid].mean;
             temp[pid] = {
-                currentLevelPaperMean: paperMean,
+                currentLevelPaperMean: paperMeanObj.mean,
                 highLevelPaperMean: highLevelPaperMean
             }
         });

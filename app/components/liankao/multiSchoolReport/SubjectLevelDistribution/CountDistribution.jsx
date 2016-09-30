@@ -32,6 +32,7 @@ export default class StudentCountDistribution extends React.Component {
     render() {
         var {currentLevel} = this.state;
         var {tableHeadersByLevel} = this.props;
+        var levelLastIndex = this.levelSize - 1;
         return (
             <div style={{marginTop: 30}}>
                 <div className={commonClass['sub-title']}>学科分档上线学生人数分布</div>
@@ -51,7 +52,7 @@ export default class StudentCountDistribution extends React.Component {
                     }
                     </ul>
                 </div>
-                <TableView hover tableHeaders={tableHeadersByLevel[currentLevel]} tableData={this.tableDataByLevel[currentLevel]} TableComponent={EnhanceTable}/>
+                <TableView hover tableHeaders={tableHeadersByLevel[currentLevel]} tableData={this.tableDataByLevel[(levelLastIndex-currentLevel)+'']} TableComponent={EnhanceTable}/>
                 <div className={commonClass['analysis-conclusion']}>
                     <p>分析诊断:</p>
                     <div>
@@ -100,6 +101,7 @@ function getTableDataByLevel(paperSchoolLevelMap, headers, levels, subjectLevels
             tableData.push(rowData);
         })
     })
+    debugger;
     return tableDataByLevel;
 }
 
