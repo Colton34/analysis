@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-03 16:03:36
+* @Last Modified time: 2016-10-03 19:51:57
 */
 'use strict';
 var _ = require('lodash');
@@ -239,4 +239,32 @@ function generateExamClassesInfo(examStudentsInfo) {
         }
     });
     return result;
+}
+
+exports.saveCustomExam = function(customExam) {
+    var url = config.analysisServer + '/save';
+    return when.promise(function(resolve, reject) {
+        client.post(url, {body: customExam, json: true}, function(err, response, body) {
+            if (err) return reject(new errors.URIError('查询analysis server(save exam) Error: ', err));
+            var data = JSON.parse(body);
+            if(data.error) return reject(new errors.Error('查询analysis server(save exam)失败'));
+            resolve(body);
+        });
+    });
+}
+
+exports.createCustomExamInfo = function(examId, examName, userId) {
+    return when.promise(function(resolve, reject) {
+        var customExamInfo = {
+            exam_id: examId,
+            name: examName,
+            owner: userId,
+            create_time: new Date(),
+            status: 0
+        };
+        peterFX.create('@CustomExamInfo', customExamInfo, function(err, result) {
+            if(err) return reject(new errors.data.MongoDBError('【createCustomExamInfo】Error: ', err));
+            resolve(examId);
+        });
+    })
 }
