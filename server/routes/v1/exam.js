@@ -2,7 +2,7 @@
  * @Author: HellMagic
  * @Date:   2016-04-30 11:14:17
  * @Last Modified by:   HellMagic
- * @Last Modified time: 2016-09-23 09:36:07
+ * @Last Modified time: 2016-10-03 16:30:18
  */
 
 'use strict';
@@ -26,7 +26,8 @@ router.get('/custom/rank/report', exam.customRankReport);
 router.get('/school/analysis',  exam.validateExam, exam.initExam, exam.schoolAnalysis);
 router.get('/custom/school/analysis', exam.customSchoolAnalysis);
 
-router.post('/custom/analysis', exam.createCustomAnalysis);
+// router.post('/custom/analysis', exam.createCustomAnalysis);
+router.post('/custom/analysis', exam.createCustomAnalysis2);
 router.put('/custom/analysis', exam.inValidCustomAnalysis);
 
 router.put('/levels', exam.updateExamBaseline);

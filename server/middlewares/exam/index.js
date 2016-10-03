@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-03 16:03:58
+* @Last Modified time: 2016-10-03 19:24:46
 */
 
 'use strict';
@@ -13,6 +13,8 @@ var when = require('when');
 var moment = require('moment');
 require('moment/locale/zh-cn');
 var errors = require('common-errors');
+
+var client = require('request');
 
 var examUitls = require('./util');
 var peterFX = require('peter').getManager('fx');
@@ -403,6 +405,148 @@ exports.createCustomAnalysis = function(req, res, next) {
         if(err) return next(new errors.data.MongoDBError('创建自定义分析错误', err));
         res.status(200).json({examId: result});
     });
+}
+
+
+// router.post('/save', function(req, res){
+
+//     var user = req.session.user;
+//     var schoolId = user.schoolId;
+//     var exam = JSON.parse(req.body.exam);
+
+//     exam.school_id = schoolId;
+
+//     co(function*(){
+//         var response = yield coRequest({
+//             url: `${dataServer}/save`, //URL to hit
+//             method: 'POST',
+//             json: exam
+//         });
+//         var examId = response.body;
+
+//         console.log(`创建考试结果，examId = ${examId}`);
+//         if(examId){
+//             //调用数据服务保存接口，得到返回examId，记录分析管理需要的相关数据。
+//             var rebuildExam = {
+//                 exam_id : `${examId}`,
+//                 data_set_id : `${examId}`,
+//                 name : exam.exam_name,
+//                 creator : '' + user.id,
+//                 create_time : new Date(),
+//                 status : 0
+//             };
+
+//             var rebuildExamId = yield coPeter.create('@Exam', rebuildExam);
+//         }else{
+//             throw "考试创建失败";
+//         }
+
+//         res.json(httpResult.succ('OK'));
+
+//     }).catch(function(err){
+//         console.log(err);
+//         res.json(httpResult.err_logic(err));
+//     });
+// });
+
+//     var url = config.analysisServer + '/exam?id=' + examid;
+
+//     return when.promise(function(resolve, reject) {
+//         client.get(url, {}, function(err, res, body) {
+//             if (err) return reject(new errors.URIError('查询analysis server(getExamById) Error: ', err));
+//             var data = JSON.parse(body);
+//             if(data.error) return reject(new errors.Error('查询analysis server(getExamById)失败, examid = ' + examid));
+//             data.fetchId = examid;
+//             if(fromType) data.from = fromType;
+//             resolve(data);
+//         });
+//     })
+
+
+exports.createCustomAnalysis2 = function(req, res, next) {
+    if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
+    // var url = config.analysisServer + '/save';
+    var url = 'http://ct.yunxiao.com:8158/save';
+    // var url = 'http://localhost:5000/test';
+    req.body.data.school_id = req.user.schoolId;
+
+console.log('school_id = ', req.user.schoolId);
+
+
+    var grade = req.body.data.papers[0].grade;
+
+// console.log('x length = ', req.body.data.papers[0].matrix.x.length);
+
+        // client.post(url, {body: req.body.data, json: true}, function(err, response, body) {
+        //     if (err) return next(new errors.URIError('查询analysis server(save exam) Error: ', err));
+        //     var data = JSON.parse(body);
+        //     if(data.error) return next(new errors.Error('查询analysis server(save exam)失败'));
+        //     console.log('response body = ', body);
+        //     res.status(200).send(body);
+        //     // resolve(body);
+        // });
+    when.promise(function(resolve, reject) {
+        client.post(url, {body: req.body.data, json: true}, function(err, response, body) {
+            if (err) return reject(new errors.URIError('查询analysis server(save exam) Error: ', err));
+            var data = JSON.parse(body);
+            if(data.error) return reject(new errors.Error('查询analysis server(save exam)失败'));
+            resolve(body);
+        });
+    }).then(function(examId) {
+
+console.log('examId = ', examId);
+console.log('isString = ', _.isString(examId));
+console.log('req.user.id = ', req.user.id);
+console.log('userid is string = ', _.isString(req.user.id));
+
+
+//             var rebuildExam = {
+//                 exam_id : `${examId}`,
+//                 data_set_id : `${examId}`,
+//                 name : exam.exam_name,
+//                 creator : '' + user.id,
+//                 create_time : new Date(),
+//                 status : 0
+//             };
+
+//             var rebuildExamId = yield coPeter.create('@Exam', rebuildExam);
+        var customExamInfo = {
+            exam_id: '5000225',
+            name: req.body.data['exam_name'],
+            owner: req.user.id,
+            create_time: new Date(),
+            status: 0
+        };
+
+console.log('======== validId = ', examId+'-'+req.user.schoolId);
+
+            peterFX.create('@CustomExamInfo', customExamInfo, function(err, re) {
+                if(err) return next(err);
+                console.log('=======  re = ', re);
+                //TODO: 这里需要老大返回可用的examId而不是
+                res.status(200).json({examId: examId+'-'+req.user.schoolId, grade: grade});
+            });
+        // return when.promise(function(resolve, reject) {
+        //     peterFX.create('@CustomExamInfo', customExamInfo, function(err, re) {
+        //         if(err) return reject(err);
+        //         console.log('=======  re = ', re);
+        //         res.status(200).json(re);
+        //     })
+        // })
+    }).catch(function(err) {
+        next(err);
+    })
+
+
+    // return when.promise(function(resolve, reject) {
+    //     client.post(url, {data: req.body.data}, function(err, response, body) {
+    //         if (err) return reject(new errors.URIError('查询analysis server(save exam) Error: ', err));
+    //         // var data = JSON.parse(body);
+    //         // if(data.error) return reject(new errors.Error('查询analysis server(save exam)失败'));
+    //         console.log('response body = ', body);
+    //         res.status(200).send(body);
+    //     })
+    // })
 }
 
 exports.inValidCustomAnalysis = function(req, res, next) {

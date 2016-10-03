@@ -111,11 +111,14 @@ class CustomizeAnalysis extends React.Component {
             value.newSQM = newSQM;
         });
 
-        var postData = makeExamSchema(resultSet, this.props.analysisName);
+        // var postData = makeExamSchema(resultSet, this.props.analysisName);
+        var postData = makeExamSchema2(resultSet, this.props.analysisName);
+
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         params.request.post(customBaseUrl, { data: postData }).then(function (res) {
             //创建成功后进入到此分析的Dashboard
-            browserHistory.push('/dashboard?examid=' + res.data.examId);
+            debugger;
+            browserHistory.push('/dashboard?examid=' + res.data.examId+'&grade='+res.data.grade);
         }).catch(function (err) {
             console.log('自定义分析创建失败：', err);
             this.generatingAnalysis = false;
@@ -357,6 +360,25 @@ currentSubject: {
 }
 
 */
+
+function makeExamSchema2(resultSet, analysisName) {
+    debugger;
+    var papers = _.map(resultSet, (obj, subjectName) => {
+        return {
+            grade: obj.grade,
+            matrix: obj.newSQM,
+            paper_name: analysisName + '-' + subjectName,
+            subject: subjectName
+        }
+    });
+
+    return {
+        exam_name: analysisName,
+        papers: papers
+    }
+}
+
+
 function makeExamSchema(resultSet, analysisName) {
     var subjectKeys = _.keys(resultSet);
     var subjectsIdArr = _.map(subjectKeys, (subjectName) => {
