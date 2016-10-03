@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-03 19:03:53
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-25 11:35:31
+* @Last Modified time: 2016-10-03 13:50:50
 */
 
 'use strict';
@@ -67,6 +67,36 @@ exports.getUserInfo2 = function(name, pwd){
     });
 }
 
+exports.fetchUserAuthorization = function(userId) {
+    var url = buildGetUrl(apiAccessRange, {userid: userId});
+    return when.promise(function(resolve, reject) {
+        client.get(url, {}, function(err, res, body) {
+            if(err) return reject(new errors.URIError('获取用户权限I失败', err));
+            if(res.statusCode != 200) return reject(new errors.URIError('获取用户权限I不成功'));
+            body = body.replace(new RegExp('""', 'g'), 'null');
+            body = JSON.parse(body);
+
+            if(body.code != 1) return reject(new errors.Error('获取用户权限I Error: body.code != 1'));
+            // resolve(body.object);
+            return resolve(parseGrade(body.object));
+        })
+    })
+}
+
+exports.fetchUserAuthorization2 = function(userId) {
+    return when.promise(function(resolve, reject) {
+        client.post(apiAccessRange2, {json: {userId: ''+userId}}, function(err, res, body) {
+            if(err) return reject(new errors.URIError('获取用户权限II失败', err));
+            if(res.statusCode != 200) return reject(new errors.URIError('获取用户权限II不成功'));
+            body = JSON.stringify(body).replace(new RegExp('""', 'g'), 'null');
+            body = JSON.parse(body);
+            if(body.code != 0) return reject(new errors.Error('获取用户权限II Error: body.code != 0'));
+            // resolve(body.data);
+            return resolve(parseGrade(body.data));
+        })
+    })
+}
+
 
 function buildGetUrl(apiUrl, params){
     return `${apiUrl}?` + qs.stringify(params);
@@ -98,37 +128,6 @@ function getUserId(url) {
         });
     })
 }
-
-exports.fetchUserAuthorization = function(userId) {
-    var url = buildGetUrl(apiAccessRange, {userid: userId});
-    return when.promise(function(resolve, reject) {
-        client.get(url, {}, function(err, res, body) {
-            if(err) return reject(new errors.URIError('获取用户权限I失败', err));
-            if(res.statusCode != 200) return reject(new errors.URIError('获取用户权限I不成功'));
-            body = body.replace(new RegExp('""', 'g'), 'null');
-            body = JSON.parse(body);
-
-            if(body.code != 1) return reject(new errors.Error('获取用户权限I Error: body.code != 1'));
-            // resolve(body.object);
-            return resolve(parseGrade(body.object));
-        })
-    })
-}
-
-exports.fetchUserAuthorization2 = function(userId) {
-    return when.promise(function(resolve, reject) {
-        client.post(apiAccessRange2, {json: {userId: ''+userId}}, function(err, res, body) {
-            if(err) return reject(new errors.URIError('获取用户权限II失败', err));
-            if(res.statusCode != 200) return reject(new errors.URIError('获取用户权限II不成功'));
-            body = JSON.stringify(body).replace(new RegExp('""', 'g'), 'null');
-            body = JSON.parse(body);
-            if(body.code != 0) return reject(new errors.Error('获取用户权限II Error: body.code != 0'));
-            // resolve(body.data);
-            return resolve(parseGrade(body.data));
-        })
-    })
-}
-
 
 function parseGrade(auth){
     if(auth){
