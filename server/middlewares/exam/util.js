@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 18:52:53
+* @Last Modified time: 2016-10-03 16:03:36
 */
 'use strict';
 var _ = require('lodash');
@@ -87,9 +87,14 @@ function getPaperTotalInfo(paperId) {
 }
 
 function generateStudentsTotalInfo(papers) {
-    var studentsTotalInfo = {}, paperStudentObj;
+    var studentsTotalInfo = {}, paperStudentObj, allStudentsPaperInfo = [], temp;
     _.each(papers, (paperObj) => {
         var studentsPaperInfo = paperObj.y;
+        temp = {};
+        temp.subject = paperObj.x[0].name;
+        temp.manfen = paperObj.x[0].score;
+        temp.students = studentsPaperInfo;
+        allStudentsPaperInfo.push(temp);
         _.each(studentsPaperInfo, (studentObj) => {
             paperStudentObj = studentsTotalInfo[studentObj.id];
             if(!paperStudentObj) {
@@ -100,7 +105,11 @@ function generateStudentsTotalInfo(papers) {
             paperStudentObj.score = paperStudentObj.score + studentObj.score;
         });
     });
-    return _.sortBy(_.values(studentsTotalInfo), 'score');
+    var studentsTotalInfo = _.sortBy(_.values(studentsTotalInfo), 'score');
+    return {
+        studentsTotalInfo: studentsTotalInfo,
+        allStudentsPaperInfo: allStudentsPaperInfo
+    };
 }
 
 var getGradeExamBaseline = exports.getGradeExamBaseline = function(examId, grade) {

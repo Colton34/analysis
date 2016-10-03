@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-27 19:41:41
+* @Last Modified time: 2016-10-03 16:03:58
 */
 
 'use strict';
@@ -62,9 +62,11 @@ exports.initExam = function(req, res, next) {
 
 exports.dashboard = function(req, res, next) {
     var exam = req.exam, result = {};
-    examUitls.generateDashboardInfo(exam).then(function(studentsTotalInfo) {
-        var examScoreArr = studentsTotalInfo;
-        var examScoreMap = _.groupBy(studentsTotalInfo, 'class');
+    examUitls.generateDashboardInfo(exam).then(function(dashboardInfo) {
+        var examScoreArr = dashboardInfo.studentsTotalInfo;
+        var allStudentsPaperInfo = dashboardInfo.allStudentsPaperInfo;
+
+        var examScoreMap = _.groupBy(examScoreArr, 'class');
         var realClasses = _.keys(examScoreMap);
 
         var auth = req.user.auth;
@@ -78,7 +80,7 @@ exports.dashboard = function(req, res, next) {
                 var liankaoReportResult = liankaoReport(exam, examScoreArr);
                 result.liankaoReport = liankaoReportResult;
             } else {
-                var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr);
+                var authSubjects = getAuthSubjectsInfo(auth, exam, examScoreArr, allStudentsPaperInfo);
                 var authClasses = getAuthClasses(auth, exam.grade);
 
                 examScoreMap = getAuthScoreMap(examScoreMap, authClasses);
@@ -104,24 +106,16 @@ exports.dashboard = function(req, res, next) {
 }
 
 
-function getAuthSubjectsInfo(auth, exam, examScoreArr) {
+function getAuthSubjectsInfo(auth, exam, examScoreArr, allStudentsPaperInfo) {
     var result = [], subjectMeanRates = [], gradeKey = exam.grade.name;
     var totalScoreMeanRate = _.round(_.divide(_.mean(_.map(examScoreArr, (obj) => obj.score)), exam.fullMark), 2);
 
-    if(exam['[papers]'] && exam['[papers]'].length > 0) {
-        subjectMeanRates = _.map(exam['[papers]'], (obj) => {
-            var studentsPaperScores = [];
-            _.each(_.values(obj.scores), (scoresArr) => {
-                studentsPaperScores = _.concat(studentsPaperScores, scoresArr);
-            });
-            var meanRate = _.round(_.divide(_.mean(studentsPaperScores), obj.manfen), 2);
-            return {
-                subject: obj.subject,
-                meanRate: meanRate
-            }
-        });
-    }
-
+    subjectMeanRates = _.map(allStudentsPaperInfo, (obj, index) => {
+        return {
+            subject: obj.subject,
+            meanRate: _.round(_.divide(_.mean(_.map(obj.students, (obj) => obj.score)), obj.manfen), 2)
+        }
+    });
     if((auth.isSchoolManager) || (_.isBoolean(auth.gradeAuth[gradeKey]) && auth.gradeAuth[gradeKey])) {
         result.push({subject: '总分', meanRate: totalScoreMeanRate});
         result = _.concat(result, subjectMeanRates);
