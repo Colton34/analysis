@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-03 19:54:51
+* @Last Modified time: 2016-10-04 11:02:19
 */
 
 'use strict';
@@ -413,22 +413,76 @@ exports.createCustomAnalysis2 = function(req, res, next) {
     var examName = customExamData['exam_name'];
     var grade = req.body.data.papers[0].grade;
     examUitls.saveCustomExam(customExamData).then(function(examId) {
-        return examUitls.createCustomExamInfo(examId, examName, req.user.id);
-    }).then(function(examId) {
-        res.status(200).json({ examId: examId + '-' + schoolId, grade: grade});
+        var fetchExamId = examId + '-' + schoolId;
+        return examUitls.createCustomExamInfo(fetchExamId, examName, req.user.id);
+    }).then(function(fetchExamId) {
+        res.status(200).json({ examId: fetchExamId, grade: grade});
     }).catch(function(err) {
         next(err);
     })
 }
 
-exports.inValidCustomAnalysis = function(req, res, next) {
+// exports.inValidCustomAnalysis = function(req, res, next) {
+//     req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
+//     if(req.validationErrors()) return next(req.validationErrors());
+
+//     peterFX.set(req.body.examId, {isValid: false}, function(err, result) {
+//         if(err) return next(new errors.data.MongoDBError('更新自定义分析错误', err));
+//         res.status(200).send('ok');
+//     })
+// }
+
+
+//TODO:待完善！！！
+exports.inValidCustomAnalysis2 = function(req, res, next) {
+
+console.log('========== 2');
+
+
     req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
 
-    peterFX.set(req.body.examId, {isValid: false}, function(err, result) {
-        if(err) return next(new errors.data.MongoDBError('更新自定义分析错误', err));
+
+console.log('========== 2.0');
+
+
+    when.promise(function(resolve, reject) {
+        var postBody = {
+            "id" : req.body.examId,
+            "school_id" : req.user.schoolId
+        };
+        //TODO: Mock~需要验证！！！
+        var url = "http://ct.yunxiao.com:8158/del";
+        client.post(url, {body: postBody, json: true}, function(err, response, body) {
+            if (err) return reject(new errors.URIError('查询analysis server(invalid exam) Error: ', err));
+            if(!_.isEqual(body, 0)) return reject(new errors.Error('查询analysis server(invalid exam)错误'));
+            resolve(body);
+        });
+    }).then(function(body) {
+        //TODO: 确认是否还需要重置存储的状态位--如果获取exams列表的过程（即analysis server那边）已经对“删除”的自定义分析做过了过滤，那么就不需要在我这里再次标记了。如果没有，要么把自定义分析objectID传到前端，
+        //要么先query get然后再set
+        return when.promise(function(resolve, reject) {
+            //先query
+            //可是这些条件都是在home页都已经过滤过的（当然如果是hack user直接调用api那另说）req.body.examId是不是需要parseInt？req.user.id不需要了，应该就是int了
+            peterFX.query('@CustomExamInfo', {exam_id: req.body.examId, status: 1, owner: req.user.id}, function(err, results) {
+                if(err) return reject(new errors.data.MongoDBError('查找CustomExamInfo Error : ', err));
+                if(!results || results.length != 1) return reject(new errors.Error('无效的customExamInfo'));
+                resolve(result[0]);
+            });
+        });
+    }).then(function(customExamInfo) {
+        console.log('customExamInfo._id =============================== ', customExamInfo._id);
+        return when.promise(function(resolve, reject) {
+            peterFX.set(customExamInfo._id, {status: 0}, function(err, result) {
+                if(err) return reject(new errors.data.MongoDBError('重置customExamInfo status Error: ', err));
+                resolve(result);
+            });
+        });
+    }).then(function() {
         res.status(200).send('ok');
-    })
+    }).catch(function(err) {
+        next(err);
+    });
 }
 
 exports.updateExamBaseline = function(req, res, next) {

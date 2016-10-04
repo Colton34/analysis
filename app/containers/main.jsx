@@ -6,12 +6,24 @@ import Radium from 'radium';
 import {Link} from 'react-router';
 
 class Main extends React.Component {
+    delCustomExam() {
+        var url = '/exam/custom/analysis';
+        debugger;
+        window.request.put(url, {examId: '5000233-494'}).then(function(res) {
+            console.log(res.data);
+            debugger;
+        }).catch(function(err) {
+            console.log('Error: ', err);
+        })
+    }
+
     render() {
         return (
             <div>
                 <form action="">
                     <input type="text" placeholder="Hello" />
                 </form>
+                <button onClick={this.delCustomExam.bind(this)}>删除自定义</button>
                 <Link to={{pathname: '/liankao/report', query: {examid: '1009016-1647', grade: '初一'}}}>【Mock】联考报告</Link>
                 <Link to={{pathname: '/home'}}>【正常】首页</Link>
             </div>

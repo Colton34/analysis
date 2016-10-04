@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-03 19:51:57
+* @Last Modified time: 2016-10-03 21:09:44
 */
 'use strict';
 var _ = require('lodash');
@@ -260,7 +260,7 @@ exports.createCustomExamInfo = function(examId, examName, userId) {
             name: examName,
             owner: userId,
             create_time: new Date(),
-            status: 0
+            status: 1
         };
         peterFX.create('@CustomExamInfo', customExamInfo, function(err, result) {
             if(err) return reject(new errors.data.MongoDBError('【createCustomExamInfo】Error: ', err));
