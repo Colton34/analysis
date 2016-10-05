@@ -2,21 +2,8 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-30 12:03:55
+* @Last Modified time: 2016-10-04 12:13:16
 */
-
-
-/*
-Note:【设计】
-    1. paperId === _id，即是ObjectId  pid === id 即是StringId。如果有paper那么id就是StringId，如果没有那么id是ObjectId。pid应该一定是指StringId
-    2. segments和区间段的表示法描述：
-    segments: [<start>, <stepTwo>, <stepThree>, ... , <end> ]  length=n
-    注意，segments中都是【从小到大】顺序的排列，但是有些显示的时候需要从大到小显示，那样需要显示的地方自己reverse，比如档次从高档到低档显示
-    区间段：由segments依次相邻的两个刻度形成。[<start>, <stepTwo>], (<stepTwo, stepThree>], (], ... (<>, <end>]   (n-1)个 注意：【左开右合】
-    如果segments设置的最小（大）值不是所有查询值中的最小（大）值，那么给出的index就会有-1（或者当超过最大值的时候是 (segments.length-1)）出现，但是从设计上考虑不应
-    该出现这两个值。剩下的[0~segments.length-2]这共segments.length-1个值分别对应
-    (segments.length-1)个区段。
- */
 
 'use strict';
 import _ from 'lodash';
@@ -37,11 +24,6 @@ import {addRankInfo} from '../sdk';
 var examPath = "/exam";
 var paperPath = '/papers';
 
-/**
- * 获取Home格式化好的视图数据
- * @param  {[type]} params [description]
- * @return {[type]}        [description]
- */
 export function initHomeData(params) {
     var url = examPath + '/home';
 
@@ -120,98 +102,7 @@ export function initRankReportdData(params) {
  * @return {[type]}        [description]
 
 组织的数据结构格式：
-    examInfo:
-        {
-            name:
-            gradeName:
-            startTime:
-            realClasses:
-            lostClasses:
-            realStudentsCount:
-            lostStudentsCount:
-            subjects:
-            fullMark:
-        }
 
-    examStudentsInfo
-        [
-            {
-                id:
-                name:
-                class:
-                score:
-                school:（注意是school name而不是school id）
-                papers: [
-                    {id: , paperid: , score: , class_name: }
-                ],
-                questionScores: [
-                    {paperid: , scores: [], answers: [] }
-                ]
-            },
-            ...
-        ]
-
-    examPapersInfo
-        {
-            <pid>: {
-                id:
-                paper:
-                subject:
-                fullMark:
-                realClasses:
-                lostClasses:
-                realStudentsCount:
-                lostStudentsCount:
-                classes: {
-                    <className>: <此科目此班级参加考试的人数>
-                },
-                questions:
-            },
-            ...
-        }
-
-    examClassesInfo
-        {
-            <className>: {
-                name:
-                students:
-                realStudentsCount:
-                losstStudentsCount:
-            }
-        }
-
-    headers:
-        [
-            {
-                id: 'totalScore',
-                subject: '总分'
-            },
-            {
-                id:xxx,
-                subject:'语文' ,
-                index:xxx
-            },
-            ...
-        ]
-
-    levels:
-        {
-            '0': {
-                score: 0,
-                count: 0,
-                percentage: 15  //确认这里60%是“累计占比”--即一档+二挡+三挡总共60%
-            },
-            '1': {
-                score: 0,
-                count: 0,
-                percentage: 25
-            },
-            '2': {
-                score: 0,
-                count: 0,
-                percentage: 60
-            }
-        }
 */
 /*
 subjectLevels:

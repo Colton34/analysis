@@ -1,7 +1,7 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-09-30 14:27:17
+* @Last Modified time: 2016-10-04 11:44:41
 */
 
 'use strict';
@@ -57,15 +57,13 @@ export function makeSegments(end, start = 0, step, count = 12) {
 */
 
 
-//在区间数组中查找所给的目标数值所归属的区间段
-//判断归属区间的原则是：如果是第一个区间那么左右都是闭区间，如果不是第一个区间则左开右闭
 function getSegmentIndex(segments, target) {
     var low = 0,
         high = segments.length - 1;
     while (low <= high) {
         var middle = _.ceil((low + high) / 2);
         if (target == segments[middle]) {
-            return (target == segments[0]) ? middle : middle - 1;
+            return (target == _.last(segments)) ? middle - 1 : middle;
         } else if (target < segments[middle]) {
             high = middle - 1;　　
         } else {

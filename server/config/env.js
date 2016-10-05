@@ -2,12 +2,12 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-26 17:53:19
+* @Last Modified time: 2016-10-04 11:05:01
 */
 
 'use strict';
 
-var development = {
+var production = {
     "analysisServer"    : "http://ct.yunxiao.com:8158", //http://fx-engine.yunxiao.com
     "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://fx:fx123456@server4.yunxiao.com:8300/hfs-test',  //mongodb://localhost:27017/hfs-test
     'fxdb': 'mongodb://fx2:123456@ct.yunxiao.com:19000/fx2',
@@ -39,7 +39,7 @@ var test = {
     "casServer": "http://passport.yunxiao.com"
 };
 
-var production = {
+var development = {
     "analysisServer"    : "http://fx-engine.yunxiao.com",
     "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://read:%3A_3IJon%3Cbb08@server4-ks.yunxiao.com:8300/analy4',  //mongodb://localhost:27017/hfs-test
     'fxdb': 'mongodb://hfsfenxi:%5D%237UXrz%5Bjq98@server4-ks.yunxiao.com:8300/hfsfenxi',
