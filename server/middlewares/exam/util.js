@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-05 15:43:43
+* @Last Modified time: 2016-10-05 17:23:34
 */
 'use strict';
 var _ = require('lodash');
@@ -73,6 +73,7 @@ exports.getValidExamsBySchoolId = function(schoolId, userId, isLianKaoManager, a
     });
 }
 
+//Note: 注意从此不再求学校年级基本信息了。关于缺考的信息【暂时】不做计算。
 exports.generateExamInfo = function(examId, gradeName, schoolId, isLianKao) {
     var result;
     return getExamById(examId).then(function(exam) {
@@ -83,11 +84,13 @@ exports.generateExamInfo = function(examId, gradeName, schoolId, isLianKao) {
         result.startTime = exam.event_time;
         result.gradeName = gradeName;
         result.subjects = _.map(result['[papers]'], (obj) => obj.subject);
-        var resultPromises = isLianKao ? [getGradeExamBaseline(examId, gradeName)] : [getGradeExamBaseline(examId, gradeName), getValidSchoolGrade(schoolId, gradeName)];
-        return when.all(resultPromises);
-    }).then(function(results) {
-        result.baseline = results[0];
-        if(!isLianKao) result.grade = results[1];
+        // var resultPromises = isLianKao ? [getGradeExamBaseline(examId, gradeName)] : [getGradeExamBaseline(examId, gradeName), getValidSchoolGrade(schoolId, gradeName)];
+        // return when.all(resultPromises);
+        return getGradeExamBaseline(examId, gradeName);
+    }).then(function(baseline) { //results
+        // result.baseline = results[0];
+        // if(!isLianKao) result.grade = results[1];
+        result.baseline = baseline;
         return when.resolve(result);
     })
 }
@@ -262,22 +265,24 @@ function generateStudentsTotalInfo(papers) {
 }
 
 //TODO: 这里最好还是通过analysis server来返回学校的基本信息（添加grade等需要的字段），这样就完全避免查询数据库.
-function getValidSchoolGrade(schoolId, gradeName) {
-    return when.promise(function(resolve, reject) {
-        peterHFS.get('@School.'+schoolId, function(err, school) {
-            if(err || !school) {
-                console.log('不存在此学校，请确认：schoolId = ', schoolId);
-                return reject(new errors.data.MongoDBError('find school:'+schoolId+' error', err));
-            }
-            var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
-            if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) {
-                console.log('此学校没有对应的年假或从属此年级的班级：【schoolId = ' + schoolId + '  schoolName = ' + school.name + '  gradeName = ' + gradeName + '】');
-                return when.reject(new errors.Error('学校没有找到对应的年级或者从属此年级的班级：【schoolId = ' +schoolId + '  schoolName = ' +school.name + '  gradeName = ' + gradeName + '】'));
-            }
-            resolve(targetGrade);
-        });
-    });
-}
+//【暂时】注销 -- 用不到
+// function getValidSchoolGrade(schoolId, gradeName) {
+//     return when.promise(function(resolve, reject) {
+//         peterHFS.get('@School.'+schoolId, function(err, school) {
+//             if(err || !school) {
+//                 console.log('不存在此学校，请确认：schoolId = ', schoolId);
+//                 return reject(new errors.data.MongoDBError('find school:'+schoolId+' error', err));
+//             }
+//             var targetGrade = _.find(school['[grades]'], (grade) => grade.name == gradeName);
+//             if (!targetGrade || !targetGrade['[classes]'] || targetGrade['[classes]'].length == 0) {
+//                 console.log('此学校没有对应的年假或从属此年级的班级：【schoolId = ' + schoolId + '  schoolName = ' + school.name + '  gradeName = ' + gradeName + '】');
+//                 targetGrade = getMockExamGrade(scoresInfo, grade);
+//                 // return when.reject(new errors.Error('学校没有找到对应的年级或者从属此年级的班级：【schoolId = ' +schoolId + '  schoolName = ' +school.name + '  gradeName = ' + gradeName + '】'));
+//             }
+//             resolve(targetGrade);
+//         });
+//     });
+// }
 
 function getPaperInstancesByExam(exam) {
     var getPaperInstancePromises = _.map(exam['[papers]'], (obj) => getPaperById(obj.paper));
@@ -338,3 +343,17 @@ function generateExamClassesInfo(examStudentsInfo) {
     });
     return result;
 }
+
+// function getMockExamGrade(scoresInfo, gradeName) {
+//     var classes = _.map(scoresInfo, (studentObjs, className) => {
+//         var studentIds = _.map(studentObjs, (obj) => obj.id);
+//         return {
+//             name: className,
+//             '[students]': studentIds
+//         }
+//     });
+//     return {
+//         name: gradeName,
+//         '[classes]': classes
+//     }
+// }
