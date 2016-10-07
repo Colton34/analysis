@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-05 17:20:36
+* @Last Modified time: 2016-10-07 12:46:46
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -24,18 +24,75 @@ var peterFX = require('peter').getManager('fx');
 
 exports.home = function(req, res, next) {
     var userAuth = req.user.auth;
-    var authGrades = authGrades = _.keys(userAuth.gradeAuth)
-    examUitls.getValidExamsBySchoolId(req.user.schoolId, req.user.id, userAuth.isLianKaoManager, authGrades).then(function(result) {
-        var validExams = result.validExams, errorInfo = result.errorInfo;
+    examUitls.getValidExamsBySchoolId(req.user.schoolId, req.user.id, userAuth).then(function(result) {
+        var validAuthExams = result.validAuthExams, errorInfo = result.errorInfo;
         try {
-            var formatedExams = formatExams(validExams);
-            res.status(200).json({examList: formatedExams, errorInfo: errorInfo});//TODO:这里的error机制需要重新设计
+            var formatedExams = formatExams(validAuthExams);
+            res.status(200).json({examList: formatedExams, errorInfo: errorInfo});
         } catch(e) {
             next(new errors.Error('格式化exams错误', e));
         }
     }).catch(function(err) {
         next(err);
     });
+}
+
+function formatExams(exams) {
+    var examsBaseOnGrade = getExamsBaseOnGrade(exams);
+    var examFormatedTimeMap = examsGroupByFormatedTime(examsBaseOnGrade);
+    var examTimeIndex = getExamTimeIndex(_.keys(examFormatedTimeMap));
+    return _.map(examTimeIndex, (timeKey) => {
+        var values = _.orderBy(examFormatedTimeMap[timeKey], 'timestamp');
+        return {
+            timeKey: timeKey,
+            values: values
+        }
+    });
+}
+
+function getExamsBaseOnGrade(exams) {
+    var result = [];
+    _.each(exams, (examItem) => {
+        getFormatedExam(examItem, result);
+    });
+    return result;
+}
+
+function getFormatedExam(exam, result) {
+    var gradePapersMap = _.groupBy(exam['[papers]'], (paperItem) => paperItem.grade);
+    _.each(gradePapersMap, (gradePapers, gradeKey) => {
+        var obj = _.pick(exam, ['from', 'event_time']);
+        obj.examName = (_.size(gradePapersMap) == 1) ? exam.name : exam.name + "(年级：" + gradeKey + ")";
+        obj.grade = gradeKey;
+        obj.id = exam.id;
+        obj.timestamp = moment(exam['event_time']).valueOf();
+        obj.formatedTime = moment(exam['event_time']).format('ll');
+        obj.subjectCount = gradePapers.length;
+        obj.fullMark = 0;
+        obj.papers = _.map(gradePapers, (paperItem) => {
+            obj.fullMark += paperItem.manfen;
+            return {
+                id: paperItem.id,
+                subject: paperItem.subject
+            }
+        });
+        result.push(obj);
+    });
+}
+
+function examsGroupByFormatedTime(exams) {
+    return _.groupBy(exams, function(exam) {
+        var time = moment(exam["event_time"]);
+        var year = time.get('year') + '';
+        var month = time.get('month') + 1;
+        month = (month > 9) ? (month + '') : ('0' + month);
+        var key = year + '.' + month;
+        return key;
+    });
+}
+
+function getExamTimeIndex(formatedTimeKeys) {
+    return _.orderBy(formatedTimeKeys, [(timeKey) => _.split(timeKey, '.')[0], (timeKey) => _.split(timeKey, '.')[1]], ['desc', 'desc']);
 }
 
 
@@ -71,6 +128,117 @@ exports.initExam = function(req, res, next) {
     });
 }
 
+exports.dashboard = function(req, res, next) {
+    var exam = req.exam, result = {};
+    examUitls.generateDashboardInfo(exam).then(function(dashboardInfo) {
+        var examScoreArr = dashboardInfo.studentsTotalInfo;
+        var allStudentsPaperInfo = dashboardInfo.allStudentsPaperInfo;
+        var examScoreByClass = _.groupBy(examScoreArr, 'class');
+        var realClasses = _.keys(examScoreByClass);
+        var userReportAuthConfig = getUserReportAuthConfig(req.user.auth, exam.gradeName);
+        try {
+            result.examInfoGuide = getDashboardExamInfoGuide(exam, realClasses.length, examScoreArr.length), result.scoreRank = getDashboardScoreRank(examScoreArr);
+            if(userReportAuthConfig.schoolReport) result.schoolReport = getDashboardSchoolReport(exam.fullMark, examScoreArr);
+            if(userReportAuthConfig.subjectReport) result.subjectReport = getDashboradSubjectReport(userReportAuthConfig, exam.fullMark, examScoreArr, allStudentsPaperInfo);
+            if(userReportAuthConfig.classReport) result.classReport = getDashboardClassReport(userReportAuthConfig, realClasses, examScoreArr, examScoreByClass, exam.gradeName);
+            if(userReportAuthConfig.liankaoTotalReport) result.liankaoTotalReport = getDashboardLiankaoTotalReport(exam.fullMark, examScoreArr);
+
+        } catch(e) {
+            next(new errors.Error('format dashboard error : ', e));
+        }
+    }).catch(function(err) {
+        next(err);
+    });
+}
+
+
+exports.rankReport = function(req, res, next) {
+    var exam = req.exam, result = {};
+    examUitls.generateDashboardInfo(exam).then(function(dashboardInfo) {
+        var examScoreArr = dashboardInfo.studentsTotalInfo;
+        var allStudentsPaperInfo = dashboardInfo.allStudentsPaperInfo;//注意要从这里获取！！！--因为有可能auth内的班级没有参加某场考试
+        var examScoreMap = (req.user.isLianKaoManager) ? _.groupBy(examScoreArr, 'school') : _.groupBy(examScoreArr, 'class');
+        var examScoreMapKeys = _.keys(examScoreMap);
+        var authSubjectKeysInfo = getAuthSubjectKeysInfo(req.user.auth, exam.gradeName, exam['[papers]'], examScoreMapKeys);
+        var authRankCache = getAuthRankCache(authSubjectKeysInfo, examScoreMap);
+        var authTotalClasses = _.keys(authRankCache['totalScore']);
+        var authExamInfo = getAuthExamInfo(exam.name, authTotalClasses, authSubjectKeysInfo);
+        return {
+            examInfo: authExamInfo, //TODO: 确认并计算examInfo
+            rankCache: authRankCache
+        }
+    }).catch(function(err) {
+        next(err);
+    });
+}
+
+exports.schoolAnalysis = function(req, res, next) {
+    examUitls.generateExamReportInfo(req.exam).then(function(result) {
+        console.time('keys');
+        req.exam.realClasses = _.keys(_.groupBy(result.examStudentsInfo, 'class'));
+        console.timeEnd('keys');
+        req.exam.realStudentsCount = result.examStudentsInfo.length;
+        res.status(200).json({
+            examInfo: req.exam,
+            examStudentsInfo: result.examStudentsInfo,
+            examPapersInfo: result.examPapersInfo,
+            examClassesInfo: result.examClassesInfo,
+            examBaseline: req.exam.baseline,
+            isLianKao: req.user.auth.isLianKaoManager
+        })
+    }).catch(function(err) {
+        next(new errors.Error('schoolAnalysis Error', err));
+    })
+}
+
+exports.createCustomAnalysis = function(req, res, next) {
+    if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
+    var schoolId = req.user.schoolId;
+    var customExamData = req.body.data;
+    customExamData.school_id = schoolId;
+    var examName = customExamData['exam_name'];
+    var grade = req.body.data.papers[0].grade;
+    examUitls.saveCustomExam(customExamData).then(function(examId) {
+        var fetchExamId = examId + '-' + schoolId;
+        return examUitls.createCustomExamInfo(fetchExamId, req.user.schoolId, examName, grade, req.user.id);
+    }).then(function(fetchExamId) {
+        res.status(200).json({ examId: fetchExamId, grade: grade});
+    }).catch(function(err) {
+        next(err);
+    });
+}
+
+
+//TODO:待完善！！！
+exports.inValidCustomAnalysis = function(req, res, next) {
+    req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    examUitls.delCustomExam(req.body.examId, req.user.schoolId).then(function(body) {
+        //TODO: 确认是否还需要重置存储的状态位--如果获取exams列表的过程（即analysis server那边）已经对“删除”的自定义分析做过了过滤，那么就不需要在我这里再次标记了。如果没有，要么把自定义分析objectID传到前端，
+        //要么先query get然后再set
+        return examUitls.findCustomInfo(req.body.examId, req.user.id);
+    }).then(function(customExamInfo) {
+        console.log('customExamInfo._id =============================== ', customExamInfo._id);
+        return examUitls.inValidCustomExamInfo(customExamInfo._id);
+    }).then(function() {
+        res.status(200).send('ok');
+    }).catch(function(err) {
+        next(err);
+    });
+}
+
+exports.updateExamBaseline = function(req, res, next) {
+    req.checkBody('examId', '更新grade exam levels数据错误，无效的examId').notEmpty();
+    if (req.validationErrors()) return next(req.validationErrors());
+    if(!req.body.baseline) return next(new errors.HttpStatusError(400, "更新grade exam levels数据错误，无效的baseline"));
+
+    updateBaseline(req.body.examId, req.body.baseline).then(function(msg) {
+        res.status(200).send('ok');
+    }).catch(function(err) {
+        next(err);
+    });
+}
 
 /*
 return:
@@ -171,28 +339,7 @@ function getDashboardClassReport(userReportAuthConfig, realClasses, examScoreArr
 }
 
 
-exports.dashboard = function(req, res, next) {
-    var exam = req.exam, result = {};
-    examUitls.generateDashboardInfo(exam).then(function(dashboardInfo) {
-        var examScoreArr = dashboardInfo.studentsTotalInfo;
-        var allStudentsPaperInfo = dashboardInfo.allStudentsPaperInfo;
-        var examScoreByClass = _.groupBy(examScoreArr, 'class');
-        var realClasses = _.keys(examScoreByClass);
-        var userReportAuthConfig = getUserReportAuthConfig(req.user.auth, exam.gradeName);
-        try {
-            result.examInfoGuide = getDashboardExamInfoGuide(exam, realClasses.length, examScoreArr.length), result.scoreRank = getDashboardScoreRank(examScoreArr);
-            if(userReportAuthConfig.schoolReport) result.schoolReport = getDashboardSchoolReport(exam.fullMark, examScoreArr);
-            if(userReportAuthConfig.subjectReport) result.subjectReport = getDashboradSubjectReport(userReportAuthConfig, exam.fullMark, examScoreArr, allStudentsPaperInfo);
-            if(userReportAuthConfig.classReport) result.classReport = getDashboardClassReport(userReportAuthConfig, realClasses, examScoreArr, examScoreByClass, exam.gradeName);
-            if(userReportAuthConfig.liankaoTotalReport) result.liankaoTotalReport = getDashboardLiankaoTotalReport(exam.fullMark, examScoreArr);
 
-        } catch(e) {
-            next(new errors.Error('format dashboard error : ', e));
-        }
-    }).catch(function(err) {
-        next(err);
-    });
-}
 
 //当如果是liankao的话，把【学校】当做【班级】处理
 /*
@@ -231,25 +378,6 @@ exports.dashboard = function(req, res, next) {
 
  */
 
-exports.rankReport = function(req, res, next) {
-    var exam = req.exam, result = {};
-    examUitls.generateDashboardInfo(exam).then(function(dashboardInfo) {
-        var examScoreArr = dashboardInfo.studentsTotalInfo;
-        var allStudentsPaperInfo = dashboardInfo.allStudentsPaperInfo;//注意要从这里获取！！！--因为有可能auth内的班级没有参加某场考试
-        var examScoreMap = (req.user.isLianKaoManager) ? _.groupBy(examScoreArr, 'school') : _.groupBy(examScoreArr, 'class');
-        var examScoreMapKeys = _.keys(examScoreMap);
-        var authSubjectKeysInfo = getAuthSubjectKeysInfo(req.user.auth, exam.gradeName, exam['[papers]'], examScoreMapKeys);
-        var authRankCache = getAuthRankCache(authSubjectKeysInfo, examScoreMap);
-        var authTotalClasses = _.keys(authRankCache['totalScore']);
-        var authExamInfo = getAuthExamInfo(exam.name, authTotalClasses, authSubjectKeysInfo);
-        return {
-            examInfo: authExamInfo, //TODO: 确认并计算examInfo
-            rankCache: authRankCache
-        }
-    }).catch(function(err) {
-        next(err);
-    });
-}
 
 function getAuthExamInfo(examName, authTotalClasses, authSubjectKeysInfo) {
     var authPapersInfo = _.map(authSubjectKeysInfo, (subjectKeysObj, pid) => {
@@ -329,131 +457,14 @@ function getAllAuth(allSubjectNames, examScoreMapKeys) {
     return result;
 }
 
-exports.schoolAnalysis = function(req, res, next) {
-    examUitls.generateExamReportInfo(req.exam).then(function(result) {
-        console.time('keys');
-        req.exam.realClasses = _.keys(_.groupBy(result.examStudentsInfo, 'class'));
-        console.timeEnd('keys');
-        req.exam.realStudentsCount = result.examStudentsInfo.length;
-        res.status(200).json({
-            examInfo: req.exam,
-            examStudentsInfo: result.examStudentsInfo,
-            examPapersInfo: result.examPapersInfo,
-            examClassesInfo: result.examClassesInfo,
-            examBaseline: req.exam.baseline,
-            isLianKao: req.user.auth.isLianKaoManager
-        })
-    }).catch(function(err) {
-        next(new errors.Error('schoolAnalysis Error', err));
-    })
-}
-
-exports.createCustomAnalysis = function(req, res, next) {
-    if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
-    var schoolId = req.user.schoolId;
-    var customExamData = req.body.data;
-    customExamData.school_id = schoolId;
-    var examName = customExamData['exam_name'];
-    var grade = req.body.data.papers[0].grade;
-    examUitls.saveCustomExam(customExamData).then(function(examId) {
-        var fetchExamId = examId + '-' + schoolId;
-        return examUitls.createCustomExamInfo(fetchExamId, req.user.schoolId, examName, grade, req.user.id);
-    }).then(function(fetchExamId) {
-        res.status(200).json({ examId: fetchExamId, grade: grade});
-    }).catch(function(err) {
-        next(err);
-    });
-}
 
 
-//TODO:待完善！！！
-exports.inValidCustomAnalysis = function(req, res, next) {
-    req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
-    if(req.validationErrors()) return next(req.validationErrors());
 
-    examUitls.delCustomExam(req.body.examId, req.user.schoolId).then(function(body) {
-        //TODO: 确认是否还需要重置存储的状态位--如果获取exams列表的过程（即analysis server那边）已经对“删除”的自定义分析做过了过滤，那么就不需要在我这里再次标记了。如果没有，要么把自定义分析objectID传到前端，
-        //要么先query get然后再set
-        return examUitls.findCustomInfo(req.body.examId, req.user.id);
-    }).then(function(customExamInfo) {
-        console.log('customExamInfo._id =============================== ', customExamInfo._id);
-        return examUitls.inValidCustomExamInfo(customExamInfo._id);
-    }).then(function() {
-        res.status(200).send('ok');
-    }).catch(function(err) {
-        next(err);
-    });
-}
 
-exports.updateExamBaseline = function(req, res, next) {
-    req.checkBody('examId', '更新grade exam levels数据错误，无效的examId').notEmpty();
-    if (req.validationErrors()) return next(req.validationErrors());
-    if(!req.body.baseline) return next(new errors.HttpStatusError(400, "更新grade exam levels数据错误，无效的baseline"));
 
-    updateBaseline(req.body.examId, req.body.baseline).then(function(msg) {
-        res.status(200).send('ok');
-    }).catch(function(err) {
-        next(err);
-    });
-}
 
-function formatExams(exams) {
-    var examsBaseOnGrade = getExamsBaseOnGrade(exams);
-    var examFormatedTimeMap = examsGroupByFormatedTime(examsBaseOnGrade);
-    var examTimeIndex = getExamTimeIndex(_.keys(examFormatedTimeMap));
-    return _.map(examTimeIndex, (timeKey) => {
-        var values = _.orderBy(examFormatedTimeMap[timeKey], 'timestamp');
-        return {
-            timeKey: timeKey,
-            values: values
-        }
-    });
-}
 
-function getExamsBaseOnGrade(exams) {
-    var result = [];
-    _.each(exams, (examItem) => {
-        getFormatedExam(gradeExamsMap, result);
-    });
-    return result;
-}
 
-function getFormatedExam(exam, result) {
-    var gradePapersMap = _.groupBy(examItem['[papers]'], (paperItem) => paperItem.grade);
-    _.each(gradePapersMap, (gradePapers, gradeKey) => {
-        var obj = _.pick(exam, ['from', 'event_time']);
-        obj.examName = (_.size(gradeExamsMap) == 1) ? exam.name : exam.name + "(年级：" + gradeKey + ")";
-        obj.grade = gradeKey;
-        obj.id = exam.exam;
-        obj.timestamp = moment(value.exam['event_time']).valueOf();
-        obj.formatedTime = moment(value.exam['event_time']).format('ll');
-        obj.subjectCount = gradePapers.length;
-        obj.fullMark = 0;
-        obj.papers = _.map(gradePapers, (paperItem) => {
-            obj.fullMark += paperItem.manfen;
-            return {
-                id: paperItem.id,
-                subject: paperItem.subject
-            }
-        });
-        result.push(obj);
-    });
-}
-
-function examsGroupByFormatedTime(exams) {
-    return _.groupBy(exams, function(exam) {
-        var time = moment(exam["event_time"]);
-        var year = time.get('year') + '';
-        var month = time.get('month') + 1;
-        month = (month > 9) ? (month + '') : ('0' + month);
-        var key = year + '.' + month;
-        return key;
-    });
-}
-
-function getExamTimeIndex(formatedTimeKeys) {
-    return _.orderBy(formatedTimeKeys, [(timeKey) => _.split(timeKey, '.')[0], (timeKey) => _.split(timeKey, '.')[1]], ['desc', 'desc']);
-}
 
 function updateBaseline(examId, targetBaseline) {
     return when.promise(function(resolve, reject) {

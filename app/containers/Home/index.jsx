@@ -174,10 +174,7 @@ class ExamItem extends React.Component {
     }
     render() {
         var {timeKey, item} = this.props;
-        var examid = item.id.slice(_.findIndex(item.id, (c) => c !== '0'));
-
-        var targetUrl = (item.from === 40) ? '/dashboard?examid=' + examid : '/dashboard?examid=' + examid + '&grade=' + item.grade;
-        var queryOptions = (item.from === 40) ? { examid: examid } : {examid: examid, grade: item.grade};
+        var queryOptions = {examid: item.id, grade: item.grade};
 
         return (
             <div style={this.props.isLast ? {marginBottom: 15} : {}}>
@@ -276,6 +273,7 @@ class ExamList extends React.Component {
     }
     render() {
         var {examList, errorInfo} = this.props;
+        debugger;
         var {pageIndex, pageSize} = this.state;
         return (
             <div style={{ display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 25, backgroundColor: '#fff' }}>
@@ -290,7 +288,7 @@ class ExamList extends React.Component {
                     ) : ''
                 }
                 {
-                    examList.length && _.isEmpty(errorInfo) ? _.map(examList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize), (obj) => {
+                    examList.length && _.isEmpty(errorInfo.msg) ? _.map(examList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize), (obj) => {
                         return _.map(obj.values, (exam, index) => {
                             if (index === 0) {
                                 return <ExamItem key={index} timeKey={obj.timeKey} item={exam}/>
@@ -304,7 +302,7 @@ class ExamList extends React.Component {
                 }
                 {/*-------------------------------------------分页----------------------------------------------------------*/}
                 {
-                    examList.length  && _.isEmpty(errorInfo) ?
+                    examList.length  && _.isEmpty(errorInfo.msg) ?
                         <div style={{marginTop: 15, color: '#9a9a9a'}}>
                             <ul style={{margin: '0 auto', width: '50%', listStyleType: 'none', textAlign: 'center'}}>
                                 <li key='pagePrev' style={localStyle.pageDirection} data-page='prev' onClick={this.onClickPage.bind(this)}>

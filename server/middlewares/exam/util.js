@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-05 17:23:34
+* @Last Modified time: 2016-10-07 12:41:53
 */
 'use strict';
 var _ = require('lodash');
@@ -55,19 +55,27 @@ var getGradeExamBaseline = exports.getGradeExamBaseline = function(examId, grade
     });
 }
 
-exports.getValidExamsBySchoolId = function(schoolId, userId, isLianKaoManager, authGrades) {
+function getValidAuthExams(validExams, userAuth) {
+    if(userAuth.isSchoolManager) return validExams;
+    return _.filter(validExams, (examItem) => {
+        return _.intersection(_.keys(userAuth.gradeAuth), _.keys(_.groupBy(examItem['[papers]'], 'grade'))).length > 0;
+    });
+}
+
+exports.getValidExamsBySchoolId = function(schoolId, userId, userAuth) {
     var ifSchoolHaveExams = false, errorInfo = {msg: ''};
     return getSchoolById(schoolId).then(function(data) {
         if(data['[exams]'] && data['[exams]'].length > 0) ifSchoolHaveExams = true;
-        return filterValidExams(data['exams'], userId, schoolId, isLianKaoManager, authGrades);
+        return filterValidExams(data['[exams]'], userId, schoolId, userAuth.isLianKaoManager);
     }).then(function(validExams) {
         if(!ifSchoolHaveExams) errorInfo.msg = '此学校没有考试';
-        if(ifSchoolHaveExams && validExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
-        var examPromises = _.map(validExams, (obj) => getExamById(obj.exam, obj.from));
-        return when.all(examPromises);
-    }).then(function(validExamIntances) {
+        var existPapersExams = _.filter(validExams, (obj) => (obj['[papers]'] && obj['[papers]'].length > 0));
+        if(ifSchoolHaveExams && existPapersExams.length == 0) errorInfo.msg = '此学校下考试都没有科目';
+        if(ifSchoolHaveExams && userAuth.isLianKaoManager && validExams.length == 0) errorInfo.msg = '暂无联考考试内容可供查看';
+        var validAuthExams = getValidAuthExams(validExams, userAuth);
+        if(ifSchoolHaveExams && !userAuth.isLianKaoManager && validAuthExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
         return when.resolve({
-            validExams: validExamIntances,
+            validAuthExams: validAuthExams,
             errorInfo: errorInfo
         });
     });
@@ -201,18 +209,29 @@ function getSchoolById(schoolId) {
     });
 }
 
-function filterValidExams(originalExams, userId, schoolId, isLianKaoManager, authGrades) {
-    originalExams = _.filter(originalExams, (obj) => obj['[papers]'].length > 0);//先进行基本的过滤
-    var validNotCustomExams = _.filter(originalExams, (examItem) => {
-        //针对非自定义的考试：如果是联考管理者，那么获取所有联考考试；如果不是联考管理者，那么获取此用户权限下的普通阅卷考试（from !='20' && from != '40'）
-        return (isLianKaoManager) ? (examItem.from == '20') : ((examItem.from != '20' && examItem.from != '40') && (_.includes(authGrades, examItem.grade)));
-    });
-    return getCustomExamInfoByUserId(userId).then(function(userCustomExamInfos) {
-        var validCustomExamIds = _.map(userCustomExamInfos, (obj) => obj['exam_id']);
-        var validCustomExams = _.filter(originalExams, (obj) => {
-            return (obj.from == '40' && _.includes(validCustomExamIds, obj['exam_id']));
+function filterValidExams(originalExams, userId, schoolId, isLianKaoManager) {
+    var temp = {};
+    var validNotCustomExams = _.chain(originalExams).filter((examItem) => {
+        return (isLianKaoManager) ? (examItem.from == '20') : (examItem.from != '20' && examItem.from != '40');
+    }).map((examItem) => {
+        return {
+            id: examItem['exam'],
+            from: examItem.from
+        }
+    }).value();
+    return getCustomExamInfoByUserId(userId, schoolId).then(function(userCustomExamInfos) {
+        var validCustomExams = _.map(userCustomExamInfos, (obj) => {
+            return {
+                id: obj['exam_id'],
+                from: '40'
+            }
         });
-        return when.resolve(_.concat(validNotCustomExams, validCustomExams));
+        var allValidExams = _.concat(validNotCustomExams, validCustomExams);
+        temp.allValidExams = allValidExams;
+        var getExamInstancePromises = _.map(allValidExams, (validExam) => getExamById(validExam.id));
+        return when.all(getExamInstancePromises);
+    }).then(function(examInstances) {
+        return when.resolve(_.map(examInstances, (examItem, index) => _.assign({}, examItem, temp.allValidExams[index])));
     });
 }
 
