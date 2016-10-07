@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-07 12:46:46
+* @Last Modified time: 2016-10-07 12:56:52
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -142,7 +142,7 @@ exports.dashboard = function(req, res, next) {
             if(userReportAuthConfig.subjectReport) result.subjectReport = getDashboradSubjectReport(userReportAuthConfig, exam.fullMark, examScoreArr, allStudentsPaperInfo);
             if(userReportAuthConfig.classReport) result.classReport = getDashboardClassReport(userReportAuthConfig, realClasses, examScoreArr, examScoreByClass, exam.gradeName);
             if(userReportAuthConfig.liankaoTotalReport) result.liankaoTotalReport = getDashboardLiankaoTotalReport(exam.fullMark, examScoreArr);
-
+            res.status(200).json(result);
         } catch(e) {
             next(new errors.Error('format dashboard error : ', e));
         }
@@ -150,7 +150,6 @@ exports.dashboard = function(req, res, next) {
         next(err);
     });
 }
-
 
 exports.rankReport = function(req, res, next) {
     var exam = req.exam, result = {};
