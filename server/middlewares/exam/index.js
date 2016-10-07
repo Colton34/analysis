@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-07 12:56:52
+* @Last Modified time: 2016-10-07 15:55:13
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -151,94 +151,6 @@ exports.dashboard = function(req, res, next) {
     });
 }
 
-exports.rankReport = function(req, res, next) {
-    var exam = req.exam, result = {};
-    examUitls.generateDashboardInfo(exam).then(function(dashboardInfo) {
-        var examScoreArr = dashboardInfo.studentsTotalInfo;
-        var allStudentsPaperInfo = dashboardInfo.allStudentsPaperInfo;//注意要从这里获取！！！--因为有可能auth内的班级没有参加某场考试
-        var examScoreMap = (req.user.isLianKaoManager) ? _.groupBy(examScoreArr, 'school') : _.groupBy(examScoreArr, 'class');
-        var examScoreMapKeys = _.keys(examScoreMap);
-        var authSubjectKeysInfo = getAuthSubjectKeysInfo(req.user.auth, exam.gradeName, exam['[papers]'], examScoreMapKeys);
-        var authRankCache = getAuthRankCache(authSubjectKeysInfo, examScoreMap);
-        var authTotalClasses = _.keys(authRankCache['totalScore']);
-        var authExamInfo = getAuthExamInfo(exam.name, authTotalClasses, authSubjectKeysInfo);
-        return {
-            examInfo: authExamInfo, //TODO: 确认并计算examInfo
-            rankCache: authRankCache
-        }
-    }).catch(function(err) {
-        next(err);
-    });
-}
-
-exports.schoolAnalysis = function(req, res, next) {
-    examUitls.generateExamReportInfo(req.exam).then(function(result) {
-        console.time('keys');
-        req.exam.realClasses = _.keys(_.groupBy(result.examStudentsInfo, 'class'));
-        console.timeEnd('keys');
-        req.exam.realStudentsCount = result.examStudentsInfo.length;
-        res.status(200).json({
-            examInfo: req.exam,
-            examStudentsInfo: result.examStudentsInfo,
-            examPapersInfo: result.examPapersInfo,
-            examClassesInfo: result.examClassesInfo,
-            examBaseline: req.exam.baseline,
-            isLianKao: req.user.auth.isLianKaoManager
-        })
-    }).catch(function(err) {
-        next(new errors.Error('schoolAnalysis Error', err));
-    })
-}
-
-exports.createCustomAnalysis = function(req, res, next) {
-    if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
-    var schoolId = req.user.schoolId;
-    var customExamData = req.body.data;
-    customExamData.school_id = schoolId;
-    var examName = customExamData['exam_name'];
-    var grade = req.body.data.papers[0].grade;
-    examUitls.saveCustomExam(customExamData).then(function(examId) {
-        var fetchExamId = examId + '-' + schoolId;
-        return examUitls.createCustomExamInfo(fetchExamId, req.user.schoolId, examName, grade, req.user.id);
-    }).then(function(fetchExamId) {
-        res.status(200).json({ examId: fetchExamId, grade: grade});
-    }).catch(function(err) {
-        next(err);
-    });
-}
-
-
-//TODO:待完善！！！
-exports.inValidCustomAnalysis = function(req, res, next) {
-    req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
-    if(req.validationErrors()) return next(req.validationErrors());
-
-    examUitls.delCustomExam(req.body.examId, req.user.schoolId).then(function(body) {
-        //TODO: 确认是否还需要重置存储的状态位--如果获取exams列表的过程（即analysis server那边）已经对“删除”的自定义分析做过了过滤，那么就不需要在我这里再次标记了。如果没有，要么把自定义分析objectID传到前端，
-        //要么先query get然后再set
-        return examUitls.findCustomInfo(req.body.examId, req.user.id);
-    }).then(function(customExamInfo) {
-        console.log('customExamInfo._id =============================== ', customExamInfo._id);
-        return examUitls.inValidCustomExamInfo(customExamInfo._id);
-    }).then(function() {
-        res.status(200).send('ok');
-    }).catch(function(err) {
-        next(err);
-    });
-}
-
-exports.updateExamBaseline = function(req, res, next) {
-    req.checkBody('examId', '更新grade exam levels数据错误，无效的examId').notEmpty();
-    if (req.validationErrors()) return next(req.validationErrors());
-    if(!req.body.baseline) return next(new errors.HttpStatusError(400, "更新grade exam levels数据错误，无效的baseline"));
-
-    updateBaseline(req.body.examId, req.body.baseline).then(function(msg) {
-        res.status(200).send('ok');
-    }).catch(function(err) {
-        next(err);
-    });
-}
-
 /*
 return:
     {
@@ -337,70 +249,24 @@ function getDashboardClassReport(userReportAuthConfig, realClasses, examScoreArr
     }
 }
 
-
-
-
-//当如果是liankao的话，把【学校】当做【班级】处理
-/*
-
-    examInfo: {
-        name: ,
-        papers: , //注意要在这里添加 totalScore的信息
-        classes:
-    }
-
-    rankCache: {
-        totalScore: {
-            <className>: [ //已经是有序的（升序）
-                {
-                    kaohao: ,
-                    name: ,
-                    class: ,
-                    score:
-                }
-            ],
-            ...
-        },
-        <pid>: {
-            <className>: [
-                {
-                    kaohao: ,
-                    name: ,
-                    class: ,
-                    score
-                }
-            ],
-            ...
-        },
-        ...
-    }
-
- */
-
-
-function getAuthExamInfo(examName, authTotalClasses, authSubjectKeysInfo) {
-    var authPapersInfo = _.map(authSubjectKeysInfo, (subjectKeysObj, pid) => {
-        //TODO:这些命名都要纠正过来：只有[id]和[objectId]
-        return {
-            paper: subjectKeysObj.objectId,
-            pid: pid,
-            name: subjectKeysObj.name
-        }
+exports.rankReport = function(req, res, next) {
+    var exam = req.exam, result = {};
+    examUitls.generateDashboardInfo(exam).then(function(dashboardInfo) {
+        var examScoreArr = dashboardInfo.studentsTotalInfo;
+        var allStudentsPaperInfo = dashboardInfo.allStudentsPaperInfo;//注意要从这里获取！！！--因为有可能auth内的班级没有参加某场考试
+        var examScoreMap = (req.user.auth.isLianKaoManager) ? _.groupBy(examScoreArr, 'school') : _.groupBy(examScoreArr, 'class');
+        var examScoreMapKeys = _.keys(examScoreMap);
+        var authSubjectKeysInfo = getAuthSubjectKeysInfo(req.user.auth, exam.gradeName, exam['[papers]'], examScoreMapKeys);
+        var authRankCache = getAuthRankCache(authSubjectKeysInfo, examScoreMap, allStudentsPaperInfo, req.user.auth.isLianKaoManager);
+        var authTotalClasses = _.keys(authRankCache['totalScore']);
+        var authExamInfo = getAuthExamInfo(exam.name, authTotalClasses, authSubjectKeysInfo);
+        res.status(200).json({
+            examInfo: authExamInfo,
+            rankCache: authRankCache
+        });
+    }).catch(function(err) {
+        next(err);
     });
-    return {
-        name: examName,
-        papers: authPapersInfo,
-        classes: authTotalClasses
-    }
-}
-
-function getAuthRankCache(authSubjectKeysInfo, examScoreMap, allExamPapersByKeyname) {
-    var totalKeys = _.chain(authSubjectKeysInfo).map((subjectKeysObj, pid) => subjectKeysObj.keys).union().value();
-    var result = {};
-    _.each(_.assign({'totalScore': {keys: totalKeys, id: 'totalScore', objectId: 'totalScore', name: '总分'}}, authSubjectKeysInfo), (subjectKeysObj, tpid) => {
-        result[tpid] = _.pick(examScoreMap, subjectKeysObj.keys);
-    });
-    return result;
 }
 
 /*
@@ -416,51 +282,136 @@ return :
         ...
     }
  */
-function getAuthSubjectkeysInfo(auth, gradeName, examPapers, examScoreMapKeys) {
+function getAuthSubjectKeysInfo(auth, gradeName, examPapers, examScoreMapKeys) {
     //虽然科目分文理，但是老师的权限的名称不会分文理。。。WTF，为什么总是用字符串进行匹配呢？？？为什么没有一个auth collection来统一管理？？？--那么一个数学老师，给他看文科数学呢还是理科数学？
     //当前只能给全部二者。。。
     var result = {}, currentGradeAuth = (auth.gradeAuth) ? auth.gradeAuth[gradeName] : undefined;
     var allSubjectNameInfo = _.map(examPapers, (obj) => {
-        if(_.includes(obj.name, '文科')) return {name: `${obj.subject}(文科)`, id: obj.id, objctId: obj._id};
-        if(_.includes(obj.name, '理科')) return {name: `${obj.subject}(理科)`, id: obj.id, objectId: obj._id};
-        return {name: obj.subject, id: obj.id, objectId: obj._id};
+        if(_.includes(obj.name, '文科')) return {name: `${obj.subject}(文科)`, pid: obj.id, paper: obj.paper};
+        if(_.includes(obj.name, '理科')) return {name: `${obj.subject}(理科)`, pid: obj.id, paper: obj.paper};
+        return {name: obj.subject, pid: obj.id, paper: obj.paper};
     });
-    if(req.auth.isSchoolManager || (_.isBoolean(currentGradeAuth) && currentGradeAuth)) return getAllAuth(allSubjectNameInfo, examScoreMapKeys);
+    if(auth.isSchoolManager || (_.isBoolean(currentGradeAuth) && currentGradeAuth)) return getAllAuth(allSubjectNameInfo, examScoreMapKeys);
     _.each(currentGradeAuth.subjectManagers, (obj) => {
         _.each(allSubjectNameInfo, (subjectNameObj) => {
-            if(_.includes(subjectNameObj.name, obj.subject)) result[subjectNameObj.id] = _.assign({keys: examScoreMapKeys}, subjectNameObj);
+            if(_.includes(subjectNameObj.name, obj.subject)) result[subjectNameObj.pid] = _.assign({keys: examScoreMapKeys}, subjectNameObj);
         });
     });
     _.each(currentGradeAuth.groupManagers, (obj) => {
         _.each(allSubjectNameInfo, (subjectNameObj) => {
-            if(!result[subjectNameObj.id]) result[subjectNameObj.id] = _.assign({keys: [obj.group]}, subjectNameObj);
-            if(!_.includes(result[subjectNameObj.id].keys, obj.group)) result[subjectNameObj.id].keys.push(obj.group);
+            if(!result[subjectNameObj.pid]) result[subjectNameObj.pid] = _.assign({keys: [obj.group]}, subjectNameObj);
+            if(!_.includes(result[subjectNameObj.pid].keys, obj.group)) result[subjectNameObj.pid].keys.push(obj.group);
         });
     });
     _.each(currentGradeAuth.subjectTeachers, (obj) => {
         _.each(allSubjectNameInfo, (subjectNameObj) => {
             if(_.includes(subjectNameObj.name, obj.subject)) {
-                if(!result[subjectNameObj.id]) result[subjectNameObj.id] = _.assign({keys: [obj.group]}, subjectNameObj);
-                if(!_.includes(result[subjectNameObj.id].keys, obj.group)) result[subjectNameObj.id].keys.push(obj.group);
+                if(!result[subjectNameObj.pid]) result[subjectNameObj.pid] = _.assign({keys: [obj.group]}, subjectNameObj);
+                if(!_.includes(result[subjectNameObj.pid].keys, obj.group)) result[subjectNameObj.pid].keys.push(obj.group);
             }
         });
-    })
+    });
     return result;
 }
 
 function getAllAuth(allSubjectNames, examScoreMapKeys) {
     var result = {};
     _.each(allSubjectNames, (subjectNameObj) => {
-        result[subjectNameObj.id] = _.assign({keys: examScoreMapKeys}, subjectNameObj);
+        result[subjectNameObj.pid] = _.assign({keys: examScoreMapKeys}, subjectNameObj);
     });
     return result;
 }
 
+function getAuthRankCache(authSubjectKeysInfo, examScoreMap, allStudentsPaperInfo, isLianKao) {
+    var totalKeys = [];
+    _.each(authSubjectKeysInfo, (subjectKeysObj, pid) => {
+        totalKeys = _.union(totalKeys, subjectKeysObj.keys);
+    });
+    var allStudentsPaperInfoMap = _.keyBy(allStudentsPaperInfo, 'id');
+    var result = {}, paperScoreMap;
+    _.each(_.assign({'totalScore': {keys: totalKeys, pid: 'totalScore', paper: 'totalScore', name: '总分'}}, authSubjectKeysInfo), (subjectKeysObj, tpid) => {
+        if(tpid != 'totalScore') paperScoreMap = (isLianKao) ? _.groupBy(allStudentsPaperInfoMap[tpid].students, 'school') : _.groupBy(allStudentsPaperInfoMap[tpid].students, 'class');
+        result[subjectKeysObj.paper] = (tpid == 'totalScore') ? _.pick(examScoreMap, subjectKeysObj.keys) : _.pick(paperScoreMap, subjectKeysObj.keys);
+    });
+    return result;
+}
+
+function getAuthExamInfo(examName, authTotalClasses, authSubjectKeysInfo) {
+    var authPapersInfo = _.map(authSubjectKeysInfo, (subjectKeysObj, pid) => _.pick(subjectKeysObj, ['name', 'paper', 'pid']));
+    return {
+        name: examName,
+        papers: authPapersInfo,
+        classes: authTotalClasses
+    }
+}
+
+exports.schoolAnalysis = function(req, res, next) {
+    examUitls.generateExamReportInfo(req.exam).then(function(result) {
+        console.time('keys');
+        req.exam.realClasses = _.keys(_.groupBy(result.examStudentsInfo, 'class'));
+        console.timeEnd('keys');
+        req.exam.realStudentsCount = result.examStudentsInfo.length;
+        res.status(200).json({
+            examInfo: req.exam,
+            examStudentsInfo: result.examStudentsInfo,
+            examPapersInfo: result.examPapersInfo,
+            examClassesInfo: result.examClassesInfo,
+            examBaseline: req.exam.baseline,
+            isLianKao: req.user.auth.isLianKaoManager
+        })
+    }).catch(function(err) {
+        next(new errors.Error('schoolAnalysis Error', err));
+    })
+}
+
+exports.createCustomAnalysis = function(req, res, next) {
+    if(!req.body.data) return next(new errors.HttpStatusError(400, "没有data属性数据"));
+    var schoolId = req.user.schoolId;
+    var customExamData = req.body.data;
+    customExamData.school_id = schoolId;
+    var examName = customExamData['exam_name'];
+    var grade = req.body.data.papers[0].grade;
+    examUitls.saveCustomExam(customExamData).then(function(examId) {
+        var fetchExamId = examId + '-' + schoolId;
+        return examUitls.createCustomExamInfo(fetchExamId, req.user.schoolId, examName, grade, req.user.id);
+    }).then(function(fetchExamId) {
+        res.status(200).json({ examId: fetchExamId, grade: grade});
+    }).catch(function(err) {
+        next(err);
+    });
+}
 
 
+//TODO:待完善！！！
+exports.inValidCustomAnalysis = function(req, res, next) {
+    req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
 
+    examUitls.delCustomExam(req.body.examId, req.user.schoolId).then(function(body) {
+        //TODO: 确认是否还需要重置存储的状态位--如果获取exams列表的过程（即analysis server那边）已经对“删除”的自定义分析做过了过滤，那么就不需要在我这里再次标记了。如果没有，要么把自定义分析objectID传到前端，
+        //要么先query get然后再set
+        return examUitls.findCustomInfo(req.body.examId, req.user.id);
+    }).then(function(customExamInfo) {
+        console.log('customExamInfo._id =============================== ', customExamInfo._id);
+        return examUitls.inValidCustomExamInfo(customExamInfo._id);
+    }).then(function() {
+        res.status(200).send('ok');
+    }).catch(function(err) {
+        next(err);
+    });
+}
 
+exports.updateExamBaseline = function(req, res, next) {
+    req.checkBody('examId', '更新grade exam levels数据错误，无效的examId').notEmpty();
+    if (req.validationErrors()) return next(req.validationErrors());
+    if(!req.body.baseline) return next(new errors.HttpStatusError(400, "更新grade exam levels数据错误，无效的baseline"));
 
+    updateBaseline(req.body.examId, req.body.baseline).then(function(msg) {
+        res.status(200).send('ok');
+    }).catch(function(err) {
+        next(err);
+    });
+}
 
 
 

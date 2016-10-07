@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-07 12:41:53
+* @Last Modified time: 2016-10-07 15:56:57
 */
 'use strict';
 var _ = require('lodash');
@@ -104,8 +104,10 @@ exports.generateExamInfo = function(examId, gradeName, schoolId, isLianKao) {
 }
 
 exports.generateDashboardInfo = function(exam) {//Note:这里依然没有对auth进行判断
+    var paperBaseInfo = _.map(exam['[papers]'], (obj) => _.pick(obj, ['id', 'grade', 'paper']));
     var getPapersTotalInfoPromises = _.map(exam['[papers]'], (obj) => getPaperTotalInfo(obj.paper));
     return when.all(getPapersTotalInfoPromises).then(function(papers) {
+        papers = _.map(papers, (paperItem, index) => _.assign({}, paperItem, paperBaseInfo[index]));
         return when.resolve(generateStudentsTotalInfo(papers));
     });
 }
@@ -260,16 +262,18 @@ function getPaperTotalInfo(paperId) {
 function generateStudentsTotalInfo(papers) {
     var studentsTotalInfo = {}, paperStudentObj, allStudentsPaperInfo = [], temp;
     _.each(papers, (paperObj) => {
-        var studentsPaperInfo = paperObj.y;
+        var studentsPaperInfo = _.map(paperObj.y, (stuObj) => _.assign({pid: paperObj.id, paper: paperObj.paper}, stuObj));
         temp = {};
         temp.subject = paperObj.x[0].name;
         temp.manfen = paperObj.x[0].score;
         temp.students = studentsPaperInfo;
+        temp.id = paperObj.id;
         allStudentsPaperInfo.push(temp);
         _.each(studentsPaperInfo, (studentObj) => {
             paperStudentObj = studentsTotalInfo[studentObj.id];
             if(!paperStudentObj) {
-                paperStudentObj = _.pick(studentObj, ['id', 'name', 'class', 'school']);
+                paperStudentObj = _.pick(studentObj, ['id', 'name', 'class', 'school', 'kaohao']);
+                paperStudentObj['paper'] = 'totalScore';
                 paperStudentObj.score = 0;
                 studentsTotalInfo[studentObj.id] = paperStudentObj;
             }

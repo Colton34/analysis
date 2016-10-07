@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-04 12:13:16
+* @Last Modified time: 2016-10-07 13:58:48
 */
 
 'use strict';
@@ -92,6 +92,7 @@ export function initRankReportdData(params) {
     var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/rank/report?examid=' + params.examid;
 
     return params.request.get(url).then(function(res) {
+        debugger;
         return Promise.resolve(res.data);
     });
 }
