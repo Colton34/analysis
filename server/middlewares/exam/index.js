@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-08 11:22:23
+* @Last Modified time: 2016-10-08 12:21:47
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -381,18 +381,12 @@ exports.createCustomAnalysis = function(req, res, next) {
     });
 }
 
-
-//TODO:待完善！！！
 exports.inValidCustomAnalysis = function(req, res, next) {
     req.checkBody('examId', '删除自定义分析错误，无效的examId').notEmpty();
     if(req.validationErrors()) return next(req.validationErrors());
-
     examUitls.delCustomExam(req.body.examId, req.user.schoolId).then(function(body) {
-        //TODO: 确认是否还需要重置存储的状态位--如果获取exams列表的过程（即analysis server那边）已经对“删除”的自定义分析做过了过滤，那么就不需要在我这里再次标记了。如果没有，要么把自定义分析objectID传到前端，
-        //要么先query get然后再set
-        return examUitls.findCustomInfo(req.body.examId, req.user.id);
+        return examUitls.findCustomInfo(req.body.examId + '-' + req.user.schoolId, req.user.id);
     }).then(function(customExamInfo) {
-        console.log('customExamInfo._id =============================== ', customExamInfo._id);
         return examUitls.inValidCustomExamInfo(customExamInfo._id);
     }).then(function() {
         res.status(200).send('ok');

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-07 15:56:57
+* @Last Modified time: 2016-10-08 12:21:54
 */
 'use strict';
 var _ = require('lodash');
@@ -172,7 +172,10 @@ exports.delCustomExam = function(examId, schoolId) {
         var url = config.analysisServer + "/del";
         client.post(url, {body: postBody, json: true}, function(err, response, body) {
             if (err) return reject(new errors.URIError('查询analysis server(invalid exam) Error: ', err));
-            if(!_.isEqual(body, 0)) return reject(new errors.Error('查询analysis server(invalid exam)错误'));
+            if(!_.isEqual(body, 0)) {
+                var bodyObj = JSON.parse(body);
+                return reject(new errors.Error('查询analysis server(invalid exam)错误', bodyObj.error));
+            }
             resolve(body);
         });
     });
@@ -180,12 +183,10 @@ exports.delCustomExam = function(examId, schoolId) {
 
 exports.findCustomInfo = function(examId, userId) {
     return when.promise(function(resolve, reject) {
-        //先query
-        //可是这些条件都是在home页都已经过滤过的（当然如果是hack user直接调用api那另说）req.body.examId是不是需要parseInt？req.user.id不需要了，应该就是int了
         peterFX.query('@CustomExamInfo', {exam_id: examId, status: 1, owner: userId}, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('查找CustomExamInfo Error : ', err));
             if(!results || results.length != 1) return reject(new errors.Error('无效的customExamInfo'));
-            resolve(result[0]);
+            resolve(results[0]);
         });
     });
 }

@@ -9,7 +9,7 @@ class Main extends React.Component {
     delCustomExam() {
         var url = '/exam/custom/analysis';
         debugger;
-        window.request.put(url, {examId: '5000233-494'}).then(function(res) {
+        window.request.put(url, {examId: '5002976'}).then(function(res) {
             console.log(res.data);
             debugger;
         }).catch(function(err) {
