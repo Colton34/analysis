@@ -98,6 +98,7 @@ class ExamSelect extends React.Component {
             examList: this.props.examList,
             infoDialogMsg: ''
         }
+        debugger;
     }
     componentDidMount() {
         this.getExamList();
@@ -380,6 +381,7 @@ class ExamSelect extends React.Component {
         var {currentSubject} = this.props;
         var currentPapers = Map.isMap(currentSubject) ? currentSubject.toJS().src : currentSubject.src;
         var {examList} = this.state;
+        debugger;
         var paperIds = Object.keys(currentPapers);
         var _this = this;
         var options = {
@@ -452,7 +454,6 @@ class ExamSelect extends React.Component {
                             {
                                 examList.map((exam, index) => {
                                     var date = new Date(exam.timestamp);
-
                                     return (
                                         <div className='exam-item' key={'exam-' + index}>
                                             <p id={exam.id} className='exam-name' style={{ marginBottom: 4 }}>{exam.examName}</p>

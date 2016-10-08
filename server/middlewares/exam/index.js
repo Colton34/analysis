@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-07 15:55:13
+* @Last Modified time: 2016-10-08 11:22:23
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -69,10 +69,10 @@ function getFormatedExam(exam, result) {
         obj.formatedTime = moment(exam['event_time']).format('ll');
         obj.subjectCount = gradePapers.length;
         obj.fullMark = 0;
-        obj.papers = _.map(gradePapers, (paperItem) => {
+        obj['papers'] = _.map(gradePapers, (paperItem) => {
             obj.fullMark += paperItem.manfen;
             return {
-                id: paperItem.id,
+                id: paperItem['paper'],
                 subject: paperItem.subject
             }
         });
