@@ -15,6 +15,7 @@ export default function ({reportDS}) {
     _.each(examPapersInfo, (obj, pid) => papersFullMark[pid] = obj.fullMark);
     var tableHeadersByLevel = getTableHeadersByLevel(headers, levels, subjectLevels);
     var studentsPaperMapByGroup = getStudentsPaperMapByGroup(examStudentsInfo, allStudentsPaperMap);
+    var paperSchoolLevelMap = getPaperSchoolLevelMap(examStudentsInfo, examFullMark, allStudentsPaperMap, levels, subjectLevels, papersFullMark);
     return (
         <div id='subjectLevelDistribution' className={commonClass['section']}>
             <div>
