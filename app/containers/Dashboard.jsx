@@ -16,10 +16,10 @@ import PaperComment from '../components/dashboard/paper-comment';
 import PaperQuality from '../components/dashboard/paper-quality';
 import StudentReport from '../components/dashboard/student-report';
 
-import LiankaoReport from '../components/dashboard/liankao-report';
+import LiankaoTotalReport from '../components/dashboard/liankao-total-report';
 import SchoolReport from '../components/dashboard/school-report';
 
-import LiankaoSchoolReport from '../components/dashboard/liankao_school_report';
+import LianKaoSubjectReport from '../components/dashboard/liankao-subject-report';
 
 import {initDashboardAction} from '../reducers/dashboard/actions';
 import {initParams} from '../lib/util';
@@ -50,6 +50,7 @@ class Dashboard extends React.Component {
         }
     }
     componentDidMount() {
+        debugger;
         if (this.props.dashboard.haveInit) return;
 
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
@@ -102,7 +103,7 @@ class Dashboard extends React.Component {
     render() {
         var examInfoGuide = (Map.isMap(this.props.dashboard.examInfoGuide)) ? this.props.dashboard.examInfoGuide.toJS() : this.props.dashboard.examInfoGuide;
         var scoreRank = (Map.isMap(this.props.dashboard.scoreRank)) ? this.props.dashboard.scoreRank.toJS() : this.props.dashboard.scoreRank;
-        var liankaoReport = (Map.isMap(this.props.dashboard.liankaoReport)) ? this.props.dashboard.liankaoReport.toJS() : this.props.dashboard.liankaoReport;
+        var liankaoTotalReport = (Map.isMap(this.props.dashboard.liankaoTotalReport)) ? this.props.dashboard.liankaoTotalReport.toJS() : this.props.dashboard.liankaoTotalReport;
         var schoolReport = (Map.isMap(this.props.dashboard.schoolReport)) ? this.props.dashboard.schoolReport.toJS() : this.props.dashboard.schoolReport;
         var classReport = (Map.isMap(this.props.dashboard.classReport)) ? this.props.dashboard.classReport.toJS() : this.props.dashboard.classReport;
         var subjectReport = (List.isList(this.props.dashboard.subjectReport)) ? this.props.dashboard.subjectReport.toJS() : this.props.dashboard.subjectReport;
@@ -135,17 +136,17 @@ class Dashboard extends React.Component {
                                             </a> : ''
                                     }
                                 </div>
-                                {(examInfoGuide && _.size(examInfoGuide) > 0) ? <ExamGuideComponent data={examInfoGuide} /> : ''}
+                                {(examInfoGuide && _.size(examInfoGuide) > 0) ? <ExamGuideComponent data={examInfoGuide} isLiankao={user.auth.isLianKaoManager} /> : ''}
                                 <div className='row' style={{ marginTop: 20 }}>
-                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} user={user} expand={_.size(schoolReport) === 0 && _.size(liankaoReport) === 0? true : false}/> : ''}
+                                    {(scoreRank && _.size(scoreRank) > 0) ? <ScoreRank data={scoreRank} examid={examid} grade={grade} user={user} expand={_.size(schoolReport) === 0 && _.size(liankaoTotalReport) === 0? true : false}/> : ''}
                                     {(schoolReport && _.size(schoolReport) > 0) ? <SchoolReport examid={examid} grade={grade} data={schoolReport}/> : ''}
-                                    {(liankaoReport && _.size(liankaoReport) > 0) ? <LiankaoReport examid={examid} grade={grade} data={liankaoReport}/> : ''}
+                                    {(liankaoTotalReport && _.size(liankaoTotalReport) > 0) ? <LiankaoTotalReport examid={examid} grade={grade} data={liankaoTotalReport}/> : ''}
                                 </div>
                                 {/* */}
                                 <div className='row' style={{ marginTop: 20 }}>
                                     {(classReport && _.size(classReport) > 0) ? <ClassReport data={classReport} grade={grade} examid={examid} /> : ''}
                                     {(subjectReport && _.size(subjectReport) > 0) ? <SubjectReport data={subjectReport} grade={grade} examid={examid} /> : ''}
-                                    {user.auth.isLianKaoManager?<LiankaoSchoolReport />:''}
+                                    {user.auth.isLianKaoManager?<LianKaoSubjectReport />:''}
                                 </div>
                                 <Dialog show={this.state.showConfirmDialog} onHide={this.onHideDialog.bind(this) } onConfirm={this.onDeleteAnalysis.bind(this) }/>
                         </div>

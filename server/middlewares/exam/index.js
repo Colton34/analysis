@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-08 12:23:13
+* @Last Modified time: 2016-10-08 17:14:41
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -133,14 +133,19 @@ exports.dashboard = function(req, res, next) {
     examUitls.generateDashboardInfo(exam).then(function(dashboardInfo) {
         var examScoreArr = dashboardInfo.studentsTotalInfo;
         var allStudentsPaperInfo = dashboardInfo.allStudentsPaperInfo;
-        var examScoreByClass = _.groupBy(examScoreArr, 'class');
-        var realClasses = _.keys(examScoreByClass);
+
+        // var examScoreByClass = _.groupBy(examScoreArr, 'class');
+        // var realClasses = _.keys(examScoreByClass);
+
+        var examScoreByKey = (req.user.auth.isLianKaoManager) ? _.groupBy(examScoreArr, 'school') : _.groupBy(examScoreArr, 'class');
+        var realKyes = _.keys(examScoreByKey);
+
         var userReportAuthConfig = getUserReportAuthConfig(req.user.auth, exam.gradeName);
         try {
-            result.examInfoGuide = getDashboardExamInfoGuide(exam, realClasses.length, examScoreArr.length), result.scoreRank = getDashboardScoreRank(examScoreArr);
+            result.examInfoGuide = getDashboardExamInfoGuide(exam, realKyes.length, examScoreArr.length), result.scoreRank = getDashboardScoreRank(examScoreArr);
             if(userReportAuthConfig.schoolReport) result.schoolReport = getDashboardSchoolReport(exam.fullMark, examScoreArr);
             if(userReportAuthConfig.subjectReport) result.subjectReport = getDashboradSubjectReport(userReportAuthConfig, exam.fullMark, examScoreArr, allStudentsPaperInfo);
-            if(userReportAuthConfig.classReport) result.classReport = getDashboardClassReport(userReportAuthConfig, realClasses, examScoreArr, examScoreByClass, exam.gradeName);
+            if(userReportAuthConfig.classReport) result.classReport = getDashboardClassReport(userReportAuthConfig, realKyes, examScoreArr, examScoreByKey, exam.gradeName);
             if(userReportAuthConfig.liankaoTotalReport) result.liankaoTotalReport = getDashboardLiankaoTotalReport(exam.fullMark, examScoreArr);
             res.status(200).json(result);
         } catch(e) {

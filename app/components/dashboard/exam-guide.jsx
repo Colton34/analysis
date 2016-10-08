@@ -19,7 +19,7 @@ import {initExamGuide} from '../../reducers/dashboard/actions';
 
  */
 
-const GlobalGuideCom = ({data}) => {
+const GlobalGuideCom = ({data, isLiankao}) => {
     return (
         <div className='row'>
             <div style={{ width: '100%', height: 87, lineHeight: '87px', backgroundColor: '#fff', borderRadius: 2, display: 'table-cell', verticalAlign: 'middle'}}>
@@ -30,13 +30,13 @@ const GlobalGuideCom = ({data}) => {
                 </div>
                 <div style={localStyle.inlineBox}>
                     <span style={localStyle.numStyle}>{data.realClassesCount}</span>
-                    <span style={localStyle.descStyle}>考试班级数</span>
+                    <span style={localStyle.descStyle}>考试{isLiankao ? '学校': '班级'}数</span>
                     <span style={localStyle.borderBox}></span>
                 </div>
                 <div style={localStyle.inlineBox}>
                     <span style={localStyle.numStyle}>{data.realStudentsCount}</span>
                     <span>考试学生数</span>
-                    
+
                 </div>
 {/*
                 <div style={localStyle.inlineBox}>

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:09:30
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-17 14:19:31
+* @Last Modified time: 2016-10-08 16:55:33
 */
 
 'use strict';
@@ -13,7 +13,7 @@ var InitialState = Record({
 
     examInfoGuide: {},
     scoreRank: {},
-    liankaoReport: {},
+    liankaoTotalReport: {},
     schoolReport: {},
     classReport: {},
     subjectReport: []

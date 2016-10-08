@@ -53,13 +53,13 @@ function getLevelStudentsInfo(levelKey, levels, examStudentsInfo, examFullMark) 
     var currentLevelScore = levels[levelKey].score, levelLastIndex = _.size(levels)-1, targetStudents;
     if(levelKey == '0') {
         var highLevelScore = levels[(parseInt(levelKey)+1)+''].score;
-        targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score <= highLevelScore));
+        targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score < highLevelScore));
     } else if(levelKey == levelLastIndex+'') {
         var highLevelScore = examFullMark;
-        targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore));
+        targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score <= highLevelScore));
     } else {
         var highLevelScore = levels[(parseInt(levelKey)+1)+''].score;
-        targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore));
+        targetStudents = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score < highLevelScore));
     }
     return targetStudents;
 }

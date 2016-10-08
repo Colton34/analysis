@@ -64,7 +64,7 @@ class FullScoreInfo extends React.Component {
                         return (
                             <li key={'fullScoreTrend-li-' + index} style={{height: 40, lineHeight: '40px', display: 'table-row' }}>
                                 <span className={commonClass['list-dot']} style={{ width: 20, height: 40, lineHeight: '40px', textAlign: 'center', display: 'table-cell', verticalAlign: 'middle'}}></span>
-                                <span style={{ marginRight: 20, display: 'table-cell', width: 110, textAlign: 'left', borderBottom: '1px dashed ' + colorsMap.C04}}>{(index === 0 ? '[' + data.low : '(' + data.low) + ',' + data.high + ']分区间'}</span>
+                                <span style={{ marginRight: 20, display: 'table-cell', width: 110, textAlign: 'left', borderBottom: '1px dashed ' + colorsMap.C04}}>{'[' + data.low + ',' + data.high + (index === yData.length-1 ? ']' : ')') + '分区间'}</span>
                                 <span style={{ marginRight: 20, display: 'table-cell', width: 50, textAlign: 'left',  borderBottom: '1px dashed ' + colorsMap.C04}}>{data.y}</span>
                                 <span style={{ display: 'table-cell', textAlign: 'left', borderBottom: '1px dashed ' + colorsMap.C04, }}>人</span>
                             </li>

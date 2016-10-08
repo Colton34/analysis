@@ -15,7 +15,6 @@ export default function ({reportDS}) {
     _.each(examPapersInfo, (obj, pid) => papersFullMark[pid] = obj.fullMark);
     var tableHeadersByLevel = getTableHeadersByLevel(headers, levels, subjectLevels);
     var studentsPaperMapByGroup = getStudentsPaperMapByGroup(examStudentsInfo, allStudentsPaperMap);
-    var paperSchoolLevelMap = getPaperSchoolLevelMap(examStudentsInfo, examFullMark, allStudentsPaperMap, levels, subjectLevels, papersFullMark); //getPaperSchoolLevelMap(studentsPaperMapByGroup, levels, subjectLevels);
     return (
         <div id='subjectLevelDistribution' className={commonClass['section']}>
             <div>
@@ -82,14 +81,6 @@ function getStudentsPaperMapByGroup(examStudentsInfo, allStudentsPaperMap) {
         result[paperId]['联考全体'] = studentList;
     });
     return result;
-
-    // allStudentsPaperMap.totalScore = examStudentsInfo;
-    // _.forEach(allStudentsPaperMap, (studentList, paperid) => {
-    //     var group = _.groupBy(studentList, 'school');
-    //     allStudentsPaperMap[paperid] = group;
-    //     allStudentsPaperMap[paperid]['联考全体'] = studentList;
-    // })
-    return allStudentsPaperMap;
 }
 
 
@@ -154,21 +145,17 @@ function getPaperSchoolLevelMap(examStudentsInfo, examFullMark, allStudentsPaper
         }
         obj['联考全体'] = temp;
     });
-// debugger;
     var singleSchoolLevelInfoMap = {}, singleSchoolSubjectLevelInfoMap = {}, currentSchoolStudentsPaperMap, currentSchoolLevelInfo, currentSchoolSubjectLevelInfo;
     _.each(studentsGroupBySchool, (singleSchoolStudents, schoolName) => {
         currentSchoolStudentsPaperMap = _.groupBy(_.concat(..._.map(singleSchoolStudents, (student) => student.papers)), 'paperid');;
         currentSchoolLevelInfo = getLevelInfo(levels, singleSchoolStudents, examFullMark);
-        // debugger;
         currentSchoolSubjectLevelInfo = getSubjectLevelInfo(subjectLevels, currentSchoolStudentsPaperMap, papersFullMark);
-        // debugger;
 
         _.each(result, (obj, tpid) => {
             if(tpid == 'totalScore') {
                 temp = {};
                 _.each(currentSchoolLevelInfo, (sobj, levelKey) => temp[levelKey] = sobj.targets);
                 obj[schoolName] = temp;
-                // debugger;
             } else {
                 temp = {};
                 _.each(currentSchoolSubjectLevelInfo, (subjectLevelInfoObj, levelKey) => {
@@ -180,28 +167,3 @@ function getPaperSchoolLevelMap(examStudentsInfo, examFullMark, allStudentsPaper
     });
     return result;
 }
-
-
-// function getPaperSchoolLevelMap(studentsPaperMapByGroup, levels, subjectLevels) {
-//     var paperSchoolLevelMap = _.cloneDeep(studentsPaperMapByGroup);
-
-//     var levelSize = _.size(levels);
-//     _.forEach(paperSchoolLevelMap, (subjectInfo, paperid)  => {
-//         _.forEach(subjectInfo, (schoolStudents, schoolName) => {
-//             var studentsByLevel = {};
-//             var locations = []; // 记录slice时候的end值；
-//             for (let i = 0; i < levelSize; i++) {
-//                 locations.push(_.sortedIndexBy(schoolStudents, { score: paperid === 'totalScore' ? levels[i].score : subjectLevels[i][paperid].mean}, 'score'));
-//             }
-//             for (let i = 0; i < levelSize; i++) {
-//                 if (i !== levelSize - 1) {
-//                     studentsByLevel[levelSize - i - 1] = schoolStudents.slice(locations[i], locations[i + 1]);
-//                 } else {
-//                     studentsByLevel[levelSize - i - 1] = schoolStudents.slice(locations[i]);
-//                 }
-//             }
-//             paperSchoolLevelMap[paperid][schoolName] = studentsByLevel;
-//         })
-//     })
-//     return paperSchoolLevelMap;
-// }
