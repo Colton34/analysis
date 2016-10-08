@@ -203,19 +203,19 @@ function getCurrentClassPercentageRow(currentClassCountRow, totalSchoolRow) {
 function makeCurrentSubjectLevelInfo(levels, subjectLevels, examFullMark, examStudentsInfo, examPapersInfo, subjectLevelMeanInfo, currentLevelKey, levObj, currentClass, classStudents, classStudentsPaperMap, allStudentsPaperMap) {
     var papersFullMark = {};
     _.each(examPapersInfo, (obj, pid) => papersFullMark[pid] = obj.fullMark);
-    var tempSubjectMeanMap = {};
-    _.each(subjectLevels, (subjectLevelObj, levelKey) => {
-        var temp = {};
-        _.each(subjectLevelObj, (v, pid) => {
-            temp[pid] = v.mean;
-        });
-        tempSubjectMeanMap[levelKey] = temp;
-    });
+    // var tempSubjectMeanMap = {};
+    // _.each(subjectLevels, (subjectLevelObj, levelKey) => {
+    //     var temp = {};
+    //     _.each(subjectLevelObj, (v, pid) => {
+    //         temp[pid] = v.mean;
+    //     });
+    //     tempSubjectMeanMap[levelKey] = temp;
+    // });
 
     var result = {};
     result.totalSchool = {};
     var totalSchoolLevelInfo = getLevelInfo(levels, examStudentsInfo, examFullMark);
-    var totalSchoolSubjectLevelInfo = getSubjectLevelInfo(tempSubjectMeanMap, allStudentsPaperMap, papersFullMark);
+    var totalSchoolSubjectLevelInfo = getSubjectLevelInfo(subjectLevels, allStudentsPaperMap, papersFullMark);
     result.totalSchool.totalScore = totalSchoolLevelInfo[currentLevelKey].count;
     _.each(totalSchoolSubjectLevelInfo[currentLevelKey], (obj, pid) => {
         result.totalSchool[pid] = obj.count;
@@ -223,7 +223,7 @@ function makeCurrentSubjectLevelInfo(levels, subjectLevels, examFullMark, examSt
 
     var temp = {}, currentClassStudentsPaperMap = _.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid');
     var currentClassLevelInfo = getLevelInfo(levels, classStudents, examFullMark);
-    var currentClassSubjectLevelInfo = getSubjectLevelInfo(tempSubjectMeanMap, currentClassStudentsPaperMap, papersFullMark);
+    var currentClassSubjectLevelInfo = getSubjectLevelInfo(subjectLevels, currentClassStudentsPaperMap, papersFullMark);
 
     temp.totalScore = currentClassLevelInfo[currentLevelKey].count;
     _.each(currentClassSubjectLevelInfo[currentLevelKey], (obj, pid) => {

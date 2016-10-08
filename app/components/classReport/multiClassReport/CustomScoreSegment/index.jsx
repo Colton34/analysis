@@ -87,6 +87,7 @@ function getDS(currentSubject, currentScoreStep, examPapersInfo, allStudentsPape
     segments.push(currentSubject.fullMark);
     //TODO: chart也需要构造x轴
     var tableHeader = getTableHeader(segments);
+    debugger;
     tableDS.push(tableHeader);
 //当前科目
     //所选择的班级，所划分的区间段
@@ -102,7 +103,9 @@ function getDS(currentSubject, currentScoreStep, examPapersInfo, allStudentsPape
 }
 
 function getformatedDS(segments, tableDS) {
+    debugger;
     var categories = getCategories(tableDS);
+    debugger;
     var tableHeader = getTableHeader(segments);
     var tableData = getTableData(tableDS);
     var series = getSeriesData(tableDS);
@@ -121,8 +124,8 @@ function getCategories(tableDS) {
 function getTableHeader(segments) {
     var categories = [];
     var header =  _.map(_.range(segments.length-1), (index) => {
-        var prefix = (index == 0) ? '[' : '(';
-        var value = prefix + segments[index] + '-' + segments[index+1] + ']分';
+        var afefix = (index == segments.length-2) ? ']' : ')';
+        var value = '[' + segments[index] + '-' + segments[index+1] + afefix + '分';
         categories.push(value);
         return {id: value, name: value};
     });

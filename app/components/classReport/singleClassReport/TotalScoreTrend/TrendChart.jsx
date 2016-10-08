@@ -49,7 +49,7 @@ export default function TrendChart({chartDS, examInfo,classStudents}) {
                 color: '#fff'
             },
             formatter: function () {
-                return (this.point.low > 0 ? '(' : '[') + this.point.low + '-' + this.point.high + ']区间人数<br />' + this.point.y + '人,占'
+                return '[' + this.point.low + '-' + this.point.high + (this.point.x == chartDS['x-axon'].length-1 ? ']' : ')') + '区间人数<br />' + this.point.y + '人,占'
                     + Math.round(((this.point.y / classStudents.length) * 100)) + '%';
             }
         },

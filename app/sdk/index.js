@@ -1,7 +1,7 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-10-04 11:44:41
+* @Last Modified time: 2016-10-08 16:25:32
 */
 
 'use strict';
@@ -211,7 +211,7 @@ export function getLevelInfo(levels, baseStudents, examFullMark, isByScore=true)
     var targets, count, sumCount, sumPercentage, result = {}, temp = {}, levelLastIndex = _.size(levels) - 1;
     _.each(levels, (levelObj, levelKey) => {
         var currentLevelRel = levelScoreRel[levelKey];
-        targets = (levelKey == '0') ? _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score <= currentLevelRel.highLevelScore)) : _.filter(baseStudents, (obj) => (obj.score > currentLevelRel.currentLevelScore) && (obj.score <= currentLevelRel.highLevelScore));
+        targets = (levelKey == levelLastIndex) ? _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score <= currentLevelRel.highLevelScore)) : _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score < currentLevelRel.highLevelScore));
         count = targets.length;
         temp[levelKey] = count;
         sumCount = (levelKey == levelLastIndex + '') ? (count) : (_.sum(_.values(_.pickBy(temp, (v, k) => k >= levelKey))));
@@ -261,7 +261,7 @@ function getScoreInfoByPercentage(levels, levelKey, currentPercentage, baseStude
 
 export function getSubjectLevelInfo(subjectLevels, papersStudents, papersFullMark) {
     var subjectLevelRel = getSubjectLevelRel(subjectLevels, papersFullMark);
-    var targets, count, temp, result = {};
+    var targets, count, temp, result = {}, levelLastIndex = _.size(subjectLevels) - 1;
     _.each(subjectLevels, (papersLevelObj, levelKey) => {
         temp = {};
         _.each(papersLevelObj, (v, pid) => {
@@ -271,7 +271,7 @@ export function getSubjectLevelInfo(subjectLevels, papersStudents, papersFullMar
                 temp[pid] = { targets: [], count: 0};
                 return;
             }
-            targets = (levelKey == '0') ? _.filter(papersStudents[pid], (obj) => (obj.score >= currentPaperRel.currentLevelPaperMean) && (obj.score <= currentPaperRel.highLevelPaperMean)) : _.filter(papersStudents[pid], (obj) => (obj.score > currentPaperRel.currentLevelPaperMean) && (obj.score <= currentPaperRel.highLevelPaperMean));
+            targets = (levelKey == levelLastIndex) ? _.filter(papersStudents[pid], (obj) => (obj.score >= currentPaperRel.currentLevelPaperMean) && (obj.score <= currentPaperRel.highLevelPaperMean)) : _.filter(papersStudents[pid], (obj) => (obj.score >= currentPaperRel.currentLevelPaperMean) && (obj.score < currentPaperRel.highLevelPaperMean));
             count = targets.length;
             temp[pid] = {
                 targets: targets,

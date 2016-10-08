@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-07 13:58:48
+* @Last Modified time: 2016-10-08 13:31:41
 */
 
 'use strict';
@@ -323,7 +323,7 @@ function findScoreSegmentIndex(segments, des) {
     while (low <= high) {
         var middle = _.ceil((low + high) / 2);
         if (des == segments[middle]) {
-            return (des == segments[0]) ? middle : middle - 1;
+            return (des == _.last(segments)) ? middle - 1 : middle;
         } else if (des < segments[middle]) {
             high = middle - 1;　　
         } else {
@@ -448,7 +448,7 @@ function getLevelsByPercentage(levels, levelKey, defalutPercentage, examStudents
         var highTargetStudent = _.takeRight(examStudentsInfo, highFlagCount)[0];
         var highLevelScore = highTargetStudent.score;
 
-        var count = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score <= highLevelScore)).length;
+        var count = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score < highLevelScore)).length;
         var sumCount = _.filter(examStudentsInfo, (obj) => obj.score >= currentLevelScore).length;
         var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
         return {
@@ -463,7 +463,7 @@ function getLevelsByPercentage(levels, levelKey, defalutPercentage, examStudents
         var currentLevelScore = targetStudent.score;
 
         var highLevelScore = examFullMark;
-        var count = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore)).length;
+        var count = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score <= highLevelScore)).length;
         var sumCount = count;
         var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
         return {
@@ -482,7 +482,7 @@ function getLevelsByPercentage(levels, levelKey, defalutPercentage, examStudents
         var highLevelScore = highTargetStudent.score;
 
         // var highLevelScore = levels[(parseInt(levelKey)+1)+''].score;
-        var count = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore)).length;
+        var count = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score < highLevelScore)).length;
         var sumCount = _.filter(examStudentsInfo, (obj) => obj.score > currentLevelScore).length;
         var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
         return {

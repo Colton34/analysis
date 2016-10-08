@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-08 12:21:47
+* @Last Modified time: 2016-10-08 12:23:13
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -406,9 +406,6 @@ exports.updateExamBaseline = function(req, res, next) {
         next(err);
     });
 }
-
-
-
 
 function updateBaseline(examId, targetBaseline) {
     return when.promise(function(resolve, reject) {

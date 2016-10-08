@@ -24,6 +24,9 @@ const FullScoreTrend = ({reportDS}) => {
         return obj;
     })
 
+
+console.log(result['x-axon'].length+'==============');
+
 //自定义Module数据结构
     var config = {
         colors:['#00adfb'],
@@ -68,7 +71,7 @@ const FullScoreTrend = ({reportDS}) => {
                 color:'#fff'
             },
             formatter: function(){
-                 return (this.point.low>0?'(':'[')+this.point.low + '-' + this.point.high +']区间人数<br />'+ this.point.y +'人,占'
+                 return '['+this.point.low + '-' + this.point.high +(this.point.x == result['x-axon'].length - 1 ? ']' : ')')+'区间人数<br />'+ this.point.y +'人,占'
                  +Math.round(((this.point.y/examInfo.realStudentsCount)*100))+'%';
             }
         },
@@ -141,7 +144,7 @@ class FullScoreInfo extends React.Component {
                         return (
                             <li key={'fullScoreTrend-li-' + index} style={{height: 40, lineHeight: '40px', display: 'table-row' }}>
                                 <span className={schoolReportStyles['list-dot']} style={{ width: 20, height: 40, lineHeight: '40px', textAlign: 'center', display: 'table-cell', verticalAlign: 'middle'}}></span>
-                                <span style={{ marginRight: 20, display: 'table-cell', width: 110, textAlign: 'left', borderBottom: '1px dashed ' + C04}}>{(index === 0 ? '[' + data.low : '(' + data.low) + ',' + data.high + ']分区间'}</span>
+                                <span style={{ marginRight: 20, display: 'table-cell', width: 110, textAlign: 'left', borderBottom: '1px dashed ' + C04}}>{'[' + data.low + ',' + data.high + (index == yData.length-1 ? ']' : ')')+ '分区间'}</span>
                                 <span style={{ marginRight: 20, display: 'table-cell', width: 50, textAlign: 'left',  borderBottom: '1px dashed ' + C04}}>{data.y}</span>
                                 <span style={{ display: 'table-cell', textAlign: 'left', borderBottom: '1px dashed ' + C04, }}>人</span>
                             </li>

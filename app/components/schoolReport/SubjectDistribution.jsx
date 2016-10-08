@@ -363,6 +363,9 @@ class TextView extends React.Component {
 function theSubjectLevelTable(subjectLevelInfo, validOrderedSubjectMean, examInfo) {
     //此档的内容
     //这里面依然会有二连杀：即虽然上面已经避免了可能会因为paper mean的"25xx"算法而导致漏掉一些科目的平均分，但是当去求某一个班级的数据的时候依然要考虑此班级有可能没有考某一科目！！！
+    debugger;
+
+
     var table = [];
     var titleHeader = _.map(validOrderedSubjectMean, (headerObj, index) => {
         return headerObj.subject + '(' + headerObj.mean + ')';
@@ -505,21 +508,25 @@ function makeSubjectLevelInfo(levels, currentLevelKey, currentLevelScore, subjec
     var papersFullMark = {};
     _.each(examPapersInfo, (obj, pid) => papersFullMark[pid] = obj.fullMark);
     var subjectsMean = _.cloneDeep(subjectLevels[currentLevelKey]);   //makeLevelSubjectMean(currentLevelScore, examStudentsInfo, examPapersInfo, examFullMark);//这里有可能拿不到全科--TODO：在最开始就做校验！！！。
-    var tempSubjectMeanMap = {};
-    _.each(subjectLevels, (subjectLevelObj, levelKey) => {
-        var temp = {};
-        _.each(subjectLevelObj, (v, pid) => {
-            temp[pid] = v.mean;
-        });
-        tempSubjectMeanMap[levelKey] = temp;
-    });
+    // var tempSubjectMeanMap = {};
+    // _.each(subjectLevels, (subjectLevelObj, levelKey) => {
+    //     var temp = {};
+    //     _.each(subjectLevelObj, (v, pid) => {
+    //         temp[pid] = v.mean;
+    //     });
+    //     tempSubjectMeanMap[levelKey] = temp;
+    // });
 
     subjectsMean.totalScore = { id: 'totalScore', mean: currentLevelScore, name: '总分' };
+    debugger;
     var result = {};
     result.totalSchool = {};
     var totalSchoolLevelInfo = getLevelInfo(levels, examStudentsInfo, examFullMark);
-    var totalSchoolSubjectLevelInfo = getSubjectLevelInfo(tempSubjectMeanMap, allStudentsPaperMap, papersFullMark);
+    debugger;
+    var totalSchoolSubjectLevelInfo = getSubjectLevelInfo(subjectLevels, allStudentsPaperMap, papersFullMark);
+    debugger;
     result.totalSchool.totalScore = totalSchoolLevelInfo[currentLevelKey].count;
+    debugger;
 
     _.each(subjectsMean, (subMean, pid) => {
         if (pid == 'totalScore') return;
@@ -528,7 +535,7 @@ function makeSubjectLevelInfo(levels, currentLevelKey, currentLevelScore, subjec
     _.each(studentsGroupByClass, (classStudents, className) => {
         var temp = {}, currentClassStudentsPaperMap = _.groupBy(_.concat(..._.map(classStudents, (student) => student.papers)), 'paperid');
         var currentClassLevelInfo = getLevelInfo(levels, classStudents, examFullMark);
-        var currentClassSubjectLevelInfo = getSubjectLevelInfo(tempSubjectMeanMap, currentClassStudentsPaperMap, papersFullMark);
+        var currentClassSubjectLevelInfo = getSubjectLevelInfo(subjectLevels, currentClassStudentsPaperMap, papersFullMark);
 
         temp.totalScore = currentClassLevelInfo[currentLevelKey].count;
         //Note: 这里的算法没有问题：subjectsMean是全部有效的，而这里遍历的pid是跟着当前班级所考的科目走的
