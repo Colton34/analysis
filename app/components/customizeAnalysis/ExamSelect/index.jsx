@@ -312,7 +312,7 @@ class ExamSelect extends React.Component {
     getExamList() {
         var {startDate, endDate} = this.state;
         var newList = _.filter(this.props.examList, exam => {
-            return moment(exam.time) >= startDate && moment(exam.time) <= endDate
+            return moment(exam.timestamp) >= startDate && moment(exam.timestamp) <= endDate
         })
         this.setState({
             examList: newList
@@ -451,7 +451,7 @@ class ExamSelect extends React.Component {
                         <div id='examList'>
                             {
                                 examList.map((exam, index) => {
-                                    var date = new Date(exam.time);
+                                    var date = new Date(exam.timestamp);
 
                                     return (
                                         <div className='exam-item' key={'exam-' + index}>
