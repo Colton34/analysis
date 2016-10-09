@@ -136,7 +136,7 @@ class ScoreLevelRadioGroup extends React.Component {
                         _.map(defaultRadioRange, (levelCount) => {
                             return (
                                 <label  key={'label'+levelCount} id={levelCount} style={{paddingLeft:'20px'}}>
-                                    <Radio value={levelCount} />{numberMap[levelCount]+'档'}
+                                    <Radio value={levelCount} />{numberMap[levelCount]+'等'}
                                 </label>
                             )
                         })
@@ -185,7 +185,6 @@ class ScoreLevelForm extends React.Component {
 
     render() {
         var levelLastIndex = this.state.levelPercentages.length - 1;
-        debugger;
         return (
             <div style={{padding:'30px'}}>
                 <ScoreLevelRadioGroup initLevelCount={this.state.levelPercentages.length} changeLevelCount={this.changeLevelCount.bind(this)} />
@@ -212,7 +211,7 @@ const ScoreLevelDialog = (props) => {
                 <button className={commonClass['dialog-close']} onClick={props.hideModal}>
                     <i className='icon-cancel-3'></i>
                 </button>
-                设置分档线
+                设置等级参数
             </Header>
             <ScoreLevelForm {...props}/>
         </Modal>
@@ -251,7 +250,7 @@ export default class ScoreLevelBySubject extends React.Component {
 
                     <span onClick={this.showModal.bind(this)} style={{color:'#fff',backgroundColor:'rgb(29,174,248)',width:120,height:30,float:'right',borderRadius:'2px',lineHeight:'30px',cursor:'pointer'}}>
                         <i className='icon-cog-2' style={{fontSize: 12,paddingLeft:10}}></i>
-                        设置分档参数
+                        设置等级参数
                     </span>
                 </div>
                 <ScoreLevelDialog
