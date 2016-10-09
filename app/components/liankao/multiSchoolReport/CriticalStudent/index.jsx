@@ -106,6 +106,7 @@ class CriticalForm extends React.Component {
     }
 
     setFormLevelBufferState(newFormLevelBufferInfo, levelValidSate) {
+        debugger;
         var newChildValidState = _.cloneDeep(this.state.childValidState);
         newChildValidState[levelValidSate.levelKey] = levelValidSate.isValid;
         this.setState({
@@ -141,6 +142,7 @@ class CriticalForm extends React.Component {
     render() {
         var levelLastIndex = _.size(this.state.formLevelBufferInfo) - 1;
         var formIsValid = _.every(this.state.childValidState, (v) => v);
+        debugger;
         var levelSize = _.size(this.levels);
         return (
             <div>
@@ -165,12 +167,12 @@ class CriticalForm extends React.Component {
                     </div>
                 </Body>
                 <Footer className="text-center" style={{ textAlign: 'center', borderTop: 0, padding: '0 0 30px 0' }}>
-                    <a href="javascript:void(0)" style={_.assign({}, localStyle.btn, { backgroundColor: '#59bde5', color: '#fff' }) } onClick={this.handleSubmit.bind(this) } disabled={!formIsValid}>
+                    <button style={_.assign({}, localStyle.btn, { backgroundColor: '#59bde5', color: '#fff' }) } onClick={this.handleSubmit.bind(this) } disabled={!formIsValid}>
                         确定
-                    </a>
-                    <a href="javascript:void(0)" style={localStyle.btn} onClick={this.handleCancel.bind(this) }>
+                    </button>
+                    <button style={localStyle.btn} onClick={this.handleCancel.bind(this) }>
                         取消
-                    </a>
+                    </button>
                 </Footer>
             </div>
         );
@@ -256,6 +258,7 @@ function mapDispatchToProps(dispatch) {
 
 function validateIsNumber({value}) {
     var isValid = !!value &&isNumber(value);
+    // debugger;
     return (isValid) ? '' : '只能填入数字';
 }
 
@@ -319,7 +322,7 @@ function getTableData(studentsInfoBySchool, levels, levelBuffers, schoolNames) {
     _.forEach(schoolNames, schoolName => {
         var rowData = {school: schoolName};
         var segmentsCount = makeSegmentsCount(studentsInfoBySchool[schoolName], segments); //从低到高
-        segmentsCount = _.filter(segmentsCount, (countInfo, index) => (index % 2 == 0)); //过滤出区间段内的学生人数,从低到高； 
+        segmentsCount = _.filter(segmentsCount, (countInfo, index) => (index % 2 == 0)); //过滤出区间段内的学生人数,从低到高；
         _.forEach(levels, (levelInfo, levelNum) => {
             rowData[levelNum] = segmentsCount[levelSize - levelNum -1];
         })
