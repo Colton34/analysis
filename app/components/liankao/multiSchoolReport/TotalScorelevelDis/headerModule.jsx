@@ -246,7 +246,7 @@ class LevelForm extends React.Component {
                 }
                 <div style={{textAlign:'center'}}>
                     <button onClick={this.handleSubmit.bind(this)} disabled={!formIsValid} style={{backgroundColor: '#59bde5', color: '#fff', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',padding:0,borderWidth:0,marginRight:'20px',borderRadius:'2px'}}>确认</button>
-                    <button onClick={this.handleCancel.bind(this)} style={{backgroundColor: '#f2f2f2', color: '#fff', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',padding:0,borderWidth:0,borderRadius:'2px'}}>取消</button>
+                    <button onClick={this.handleCancel.bind(this)} style={{backgroundColor: '#f2f2f2', color: 'rgb(106,106,106)', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',padding:0,borderWidth:0,borderRadius:'2px'}}>取消</button>
                 </div>
             </div>
         );

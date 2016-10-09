@@ -19,7 +19,7 @@ import EnhanceTable from '../../../../common/EnhanceTable';
 var validateRules = [validateIsNumber, validateLevelBuffer];
 
 var localStyle = {
-    btn: {lineHeight: '32px', width: 84, height: 32,  display: 'inline-block',textAlign: 'center',textDecoration: 'none', backgroundColor:'#f2f2f2',color: '#6a6a6a', margin: '0 6px'}
+    btn: {backgroundColor: 'rgb(242, 242, 242)', color: 'rgb(106, 106, 106)',width: 84, height: 32,  display: 'inline-block',textAlign: 'center',padding:0,borderWidth:0,marginRight:'20px',borderRadius:'2px'}
 }
 
 class CriticalInput extends React.Component {
@@ -339,4 +339,3 @@ function makeCriticalSegments(levelBuffers, levels) {
     });
     return result;
 }
-
