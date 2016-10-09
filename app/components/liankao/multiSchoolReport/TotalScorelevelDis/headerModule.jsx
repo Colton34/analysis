@@ -527,7 +527,7 @@ function validateSubjectLevel({formLevelInfo, examStudentsInfo, examPapersInfo, 
         isValid = _.every(subjectLevelSegments, (singleSubjectLevelSegments) => {
             var ifValid = _.every(singleSubjectLevelSegments, (v) => (validateIsNumber(v) && validateValueRange(v, examFullMark)));
             if(!ifValid) return ifValid;
-            return _.every(_.range(_.size(singleSubjectLevelSegments)-1), (i) => singleSubjectLevelSegments[i+1] > singleSubjectLevelSegments[i]);
+            return _.every(_.range(_.size(singleSubjectLevelSegments)-1), (i) => singleSubjectLevelSegments[i+1].mean > singleSubjectLevelSegments[i].mean);
         });
     }
     return (isValid) ? '' : '此分档线下的学科分档线不合理'
