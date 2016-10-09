@@ -5,13 +5,13 @@ import TableView from '../../../common/TableView';
 import StatisticalLib from 'simple-statistics';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
-var functionList = [getSubjectName, getRealStudentCount, getLostStudentCount, getFullMark, getMaxScore, getMinScore, getMeanScore, getStandardDeviation, getDiscriminationFactor, getDifficulty, getReliabilityCoefficient, getSampleCorrelation];
+var functionList = [getSubjectName, getRealStudentCount, getFullMark, getMaxScore, getMinScore, getMeanScore, getStandardDeviation, getDiscriminationFactor, getDifficulty, getReliabilityCoefficient, getSampleCorrelation];//getLostStudentCount,
 
 export default function AnalysisFactor({currentPaperInfo, currentPaperStudentsInfo, reportDS, currentSubject}) {
     var examStudentsInfo = reportDS.examStudentsInfo.toJS();
 
     var paperScores = _.map(currentPaperStudentsInfo, (obj) => obj.score);//Note:已经排好序了，从小到大
-    var tableData = [['科目', '参考总人数', '缺考人数', '满分', '最高分', '最低分', '平均分', '标准差', '差异系数', '难度', 'α信度系数', '相关系数'], []];
+    var tableData = [['科目', '参考总人数', '满分', '最高分', '最低分', '平均分', '标准差', '差异系数', '难度', 'α信度系数', '相关系数'], []]; //'缺考人数',
 
     _.forEach(functionList, func => {
         tableData[1].push(func({currentPaperInfo, paperScores, currentPaperStudentsInfo, currentSubject, examStudentsInfo}));
@@ -63,9 +63,9 @@ function getDifficulty({paperScores, currentPaperInfo}) {
 function getRealStudentCount({currentPaperInfo}) {
     return currentPaperInfo.realStudentsCount;//实考人数
 }
-function getLostStudentCount({currentPaperInfo}) {
-    return currentPaperInfo.lostStudentsCount;//缺考人数
-}
+// function getLostStudentCount({currentPaperInfo}) {
+//     return currentPaperInfo.lostStudentsCount;//缺考人数
+// }
 //a=[K/(K-1)]×[1-(∑S2i)/(S2x)] -- k是此科目题目数量； ∑S2i是每道题目的方差和  S2x是所有题目总分（即学科得分）的方差
 function getReliabilityCoefficient({currentPaperStudentsInfo, currentSubject, examStudentsInfo}) {
 //当前科目所包含的题目 每个学生在各个题目上的得分

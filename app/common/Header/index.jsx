@@ -69,7 +69,7 @@ class HeaderComponent extends React.Component {
                             <a href="/" className={style['menu-nav']} style={localStyle.headerLink} key={'headerLink-0'}>首页</a>
                         </li>
                     </ul>
-                    {!this.props.user.auth.isLianKaoManager ? (<a key='addAnalysisBtn' href='/add/analysis' style={localStyle.addAnalysisBtn}><i className='icon-add-3'></i>自定义分析</a>) : ''}
+                    {/*{!this.props.user.auth.isLianKaoManager ? (<a key='addAnalysisBtn' href='/add/analysis' style={localStyle.addAnalysisBtn}><i className='icon-add-3'></i>自定义分析</a>) : ''} */}
 
                     {/* ------------------------------右侧头像、名字--------------------------------------*/ }
                     <a href='javascript:;' onClick={this.onClickAvatar.bind(this)} style={localStyle.userInfo}>

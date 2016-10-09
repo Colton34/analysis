@@ -6,8 +6,8 @@ import StatisticalLib from 'simple-statistics';
 import TableView from '../../../../common/TableView';
 import EnhanceTable from '../../../../common/EnhanceTable';
 
-var COLUMN_NAMES = ["学科", "满分","最高分","最低分","平均分","标准差","差异系数","难度","实考人数","缺考人数"];
-var INDICATORFUNS = [getSubjectName, getFullMark, getMaxScore, getMinScore, getMeanScore, getStandardDeviation, getDiscriminationFactor, getDifficulty, getRealStudentCount, getLostStudentCount];
+var COLUMN_NAMES = ["学科", "满分","最高分","最低分","平均分","标准差","差异系数","难度","实考人数"];//'缺考人数'
+var INDICATORFUNS = [getSubjectName, getFullMark, getMaxScore, getMinScore, getMeanScore, getStandardDeviation, getDiscriminationFactor, getDifficulty, getRealStudentCount];//getLostStudentCount
 var columnIndicatorFunMap = getIndicatorFunMap(COLUMN_NAMES, INDICATORFUNS);
 
 export default function ExamPerformance({classStudents, classStudentsPaperMap, classHeaders, currentClass, reportDS}) {
@@ -102,9 +102,9 @@ function getDifficulty({paperScores, examPapersInfo, headerObj}) {
 function getRealStudentCount({examPapersInfo, headerObj, currentClass}) {
     return examPapersInfo[headerObj.id].classes[currentClass];//实考人数
 }
-function getLostStudentCount({examClassesInfo, currentClass, examPapersInfo, headerObj}) {
-    return examClassesInfo[currentClass].students.length - examPapersInfo[headerObj.id].classes[currentClass];//缺考人数
-}
+// function getLostStudentCount({examClassesInfo, currentClass, examPapersInfo, headerObj}) {
+//     return examClassesInfo[currentClass].students.length - examPapersInfo[headerObj.id].classes[currentClass];//缺考人数
+// }
 
 //TODO（原因简单说明）: 1.classStudentsPaperMap中的obj是
 /*

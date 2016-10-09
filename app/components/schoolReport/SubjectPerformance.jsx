@@ -386,7 +386,7 @@ export default SubjectPerformance;
 function theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers) {
     var table = [];
 
-    var titleHeader = ['学科', '满分', '最高分', '最低分', '平均分', '标准差', '差异系数', '难度', '实考人数', '缺考人数'];
+    var titleHeader = ['学科', '满分', '最高分', '最低分', '平均分', '标准差', '差异系数', '难度', '实考人数'];//'缺考人数'
 
     table.push(titleHeader);
 
@@ -407,7 +407,7 @@ function theSubjectExamTable(examStudentsInfo, examPapersInfo, allStudentsPaperM
         subjectRow.push(_.round(_.divide(sqrt, mean), 2)); //差异系数: 标准差/平均分
         subjectRow.push(_.round(_.divide(mean, examPapersInfo[headerObj.id].fullMark), 2)); //难度
         subjectRow.push(examPapersInfo[headerObj.id].realStudentsCount); //实考人数
-        subjectRow.push(examPapersInfo[headerObj.id].lostStudentsCount); //缺考人数
+        // subjectRow.push(examPapersInfo[headerObj.id].lostStudentsCount); //缺考人数
 
         table.push(subjectRow);
     });
