@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-09-20 16:01:08
+* @Last Modified time: 2016-10-09 15:52:50
 */
 
 'use strict';
@@ -73,5 +73,15 @@ export function downloadTable(headSeq, headSelect, headerMapper, renderRows, exp
 }
 
 export function isNumber(val) {
-    return /^\d+$/.test(val);
+    var isPureNumber = _.isNumber(val) && !_.isNaN(val);
+    if(isPureNumber) return isPureNumber;
+    var isStringInt = /^\d+$/.test(val);
+    if(isStringInt) return isStringInt;
+    if(_.includes(val, '.')) {
+        var floatArr = _.split(val, '.');
+        if(floatArr.length != 2) return false;
+        return /^\d+$/.test(floatArr[0]) && /^\d+$/.test(floatArr[1]);
+    } else {
+        return false;
+    }
 }

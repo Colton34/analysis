@@ -480,7 +480,7 @@ function getNewCountFormLevelInfo(oldFormLevelInfo, count) {
 */
 function validateIsNumber({value}) {
     var isValid = !!value &&isNumber(value);
-    return (isValid) ? '' : '只能填入数字';
+    return (isValid) ? '' : '只能输入正整数数值';
 }
 
 function validateValueRange({value, examFullMark}) {
@@ -488,7 +488,7 @@ function validateValueRange({value, examFullMark}) {
     return (isValid) ? '' : '分数不能大于总分或小于零分';
 }
 
-function validatePercentageRange(value) {
+function validatePercentageRange({value}) {
     var isValid = (value > 0) && (value <= 100);
     return (isValid) ? '' : '百分比不能大于100或小于0';
 }
