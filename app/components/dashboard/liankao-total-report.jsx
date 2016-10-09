@@ -101,8 +101,8 @@ class LianKaoReportCard extends React.Component {
             tooltip: {
                 formatter: function(){
                     return '分数区间：<b>' +
-                            (this.point.first ? '[' : '(') +
-                            this.point.low + ',' + this.point.high + ']</b><br/>' +
+                            ('['  +
+                            this.point.low + ',' + this.point.high + (this.point.last?']':')')+'</b><br/>' )+
                             '人数:<b>' + this.point.y + '人</b>';
                 }
             },
