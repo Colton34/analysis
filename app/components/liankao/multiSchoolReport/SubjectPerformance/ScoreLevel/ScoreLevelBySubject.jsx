@@ -92,7 +92,7 @@ class ScoreLevelInput extends React.Component {
         console.log(this.state.value);
         debugger;
         return (
-            <div style={{marginBottom: 30}}>
+            <div style={{marginBottom: 60}}>
                 <div >
                     <label htmlFor={this.props.levelIndex+'-'+'input'} style={{fontWeight:400}}>{letterMap[levelLastIndex - this.props.levelIndex] + '等：'}</label>
                     <input
@@ -130,7 +130,7 @@ class ScoreLevelRadioGroup extends React.Component {
                 name="levels"
                 selectedValue={this.state.selectedValue}
                 onChange={this.handleChange.bind(this)}>
-                <div style={{padding:'0 30px 30px 0',paddingLeft:150}}>
+                <div style={{padding:'0 30px 60px 0',paddingLeft:150}}>
                     {/*<span>本场最高分{_.last(this.props.examStudentsInfo).score}分。当前设置为</span>*/}
                     {
                         _.map(defaultRadioRange, (levelCount) => {
