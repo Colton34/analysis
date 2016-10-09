@@ -14,7 +14,7 @@ import { Modal, Table as BootTable} from 'react-bootstrap';
 var {Header, Title, Body, Footer} = Modal;
 
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
-import {makeSubjectLevels} from '../../../../sdk';
+import {makeSubjectLevels, getLevelInfo} from '../../../../sdk';
 import {isNumber, initParams} from '../../../../lib/util';
 import {changeLevelAction, saveBaselineAction} from '../../../../reducers/reportDS/actions';
 import commonClass from '../../../../styles/common.css';
@@ -57,10 +57,12 @@ d.校验的结果作为form valid的输入
         if (this.state.validationStarted) {
             this.prepareToValidate();
         }
-        var newFormLevelInfo = getNewChangeFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
-        var errorMsg = this.props.validation(e.target.value, newFormLevelInfo, this.props.info.type);
-        this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !(!!errorMsg)});
-        this.props.setErrorMessage(errorMsg);
+        var newShowFormLevelInfo = getNewShowFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
+        this.props.setFormLevelState(newShowFormLevelInfo);
+        // var newFormLevelInfo = getNewChangeFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
+        // var errorMsg = this.props.validation(e.target.value, newFormLevelInfo, this.props.info.type);
+        // this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !(!!errorMsg)});
+        // this.props.setErrorMessage(errorMsg);
     }
 
     handleBlur(e) {
@@ -186,12 +188,14 @@ class LevelForm extends React.Component {
     }
 
     setFormLevelState(newFormLevelInfo, levelValidSate) {
-        var newChildValidState = _.cloneDeep(this.state.childValidState);
-        newChildValidState[levelValidSate.levelKey] = levelValidSate.isValid;
-        this.setState({
-            formLevelInfo: newFormLevelInfo,
-            childValidState: newChildValidState
-        })
+        var data = {formLevelInfo: newFormLevelInfo};
+        if(levelValidSate) {
+            var newChildValidState = _.cloneDeep(this.state.childValidState);
+            newChildValidState[levelValidSate.levelKey] = levelValidSate.isValid;
+            data['childValidState'] = newChildValidState;
+        }
+
+        this.setState(data);
     }
 
     validation(value, newFormLevelInfo, valueType) {
@@ -341,6 +345,13 @@ function getNewChangeFormLevelInfo(inputValue, inputInfo, oldFormLevelInfo, exam
     return newChangeFormLevelInfo;
 }
 
+function getNewShowFormLevelInfo(inputValue, inputInfo, oldFormLevelInfo) {
+    var newChangeFormLevelInfo = _.cloneDeep(oldFormLevelInfo);
+    // var inputType = inputInfo.type;
+    newChangeFormLevelInfo[inputInfo.id][inputInfo.type] = inputValue;
+    return newChangeFormLevelInfo;
+}
+
 //TODO:在levels里添加sumCount，修改percentage为sumPercentage
 function getOtherInputValue(otherInputType, inputValue, levelKey, formLevelInfo, examStudentsInfo, examFullMark) {
     if(!isNumber(inputValue)) {
@@ -352,94 +363,15 @@ function getOtherInputValue(otherInputType, inputValue, levelKey, formLevelInfo,
         }
     }
     inputValue = parseFloat(inputValue);
-    var levelLastIndex = _.size(formLevelInfo) - 1;
+    var result;
     if(otherInputType == 'percentage') {
-        //根据score计算percentage和count。但是percentage是累积的percentage
-        if(levelKey == '0') { // 【应该用不到此边界判断】 && levelKey != levelLastIndex+''
-            var highLevelScore = formLevelInfo[(parseInt(levelKey)+1)+''].score;
-            var count = _.filter(examStudentsInfo, (obj) => (obj.score >= inputValue) && (obj.score <= highLevelScore)).length;
-            var sumCount = _.filter(examStudentsInfo, (obj) => obj.score >= inputValue).length;
-            var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
-            return {
-                count: count,
-                sumCount: sumCount,
-                score: inputValue,
-                percentage: sumPercentage
-            }
-        } else if(levelKey == levelLastIndex+'') {
-            var highLevelScore = examFullMark;
-            var count = _.filter(examStudentsInfo, (obj) => (obj.score > inputValue) && (obj.score <= highLevelScore)).length;
-            var sumCount = count;
-            var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
-            return {
-                count: count,
-                sumCount: sumCount,
-                score: inputValue,
-                percentage: sumPercentage
-            }
-        } else {
-            var highLevelScore = formLevelInfo[(parseInt(levelKey)+1)+''].score;
-            var count = _.filter(examStudentsInfo, (obj) => (obj.score > inputValue) && (obj.score <= highLevelScore)).length;
-            var sumCount = _.filter(examStudentsInfo, (obj) => obj.score > inputValue).length;
-            var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
-            return {
-                count: count,
-                sumCount: sumCount,
-                score: inputValue,
-                percentage: sumPercentage
-            }
-        }
+        formLevelInfo[levelKey].score = inputValue;
+        result = getLevelInfo(formLevelInfo, examStudentsInfo, examFullMark);
     } else {
-        //根据percentage计算score和count
-        //用例：设置了30%，计算出分数线是500，但是500的有好多人，容纳到30%的数量里不能包括全部分数线是500的学生，这里采取截断方式--即去掉这些学生，虽然他们上线了--即人数就不准了。--update: 不，要保证数据准确！！！所以对输入的percentage进行纠正~
-        //TODO: 重构~太冗余了。
-        if(levelKey == '0') {//低档次
-            var flagCount = _.ceil(_.multiply(_.divide(inputValue, 100), examStudentsInfo.length));
-            var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
-            var currentLevelScore = targetStudent.score;
-
-            var highLevelScore = formLevelInfo[(parseInt(levelKey)+1)+''].score;
-            var count = _.filter(examStudentsInfo, (obj) => (obj.score >= currentLevelScore) && (obj.score <= highLevelScore)).length;
-            var sumCount = _.filter(examStudentsInfo, (obj) => obj.score >= currentLevelScore).length;
-            var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
-            return {
-                count: count,
-                sumCount: sumCount,
-                score: currentLevelScore,
-                percentage: sumPercentage
-            }
-        } else if(levelKey == levelLastIndex+'') {
-            var flagCount = _.ceil(_.multiply(_.divide(inputValue, 100), examStudentsInfo.length));
-            var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
-            var currentLevelScore = targetStudent.score;
-
-            var highLevelScore = examFullMark;
-            var count = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore)).length;
-            var sumCount = count;
-            var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
-            return {
-                count: count,
-                sumCount: sumCount,
-                score: currentLevelScore,
-                percentage: sumPercentage
-            }
-        } else {
-            var flagCount = _.ceil(_.multiply(_.divide(inputValue, 100), examStudentsInfo.length));
-            var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
-            var currentLevelScore = targetStudent.score;
-
-            var highLevelScore = formLevelInfo[(parseInt(levelKey)+1)+''].score;
-            var count = _.filter(examStudentsInfo, (obj) => (obj.score > currentLevelScore) && (obj.score <= highLevelScore)).length;
-            var sumCount = _.filter(examStudentsInfo, (obj) => obj.score > currentLevelScore).length;
-            var sumPercentage = _.round(_.multiply(_.divide(sumCount, examStudentsInfo.length), 100), 2);
-            return {
-                count: count,
-                sumCount: sumCount,
-                score: currentLevelScore,
-                percentage: sumPercentage
-            }
-        }
+        formLevelInfo[levelKey].percentage = inputValue;
+        result = getLevelInfo(formLevelInfo, examStudentsInfo, examFullMark, false);
     }
+    return result[levelKey];
 }
 
 function getNewCountFormLevelInfo(oldFormLevelInfo, count) {

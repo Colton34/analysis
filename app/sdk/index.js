@@ -1,7 +1,7 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-10-08 16:25:32
+* @Last Modified time: 2016-10-09 18:50:50
 */
 
 'use strict';
@@ -213,17 +213,25 @@ export function getLevelInfo(levels, baseStudents, examFullMark, isByScore=true)
         var currentLevelRel = levelScoreRel[levelKey];
         targets = (levelKey == levelLastIndex) ? _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score <= currentLevelRel.highLevelScore)) : _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score < currentLevelRel.highLevelScore));
         count = targets.length;
-        temp[levelKey] = count;
-        sumCount = (levelKey == levelLastIndex + '') ? (count) : (_.sum(_.values(_.pickBy(temp, (v, k) => k >= levelKey))));
-        sumPercentage = _.round(_.multiply(_.divide(sumCount, baseStudents.length), 100), 2);
+        // temp[levelKey] = count;
+        // sumCount = (levelKey == levelLastIndex + '') ? (count) : (_.sum(_.values(_.pickBy(temp, (v, k) => k >= levelKey))));
+        // debugger;
+        // sumPercentage = _.round(_.multiply(_.divide(sumCount, baseStudents.length), 100), 2);
         result[levelKey] = {
             targets: targets,
             count: count,
-            sumCount: sumCount,
-            score: currentLevelRel.currentLevelScore,
-            percentage: sumPercentage
+            score: currentLevelRel.currentLevelScore
         }
-    })
+    });
+    _.each(levels, (levelObj, levelKey) => {
+        temp[levelKey] = levelObj.count
+    });
+    _.each(temp, (count, levelKey) => {
+        sumCount = (levelKey == levelLastIndex + '') ? (count) : (_.sum(_.values(_.pickBy(temp, (v, k) => k >= levelKey))));
+        sumPercentage = _.round(_.multiply(_.divide(sumCount, baseStudents.length), 100), 2);
+        result[levelKey].sumCount = sumCount;
+        result[levelKey].percentage = sumPercentage;
+    });
     return result;
 }
 
@@ -239,16 +247,18 @@ function getLevelScoreRel(levels, baseStudents, examFullMark, isByScore=true) {
                 highLevelScore: highLevelScore
             }
         } else {
-            result[levelKey] = getScoreInfoByPercentage(levels, levelKey, levelObj.percentage, baseStudents);
+            result[levelKey] = getScoreInfoByPercentage(levels, levelKey, levelObj.percentage, baseStudents, examFullMark);
         }
     });
     return result;
 }
 
-function getScoreInfoByPercentage(levels, levelKey, currentPercentage, baseStudents) {
+function getScoreInfoByPercentage(levels, levelKey, currentPercentage, baseStudents, examFullMark) {
     var flagCount = _.ceil(_.multiply(_.divide(currentPercentage, 100), baseStudents.length));
     var targetStudent = _.takeRight(baseStudents, flagCount)[0];
     var currentLevelScore = targetStudent.score;
+
+    if(levelKey == (_.size(levels)-1)) return {currentLevelScore: currentLevelScore, highLevelScore: examFullMark};
 
     var highFlagCount = _.ceil(_.multiply(_.divide(levels[(parseInt(levelKey)+1)+''].percentage, 100), baseStudents.length));
     var highTargetStudent = _.takeRight(baseStudents, highFlagCount)[0];

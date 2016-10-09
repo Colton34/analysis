@@ -57,7 +57,6 @@ function getTableDS(levels, allStudentsCount, levelStudentsInfoBySchool, allStud
         currentSchoolRow.unshift(schoolName);
         tableDS.push(currentSchoolRow);
     });
-
     return tableDS;
 }
 
