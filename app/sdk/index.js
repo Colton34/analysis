@@ -1,7 +1,7 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-10-09 18:50:50
+* @Last Modified time: 2016-10-10 16:55:20
 */
 
 'use strict';
@@ -213,17 +213,13 @@ export function getLevelInfo(levels, baseStudents, examFullMark, isByScore=true)
         var currentLevelRel = levelScoreRel[levelKey];
         targets = (levelKey == levelLastIndex) ? _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score <= currentLevelRel.highLevelScore)) : _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score < currentLevelRel.highLevelScore));
         count = targets.length;
-        // temp[levelKey] = count;
-        // sumCount = (levelKey == levelLastIndex + '') ? (count) : (_.sum(_.values(_.pickBy(temp, (v, k) => k >= levelKey))));
-        // debugger;
-        // sumPercentage = _.round(_.multiply(_.divide(sumCount, baseStudents.length), 100), 2);
         result[levelKey] = {
             targets: targets,
             count: count,
             score: currentLevelRel.currentLevelScore
         }
     });
-    _.each(levels, (levelObj, levelKey) => {
+    _.each(result, (levelObj, levelKey) => {
         temp[levelKey] = levelObj.count
     });
     _.each(temp, (count, levelKey) => {

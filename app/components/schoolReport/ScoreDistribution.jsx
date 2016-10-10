@@ -20,6 +20,7 @@ import DropdownList from '../../common/DropdownList';
 
 //Util
 import {makeSegmentsCount} from '../../api/exam';
+import {getLevelInfo} from '../../sdk';
 import {initParams} from '../../lib/util';
 
 //Constant
@@ -257,6 +258,7 @@ class Dialog extends React.Component {
         //保证层级是正确的 --- TODO: 将临界生分析那里的上下浮动5分的判断也验证也加入到这里！！！
         var {examInfo, examStudentsInfo, examPapersInfo} = this.props;
         var levLength = _.size(this.levels);
+        debugger;
         var errorMsg = '';
         var isValid = _.every(_.range(_.size(this.levels) - 1), (index) => {
             return this.levels[index + ''].score < this.levels[(index + 1) + ''].score
@@ -317,6 +319,8 @@ class Dialog extends React.Component {
         var arr = id.split('-');
         var type = arr[0];
         var num = arr[1]; //是第一个（高档次） 还是 最后一个（低档次），但是赋值给levels的时候就应该颠倒过来了
+        var result, cloneLevels = _.cloneDeep(this.levels);
+        var {examInfo, examStudentsInfo} = this.props;
 
         //num = 0, 1, 2(levlTotal)
         // var higherLevObj = this.levels[(this.levLastIndex-num+1)+''];
@@ -343,25 +347,38 @@ class Dialog extends React.Component {
                     console.log('数值不合法--不能超过总分');
                     return;
                 }
-                var targetIndex;//因为examStudentsInfo是有序的，所以可以用二分
-                if(num == (_.size(this.levels) - 1)) {
-                    targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= value);
-                } else {
-                    targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > value);
-                }
-                if (targetIndex !== -1) {
-                    var count = examStudentsInfo.length - targetIndex;
-                    var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);
-                } else {
-                    var count = 0;
-                    var percentage = 0;
-                }
 
-                temp.score = value;
-                temp.percentage = percentage;
-                temp.count = count;
+                cloneLevels[(_.size(cloneLevels) - 1 - num)+''].score = value;
+                debugger;
+                result = getLevelInfo(cloneLevels, examStudentsInfo, examInfo.fullMark);
+                debugger;
+                this.refs['rate-' + num].value = result[(_.size(cloneLevels) - 1 - num)+''].percentage;
+    // return result[levelKey];
 
-                this.refs['rate-' + num].value = percentage;
+
+
+
+
+
+                // var targetIndex;//因为examStudentsInfo是有序的，所以可以用二分
+                // if(num == (_.size(this.levels) - 1)) {
+                //     targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= value);
+                // } else {
+                //     targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > value);
+                // }
+                // if (targetIndex !== -1) {
+                //     var count = examStudentsInfo.length - targetIndex;
+                //     var percentage = _.round(_.multiply(_.divide(count, examInfo.realStudentsCount), 100), 2);
+                // } else {
+                //     var count = 0;
+                //     var percentage = 0;
+                // }
+
+                // temp.score = value;
+                // temp.percentage = percentage;
+                // temp.count = count;
+
+                // this.refs['rate-' + num].value = percentage;
                 break;
             case 'rate':
             //根据给出的百分比，得到学生的位置，然后此学生的分数即为分数线
@@ -374,34 +391,44 @@ class Dialog extends React.Component {
                     console.log('数值不合法--不能超过100%');
                     return;
                 }
-                var flagCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
-                var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
 
-                //当修改百分比后也要换算成分数看一下是否满足相应的规则：前后要相差不少于10分（一旦修改levels，那么就自动重置levelBuffers为10）
-                //TODO:但是这里还是可能会有问题：因为一上来是按照默认百分比设置的，但是怎么保证默认的百分比设置对应的score就一定满足相差10分呢？
-                // if(!((!higherLevObj || (10 < higherLevObj.score - targetStudent.score)) && (!lowerLevObj || (targetStudent.score - lowerLevObj.score > 10)))) {
-                //     console.log('所给的score不符合规则');
-                //     this.isValid = false;
-                //     return;
+                cloneLevels[(_.size(cloneLevels) - 1 - num)+''].percentage = value;
+                debugger;
+                result = getLevelInfo(cloneLevels, examStudentsInfo, examInfo.fullMark, false);
+                debugger;
+                this.refs['score-' + num].value = result[(_.size(cloneLevels) - 1 - num)+''].score;
+
+
+
+                // var flagCount = _.ceil(_.multiply(_.divide(value, 100), examInfo.realStudentsCount));
+                // var targetStudent = _.takeRight(examStudentsInfo, flagCount)[0];
+
+                // //当修改百分比后也要换算成分数看一下是否满足相应的规则：前后要相差不少于10分（一旦修改levels，那么就自动重置levelBuffers为10）
+                // //TODO:但是这里还是可能会有问题：因为一上来是按照默认百分比设置的，但是怎么保证默认的百分比设置对应的score就一定满足相差10分呢？
+                // // if(!((!higherLevObj || (10 < higherLevObj.score - targetStudent.score)) && (!lowerLevObj || (targetStudent.score - lowerLevObj.score > 10)))) {
+                // //     console.log('所给的score不符合规则');
+                // //     this.isValid = false;
+                // //     return;
+                // // }
+
+                // temp.score = targetStudent.score;
+                // temp.percentage = value;
+
+                // var targetIndex;//因为examStudentsInfo是有序的，所以可以用二分
+                // if(num == (_.size(this.levels) - 1)) {
+                //     targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= temp.score);
+                // } else {
+                //     targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > temp.score);
                 // }
+                // var targetCount = examStudentsInfo.length - targetIndex;
+                // temp.count = targetCount;
 
-                temp.score = targetStudent.score;
-                temp.percentage = value;
-
-                var targetIndex;//因为examStudentsInfo是有序的，所以可以用二分
-                if(num == (_.size(this.levels) - 1)) {
-                    targetIndex = _.findIndex(examStudentsInfo, (student) => student.score >= temp.score);
-                } else {
-                    targetIndex = _.findIndex(examStudentsInfo, (student) => student.score > temp.score);
-                }
-                var targetCount = examStudentsInfo.length - targetIndex;
-                temp.count = targetCount;
-
-                this.refs['score-' + num].value = targetStudent.score;
+                // this.refs['score-' + num].value = targetStudent.score;
                 break;
         }
         // this.isValid = true; //TODO: 这里有bug，还是要确保所有的input都是true才对。不然，先来个错的，然后跳过这个错的，再来个对的，那么isValid就是true了。。。
-        this.levels[(_.size(this.levels) - 1 - num)+''] = temp;
+        this.levels[(_.size(this.levels) - 1 - num)+''] = result[(_.size(result) - 1 - num)+''];
+        debugger;
     }
     onHide() {
         this.setState({
@@ -885,6 +912,7 @@ function chageStudentsScope(theKey) {
  */
 function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels) {
     //因为levels中是高档次（即score值大的）在前面，所以需要反转顺序
+    debugger;
     var levelSegments = _.map(levels, (levObj) => levObj.score);
     //用来获取全校各档次的人数  -- segments的最后一个肯定是fullMark，而第一个是最低档的分数
     levelSegments.push(examInfo.fullMark);
@@ -901,17 +929,35 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
     var countsGroupByLevel = makeSegmentsCount(examStudentsInfo, levelSegments);
     //开始创建标准的resultInfo数据结构：
     result.totalSchool = {};
-
-    _.each(countsGroupByLevel, (count, levelKey) => {
-        result.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount); //TODO:levels中的percentage就是累占比呀！
+    _.each(levels, (levelObj, levelKey) => {
+        result.totalSchool[levelKey] = {
+            count: levelObj.count,
+            sumCount: levelObj.sumCount,
+            sumPercentage: levelObj.percentage
+        }
     });
 
+    // _.each(countsGroupByLevel, (count, levelKey) => {
+    //     result.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount); //TODO:levels中的percentage就是累占比呀！
+    // });
+
     _.each(studentsGroupByClass, (studentsFromClass, className) => {
-        var classCountsGroupByLevel = makeSegmentsCount(studentsFromClass, levelSegments);
+        var classCountsGroupByLevel = getLevelInfo(levels, studentsFromClass, examInfo.fullMark);
         var temp = {};
-        _.each(classCountsGroupByLevel, (count, levelKey) => {
-            temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[className].realStudentsCount);
+        _.each(classCountsGroupByLevel, (levelObj, levelKey) => {
+            temp[levelKey] = {
+                count: levelObj.count,
+                sumCount: levelObj.sumCount,
+                sumPercentage: levelObj.percentage
+            }
         });
+
+
+        // var classCountsGroupByLevel = makeSegmentsCount(studentsFromClass, levelSegments);
+        // var temp = {};
+        // _.each(classCountsGroupByLevel, (count, levelKey) => {
+        //     temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[className].realStudentsCount);
+        // });
         result[className] = temp;
     });
 
@@ -990,7 +1036,8 @@ function getNewBaseline(newLevels, examStudentsInfo, examPapersInfo, examId, exa
         var subjectMean = makeLevelSubjectMean(levObj.score, examStudentsInfo, examPapersInfo, examInfo.fullMark);
         // var subjectLevels = _.values(subjectMean);
         result['[subjectLevels]'].push({levelKey: levelKey, values: subjectMean});
-        result['[levels]'].push({key: levelKey, score: levObj.score, percentage: levObj.percentage, count: levObj.count});
+        result['[levels]'].push({key: levelKey, score: levObj.score, percentage: levObj.percentage, count: levObj.count, sumCount: levObj.sumCount});
+        debugger;
         //如果是update那么可以考虑只put上去需要更新的数据--但是需要能区分到底是post还是put。理论上这里如果是put那么不需要put上去levelBuffers，因为这里并没有改变levelBuffers。
         result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
         //拼装 [levels]，[subjectLevels]和[levelBuffers]所对应的每一个实体，放入到相对应的数组中，最后返回gradeExamLevels

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-08 13:31:41
+* @Last Modified time: 2016-10-10 17:18:50
 */
 
 'use strict';
@@ -19,7 +19,7 @@ import {
     LETTER_MAP as letterMap
 } from '../lib/constants';
 
-import {addRankInfo} from '../sdk';
+import {addRankInfo, getLevelInfo} from '../sdk';
 
 var examPath = "/exam";
 var paperPath = '/papers';
@@ -348,30 +348,37 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
         '0': {
             score: 0,
             count: 0,
+            sumCount: 0,
             percentage: 60,
             key: '0'
         },
         '1': {
             score: 0,
             count: 0,
+            sumCount: 0,
             percentage: 35,
             key: '1'
         },
         '2': {
             score: 0,
             count: 0,
+            sumCount: 0,
             percentage: 15,
             key: '2'
         }
     };
 
-    _.each(levels, (levelObj, levelKey) => {
-        var {count, score, percentage} = getLevelsByPercentage(levels, levelKey, levelObj.percentage, examStudentsInfo, examInfo.fullMark);
-        levelObj.count = count;
-        levelObj.score = score;
-        levelObj.percentage = percentage;
-    });
-    return levels;
+    var result = getLevelInfo(levels, examStudentsInfo, examInfo.fullMark, false);
+    debugger;
+    return result;
+
+    // _.each(levels, (levelObj, levelKey) => {
+    //     var {count, score, percentage} = getLevelsByPercentage(levels, levelKey, levelObj.percentage, examStudentsInfo, examInfo.fullMark);
+    //     levelObj.count = count;
+    //     levelObj.score = score;
+    //     levelObj.percentage = percentage;
+    // });
+    // return levels;
 }
 
 //Note:在存储的时候因为是Map所以必须存储成数组，但是使用的时候一定是Map--即在state中的形式是Map
