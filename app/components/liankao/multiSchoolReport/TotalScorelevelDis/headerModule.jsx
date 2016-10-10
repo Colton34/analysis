@@ -177,10 +177,13 @@ class LevelForm extends React.Component {
     }
 
     changeLevelCount(count) {
+        debugger;
         var preLength = _.size(this.state.formLevelInfo);
         var theDiff = Math.abs(preLength - count);
         var newChildValidState = (count > preLength) ? (_.concat(_.map(_.range(theDiff), (i) => false), _.map(_.range(_.size(this.state.formLevelInfo)), (i) => true))) : (_.map(_.range(count), (i) => true));
+        debugger;
         var newFormLevelInfo = getNewCountFormLevelInfo(this.state.formLevelInfo, count);
+        debugger;
         this.setState({
             formLevelInfo: newFormLevelInfo,
             childValidState: newChildValidState
@@ -384,8 +387,9 @@ function getNewCountFormLevelInfo(oldFormLevelInfo, count) {
         ////由少转向多，则添加最低档的数据，原来的档次向后顺延, 去掉低档次，保留高档次  5 3 [4, 3, 2] 丢掉[1, 0]
         _.each(_.range(count), (index) => {
             oldTargetLevelObj = oldFormLevelInfo[(index+theDiff) + ''];
+            debugger;
             newCountFormLevelInfo[index+''] = {score: oldTargetLevelObj.score, count: oldTargetLevelObj.count, percentage: oldTargetLevelObj.percentage};
-
+            debugger;
             // var targetScore = oldFormLevelInfo[(index+theDiff) + ''].score;
             // var targetCount = (index == 0) ? _.size(_.filter(this.props.examStudentsInfo, (s) => s.score >= targetScore)) : _.size(_.filter(this.props.examStudentsInfo, (s) => s.score > targetScore));
             // var targetPercentage = _.round(_.multiply(_.divide(targetCount, this.props.examStudentsInfo.length), 100), 2);
@@ -396,13 +400,16 @@ function getNewCountFormLevelInfo(oldFormLevelInfo, count) {
         });
         _.each(_.range(preLength), (index) => {
             oldTargetLevelObj = oldFormLevelInfo[index+''];
+            debugger;
             newCountFormLevelInfo[(index+theDiff)+''] = {score: oldTargetLevelObj.score, count: oldTargetLevelObj.count, percentage: oldTargetLevelObj.percentage};
+            debugger;
             //为什么重新算一遍，直接copy过来不可以么？-- 是为了统一计算方式：最低的【双合】，其他高档次（左开右合】
             // var targetScore = oldFormLevelInfo[index+''].score;
             // var targetCount = _.size(_.filter(this.props.examStudentsInfo, (s) => s.score > targetScore));
             // var targetPercentage = _.round(_.multiply(_.divide(targetCount, this.props.examStudentsInfo.length), 100), 2);
         });
     }
+    debugger;
     return newCountFormLevelInfo;
 }
 
@@ -412,7 +419,7 @@ function getNewCountFormLevelInfo(oldFormLevelInfo, count) {
 */
 function validateIsNumber({value}) {
     var isValid = !!value &&isNumber(value);
-    return (isValid) ? '' : '只能输入正整数数值';
+    return (isValid) ? '' : '只能输入数字';
 }
 
 function validateValueRange({value, examFullMark}) {
