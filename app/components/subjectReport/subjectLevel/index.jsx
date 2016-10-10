@@ -104,7 +104,7 @@ function makeCurrentSubjectSegmentCountInfo(subjectLevels, examPapersInfo, allSt
         _.each(subLevObj, (obj, pid) => {
             var low = obj.mean;
             var high = (subjectLevels[parseInt(levelKey)+1+'']) ? subjectLevels[parseInt(levelKey)+1+''][pid].mean : examPapersInfo[pid].fullMark;
-            var targets = (low >= high) ? [] : (levelKey == '0' ? (_.filter(allStudentsPaperMap[pid], (obj) => ((low <= obj.score) && (obj.score <= high)))) : (_.filter(allStudentsPaperMap[pid], (obj) => ((low < obj.score) && (obj.score <= high)))));
+            var targets = (low >= high) ? [] : (levelKey == (_.size(subjectLevels)-1) ? (_.filter(allStudentsPaperMap[pid], (obj) => ((low <= obj.score) && (obj.score <= high)))) : (_.filter(allStudentsPaperMap[pid], (obj) => ((low <= obj.score) && (obj.score < high)))));
             currentLevelSubjectsDisInfo[pid] = {
                 mean: obj.mean,
                 count: targets.length,
