@@ -240,7 +240,7 @@ function getSummaryCard(levelStudentsInfoBySchool, examStudentsInfo, allStudentB
         var notExistSchools = _.difference(allSchools, existSchools);
         var temp = _.map(levelSchoolStudents, (students, schoolName) => {
             return {
-                count: _.round(_.divide(students.length,allStudentBySchool[schoolName]),4),
+                count: _.round(_.divide(students.length,allStudentBySchool[schoolName].length),4),
                 school: schoolName
             }
         });

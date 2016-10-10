@@ -26,7 +26,7 @@ export default function AnalysisFactor({currentPaperInfo, currentPaperStudentsIn
             <TableView tableData={tableData}/>
             <div className={commonClass['analysis-conclusion']}>
                 <p>分析与诊断：</p>
-                <div>作为学校组织的学科考试，总体难度控制为<span style={{color: colorsMap.B03}}>{tableData[1][9]}</span>。关于试题难度更详细的分析可参见本报告“试题整体命题”部分。</div>
+                <div>作为学校组织的学科考试，总体难度控制为<span style={{color: colorsMap.B03}}>{tableData[1][8]}</span>。关于试题难度更详细的分析可参见本报告“试题整体命题”部分。</div>
             </div>
         </div>
     )
