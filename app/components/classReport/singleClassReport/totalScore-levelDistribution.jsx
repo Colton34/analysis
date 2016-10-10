@@ -7,6 +7,7 @@ import EnhanceTable from '../../../common/EnhanceTable';
 import TableView from '../../../common/TableView';
 
 import {makeSegmentsCount} from '../../../api/exam';
+import {getLevelInfo} from '../../../sdk';
 
 import commonClass from '../../../common/common.css';
 import singleClassReportStyle from './singleClassReport.css';
@@ -120,33 +121,89 @@ export default class LevelDistribution extends React.Component {
  */
 //resultByClass是totalScoreLevelInfo按照第一级是className（或'totalSchool'这个特殊的class key）作为key，第二级是levelKey，而resultByLevel的第一级是levelKey，第二级是className,
 //而且不包含totalSchool这个特殊的key
+
 function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, currentClass) {
-    var levelSegments = _.map(levels, (levObj) => levObj.score);
-    levelSegments.push(examInfo.fullMark);
-
-    var resultByClass = {}, resultByLevel = {};
-    var countsGroupByLevel = makeSegmentsCount(examStudentsInfo, levelSegments);
-    resultByClass.totalSchool = {};
-
-    _.each(countsGroupByLevel, (count, levelKey) => {
-        resultByClass.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount); //TODO:levels中的percentage就是累占比呀！
+    var result = {};
+    result.totalSchool = {};
+    _.each(levels, (levelObj, levelKey) => {
+        result.totalSchool[levelKey] = {
+            count: levelObj.count,
+            sumCount: levelObj.sumCount,
+            sumPercentage: levelObj.percentage
+        }
     });
-
     _.each(studentsGroupByClass, (studentsFromClass, className) => {
-        var classCountsGroupByLevel = makeSegmentsCount(studentsFromClass, levelSegments);
+        var classCountsGroupByLevel = getLevelInfo(levels, studentsFromClass, examInfo.fullMark);
         var temp = {};
-        _.each(classCountsGroupByLevel, (count, levelKey) => {
-            temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[className].realStudentsCount, className);
-            if(!resultByLevel[levelKey]) resultByLevel[levelKey] = [];
-            resultByLevel[levelKey].push(temp[levelKey]);
+        _.each(classCountsGroupByLevel, (levelObj, levelKey) => {
+            temp[levelKey] = {
+                count: levelObj.count,
+                sumCount: levelObj.sumCount,
+                sumPercentage: levelObj.percentage,
+                class: className
+            }
         });
-        resultByClass[className] = temp;
+        result[className] = temp;
     });
-
+    //totalScoreLevelInfoByLevel
+    var totalScoreLevelInfoByLevel = getTotalScoreLevelInfoByLevel(result, studentsGroupByClass);
     debugger;
-
-    return {totalScoreLevelInfoByClass: resultByClass, totalScoreLevelInfoByLevel: resultByLevel};
+    return {
+        totalScoreLevelInfoByClass: result,
+        totalScoreLevelInfoByLevel: totalScoreLevelInfoByLevel
+    }
 }
+
+function getTotalScoreLevelInfoByLevel(totalScoreLevelInfoByClass, studentsGroupByClass) {
+    var result = {};
+    _.each(studentsGroupByClass, (v, className) => {
+        _.each(totalScoreLevelInfoByClass[className], (classLevelObj, levelKey) => {
+            if(!result[levelKey]) result[levelKey] = [];
+            result[levelKey].push(classLevelObj)
+        });
+    });
+    return result;
+    /*
+
+按照studentsGroupByClass这个顺序，各个班级在各个level的信息
+{
+    <levelKey>: [
+
+    ]
+}
+
+
+     */
+}
+
+
+// function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels, currentClass) {
+//     var levelSegments = _.map(levels, (levObj) => levObj.score);
+//     levelSegments.push(examInfo.fullMark);
+
+//     var resultByClass = {}, resultByLevel = {};
+//     var countsGroupByLevel = makeSegmentsCount(examStudentsInfo, levelSegments);
+//     resultByClass.totalSchool = {};
+
+//     _.each(countsGroupByLevel, (count, levelKey) => {
+//         resultByClass.totalSchool[levelKey] = makeLevelInfoItem(levelKey, countsGroupByLevel, examInfo.realStudentsCount); //TODO:levels中的percentage就是累占比呀！
+//     });
+
+//     _.each(studentsGroupByClass, (studentsFromClass, className) => {
+//         var classCountsGroupByLevel = makeSegmentsCount(studentsFromClass, levelSegments);
+//         var temp = {};
+//         _.each(classCountsGroupByLevel, (count, levelKey) => {
+//             temp[levelKey] = makeLevelInfoItem(levelKey, classCountsGroupByLevel, examClassesInfo[className].realStudentsCount, className);
+//             if(!resultByLevel[levelKey]) resultByLevel[levelKey] = [];
+//             resultByLevel[levelKey].push(temp[levelKey]);
+//         });
+//         resultByClass[className] = temp;
+//     });
+
+//     debugger;
+
+//     return {totalScoreLevelInfoByClass: resultByClass, totalScoreLevelInfoByLevel: resultByLevel};
+// }
 
 function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount, className) {
     var levItem = {};

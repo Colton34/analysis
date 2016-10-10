@@ -913,9 +913,9 @@ function chageStudentsScope(theKey) {
 function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, studentsGroupByClass, levels) {
     //因为levels中是高档次（即score值大的）在前面，所以需要反转顺序
     debugger;
-    var levelSegments = _.map(levels, (levObj) => levObj.score);
-    //用来获取全校各档次的人数  -- segments的最后一个肯定是fullMark，而第一个是最低档的分数
-    levelSegments.push(examInfo.fullMark);
+    // var levelSegments = _.map(levels, (levObj) => levObj.score);
+    // //用来获取全校各档次的人数  -- segments的最后一个肯定是fullMark，而第一个是最低档的分数
+    // levelSegments.push(examInfo.fullMark);
 
     var result = {};
 
@@ -926,7 +926,7 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
 //makeSegmentsCount 获取的是：1.和segments顺序对应的key的count，也就是说低的levelKey对应的是低分段的count  2.包含[0, segments.length-2]共
 //segments.length-1个有效值
 
-    var countsGroupByLevel = makeSegmentsCount(examStudentsInfo, levelSegments);
+    // var countsGroupByLevel = makeSegmentsCount(examStudentsInfo, levelSegments);
     //开始创建标准的resultInfo数据结构：
     result.totalSchool = {};
     _.each(levels, (levelObj, levelKey) => {
@@ -964,17 +964,17 @@ function makeTotalScoreLevelInfo(examInfo, examStudentsInfo, examClassesInfo, st
     return result;
 }
 
-function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
-    var levItem = {};
+// function makeLevelInfoItem(levelKey, countsGroupByLevel, baseCount) {
+//     var levItem = {};
 
-    levItem.count = countsGroupByLevel[levelKey];
-    //各档的累计人数等于=上一个高档次的累计人数+当前档次的人数（最高档的累计人数和人数是相等的）
-    levItem.sumCount = _.sum(_.map(_.pickBy(countsGroupByLevel, (v, k) => k >= levelKey), (count) => count));
-    levItem.sumPercentage = _.round(_.multiply(_.divide(levItem.sumCount, baseCount), 100), 2);//TODO:其实这里没必要再次计算百分比--因为levels里percetage
-                                                                                //就是sumPercentage！！！
+//     levItem.count = countsGroupByLevel[levelKey];
+//     //各档的累计人数等于=上一个高档次的累计人数+当前档次的人数（最高档的累计人数和人数是相等的）
+//     levItem.sumCount = _.sum(_.map(_.pickBy(countsGroupByLevel, (v, k) => k >= levelKey), (count) => count));
+//     levItem.sumPercentage = _.round(_.multiply(_.divide(levItem.sumCount, baseCount), 100), 2);//TODO:其实这里没必要再次计算百分比--因为levels里percetage
+//                                                                                 //就是sumPercentage！！！
 
-    return levItem;
-}
+//     return levItem;
+// }
 
 /**
  *
