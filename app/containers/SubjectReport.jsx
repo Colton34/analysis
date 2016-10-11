@@ -125,16 +125,14 @@ function getAuthSubjects(auth, examInfo, headers, gradeKey) {
                 pid: obj.id
             }
         })
-    } else if(auth.gradeAuth.subjectManagers && auth.gradeAuth.subjectManagers.length > 0) {
-        var authSubjects = _.map(auth.gradeAuth.subjectManagers, (obj) => obj.subject);
-        return _.map(_.filter(headers, (obj) => {
-            _.includes(authSubjects, obj.subject);
-        }), (sobj) => {
+    } else if(auth.gradeAuth[gradeKey].subjectManagers && auth.gradeAuth[gradeKey].subjectManagers.length > 0) {
+        var authSubjects = _.map(auth.gradeAuth[gradeKey].subjectManagers, (obj) => obj.subject);
+        return _.chain(headers).filter((obj) => _.includes(authSubjects, obj.subject)).map((obj) => {
             return {
-                subject: sobj.subject,
-                pid: sobj.id
+                subject: obj.subject,
+                pid: obj.id
             }
-        })
+        }).value();
     } else {
         return [];
     }
