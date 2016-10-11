@@ -5,7 +5,7 @@ import moment from 'moment';
 import {COLORS_MAP as colorsMap} from '../../../../lib/constants';
 
 export default  function MultiHeaderInfo({reportDS, user}) {
-    
+
     var examInfo = reportDS.examInfo.toJS();
     var startTime = moment(examInfo.startTime).format('YYYY.MM.DD');
     var examStudentsInfo = reportDS.examStudentsInfo.toJS();
@@ -13,7 +13,7 @@ export default  function MultiHeaderInfo({reportDS, user}) {
     return (
         <div>
             <div id='header' style={{borderRadius: 2, backgroundColor: '#fff', padding: 30,borderBottom: '1px solid rgb(238, 238, 238)'}}>
-                <p>您好</p>
+                <p>您好：</p>
                 <p>
                     本次考试（考试时间： {startTime}），全区{examInfo.gradeName}共<span style={{ color: colorsMap.B03 }}>{schoolNumber}</span>所学校，<span style={{ color: colorsMap.B03 }}>{examInfo.realStudentsCount}</span>名学生参加考试。
                     考试学科：<span style={{ color: colorsMap.B03 }}> {_.join(examInfo.subjects, '、') }</span>，{examInfo.subjects.length}门学科。
