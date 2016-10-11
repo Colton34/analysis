@@ -186,7 +186,7 @@ const CriticalDialog = (props) => {
                 <button className={commonClass['dialog-close']} onClick={props.hideModal}>
                     <i className='icon-cancel-3'></i>
                 </button>
-                设置分档线
+                设置临界分数
             </Header>
             <CriticalForm {...props}/>
         </Modal>
