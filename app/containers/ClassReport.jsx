@@ -24,8 +24,8 @@ class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
         var realClasses = this.props.reportDS.examInfo.toJS().realClasses;
-        this.ifCanReviewMultiReport = ifCanReviewMultiReport(this.props.user.auth, this.props.grade, this.props.reportDS.examInfo.toJS());
         this.authClasses = getAuthClasses(this.props.user.auth, this.props.grade, this.props.gradeName, realClasses);
+        this.ifCanReviewMultiReport = this.authClasses.length > 1; //ifCanReviewMultiReport(this.props.user.auth, this.props.grade, this.props.reportDS.examInfo.toJS());
         this.state = {
             reportType: 'single',
             currentClass: this.authClasses[0].key
@@ -49,6 +49,7 @@ class ContentComponent extends React.Component {
         var examName = this.props.reportDS.examInfo.toJS().name;
         var currentClass = this.state.currentClass;
         var authClassesList = this.authClasses;
+        debugger;
 
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
