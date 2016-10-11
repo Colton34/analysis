@@ -85,7 +85,7 @@ d.校验的结果作为form valid的输入
                   value={this.props.value}
                   onChange={this.handleChange.bind(this)}
                   onBlur={this.handleBlur.bind(this)}
-                  style={{display:'inline-block',width: 166, height: 34,border: '1px solid #e7e7e7', borderRadius: 2, paddingLeft: 12, margin: '0 10px 0 0'}}
+                  style={{display:'inline-block',width: 166, height: 34,border: '1px solid #e7e7e7',paddingLeft: 12, margin: '0 10px 0 0'}}
                 />
             </div>
         );
