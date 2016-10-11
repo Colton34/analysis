@@ -88,9 +88,6 @@ class ScoreLevelInput extends React.Component {
 
     render() {
         var levelLastIndex = this.props.levelPercentages.length - 1;
-        console.log(this.props.value);
-        console.log(this.state.value);
-        debugger;
         return (
             <div style={{marginBottom: 60}}>
                 <div >
@@ -165,8 +162,11 @@ class ScoreLevelForm extends React.Component {
                 formIsValid: false
             })
         } else {
+            //数字，0~100；规则
+            var formIsValid = validationPercentageSegments(newLevelPercentages);
             this.setState({
-                levelPercentages: newLevelPercentages
+                levelPercentages: newLevelPercentages,
+                formIsValid: formIsValid
             })
         }
     }
@@ -318,4 +318,10 @@ function getNewCountLevelPercentages(oldLevelPercentages, newCount) {
     if(oldLevelPercentages.length > newCount) return _.takeRight(oldLevelPercentages, newCount);
     var theDiff = Math.abs(oldLevelPercentages.length - newCount);
     return _.concat(_.map(_.range(theDiff), (i) => 0), oldLevelPercentages);
+}
+
+function validationPercentageSegments(percentageSegments) {
+    var isValid = _.every(percentageSegments, (v) => isNumber(v) && (v > 0) && (v < 100));
+    if(!isValid) return isValid;
+    return _.every(_.range(percentageSegments.length - 1), (i) => percentageSegments[i] < percentageSegments[i+1]);
 }

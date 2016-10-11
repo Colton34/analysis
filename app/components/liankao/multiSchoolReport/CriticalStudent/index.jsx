@@ -106,7 +106,6 @@ class CriticalForm extends React.Component {
     }
 
     setFormLevelBufferState(newFormLevelBufferInfo, levelValidSate) {
-        debugger;
         var newChildValidState = _.cloneDeep(this.state.childValidState);
         newChildValidState[levelValidSate.levelKey] = levelValidSate.isValid;
         this.setState({
@@ -142,7 +141,6 @@ class CriticalForm extends React.Component {
     render() {
         var levelLastIndex = _.size(this.state.formLevelBufferInfo) - 1;
         var formIsValid = _.every(this.state.childValidState, (v) => v);
-        debugger;
         var levelSize = _.size(this.levels);
         return (
             <div>
@@ -258,7 +256,6 @@ function mapDispatchToProps(dispatch) {
 
 function validateIsNumber({value}) {
     var isValid = !!value &&isNumber(value);
-    // debugger;
     return (isValid) ? '' : '只能填入数字';
 }
 
