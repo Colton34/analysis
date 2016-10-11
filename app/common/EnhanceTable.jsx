@@ -1612,5 +1612,5 @@ export default Table;
 
 
 let localStyle = {
-    sortDirection: { width: 10, height: 20, position: 'absolute', top: '50%', right: '10%', marginTop: -14}
+    sortDirection: { width: 10, height: 20, position: 'absolute', top: '50%', right: '5px', marginTop: -14}
 }
