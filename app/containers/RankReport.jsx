@@ -278,7 +278,7 @@ class RankReportTableView extends React.Component {
         })
     }
     //选择一个paper，重置headReq,currentClass,pageIndex,pageSize
-    onSelectPaper(event) {
+    onSelectPaper(isLianKao, event) {
         var paperId = $(event.target).data('paperid');
         var paperName = $(event.target).text();
         var {rankCache} = this.props;
@@ -299,13 +299,14 @@ class RankReportTableView extends React.Component {
                 })
             })
             // 筛选studentInfos里的学生数据
+            var tempParams = (isLianKao) ? ['kaohao','name', 'school', 'class'] : ['kaohao','name','class'];
             this.setState({
                 currentPaper: {name: paperName, pid: paperId},
                 currentClasses: this.props.examInfo.classes,
                 pageIndex: 0,
                 pageSize: 25,
                 showData: _.values(_.pick(this.props.studentInfos, kaohaoList)),
-                headSeq: ['kaohao','name','class'].concat(['score_'+paperId, 'groupRank_'+ paperId, 'classRank_' + paperId]),
+                headSeq: tempParams.concat(['score_'+paperId, 'groupRank_'+ paperId, 'classRank_' + paperId]),
                 sortInfo: {}
             })
         } else {
@@ -506,16 +507,17 @@ class RankReportTableView extends React.Component {
         var dataEnd = (pageIndex + 1) * pageSize < showData.length ? (pageIndex + 1) * pageSize : showData.length;
 
         var theRowDatas = this.state.showData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+        var isLianKao = this.props.user.auth.isLianKaoManager;
         return (
             <div style={{ margin: '30px 30px 30px 35px' }}>
                 <div style={{border: '1px solid #eeeeee', padding: '5px 30px 0 30px'}}>
                     <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
                         <span style={{color: '#d0d0d0', marginRight: 10}}>学科：</span>
-                        <a onClick={this.onSelectPaper.bind(this) } data-paperid='all' style={this.state.currentPaper.name === '全科' ? localStyle.activeSubject : localStyle.subject} href='javascript:;'>全科</a>
+                        <a onClick={this.onSelectPaper.bind(this, isLianKao) } data-paperid='all' style={this.state.currentPaper.name === '全科' ? localStyle.activeSubject : localStyle.subject} href='javascript:;'>全科</a>
                         {
                             examInfo.papers.map((subjectObj, index) => {
                                 return (
-                                    <a key={'papers-' + index} onClick={this.onSelectPaper.bind(this) } data-paperid={subjectObj.paper} href='javascript:;' style={this.state.currentPaper.name === subjectObj.name && this.state.currentPaper.pid === subjectObj.paper? localStyle.activeSubject : localStyle.subject}>{subjectObj.name}</a>
+                                    <a key={'papers-' + index} onClick={this.onSelectPaper.bind(this, isLianKao) } data-paperid={subjectObj.paper} href='javascript:;' style={this.state.currentPaper.name === subjectObj.name && this.state.currentPaper.pid === subjectObj.paper? localStyle.activeSubject : localStyle.subject}>{subjectObj.name}</a>
                                 )
                             })
                         }
