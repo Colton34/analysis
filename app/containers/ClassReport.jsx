@@ -25,7 +25,8 @@ class ContentComponent extends React.Component {
         super(props);
         var realClasses = this.props.reportDS.examInfo.toJS().realClasses;
         this.authClasses = getAuthClasses(this.props.user.auth, this.props.grade, this.props.gradeName, realClasses);
-        this.ifCanReviewMultiReport = this.authClasses.length > 1; //ifCanReviewMultiReport(this.props.user.auth, this.props.grade, this.props.reportDS.examInfo.toJS());
+        this.ifCanShowReportNav = this.authClasses.length > 1;
+        this.ifCanReviewMultiReport = ifCanReviewMultiReport(this.props.user.auth, this.props.grade, this.props.reportDS.examInfo.toJS());
         this.state = {
             reportType: 'single',
             currentClass: this.authClasses[0].key
@@ -54,9 +55,9 @@ class ContentComponent extends React.Component {
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
                 <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} reportName={'班级分析报告'}/>
-                {(this.ifCanReviewMultiReport) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} classesList={authClassesList} reportDS={this.props.reportDS} /> : ''}
+                {(this.ifCanShowReportNav) ? <ReportTabNav changeClassReport={this.changeClassReport.bind(this)} classesList={authClassesList} reportDS={this.props.reportDS} ifCanReviewMultiReport={this.ifCanReviewMultiReport} /> : ''}
                 {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />
-            : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName} ifCanReviewMultiReport={this.ifCanReviewMultiReport}/>}
+            : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName} ifCanReviewMultiReport={this.ifCanReviewMultiReport} />}
             </div>
         );
     }
