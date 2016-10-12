@@ -44,6 +44,9 @@ function getTableHeadersByLevel(headers, levels, subjectLevels) {
             var header = {};
             header.id = headerInfo.id;
             if(headerInfo.id === 'totalScore') {
+                if(!levels[levelSize - levelNum - 1]) {
+                    debugger;
+                }
                 header.name = headerInfo.subject + '(' + levels[levelSize - levelNum - 1].score +')';
             } else {
                 header.name = headerInfo.subject + '(' + subjectLevels[levelSize - levelNum - 1][headerInfo.id].mean + ')';

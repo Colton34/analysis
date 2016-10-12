@@ -33,30 +33,30 @@ d.校验的结果作为form valid的输入
  */
     constructor(props) {
         super(props);
+        // validationStarted: false,
         this.state = {
-            validationStarted: false,
             value: this.props.value
         }
     }
 
-    componentWillMount() {
-        var startValidation = function() {
-            this.setState({
-                validationStarted: true
-            })
-        }.bind(this);
-        if (this.props.value) {
-            startValidation();
-        } else {
-            this.prepareToValidate = _.debounce(startValidation, 1000);
-        }
-    }
+    // componentWillMount() {
+    //     var startValidation = function() {
+    //         this.setState({
+    //             validationStarted: true
+    //         })
+    //     }.bind(this);
+    //     if (this.props.value) {
+    //         startValidation();
+    //     } else {
+    //         this.prepareToValidate = _.debounce(startValidation, 1000);
+    //     }
+    // }
 
-    prepareToValidate() {}
+    // prepareToValidate() {}
     handleChange(e) {
-        if (this.state.validationStarted) {
-            this.prepareToValidate();
-        }
+        // if (this.state.validationStarted) {
+        //     this.prepareToValidate();
+        // }
         var newShowFormLevelInfo = getNewShowFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
         this.props.setFormLevelState(newShowFormLevelInfo);
         // var newFormLevelInfo = getNewChangeFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
@@ -66,12 +66,13 @@ d.校验的结果作为form valid的输入
     }
 
     handleBlur(e) {
-        if (this.state.validationStarted) {
-            var newFormLevelInfo = getNewChangeFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
-            var errorMsg = this.props.validation(e.target.value, newFormLevelInfo, this.props.info.type);
-            this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !(!!errorMsg)});
-            this.props.setErrorMessage(errorMsg);//没有提到Form级别，通过form给errorMsg（就像通过inputGroup给每一个孩子input valid状态的思路），是因为需要判断是哪一个level出现了errorMsg（input不需要区分，两个都是同步valid的）
-        }
+        var newFormLevelInfo = getNewChangeFormLevelInfo(e.target.value, this.props.info, this.props.formLevelInfo, this.props.examStudentsInfo, this.props.examInfo.fullMark);
+        var errorMsg = this.props.validation(e.target.value, newFormLevelInfo, this.props.info.type);
+        this.props.setFormLevelState(newFormLevelInfo, {levelKey: this.props.info.id, isValid: !(!!errorMsg)});
+        this.props.setErrorMessage(errorMsg);//没有提到Form级别，通过form给errorMsg（就像通过inputGroup给每一个孩子input valid状态的思路），是因为需要判断是哪一个level出现了errorMsg（input不需要区分，两个都是同步valid的）
+        // if (this.state.validationStarted) {
+
+        // }
     }
 
     render() {
@@ -177,13 +178,10 @@ class LevelForm extends React.Component {
     }
 
     changeLevelCount(count) {
-        debugger;
         var preLength = _.size(this.state.formLevelInfo);
         var theDiff = Math.abs(preLength - count);
         var newChildValidState = (count > preLength) ? (_.concat(_.map(_.range(theDiff), (i) => false), _.map(_.range(_.size(this.state.formLevelInfo)), (i) => true))) : (_.map(_.range(count), (i) => true));
-        debugger;
         var newFormLevelInfo = getNewCountFormLevelInfo(this.state.formLevelInfo, count);
-        debugger;
         this.setState({
             formLevelInfo: newFormLevelInfo,
             childValidState: newChildValidState
@@ -387,9 +385,9 @@ function getNewCountFormLevelInfo(oldFormLevelInfo, count) {
         ////由少转向多，则添加最低档的数据，原来的档次向后顺延, 去掉低档次，保留高档次  5 3 [4, 3, 2] 丢掉[1, 0]
         _.each(_.range(count), (index) => {
             oldTargetLevelObj = oldFormLevelInfo[(index+theDiff) + ''];
-            debugger;
+            // debugger;
             newCountFormLevelInfo[index+''] = {score: oldTargetLevelObj.score, count: oldTargetLevelObj.count, percentage: oldTargetLevelObj.percentage};
-            debugger;
+            // debugger;
             // var targetScore = oldFormLevelInfo[(index+theDiff) + ''].score;
             // var targetCount = (index == 0) ? _.size(_.filter(this.props.examStudentsInfo, (s) => s.score >= targetScore)) : _.size(_.filter(this.props.examStudentsInfo, (s) => s.score > targetScore));
             // var targetPercentage = _.round(_.multiply(_.divide(targetCount, this.props.examStudentsInfo.length), 100), 2);
@@ -400,16 +398,15 @@ function getNewCountFormLevelInfo(oldFormLevelInfo, count) {
         });
         _.each(_.range(preLength), (index) => {
             oldTargetLevelObj = oldFormLevelInfo[index+''];
-            debugger;
+            // debugger;
             newCountFormLevelInfo[(index+theDiff)+''] = {score: oldTargetLevelObj.score, count: oldTargetLevelObj.count, percentage: oldTargetLevelObj.percentage};
-            debugger;
+            // debugger;
             //为什么重新算一遍，直接copy过来不可以么？-- 是为了统一计算方式：最低的【双合】，其他高档次（左开右合】
             // var targetScore = oldFormLevelInfo[index+''].score;
             // var targetCount = _.size(_.filter(this.props.examStudentsInfo, (s) => s.score > targetScore));
             // var targetPercentage = _.round(_.multiply(_.divide(targetCount, this.props.examStudentsInfo.length), 100), 2);
         });
     }
-    debugger;
     return newCountFormLevelInfo;
 }
 
@@ -472,6 +469,22 @@ function validateSubjectLevel({formLevelInfo, examStudentsInfo, examPapersInfo, 
     return (isValid) ? '' : '此分档线下的学科分档线不合理'
 }
 
+// function getNewBaseline(newLevels, examStudentsInfo, examPapersInfo, examId, examInfo, levelBuffers) {
+//     //通过新的levels计算subjectMeans，levelBuffer不变
+//     var result = {examid: examId, grade: examInfo.gradeName, '[levels]': [], '[subjectLevels]': [], '[levelBuffers]': []};
+//     _.each(newLevels, (levObj, levelKey) => {
+//         var subjectMean = makeLevelSubjectMean(levObj.score, examStudentsInfo, examPapersInfo, examInfo.fullMark);
+//         // var subjectLevels = _.values(subjectMean);
+//         result['[subjectLevels]'].push({levelKey: levelKey, values: subjectMean});
+//         result['[levels]'].push({key: levelKey, score: levObj.score, percentage: levObj.percentage, count: levObj.count, sumCount: levObj.sumCount});
+//         debugger;
+//         //如果是update那么可以考虑只put上去需要更新的数据--但是需要能区分到底是post还是put。理论上这里如果是put那么不需要put上去levelBuffers，因为这里并没有改变levelBuffers。
+//         result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
+//         //拼装 [levels]，[subjectLevels]和[levelBuffers]所对应的每一个实体，放入到相对应的数组中，最后返回gradeExamLevels
+//     });
+//     return result;
+// }
+
 function getNewBaseline(newLevels, newSubjectLevels, examId, examInfo, defaultLevelBuffer) {
     var result = {examid: examId, grade: examInfo.gradeName, '[levels]': [], '[subjectLevels]': [], '[levelBuffers]': []};
     _.each(newLevels, (levelObj, levelKey) => {
@@ -479,6 +492,7 @@ function getNewBaseline(newLevels, newSubjectLevels, examId, examInfo, defaultLe
         result['[levels]'].push({key: levelKey, score: levelObj.score, percentage: levelObj.percentage, count: levelObj.count});
         result['[levelBuffers]'].push({key: levelKey, score: defaultLevelBuffer});
     });
+    debugger;
     return result;
 }
 
