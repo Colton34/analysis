@@ -121,34 +121,3 @@
     padding: 30px;
     background-color: rgba(197, 233, 248, 0.2);
 }
-
-
-
-/*----------------------Test For Input Validate-------------------------------------*/
-input {
-  font-size: 1.3em;
-  display: inline-block;
-  margin: auto;
-  border-radius: 0px;
-  border: none;
-  outline: none;
-  box-shadow: 0 0 1px black;
-  padding: 0.3em 1em;
-  font-weight: 100;
-  font-family: Arial;
-  margin: 1em;
-}
-
-input:focus {
-  box-shadow: 0 0 8px rgba(0, 255, 50, 0.5)
-}
-
-input.invalid, input.invalid:focus {
-  box-shadow: 0 0 9px rgba(255, 25, 25, 0.5)
-}
-
-.validation-error {
-  color: #ee6b52;
-  margin: 10px 160px;
-  display: inline-block;
-}
