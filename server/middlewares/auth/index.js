@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-12 17:38:03
+* @Last Modified time: 2016-10-12 17:57:12
 */
 
 'use strict';
@@ -60,10 +60,13 @@ exports.authenticate = function(req, res, next) {
         // if(user) console.log('pwd 2 - ', user.pwd);
         if(!user) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '用户不存在或密码不正确'}));//可能是1.5的账号但是密码不正确，也可能确实是个无效的账号
         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '密码不正确'}));//2.0的账号但是密码不正确
-        delete user.pwd;
+
+        //Mock !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         if(user.name == 'cssyllkadmin' && user.pwd == 'yllk1906') {
             user.schoolId = 828;
         }
+
+        delete user.pwd;
         req.user = user;
         return getUserAuthorization(user.id, user.name);
     }).then(function(auth) {
