@@ -2,13 +2,13 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-11 14:46:47
+* @Last Modified time: 2016-10-12 11:37:28
 */
 
 'use strict';
 
 var development = {
-    "analysisServer"    : "http://ct.yunxiao.com:8158", //http://fx-engine.yunxiao.com   http://ct.yunxiao.com:8158
+    "analysisServer"    : "http://fx-engine.yunxiao.com", //http://fx-engine.yunxiao.com   http://ct.yunxiao.com:8158
     "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://fx:fx123456@server4.yunxiao.com:8300/hfs-test',  //mongodb://localhost:27017/hfs-test
     'fxdb': 'mongodb://fx2:123456@ct.yunxiao.com:19000/fx2',
     "port": 3000,
