@@ -281,7 +281,7 @@ class ExamList extends React.Component {
                 {
                     errorInfo && errorInfo.msg ? (
                         <div style={{width: 940, height: 505, display: 'table-cell', textAlign: 'center', verticalAlign: 'middle'}}>
-                            <div className={commonStyles['blank-list']} style={{margin: '0 auto', marginBottom: 30}}></div>
+                            <div className={commonStyles['blank-list']} style={{margin: '0 auto 30px'}}></div>
                             <p style={{color: colorsMap.C10, fontSize: 18, marginBottom: 30}}>抱歉，暂时没有和您相关的考试分析数据</p>
                             <p style={{color: colorsMap.C09}}>{errorInfo.msg}</p>
                         </div>

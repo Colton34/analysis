@@ -221,10 +221,10 @@ class CriticalStudentModule extends React.Component {
                 <div>
                     <span className={commonClass['title-bar']}></span>
                     <span className={commonClass['title']}>临界生群体分析</span>
-                    <span className={commonClass['title-desc']}>临界生群体分析，通过设置临界分数线来计算全校及各班的总分在不同分档分数线左右徘徊的人数分布。</span>
+                    <span className={commonClass['title-desc']}>临界生群体分析，通过设置临界分数值来计算联考总体及各学校的总分在不同分档分数线左右徘徊的人数分布。</span>
                 </div>
                 <div style={{marginTop: 10}}>
-                    <p>将临近总分各分数线上下的群体视为“临界生”，联考可以给他们多一点关注，找到他们的薄弱点、有针对性促进一下，他们就可能稳定、甚至提升总分档次。这无论是对学生个人，还是对联考整体的教学成就，都有显著的积极作用。</p>
+                    <p>将临近总分各分数线上下的群体视为“临界生”，可以给他们多一点关注，找到他们的薄弱点、有针对性促进一下，他们就可能稳定、甚至提升总分档次。这无论是对学生个人，还是对联考整体的教学成就，都有显著的积极作用。</p>
                     <p>系统默认临界分值为 10分，可点击右侧设置按钮进行修改。联考全体临界生群体规模，见下表：</p>
                 </div>
                 <a href="javascript:void(0)" onClick={this.showModal.bind(this)} className={commonClass.button} style={{ width: 120, height: 30, backgroundColor: colorsMap.B03, color: '#fff', position: 'absolute', right: 30, top: 30, borderRadius: 2, lineHeight: '30px' }}>

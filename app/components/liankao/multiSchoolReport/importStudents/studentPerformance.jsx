@@ -94,7 +94,7 @@ class StudentPerformanceTable extends React.Component {
                 </div>
                 {/* 名次/比例输入框  */}
                 <div style={{position: 'absolute', right: 0, top: -65 }}>
-                    <span style={{marginRight: 8}}>联考{(isGood) ? '前' : '后'}</span>
+                    <span style={{marginRight: 8}}>联考学生{(isGood) ? '前' : '后'}</span>
                     <input ref='numInput' value={this.state.inputNum} onChange={this.onChangeInput.bind(this)} style={{ fontSize:'14px',display: 'inline-block', width: 52, height: 30, lineHeight: '30px', textAlign:'center', marginRight: 5, border: '1px solid ' + colorsMap.C04}}/>
                     <span style={{marginRight: 10}}>{this.state.current.key === 'ranking' ? '名' : '%'}</span>
                     <span onClick={this.onConfirmChange.bind(this)} style={{display: 'inline-block', width: 42, height: 30, lineHeight: '30px', borderRadius: 2, backgroundColor: colorsMap.B03, color: '#fff', cursor: 'pointer', textAlign: 'center'}}>

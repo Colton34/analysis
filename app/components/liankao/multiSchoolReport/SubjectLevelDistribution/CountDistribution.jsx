@@ -37,7 +37,7 @@ export default class StudentCountDistribution extends React.Component {
             <div style={{marginTop: 30}}>
                 <div className={commonClass['sub-title']}>学科分档上线学生人数分布</div>
                 <div style={{margin: '10px 0 20px'}}>
-                    对每个档次而言，学科提供的上线人数越多，这可以视为该学科对总分上线提供了更大的可能性，促进作用大。反之，学科上线人数越少，该学科对总分上线提供的促进作用较小。
+                    对每个档次而言，学科提供的上线人数越多，可以视为该学科对总分上线提供了更大的可能性，促进作用大。反之，学科上线人数越少，该学科对总分上线提供的促进作用较小。
                     下面三个表分别显示{_.join(_.range(this.levelSize).map(num => {return numberMap[num + 1]}), '、')}档各个学科的上线人数：
                 </div>
                 {/* tab */}
@@ -72,7 +72,7 @@ export default class StudentCountDistribution extends React.Component {
                                 )
                             })
                         }
-                        相应的，学科上线人数较少，
+                        相应的，其它学科上线人数少些，但要也关注各学校学科的实际情况，下面“学科分档上线的贡献率”表格将进一步说明，各学校学科对各档上线的贡献情况。
                     </div>
                 </div>
             </div>
