@@ -234,7 +234,7 @@ class ClassPerformance extends React.Component {
                 {/* 平均得分率表格 */}
                 <p style={{marginBottom: 20}}>
                     <span className={schoolReportStyles['sub-title']}>学科平均分/平均得分率</span>
-                    <span className={schoolReportStyles['title-desc']}>平均得分率=班级平均分÷学科的总分，数值越高，班级的此学科越优秀</span>
+                    <span className={schoolReportStyles['title-desc']}>学科平均得分率=学科班级平均分÷学科的总分，数值越高，班级的此学科越优秀</span>
                 </p>
                 <TableView tableHeaderData={meanTableHeaderData} tableData={meanTableBodyData} TableComponent={AverageTable} reserveRows={6}/>
 
