@@ -101,7 +101,7 @@ export default class SummaryInfoModule extends React.Component {
               itemMarginBottom:_.size(levels) <= 3 ? 15 : (_.size(levels) === 4 ? 10 : 5)
             },
             series: [{
-                name: '档位',
+                name: '占比',
                 colorByPoint: true,
                 data: chartDataInfo   //动态数据
             }],

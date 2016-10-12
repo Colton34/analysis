@@ -121,3 +121,8 @@
     padding: 30px;
     background-color: rgba(197, 233, 248, 0.2);
 }
+/**************** dialog 错误信息的样式 ******************/
+.validation-error {
+  color: #ee6b52;
+  margin: 10px 160px;
+}
