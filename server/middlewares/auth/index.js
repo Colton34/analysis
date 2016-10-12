@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-11 16:24:24
+* @Last Modified time: 2016-10-12 10:14:44
 */
 
 'use strict';
@@ -67,7 +67,6 @@ exports.authenticate = function(req, res, next) {
         req.user = user;
         return getUserAuthorization(user.id, user.name);
     }).then(function(auth) {
-        auth = [{"grade":"初三","group":"1302","subject":null},{"grade":"初三","group":"1301","subject":null}];
         var authInfo = getUserAuthInfo(auth);
         req.user.auth = authInfo;
         return getSchoolById(req.user.schoolId)
