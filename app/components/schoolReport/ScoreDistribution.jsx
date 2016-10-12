@@ -641,7 +641,7 @@ class ScoreDistribution extends React.Component {
               itemMarginBottom:levTotal <= 3 ? 15 : (levTotal === 4 ? 10 : 5)
             },
             series: [{
-                name: '档位',
+                name: '占比',
                 colorByPoint: true,
                 data: pieChartData   //动态数据
             }],
