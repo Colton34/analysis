@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:19:09
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-13 20:14:07
+* @Last Modified time: 2016-10-12 15:35:57
 */
 
 'use strict';
@@ -29,7 +29,6 @@ var debug = require('debug')('app:' + process.pid);
 var compiled_app_module_path = path.resolve(__dirname, '../../', 'public', 'assets', 'server.js');
 var App = require(compiled_app_module_path);
 
-var peterHFS = require('peter').getManager('hfs');
 var peterFX = require('peter').getManager('fx');
 
 var mongodb = require('mongodb');
@@ -38,9 +37,8 @@ var ObjectId = mongodb.ObjectId;
 var auth = require('../middlewares/auth');
 
 module.exports = function(app) {
-    var hsfPromise = bindHFS();
     var fxPromise = bindFX();
-    when.all([hsfPromise, fxPromise]).then(function(msgArr) {
+    fxPromise.then(function(msgArr) {
         console.log('msgArr :  ', msgArr);
         try {
             initWebServer(app);
@@ -51,18 +49,6 @@ module.exports = function(app) {
     }).catch(function(err) {
         console.log('Bind DB Error: ', err);
         process.exit(1);
-    });
-}
-
-function bindHFS() {
-    return when.promise(function(resolve, reject) {
-        peterHFS.bindDb(config.hfsdb, function(error) {
-            if(error) {
-                console.log('bind Error : ', error);
-                return reject(error);
-            }
-            resolve('success bind HFS');
-        });
     });
 }
 

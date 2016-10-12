@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-30 19:57:47
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-03 15:10:02
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-10-12 15:36:32
 */
 
 'use strict';
@@ -11,7 +11,6 @@ var errors = require('common-errors');
 var client = require('request');
 var config = require('../../config/env');
 
-var peterHFS = require('peter').getManager('hfs');
 var peterFX = require('peter').getManager('fx');
 
 exports.fetchPaper = function (req, res, next) {
@@ -19,9 +18,6 @@ exports.fetchPaper = function (req, res, next) {
     if(req.validationErrors()) return next(req.validationErrors());
 
     var url = config.analysisServer + '/paper?p=' + req.params.paperId;
-
-console.log('url = ', url);
-
     client.get(url, {}, function(err, response, body) {
         if(err) return next(new errors.URIError('查询analysis server(fetchPaper) Error: ', err));
         var data = JSON.parse(body);
@@ -33,17 +29,6 @@ console.log('url = ', url);
             m: data.matrix
         });
     });
-
-    // peterHFS.get(req.params.paperId, function(err, paper) {
-    //     if(err) return next(new errors.data.MongoDBError(': '+req.params.paperId+' Error', err));
-    //     res.status(200).json({
-    //         id: paper._id,
-    //         // answers: paper.answers, //TODO: 设计关于answers的存储
-    //         x: paper['[questions]'],
-    //         y: paper['[students]'],
-    //         m: paper['matrix']
-    //     });
-    // });
 }
 
 exports.fetchCustomPaper = function(req, res, next) {

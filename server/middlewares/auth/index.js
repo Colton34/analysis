@@ -1,8 +1,8 @@
 /*
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-12 12:13:56
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-10-12 15:36:04
 */
 
 'use strict';
@@ -16,10 +16,10 @@ var errors = require('common-errors');
 var Router = require("express").Router;
 var ObjectId = require('mongodb').ObjectId;
 var jsonwebtoken = require("jsonwebtoken");
+var client = require('request');
 
 var authUitls = require('./util');
 var config = require('../../config/env');
-var peterHFS = require('peter').getManager('hfs');
 
 var adminPrivilege = {grade: null, subject: null, group: null};
 
@@ -56,11 +56,6 @@ exports.authenticate = function(req, res, next) {
         // if(user) console.log('pwd - ', user.pwd);
         if(user && (_.eq(user.pwd, password))) return when.resolve(user);//确认是1.5的账号
         return authUitls.getUserInfo2(value, password);//可能是1.5的账号，但是密码不正确；可能是2.0的账号  1.5的账号，但是使用2.0的密码--其实还是2.0的账号
-        // if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 2, message: '密码不正确'}));
-        // if(user.name == 'cssyllkadmin' && user.pwd == 'yllk1906') {
-        //     user.schoolId = 828;
-        // }
-        // return when.resolve(user);
     }).then(function(user) {
         // if(user) console.log('pwd 2 - ', user.pwd);
         if(!user) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '用户不存在或密码不正确'}));//可能是1.5的账号但是密码不正确，也可能确实是个无效的账号
@@ -83,53 +78,14 @@ exports.authenticate = function(req, res, next) {
     })
 }
 
-
-
-
-
-// exports.authenticate = function(req, res, next) {
-//     req.checkBody('value', '无效的value').notEmpty();
-//     req.checkBody('password', '无效的password').notEmpty();
-//     if(req.validationErrors()) return next(new errors.HttpStatusError(401, {errorCode: 1, message: '无效的用户名或密码'}));
-
-//     var value = req.body.value.toLowerCase();
-//     var password = req.body.password;
-
-//     authUitls.getUserInfo(value).then(function(user) {
-//         if(user) console.log('pwd - ', user.pwd);
-//         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 2, message: '密码不正确'}));
-//         if(!user) return authUitls.getUserInfo2(value, password);
-//         // if(user.name == 'cssyllkadmin' && user.pwd == 'yllk1906') {
-//         //     user.schoolId = 828;
-//         // }
-//         return when.resolve(user);
-//     }).then(function(user) {
-//         if(user) console.log('pwd 2 - ', user.pwd);
-//         if(!user) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '用户不存在'}));
-//         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '密码不正确'}));
-//         delete user.pwd;
-//         req.user = user;
-//         return getUserAuthorization(user.id, user.name);
-//     }).then(function(auth) {
-//         var authInfo = getUserAuthInfo(auth);
-//         req.user.auth = authInfo;
-//         return getSchoolById(req.user.schoolId)
-//     }).then(function(school) {
-//         var isLianKaoSchool = _.includes(school.name, '联考');
-//         req.user.auth.isLianKaoManager = (isLianKaoSchool) && (req.user.auth.isSchoolManager);
-//         var token = jsonwebtoken.sign({ user: req.user }, config.secret);
-//         req.user.token = token;
-//         next();
-//     }).catch(function(err) {
-//         next(err);
-//     })
-// }
-
 function getSchoolById(schoolId) {
+    var url = config.analysisServer + '/school?id=' + schoolId;
     return when.promise(function(resolve, reject) {
-        peterHFS.get('@School.'+schoolId, function(err, school) {
-            if(err || !school) return reject(new errors.data.MongoDBError('find school:'+schoolId+' error', err));
-            resolve(school);
+        client.get(url, {}, function(err, res, body) {
+            if (err) return reject(new errors.URIError('查询analysis server(getExamsBySchool) Error: ', err));
+            var data = JSON.parse(body);
+            if(data.error) reject(new errors.URIError('查询analysis server(getExamsBySchool)失败, schoolId = ', schoolId));
+            resolve(data);
         });
     });
 }

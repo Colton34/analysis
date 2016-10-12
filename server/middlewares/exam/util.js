@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-08 12:21:54
+* @Last Modified time: 2016-10-12 15:35:33
 */
 'use strict';
 var _ = require('lodash');
@@ -12,7 +12,6 @@ var moment = require('moment');
 var config = require('../../config/env');
 var errors = require('common-errors');
 
-var peterHFS = require('peter').getManager('hfs');
 var peterFX = require('peter').getManager('fx');
 
 var getExamById = exports.getExamById = function(examid, fromType) {

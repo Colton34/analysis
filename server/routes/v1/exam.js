@@ -1,8 +1,8 @@
 /*
  * @Author: HellMagic
  * @Date:   2016-04-30 11:14:17
- * @Last Modified by:   HellMagic
- * @Last Modified time: 2016-10-05 15:31:55
+ * @Last Modified by:   liucong
+ * @Last Modified time: 2016-10-12 15:32:26
  */
 
 'use strict';
@@ -13,7 +13,6 @@ var router = require('express').Router();
 
 var auth = require('auth');
 var exam = require('exam');
-var peterHFS = require('peter').getManager('hfs');
 
 router.get('/home', exam.home);
 router.get('/dashboard', exam.validateExam, exam.initExam, exam.dashboard);
