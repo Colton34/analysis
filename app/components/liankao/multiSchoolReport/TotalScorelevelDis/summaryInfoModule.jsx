@@ -101,7 +101,7 @@ export default class SummaryInfoModule extends React.Component {
               itemMarginBottom:_.size(levels) <= 3 ? 15 : (_.size(levels) === 4 ? 10 : 5)
             },
             series: [{
-                name: '档位',
+                name: '占比',
                 colorByPoint: true,
                 data: chartDataInfo   //动态数据
             }],
@@ -117,7 +117,7 @@ export default class SummaryInfoModule extends React.Component {
             <div  className={commonClass['section']} style={{marginTop:0}}>
                 <div className={commonClass['analysis-conclusion']} style={{marginTop:0}}>
                     <p>分析诊断：</p>
-                    <div>各校{(_.map(levels,(value,key) => {return numberMap[key-0+1];})).join('、')}
+                    <div>如上图各校{(_.map(levels,(value,key) => {return numberMap[key-0+1];})).join('、')}
                         档上线人数分布所示，基本上反映出各个学校总分较高学生的人数分布情况。下面重点列出各档上线率最高和最低的学校：
                     </div>
                     <div style={{padding:'10px 0 0 0 ',margin:'20px 0 0 0'}}>

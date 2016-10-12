@@ -21,7 +21,7 @@ export default function ({reportDS}) {
             <div>
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>学科分档上线情况</span>
-                <span className={commonClass['title-desc']}>运用大数据算法将总分的分档分数精确的分解到各学科中，得出各学科的分档分数线及分档上线人数分布，可反映出联考学生在各学科的上线情况。</span>
+                <span className={commonClass['title-desc']}>运用大数据算法将总分的分档分数精确的分解到各学科中，得出各学科的分档分数线。各学科分档上线人数分布，可反映出联考学生在各学科的上线情况。</span>
             </div>
             <StudentCountDistribution reportDS={reportDS} tableHeadersByLevel={tableHeadersByLevel}  paperSchoolLevelMap={paperSchoolLevelMap}/>
             <ContributionDistribution reportDS={reportDS } tableHeadersByLevel={tableHeadersByLevel} studentsPaperMapByGroup ={studentsPaperMapByGroup} paperSchoolLevelMap={paperSchoolLevelMap}/>

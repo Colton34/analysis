@@ -55,7 +55,7 @@ class SubjectLevelDisribution extends React.Component {
                 <div>
                     <span className={commonClass['title-bar']}></span>
                     <span className={commonClass['title']}>学科分档人数分布</span>
-                    <div className={commonClass['title-desc']} style={{marginTop: 10}}>运用大数据分析算法将总分分档分数精准地分解到学科中，得出各学科的分档分数线及其分档上线人数分布，可反映出班级在学科的上线情况。学科上线人数越多，该学科对学生总分上线提供了更大的可能性。</div>
+                    <div className={commonClass['title-desc']} style={{marginTop: 10}}>运用大数据算法将总分的分档分数精确的分解到各学科中，得出各学科的分档分数线。各学科分档上线人数分布，可反映出班级在学科的上线情况。</div>
                 </div>
                 {/****************** 切换标签 *************** */}
                 <div className='tab-ctn'>
