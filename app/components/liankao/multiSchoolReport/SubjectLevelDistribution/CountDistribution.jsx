@@ -64,7 +64,7 @@ export default class StudentCountDistribution extends React.Component {
                                         {
                                             num !== 0 ? numberMap[num + 1] + '档上线，' : ''
                                         }
-                                        <span style={{color: colorsMap.B03}}>{_.join(_.map(this.summaryInfo[num], paperid => {return this.examPapersInfo[paperid].subject}), '、')}</span>
+                                        <span style={{color: colorsMap.B03}}>{_.join(_.map(this.summaryInfo[levelLastIndex-num], paperid => {return this.examPapersInfo[paperid].subject}), '、')}</span>
                                         {
                                             num !== 0 ? '学科的促进作用来得较大。' : '学科一档线上线人数较多，它们对促使更多学生总分达到一档水平带来的可能性更大，可以说它们对一档上线的促进作用来得较大。'
                                         }
