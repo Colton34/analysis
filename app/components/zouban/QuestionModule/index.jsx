@@ -41,19 +41,32 @@ export default class QuestionModule extends React.Component {
     }
 }
 
+class SubjectSelector extends React.Component {
+    constructor(props) {
+        super(props);
 
-function SubjectSelector({}) {
-    return (
-        <div>
-            待填充(SubjectSelector)
-        </div>
-    )
+    }
+
+    render() {
+        return (
+            <div>
+                待填充(SubjectSelector)
+            </div>
+        );
+    }
 }
 
-function PaperClassSelector({}) {
-    return (
-        <div>
-            待填充(PaperClassSelector)
-        </div>
-    )
+class PaperClassSelector extends React.Component {
+    constructor(props) {
+        super(props);
+
+    }
+
+    render() {
+        return (
+            <div>
+                待填充(PaperClassSelector)
+            </div>
+        );
+    }
 }
