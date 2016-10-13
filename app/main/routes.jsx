@@ -12,6 +12,10 @@ import ClassReport from '../containers/ClassReport';
 import SubjectReport from '../containers/SubjectReport';
 import CustomizeAnalysis from '../containers/CustomizeAnalysis';
 
+import HelperBox from '../containers/HelperBox';
+import HelperBoxContainer from '../containers/HelperBoxContainer';
+import EquivalentScore from '../components/Helper/EquivalentScore';
+
 import Zouban from '../containers/Zouban';
 import ZoubanQuestionModule from '../components/zouban/QuestionModule';
 // import ZoubanQuestionContainer from '../containers/Zouban/QuestionContainer';
@@ -27,6 +31,7 @@ export default (store) => {
         <Route path="/" component={App}>
             <IndexRoute component={Main} />
             <Route path='faq' component={HelpCenter}/>
+            <Route path='helper' component={HelperBox} />
             <Route path='dashboard' component={Dashboard} />
             <Route path='liankao/report' component={LianKaoReport} />
             <Route path='school/report' component={SchoolReport} />
@@ -36,6 +41,9 @@ export default (store) => {
             <Route path='add/analysis' component={CustomizeAnalysis}/>
             <Route path='zouban' component={Zouban}>
                 <Route path="question" component={ZoubanQuestionModule} />
+            </Route>
+            <Route path='helper/:name' component={HelperBoxContainer}>
+                <Route path="equivalentScore" component={EquivalentScore} />
             </Route>
         </Route>
     );

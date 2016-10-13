@@ -21,7 +21,8 @@ class Main extends React.Component {
         return (
             <div>
                 <h4>走班Mock</h4>
-                <Link to={{pathname: '/zouban/question'}}>走班试题质量分析</Link>
+                <div><Link to={{pathname: '/helper/equivalentScore'}}>设置等值分数转换</Link></div>
+                <div><Link to={{pathname: '/zouban/question'}}>走班试题质量分析</Link></div>
 
                 <h5>=========== 走班分割线========================</h5>
 
