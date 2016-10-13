@@ -12,6 +12,10 @@ import ClassReport from '../containers/ClassReport';
 import SubjectReport from '../containers/SubjectReport';
 import CustomizeAnalysis from '../containers/CustomizeAnalysis';
 
+import Zouban from '../containers/Zouban';
+import ZoubanQuestionModule from '../components/zouban/QuestionModule';
+// import ZoubanQuestionContainer from '../containers/Zouban/QuestionContainer';
+
 import Test from '../containers/Test';
 import Main from '../containers/main';
 /*
@@ -21,7 +25,7 @@ import Main from '../containers/main';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Home} />
+            <IndexRoute component={Main} />
             <Route path='faq' component={HelpCenter}/>
             <Route path='dashboard' component={Dashboard} />
             <Route path='liankao/report' component={LianKaoReport} />
@@ -30,6 +34,9 @@ export default (store) => {
             <Route path='class/report' component={ClassReport} />
             <Route path='subject/report' component={SubjectReport} />
             <Route path='add/analysis' component={CustomizeAnalysis}/>
+            <Route path='zouban' component={Zouban}>
+                <Route path="question" component={ZoubanQuestionModule} />
+            </Route>
         </Route>
     );
 };

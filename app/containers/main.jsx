@@ -20,6 +20,11 @@ class Main extends React.Component {
     render() {
         return (
             <div>
+                <h4>走班Mock</h4>
+                <Link to={{pathname: '/zouban/question'}}>走班试题质量分析</Link>
+
+                <h5>=========== 走班分割线========================</h5>
+
                 <form action="">
                     <input type="text" placeholder="Hello" />
                 </form>
