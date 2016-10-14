@@ -21,7 +21,12 @@ import commonClass from '../../../styles/common.css';
 import QuestionPerformance from './QuestionPerformance';
 import QuestionDistribution from './QuestionDistribution';
 import QuestionDetail from './QuestionDetail';
-
+var  subjects =[{
+    name:'语文',
+},{
+    name:'数学'
+}];
+var classes = ['1班','2班','3班'];
 export default class QuestionModule extends React.Component {
     constructor(props) {
         super(props);
@@ -48,11 +53,7 @@ class SubjectSelector extends React.Component {
     }
 
     render() {
-        var  subjects =[{
-            name:'语文',
-        },{
-            name:'数学'
-        }];
+
         return (
             <div style={{ padding: '5px 30px 0 30px',marginBottom:0}} className={commonClass['section']}>
                 <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
@@ -78,7 +79,7 @@ class PaperClassSelector extends React.Component {
     }
 
     render() {
-        var classes = ['1班','2班','3班'];
+
         return (
             <div style={{heigth: 50, lineHeight: '50px',marginTop:0,padding:'0 0 0 30px'}} className={commonClass['section']}>
                 <span style={{ float: 'left', marginRight: 10}}>教学班:</span>

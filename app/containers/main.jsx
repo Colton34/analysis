@@ -23,6 +23,7 @@ class Main extends React.Component {
                 <h4>走班Mock</h4>
                 <div><Link to={{pathname: '/helper'}}>小助手</Link></div>
                 <div><Link to={{pathname: '/zouban/question'}}>走班试题质量分析</Link></div>
+                <div><Link to={{pathname: '/zouban/detail'}}>班级成绩明细</Link></div>
 
                 <h5>=========== 走班分割线========================</h5>
 
