@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-14 09:24:54
+* @Last Modified time: 2016-10-14 17:17:59
 */
 'use strict';
 var _ = require('lodash');
@@ -221,20 +221,26 @@ function filterValidExams(originalExams, userId, schoolId, isLianKaoManager) {
             from: examItem.from
         }
     }).value();
-    return getCustomExamInfoByUserId(userId, schoolId).then(function(userCustomExamInfos) {
-        var validCustomExams = _.map(userCustomExamInfos, (obj) => {
-            return {
-                id: obj['exam_id'],
-                from: '40'
-            }
-        });
-        var allValidExams = _.concat(validNotCustomExams, validCustomExams);
-        temp.allValidExams = allValidExams;
-        var getExamInstancePromises = _.map(allValidExams, (validExam) => getExamById(validExam.id));
-        return when.all(getExamInstancePromises);
-    }).then(function(examInstances) {
-        return when.resolve(_.map(examInstances, (examItem, index) => _.assign({}, examItem, temp.allValidExams[index])));
+    var getExamInstancePromises = _.map(validNotCustomExams, (validExam) => getExamById(validExam.id));
+    return when.all(getExamInstancePromises).then(function(examInstances) {
+        return when.resolve(_.map(examInstances, (examItem, index) => _.assign({}, examItem, validNotCustomExams[index])));
     });
+
+    //【暂时】取消自定义分析的内容。自定义分析的创建和查看都通过1.7
+    // return getCustomExamInfoByUserId(userId, schoolId).then(function(userCustomExamInfos) {
+    //     var validCustomExams = _.map(userCustomExamInfos, (obj) => {
+    //         return {
+    //             id: obj['exam_id'],
+    //             from: '40'
+    //         }
+    //     });
+    //     var allValidExams = _.concat(validNotCustomExams, validCustomExams);
+    //     temp.allValidExams = allValidExams;
+    //     var getExamInstancePromises = _.map(allValidExams, (validExam) => getExamById(validExam.id));
+    //     return when.all(getExamInstancePromises);
+    // }).then(function(examInstances) {
+    //     return when.resolve(_.map(examInstances, (examItem, index) => _.assign({}, examItem, temp.allValidExams[index])));
+    // });
 }
 
 function getCustomExamInfoByUserId(userId, schoolId) {

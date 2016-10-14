@@ -1,11 +1,24 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-10-10 16:55:20
+* @Last Modified time: 2016-10-14 16:55:32
 */
 
 'use strict';
 import _ from 'lodash';
+
+/*
+    计算一个区间：
+        参数：开始值 start；结束值 end；步伐 step；多少个间隔：count(当step为null的时候，通过count来计算step)
+        输出：包括start和end的，以step为步伐的计数数组
+*/
+export function makeSegments(end, start = 0, step, count = 12) {
+    step = step || _.ceil(_.divide(_.subtract(end, start), count));
+    var result = _.range(start, end + 1, step);
+    if (_.last(result) < end) result.push(end);
+    return result;
+}
+
 /*
     求某一个群定的xx属性的区间分布:<注意，因为查找的方式使用了二分法，所以群体必须是有序的！！！>
         参数：区间 segments；群体 base；属性 key
@@ -36,25 +49,6 @@ export function makeSegmentsDistribution(segments, base, key) {
         }
     });
 }
-
-
-/*
-    计算一个区间：
-        参数：开始值 start；结束值 end；步伐 step；多少个间隔：count(当step为null的时候，通过count来计算step)
-        输出：包括start和end的，以step为步伐的计数数组
-*/
-export function makeSegments(end, start = 0, step, count = 12) {
-    step = step || _.ceil(_.divide(_.subtract(end, start), count));
-    var result = _.range(start, end + 1, step);
-    if (_.last(result) < end) result.push(end);
-    return result;
-}
-
-/*
-    贡献率：
-        参数：originalMatrix
-        输出：对应的贡献率matrixFactors
-*/
 
 
 function getSegmentIndex(segments, target) {
@@ -117,6 +111,13 @@ export function makeFactor(originalMatrix) {
  *      ...(各个档次)
  *  }
  */
+
+export function newMakeSubjectLevels(levels, examStudentsInfo, examPapersInfo, examFullMark) {
+    return _.map(levels, (levObj) => {
+        return makeLevelSubjectMean(levObj.score, examStudentsInfo, examPapersInfo, examFullMark);
+    });
+}
+
 export function makeSubjectLevels(levels, examStudentsInfo, examPapersInfo, examFullMark) {
     var result = {};
     _.each(levels, (levObj, levelKey) => {
@@ -125,14 +126,6 @@ export function makeSubjectLevels(levels, examStudentsInfo, examPapersInfo, exam
     return result;
 }
 
-/**
- * 获取某一档次各个科目的平均分
- * @param  {[type]} levelScore       [description]
- * @param  {[type]} examStudentsInfo [description]
- * @param  {[type]} examPapersInfo   [description]
- * @param  {[type]} examFullMark     [description]
- * @return {[type]}                  [description]
- */
 function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, examFullMark) {
     var result = _.filter(examStudentsInfo, (student) => _.round(student.score) == _.round(levelScore));
     var count = result.length;
@@ -153,17 +146,9 @@ function makeLevelSubjectMean(levelScore, examStudentsInfo, examPapersInfo, exam
         result = _.concat(result, currentTagretLowStudents, currentTargetHighStudents);
     }
 
-    // debugger;
     return makeSubjectMean(result, examPapersInfo);
 }
 
-
-/**
- * 返回所给学生各科成绩的平均分。注意这里没有没有包括总分(totalScore)的平均分信息
- * @param  {[type]} students       [description]
- * @param  {[type]} examPapersInfo [description]
- * @return {[type]}                [description]
- */
 function makeSubjectMean(students, examPapersInfo) {
     var result = {};
     _.each(_.groupBy(_.concat(..._.map(students, (student) => student.papers)), 'paperid'), (papers, pid) => {
@@ -177,17 +162,24 @@ function makeSubjectMean(students, examPapersInfo) {
     return result;
 }
 
-//根据当前reportDS数据来format baseline格式--不进行任何计算baseline的过程，只是format
-export function formatNewBaseline(examId, grade, levels, subjectLevels, levelBuffers) {
-    var result = {examid: examId, grade: grade, '[subjectLevels]': [], '[levelBuffers]': []};
-    result['[levels]'] = _.values(levels);
-    _.each(levels, (levObj, levelKey) => {
-        result['[subjectLevels]'].push({levelKey: levelKey, values: subjectLevels[levelKey]});
-        result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
+export function insertRankInfo(studentObjs) {
+    var rankIndex = 1;
+    var orderedStudentScoreInfo = _.orderBy(_.map(_.groupBy(studentObjs, 'score'), (v, k) => {
+        return {
+            score: parseFloat(k),
+            students: v
+        }
+    }), ['score'], ['desc']);
+    _.each(orderedStudentScoreInfo, (theObj, theRank) => {
+        _.each(theObj.students, (stuObj) => {
+            stuObj.rank = rankIndex;
+            return stuObj;
+        });
+        rankIndex += theObj.students.length;
     });
-    return result;
 }
 
+//TODO:删除
 export function addRankInfo(studentObjs) {
     var rankIndex = 1;
     var orderedStudentScoreInfo = _.orderBy(_.map(_.groupBy(studentObjs, 'score'), (v, k) => {
@@ -203,6 +195,56 @@ export function addRankInfo(studentObjs) {
         });
         rankIndex += theObj.students.length;
     });
+}
+
+export function newGetLevelInfo(levels, baseStudents, examFullMark, isByScore=true) {
+    var levelScoreRel = newGetLevelScoreRel(levels, baseStudents, examFullMark, isByScore);
+    var targets, count, sumCount, sumPercentage, result = {}, temp = [];// levelLastIndex = _.size(levels) - 1;
+    return _.map(levels, (levelObj, index) => {
+        var currentLevelRel = levelScoreRel[index];
+        targets = (index == 0) ? _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score <= currentLevelRel.highLevelScore)) : _.filter(baseStudents, (obj) => (obj.score >= currentLevelRel.currentLevelScore) && (obj.score < currentLevelRel.highLevelScore));
+        count = targets.length;
+        temp[index] = count;
+        sumCount = _.sum(temp);
+        sumPercentage = _.round(_.multiply(_.divide(sumCount, baseStudents.length), 100), 2);
+        return {
+            score: currentLevelRel.currentLevelScore,
+            targets: targets,
+            count: count,
+            sumCount: sumCount,
+            sumPercentage: sumPercentage
+        }
+    });
+}
+
+function newGetLevelScoreRel(levels, baseStudents, examFullMark, isByScore=true) {
+    return _.map(levels, (levelObj, index) => {
+        if(isByScore) {
+            var highLevelScore = (index == 0) ? examFullMark : levels[index-1].score;
+            return {
+                currentLevelScore: levelObj.score,
+                highLevelScore: highLevelScore
+            }
+        } else {
+            return newGetScoreInfoByPercentage(levels, index, levelObj.sumPercentage, baseStudents, examFullMark);
+        }
+    });
+    return result;
+}
+
+function newGetScoreInfoByPercentage(levels, index, currentPercentage, baseStudents, examFullMark) {
+    var flagCount = _.ceil(_.multiply(_.divide(currentPercentage, 100), baseStudents.length));
+    var targetStudent = _.takeRight(baseStudents, flagCount)[0];
+    var currentLevelScore = targetStudent.score;
+
+    if(index == 0) return { currentLevelScore: currentLevelScore, highLevelScore: examFullMark};
+    var highFlagCount = _.ceil(_.multiply(_.divide(levels[index-1].sumPercentage, 100), baseStudents.length));
+    var highTargetStudent = _.takeRight(baseStudents, highFlagCount)[0];
+    var highLevelScore = highTargetStudent.score;
+    return {
+        currentLevelScore: currentLevelScore,
+        highLevelScore: highLevelScore
+    }
 }
 
 //TODO:这里设计的时候能不能考虑format的难易程度--遵从方便横向扫描的原则
@@ -265,6 +307,45 @@ function getScoreInfoByPercentage(levels, levelKey, currentPercentage, baseStude
     }
 }
 
+export function newGetSubjectLevelInfo(subjectLevels, papersStudents, papersFullMark) {
+    var subjectLevelRel = newGetSubjectLevelRel(subjectLevels, papersFullMark);
+    var targets, count, temp;// result = {}, levelLastIndex = _.size(subjectLevels) - 1;
+    return _.map(subjectLevels, (papersLevelObj, index) => {
+        temp = {};
+        _.each(papersLevelObj, (v, pid) => {
+            var currentPaperRel = subjectLevelRel[index][pid];
+            var currentPaperStudents = papersStudents[pid];
+            if(!currentPaperStudents || currentPaperStudents.length == 0) {
+                temp[pid] = { targets: [], count: 0};
+                return;
+            }
+            targets = (index == 0) ? _.filter(papersStudents[pid], (obj) => (obj.score >= currentPaperRel.currentLevelPaperMean) && (obj.score <= currentPaperRel.highLevelPaperMean)) : _.filter(papersStudents[pid], (obj) => (obj.score >= currentPaperRel.currentLevelPaperMean) && (obj.score < currentPaperRel.highLevelPaperMean));
+            count = targets.length;
+            temp[pid] = {
+                score: currentPaperRel.currentLevelPaperMean,
+                targets: targets,
+                count: targets.length
+            }
+        });
+        return temp;
+    });
+}
+
+function newGetSubjectLevelRel(subjectLevels, papersFullMark) {
+    var result = {}, temp, highLevelPaperMean;
+    return _.map(subjectLevels, (papersLevelObj, index) => {
+        temp = {};
+        _.each(papersLevelObj, (paperMeanObj, pid) => {
+            highLevelPaperMean = (index == 0) ? papersFullMark[pid] : subjectLevels[index-1][pid].mean;
+            temp[pid] = {
+                currentLevelPaperMean: paperMeanObj.mean,
+                highLevelPaperMean: highLevelPaperMean
+            }
+        });
+        return temp;
+    });
+}
+
 export function getSubjectLevelInfo(subjectLevels, papersStudents, papersFullMark) {
     var subjectLevelRel = getSubjectLevelRel(subjectLevels, papersFullMark);
     var targets, count, temp, result = {}, levelLastIndex = _.size(subjectLevels) - 1;
@@ -303,6 +384,17 @@ function getSubjectLevelRel(subjectLevels, papersFullMark) {
             }
         });
         result[levelKey] = temp;
+    });
+    return result;
+}
+
+//根据当前reportDS数据来format baseline格式--不进行任何计算baseline的过程，只是format
+export function formatNewBaseline(examId, grade, levels, subjectLevels, levelBuffers) {
+    var result = {examid: examId, grade: grade, '[subjectLevels]': [], '[levelBuffers]': []};
+    result['[levels]'] = _.values(levels);
+    _.each(levels, (levObj, levelKey) => {
+        result['[subjectLevels]'].push({levelKey: levelKey, values: subjectLevels[levelKey]});
+        result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
     });
     return result;
 }

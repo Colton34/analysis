@@ -174,9 +174,12 @@ export const C09 = '#999999';
 export const C12 = '#333333';
 export const C14 = '#fdfdfd';
 
-export const DEFAULT_LEVELS = {
-
-}
+export const DEFAULT_LEVELS = [
+    {sumPercentage: 15}, {sumPercentage: 35}, {sumPercentage: 60}
+];
+export const DEFAULT_INTENSIVE_LEVELS = [
+    {sumPercentage: 10}, {sumPercentage: 40}, {sumPercentage: 70}
+];
 export const DEFAULT_LEVELBUFFER = 10;
 export const DEFAULT_LEVEL_RADIO_RANGE = [3, 4,5];//默认只提供这三个档次
 

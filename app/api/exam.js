@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-14 15:55:51
+* @Last Modified time: 2016-10-14 17:03:05
 */
 
 'use strict';
@@ -16,114 +16,132 @@ var errors = require('common-errors');
 import {
     SUBJECTS_WEIGHT as subjectWeight,
     NUMBER_MAP as numberMap,
-    LETTER_MAP as letterMap
+    LETTER_MAP as letterMap,
+    DEFAULT_LEVELS as defaultLevels,
+    DEFAULT_LEVELBUFFER as defaultLevelBuffer,
+    DEFAULT_INTENSIVE_LEVELS as defaultIntensiveLevels
 } from '../lib/constants';
 
-import {addRankInfo, getLevelInfo} from '../sdk';
+import {addRankInfo, getLevelInfo, insertRankInfo, newMakeSubjectLevels, newGetLevelInfo, newGetSubjectLevelInfo} from '../sdk';
 
 var examPath = "/exam";
 var paperPath = '/papers';
 
 export function initHomeData(params) {
     var url = examPath + '/home';
-
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     })
 }
 
-export function saveBaseline(params) {
-    var url = examPath + '/levels';
-
-    return params.request.put(url, {examId: params.examId, baseline: params.baseline});
-}
-
-/**
- * 获取Dashboard API数据
- * @param  {[type]} params [description]
- * @return {[type]}        [description]
- */
 export function initDashboardData(params) {
-    var url = (params.grade) ? examPath + '/dashboard?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/dashboard?examid=' + params.examid;
-
+    var url = examPath + '/dashboard?examid=' + params.examid + '&grade=' + encodeURI(params.grade);
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     });
 }
 
-
-/**
- * 获取排行榜详情的API数据
- * @param  {[type]} params [description]
- * @return {[type]}        [description]
-    examInfo: {
-        name: ,
-        papers: , //注意要在这里添加 totalScore的信息
-        classes:
-    }
-
-    rankCache: {
-        totalScore: {
-            <className>: [ //已经是有序的（升序）
-                {
-                    kaohao: ,
-                    name: ,
-                    class: ,
-                    score:
-                }
-            ],
-            ...
-        },
-        <pid>: {
-            <className>: [
-                {
-                    kaohao: ,
-                    name: ,
-                    class: ,
-                    score
-                }
-            ],
-            ...
-        },
-        ...
-    }
- */
 export function initRankReportdData(params) {
-    var url = (params.grade) ? examPath + '/rank/report?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/rank/report?examid=' + params.examid;
-
-    return params.request.get(url).then(function(res) {
-        debugger;
-        return Promise.resolve(res.data);
-    });
-}
-
-export function fetchExamList(params) {
-    var url = examPath + '/list';
+    var url = examPath + '/rank/report?examid=' + params.examid + '&grade=' + encodeURI(params.grade);
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     });
 }
 
-export function saveEquivalentScoreInfo(params) {
-    var url = examPath + '/equivalent/score';
-    return params.request.post(url, {equivalentScoreInfo: params.equivalentScoreInfo});
+export function initReportBase(params) {
+    var url = examPath + '/school/analysis?examid=' + params.examid + '&grade=' + encodeURI(params.grade);
+    return params.request.get(url).then(function(res) {
+        var {examInfo, examStudentsInfo, examPapersInfo, examClassesInfo, examBaseline} = res.data;
+        var examFullMark = examInfo.fullMark;
+        insertRankInfo(examStudentsInfo);
+        var allStudentsPaperMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperid');
+        _.each(allStudentsPaperMap, (paperStudents) => insertRankInfo(paperStudents));
+        var headers = getExamHeaders(examPapersInfo, examInfo.fullMark);
+        var levels = getExamLevels(examBaseline, examStudentsInfo, examFullMark);
+        var subjectLevels = getExamSubjectLevels(examBaseline, levels, examStudentsInfo, examPapersInfo, examFullMark, allStudentsPaperMap);
+        if(!doubleCheckValidSubjectLevels(subjectLevels)) {
+            levels = newGetLevelInfo(defaultIntensiveLevels, examStudentsInfo, examFullMark, false);
+            subjectLevels = getExamSubjectLevels(examBaseline, levels, examStudentsInfo, examPapersInfo, examFullMark, allStudentsPaperMap);
+            //得到新的再进行检测一次，如果还是不满足条件则抛出异常
+            if(!doubleCheckValidSubjectLevels(subjectLevels)) return Promise.reject('无效的学科平均分');
+        }
+        var levelBuffers = getExamLevelBuffers(examBaseline, _.size(levels));
+        //Note: studentsGroupByClass 其实应该是studentsGroupByKey -- 但是这个因为需要isLianKao的标志--所以还是推迟到具体的报告container中计算就好
+        return Promise.resolve({
+            haveInit: true,
+            examInfo: examInfo,
+            examStudentsInfo: examStudentsInfo,
+            examPapersInfo: examPapersInfo,
+            examClassesInfo: examClassesInfo,
+            allStudentsPaperMap: allStudentsPaperMap,
+            headers: headers,
+            levels: levels,
+            subjectLevels: subjectLevels,
+            levelBuffers: levelBuffers
+        });
+    });
 }
 
-/**
- * 获取校级报告详情的API数据
- * @param  {[type]} params [description]
- * @return {[type]}        [description]
+function doubleCheckValidSubjectLevels(subjectLevels) {
+    var result = {};
+    _.each(subjectLevels, (subjectLevelObj, index) => {
+        _.each(subjectLevelObj, (obj, pid) => {
+            if(!result[pid]) result[pid] = [];
+            result[pid].push(obj.score);
+        });
+    });
+    var temp = _.every(result, (subjectLevelScores, pid) => {
+        return _.every(_.range(subjectLevelScores.length-1), (i) => subjectLevelScores[i] > subjectLevelScores[i+1]);
+    });
+    debugger;
+    return temp;
+}
 
-组织的数据结构格式：
+function getExamHeaders(examPapersInfo, examFullMark) {
+    var headers = [], restPapers = [];
+    _.each(examPapersInfo, (paperItem, pid) => {
+        var index = _.findIndex(subjectWeight, (s) => ((s == paperItem.subject) || (_.includes(paperItem.subject, s))));
+        if (index >= 0) {
+            headers.push({
+                index: index,
+                subject: paperItem.subject,
+                id: pid,
+                fullMark: paperItem.fullMark
+            });
+        } else {
+            restPapers.push({id: pid, subject: paperItem.subject});
+        }
+    });
+    headers = _.sortBy(headers, 'index');
+    headers.unshift({
+        subject: '总分',
+        id: 'totalScore',
+        fullMark: examFullMark
+    });
+    headers = _.concat(headers, restPapers);
+    return headers;
+}
 
-*/
-/*
-subjectLevels:
-    存储的是个array: [ { levelKey: xxx, values: {} } ]
-    state中是个Map: { <levelKey> : <values> }
- */
+function getExamLevels(examBaseline, examStudentsInfo, examFullMark) {
+    if(examBaseline && examBaseline['[levels]']) return examBaseline['[levels]'];
+    return newGetLevelInfo(defaultLevels, examStudentsInfo, examFullMark, false);
+}
+
+function getExamSubjectLevels(examBaseline, levels, examStudentsInfo, examPapersInfo, examFullMark, allStudentsPaperMap) {
+    if(examBaseline && examBaseline['[subjectLevels]']) return examBaseline['[subjectLevels]'];
+    var subjectLevels = newMakeSubjectLevels(levels, examStudentsInfo, examPapersInfo, examFullMark);
+    var papersFullMark = {};
+    _.each(examPapersInfo, (obj, pid) => papersFullMark[pid] = obj.fullMark);
+    return newGetSubjectLevelInfo(subjectLevels, allStudentsPaperMap, papersFullMark);
+}
+
+function getExamLevelBuffers(examBaseline, levelSize) {
+    if(examBaseline && examBaseline['[levelBuffers]']) return examBaseline['[levelBuffers]'];
+    return _.map(_.range(levelSize), (i) => defaultLevelBuffer);
+}
+
 export function initReportDS(params) {
-    var url = (params.grade) ? examPath + '/school/analysis?examid=' + params.examid + '&grade=' + encodeURI(params.grade) : examPath + '/custom/school/analysis?examid=' + params.examid;
+    var url = examPath + '/school/analysis?examid=' + params.examid + '&grade=' + encodeURI(params.grade);
 
     var examInfo, examStudentsInfo, examPapersInfo, examClassesInfo;
     var studentsGroupByClass, allStudentsPaperMap;
@@ -514,6 +532,24 @@ function getLevelsByPercentage(levels, levelKey, defalutPercentage, examStudents
             percentage: sumPercentage
         }
     }
+}
+
+export function saveBaseline(params) {
+    var url = examPath + '/levels';
+
+    return params.request.put(url, {examId: params.examId, baseline: params.baseline});
+}
+
+export function fetchExamList(params) {
+    var url = examPath + '/list';
+    return params.request.get(url).then(function(res) {
+        return Promise.resolve(res.data);
+    });
+}
+
+export function saveEquivalentScoreInfo(params) {
+    var url = examPath + '/equivalent/score';
+    return params.request.post(url, {equivalentScoreInfo: params.equivalentScoreInfo});
 }
 
 
