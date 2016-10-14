@@ -2,13 +2,13 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-12 17:52:33
+* @Last Modified time: 2016-10-14 09:27:25
 */
 
 'use strict';
 
 var development = {
-    "analysisServer"    : "http://ct.yunxiao.com:8158", //http://fx-engine.yunxiao.com   http://ct.yunxiao.com:8158
+    "analysisServer"    : "http://fx-engine.yunxiao.com", //http://fx-engine.yunxiao.com   http://ct.yunxiao.com:8158
     'fxdb': 'mongodb://fx2:123456@ct.yunxiao.com:19000/fx2',
     "port": 3000,
     "secret": "Ci23fWtahDYE3dfirAHrJhzrUEoslIxqwcDN9VNhRJCWf8Tyc1F1mqYrjGYF",
