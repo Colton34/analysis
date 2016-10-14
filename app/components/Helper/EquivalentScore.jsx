@@ -19,6 +19,31 @@ TODO: a.计算lessonName  b.使得重要的科目在前面
  */
 
 
+//Main
+class EquivalentScore extends React.Component {
+    static need = [fetchExamListAction]
+
+    constructor(props) {
+        super(props);
+
+    }
+
+    componentDidMount() {
+        var params = initParams({'request': window.request}, this.props.params, this.props.location);
+        this.props.fetchExamList(params);
+    }
+
+    render() {
+        return (
+            <div>
+                {this.props.ifError ? (<CommonErrorView />) : ((this.props.isLoading || this.props.examList.size == 0) ? <Spinkit /> : <ContentModule examList={this.props.examList} />)}
+            </div>
+        );
+    }
+}
+
+export default  connect(mapStateToProps, mapDispatchToProps)(EquivalentScore);
+
 class ContentModule extends React.Component {
     constructor(props) {
         super(props);
@@ -175,29 +200,7 @@ class EquivalentLessonScoreItem extends React.Component {
     }
 }
 
-class EquivalentScore extends React.Component {
-    static need = [fetchExamListAction]
 
-    constructor(props) {
-        super(props);
-
-    }
-
-    componentDidMount() {
-        var params = initParams({'request': window.request}, this.props.params, this.props.location);
-        this.props.fetchExamList(params);
-    }
-
-    render() {
-        return (
-            <div>
-                {this.props.ifError ? (<CommonErrorView />) : ((this.props.isLoading || this.props.examList.size == 0) ? <Spinkit /> : <ContentModule examList={this.props.examList} />)}
-            </div>
-        );
-    }
-}
-
-export default  connect(mapStateToProps, mapDispatchToProps)(EquivalentScore);
 
 function mapStateToProps(state) {
     return {
