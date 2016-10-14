@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-12 19:47:15
+* @Last Modified time: 2016-10-14 12:24:17
 */
 
 'use strict';
@@ -53,13 +53,16 @@ exports.authenticate = function(req, res, next) {
     var password = req.body.password;
 
     authUitls.getUserInfo(value).then(function(user) {
-        // if(user) console.log('pwd - ', user.pwd);
+        // if(user) console.log('来自1.5 pwd - ', user.pwd);
+
         if(user && (_.eq(user.pwd, password))) return when.resolve(user);//确认是1.5的账号
         return authUitls.getUserInfo2(value, password);//可能是1.5的账号，但是密码不正确；可能是2.0的账号  1.5的账号，但是使用2.0的密码--其实还是2.0的账号
     }).then(function(user) {
-        // if(user) console.log('pwd 2 - ', user.pwd);
+        if(user) console.log('来自2.0 pwd 2 - ', user.pwd);
         if(!user) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '用户不存在或密码不正确'}));//可能是1.5的账号但是密码不正确，也可能确实是个无效的账号
         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '密码不正确'}));//2.0的账号但是密码不正确
+
+        // console.log('school_id = ', user.schoolId);
 
         //Mock !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // if(user.name == 'cssyllkadmin' && user.pwd == 'yllk1906') {
@@ -70,6 +73,7 @@ exports.authenticate = function(req, res, next) {
         req.user = user;
         return getUserAuthorization(user.id, user.name);
     }).then(function(auth) {
+        //console.log('auth = ', JSON.stringify(auth));
         var authInfo = getUserAuthInfo(auth);
         req.user.auth = authInfo;
         return getSchoolById(req.user.schoolId)

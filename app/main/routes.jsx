@@ -44,7 +44,7 @@ export default (store) => {
                 <Route path="question" component={ZoubanQuestionModule} />
             </Route>
             <Route path='helper/:name' component={HelperBoxContainer}>
-                <Route path="equivalentScore" component={EquivalentScore} />
+                <Route path="score" component={EquivalentScore} />
             </Route>
         </Route>
     );

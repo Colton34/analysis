@@ -8,7 +8,7 @@ import {Link} from 'react-router';
 export default function HelperBox() {
     return (
         <div>
-            <Link to={{pathname: 'equivalentScore'}}>等值分数</Link>
+            <Link to={{pathname: '/helper/equivalent/score'}}>等值分数</Link>
         </div>
     )
 }

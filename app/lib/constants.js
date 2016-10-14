@@ -187,5 +187,8 @@ export const TEST_CHANGE_TWO = 'TEST_CHANGE_TWO';
 export const CHART_COLOR = ['#0099ff','#33cccc','#33cc33','#ff9900','#ff6633'];
 
 export const HELPER_TITLE_MAP = {
-    'equivalentScore': '分数转换'
+    'equivalent': '分数转换'
 }
+
+export const FETCH_EXAM_LIST = 'INIT_EXAM_LIST';
+export const FETCH_EXAM_LIST_SUCCESS = 'INIT_EXAM_LIST_SUCCESS';

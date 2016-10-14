@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-12 18:34:50
+* @Last Modified time: 2016-10-14 15:55:51
 */
 
 'use strict';
@@ -95,6 +95,18 @@ export function initRankReportdData(params) {
         debugger;
         return Promise.resolve(res.data);
     });
+}
+
+export function fetchExamList(params) {
+    var url = examPath + '/list';
+    return params.request.get(url).then(function(res) {
+        return Promise.resolve(res.data);
+    });
+}
+
+export function saveEquivalentScoreInfo(params) {
+    var url = examPath + '/equivalent/score';
+    return params.request.post(url, {equivalentScoreInfo: params.equivalentScoreInfo});
 }
 
 /**

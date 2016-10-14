@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-12 15:35:33
+* @Last Modified time: 2016-10-14 09:24:54
 */
 'use strict';
 var _ = require('lodash');
@@ -50,6 +50,18 @@ var getGradeExamBaseline = exports.getGradeExamBaseline = function(examId, grade
         peterFX.query('@ExamBaseline', config, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('getGradeExamBaseline Mongo Error: ', err));
             resolve(results[0]);
+        });
+    });
+}
+
+var getSchoolById = exports.getSchoolById = function(schoolId) {
+    var url = config.analysisServer + '/school?id=' + schoolId;
+    return when.promise(function(resolve, reject) {
+        client.get(url, {}, function(err, res, body) {
+            if (err) return reject(new errors.URIError('查询analysis server(getExamsBySchool) Error: ', err));
+            var data = JSON.parse(body);
+            if(data.error) reject(new errors.URIError('查询analysis server(getExamsBySchool)失败, schoolId = ', schoolId));
+            resolve(data);
         });
     });
 }
@@ -195,18 +207,6 @@ exports.inValidCustomExamInfo = function(customExamInfoId) {
         peterFX.set(customExamInfoId, {status: 0}, function(err, result) {
             if(err) return reject(new errors.data.MongoDBError('重置customExamInfo status Error: ', err));
             resolve(result);
-        });
-    });
-}
-
-function getSchoolById(schoolId) {
-    var url = config.analysisServer + '/school?id=' + schoolId;
-    return when.promise(function(resolve, reject) {
-        client.get(url, {}, function(err, res, body) {
-            if (err) return reject(new errors.URIError('查询analysis server(getExamsBySchool) Error: ', err));
-            var data = JSON.parse(body);
-            if(data.error) reject(new errors.URIError('查询analysis server(getExamsBySchool)失败, schoolId = ', schoolId));
-            resolve(data);
         });
     });
 }

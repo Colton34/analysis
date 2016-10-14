@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-03 19:03:53
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-12 14:48:11
+* @Last Modified time: 2016-10-14 12:22:15
 */
 
 'use strict';
@@ -48,9 +48,6 @@ exports.getUserInfo = function(name) {
 
 exports.getUserInfo2 = function(name, pwd){
     var url = buildGetUrl(apiCasValid, {username : name, password : pwd});
-
-console.log('name = ', name, '  pwd = ', pwd);
-
     return getUserId(url).then(function(userId) {
         if(!userId) return when.resolve(null);
         var token = jwt.sign({}, tokenKey, { algorithm: 'HS512', jwtid : userId, noTimestamp : false});
@@ -106,24 +103,12 @@ function buildGetUrl(apiUrl, params){
 
 
 function getUserProfile(token, userId) {
-
-console.log('token ===  ');
-console.log(token);
-console.log('=========');
-console.log('userId = ', userId);
-
-
     var url = buildGetUrl(apiUser2, {token: token});
     return when.promise(function(resolve, reject) {
         client.get(url, {}, function(err, res, body) {
             if(err) return reject(new errors.URIError('请求登录用户接口II，getUserProfile失败', err));
             if(res.statusCode != 200) return reject(new errors.Error('请求登录用户接口II不成功'));
             body = JSON.parse(body);
-
-console.log('=============== getUserProfile ============= ');
-console.log(JSON.stringify(body));
-console.log('============================ ');
-
             if(body.code != 0) return reject(new errors.Error('请求登录用户接口II Error: body.code != 0'));
             body.data.userId = userId;
             resolve(body.data);
@@ -137,11 +122,6 @@ function getUserId(url) {
             if(err) return reject(new errors.URIError('请求登录用户接口II失败', err));
             if(res.statusCode != 200) return reject(new errors.Error('请求登录用户接口II不成功'));
             body = JSON.parse(body);
-
-console.log('=========== getUserId ================');
-console.log(JSON.stringify(body));
-console.log('===========================');
-
             if(!(body.code == 1 && body.msg == 'ok')) return reject(new errors.Error('请求登录用户接口II Error: body.code != 1 or body.msg != ok'));
             resolve(body.userId);
         });
