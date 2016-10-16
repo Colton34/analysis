@@ -24,6 +24,7 @@ class Main extends React.Component {
                 <div><Link to={{pathname: '/helper'}}>小助手</Link></div>
                 <div><Link to={{pathname: '/zouban/question'}}>走班试题质量分析</Link></div>
                 <div><Link to={{pathname: '/zouban/detail'}}>班级成绩明细</Link></div>
+                <div><Link to={{pathname: '/zouban/personal'}}>走班学生个人分析</Link></div>
 
                 <h5>=========== 走班分割线========================</h5>
 

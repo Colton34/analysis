@@ -4,10 +4,11 @@ import commonClass from '../../../styles/common.css';
 import QuestionCompare from './QuestionCompare';
 import AverageCompare from './AverageCompare';
 import StudentLevelsDistribution from './StudentLevelsDistribution';
+import LevelsCompare from './LevelsCompare';
 export default class ScoreDetailModule extends React.Component {
     constructor(props) {
         super(props);
-        
+
     }
     render() {
         return (
@@ -15,6 +16,7 @@ export default class ScoreDetailModule extends React.Component {
                 <QuestionCompare></QuestionCompare>
                 <AverageCompare></AverageCompare>
                 <StudentLevelsDistribution></StudentLevelsDistribution>
+                <LevelsCompare></LevelsCompare>
             </div>
         );
     }
