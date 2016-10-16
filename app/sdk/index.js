@@ -1,12 +1,12 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-10-14 16:55:32
+* @Last Modified time: 2016-10-16 13:21:43
 */
 
 'use strict';
 import _ from 'lodash';
-
+import StatisticalLib from 'simple-statistics';
 /*
     计算一个区间：
         参数：开始值 start；结束值 end；步伐 step；多少个间隔：count(当step为null的时候，通过count来计算step)
@@ -397,4 +397,46 @@ export function formatNewBaseline(examId, grade, levels, subjectLevels, levelBuf
         result['[levelBuffers]'].push({key: levelKey, score: levelBuffers[levelKey-0]});
     });
     return result;
+}
+
+export function getQuestionInfo(questions, baseStudents, targetStudents) {
+
+}
+
+//各个维度--studnetsMap的key--上每道题目的平均分
+//每个群体里，每道题目的平均分
+/*
+
+{
+    groupKey: [<mean>, ...]
+}
+
+ */
+
+function getQuestionGroupScoreMatrix(groupStudents, key) {
+    var groupQuestionsScoreMatrix = _.map(groupStudents, (studentObj) => studentObj[key]);
+    var questionsGroupScoreMatrix = [];
+    _.each(groupQuestionsScoreMatrix, (studentQuestonsScore, i) => {
+        _.each(studentQuestonsScore, (s, j) => {
+            if(!questionsGroupScoreMatrix[j]) questionsGroupScoreMatrix[j] = [];
+            questionsGroupScoreMatrix[j].push(s);
+        });
+    });
+    return questionsGroupScoreMatrix;
+}
+
+function getGroupQuestionMean(questionsGroupScoreMatrix) {
+    return _.map(questionsGroupScoreMatrix, (questionGroupScores) => _.round(_.mean(questionGroupScores), 2));
+}
+
+export function getGroupQuestionScoreRate(questions, groupQuestionMean) {
+    return _.map(groupQuestionMean, (currentGroupQuestionMean, index) => _.round(_.divide(currentGroupQuestionMean, questions[index]), 2));
+}
+
+export function getQuestionSeparation(questionGradeScoreMatrix, paperGradeScores) {
+    return _.map(questionGradeScoreMatrix, (currentQuestionGradeScores, index) => _.round(StatisticalLib.sampleCorrelation(currentQuestionGradeScores, paperGradeScores), 2));
+}
+
+export function getGroupQuestionContriFactor(groupQuestionScoreRate, gradeQuestionScoreRate) {
+    return _.map(groupQuestionScoreRate, (x, i) => _.round(_.subtract(x, groupQuestionScoreRate[i]), 2));
 }

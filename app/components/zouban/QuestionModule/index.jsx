@@ -17,6 +17,9 @@ QuestionDetail
 
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+
 import commonClass from '../../../styles/common.css';
 import QuestionPerformance from './QuestionPerformance';
 import QuestionDistribution from './QuestionDistribution';
@@ -27,7 +30,7 @@ var  subjects =[{
     name:'数学'
 }];
 var classes = ['1班','2班','3班'];
-export default class QuestionModule extends React.Component {
+class QuestionModule extends React.Component {
     constructor(props) {
         super(props);
 
@@ -45,6 +48,16 @@ export default class QuestionModule extends React.Component {
         );
     }
 }
+
+export default connect(mapStateToProps)(QuestionModule);
+
+function mapStateToProps(state) {
+    return {
+        equivalentScoreInfo: state.zouban.equivalentScoreInfo,
+        examStudentsInfo: state.zouban.examStudentsInfo
+    }
+}
+
 
 class SubjectSelector extends React.Component {
     constructor(props) {

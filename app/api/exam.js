@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-14 17:03:05
+* @Last Modified time: 2016-10-16 17:55:36
 */
 
 'use strict';
@@ -46,6 +46,164 @@ export function initRankReportdData(params) {
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     });
+}
+
+export function initZoubanDS(params) {
+    var url = examPath + '/zouban?examid=' + params.examid + '&grade=' + encodeURI(params.grade);
+    return params.request.get(url).then(function(res) {
+        debugger;
+        var {equivalentScoreInfo, examStudentsInfo, examPapersInfo} = res.data;
+        //拿到数据，进行构建需要的DS
+        var examInfo = getZoubanExamInfo(equivalentScoreInfo, examPapersInfo);
+        debugger;
+
+
+
+
+        return Promise.resolve(res.data);
+    });
+}
+
+function getZoubanExamInfo(equivalentScoreInfo, examPapersInfo) {
+//lessons要带有顺序
+    var temp = equivalentScoreInfo[0], result = { id: temp.examId, name: temp.examName, fullMark: 0 };
+    var equivalentScoreInfoMap = _.keyBy(equivalentScoreInfo, 'objectId'), examPapersInfoMap = _.keyBy(examPapersInfo, 'objectId');
+    var commonLessons = [], otherLessons = [], lesson, lessonWeight;
+    _.each(equivalentScoreInfoMap, (infoObj, paperObjectId) => {
+        result.fullMark += infoObj.fullMark;
+        lesson = _.assign({}, infoObj, {questions: examPapersInfoMap[paperObjectId].questions});
+        lessonWeight = _.findIndex(subjectWeight, (s) => ((s == infoObj.name) || (_.includes(infoObj.name, s))));
+        (lessonWeight >= 0) ? commonLessons.push({weight: lessonWeight, value: lesson}) : otherLessons.push(lesson);
+    });
+    debugger;
+    commonLessons = _.chain(commonLessons).sortBy('weight').map((obj) => obj.value).value();
+    debugger;
+    result.lessons = _.concat(commonLessons, otherLessons);
+    debugger;
+    return result;
+}
+
+/*
+examInfo:
+{
+    id:
+    name:
+    fullMark:
+    lessons: [
+        {
+            id:
+            objectId:
+            name:
+            fullMark:
+            percentage:
+            equivalentScore:
+            questions:
+        },
+        ...
+    ]
+}
+
+examStudentsInfo:
+{
+    <studentId>: {
+        id:
+        kaohao:
+        name:
+        class:
+        school:
+        score:
+        rank:
+    },
+    ...
+}
+
+lessonStudentsInfo:
+{
+    lessonObjectId: {
+        <className>: {
+            <studentId>: {
+                score:,
+                questionScores:
+                lessonRank:
+                classRank:
+            },
+            ...
+        },
+        ...
+    },
+    ...
+}
+
+lessonQuestionInfo:
+{
+    lessonObjectId: {
+        <questionId>: {
+            lesson: {
+                scores:
+                mean:
+                rate:
+                separation:
+            },
+            <className>: {
+                scores:
+                mean:
+                rate:
+            },
+            ...
+        },
+        ...
+    },
+    ...
+}
+
+
+{
+    <lessonObjectId>: {
+        id:
+        objectId:
+        name:
+        fullMark:
+        percentage:
+        equivalentScore:
+        questions:
+        classesInfo: {
+            <className>: {
+                name: ,
+                students:[
+                    {
+                        id:
+                        name:
+                        class:
+                        school:
+                        totalScore:
+                        score:
+                        questionsScore:
+                    }
+                ]
+            }
+        }
+    }
+}
+
+{
+    <lessonObjectId>: {
+        <questionId>: {
+            <...baseInfo>
+            statisticalInfo:
+        }
+        ...
+    },
+    ...
+}
+
+
+ */
+
+
+function getZoubanDS({equivalentScoreInfo, examStudentsInfo}) {
+    //带有order的课程 (lesson)
+    //每个学科下的教学班（group）
+    //
 }
 
 export function initReportBase(params) {

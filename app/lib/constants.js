@@ -193,5 +193,14 @@ export const HELPER_TITLE_MAP = {
     'equivalent': '分数转换'
 }
 
+export const ZOUBAN_TITLE_MAP = {
+    'question': '试题质量分析',
+    'detail': '成绩明细'
+}
+
 export const FETCH_EXAM_LIST = 'INIT_EXAM_LIST';
 export const FETCH_EXAM_LIST_SUCCESS = 'INIT_EXAM_LIST_SUCCESS';
+
+
+export const INIT_ZOUBAN_DS = 'INIT_ZOUBAN_DS';
+export const INIT_ZOUBAN_DS_SUCCESS = 'INIT_ZOUBAN_DS_SUCCESS';

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:02:10
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-14 09:22:06
+* @Last Modified time: 2016-10-15 11:59:45
 */
 
 'use strict';
@@ -19,6 +19,7 @@ import reportDS from './reportDS';
 import classReport from './classReport';
 import examsCache from './examsCache';
 import helper from './helper';
+import zouban from './zouban';
 
 import {one, two} from './test';
 
@@ -32,6 +33,7 @@ var rootReducer = combineReducers({
     customAnalysis,
     examsCache,
     helper,
+    zouban,
     //设计成嵌套的reducer
     test: combineReducers({
         one,

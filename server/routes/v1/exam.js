@@ -2,7 +2,7 @@
  * @Author: HellMagic
  * @Date:   2016-04-30 11:14:17
  * @Last Modified by:   HellMagic
- * @Last Modified time: 2016-10-14 15:56:37
+ * @Last Modified time: 2016-10-15 11:31:51
  */
 
 'use strict';
@@ -24,4 +24,5 @@ router.put('/levels', exam.updateExamBaseline);
 
 router.get('/list', exam.listZoubanExams);
 router.post('/equivalent/score', exam.saveEquivalentScoreInfo);
+router.get('/zouban', exam.zoubanDS);
 module.exports = router;

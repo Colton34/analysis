@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-14 17:17:59
+* @Last Modified time: 2016-10-16 17:38:14
 */
 'use strict';
 var _ = require('lodash');
@@ -372,6 +372,97 @@ function generateExamClassesInfo(examStudentsInfo) {
     });
     return result;
 }
+
+/*
+@EquivalentScoreInfo:
+    examId: String,
+    examName: String,
+    id: String,
+    objectId: String,
+    name: String,
+    fullMark: Integer,
+    percentage: Integer,
+    equivalentScore: Integer
+}
+ */
+
+exports.getEquivalentScoreInfoById = function(examid) {
+    return fetchEquivalentScoreInfoById(examid).then(function(equivalentScoreInfo) {
+        return (!equivalentScoreInfo) ? getDefaultEquivalentScoreInfo(examid) : when.resolve(equivalentScoreInfo);
+    })
+}
+
+function fetchEquivalentScoreInfoById(examid) {
+    return when.resolve(null);
+}
+
+function getDefaultEquivalentScoreInfo(examid) {
+    return getExamById(examid, '50').then(function(examInstance) {
+                //TODO: 需要过滤grade？？？
+        var result = _.map(examInstance['[papers]'], (paperItem) => {
+            if(_.includes(paperItem.name, '文科')) return {examId: examid, examName: examInstance.name, id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(文科)`, fullMark: paperItem.manfen};
+            if(_.includes(paperItem.name, '理科')) return {examId: examid, examName: examInstance.name, id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(理科)`, fullMark: paperItem.manfen};
+            return {examId: examid, examName: examInstance.name, id: paperItem.id, objectId: paperItem.paper, name: paperItem.subject, fullMark: paperItem.manfen};
+        });
+        return when.resolve(result);
+    });
+}
+
+exports.getZoubanExamInfo = function(paperObjectIds) {
+    return when.all(_.map(paperObjectIds, (paperObjectId) => getPaperById(paperObjectId)))
+        .then(function(paperInstances) {
+            return generateZoubanPaperStudentsInfo(paperInstances);
+        });
+}
+
+function generateZoubanPaperStudentsInfo(papers) {
+    var examStudentsInfo = {}, examPapersInfo = {};
+    return when.promise(function(resolve, reject) {
+        try {
+            _.each(papers, (paperObj) => {
+                examPapersInfo[paperObj._id] = formatZoubanLessonInstance(paperObj);
+                var students = paperObj['[students]'], matrix = paperObj.matrix, paperStudentObj, answers = paperObj.answers;
+                _.each(students, (studentObj, index) => {
+                    paperStudentObj = examStudentsInfo[studentObj.id];
+                    if(!paperStudentObj) {
+                        paperStudentObj = _.pick(studentObj, ['id', 'name', 'class', 'school']);
+                        paperStudentObj.papers = [], paperStudentObj.questionScores = [], paperStudentObj.score = 0;
+                        examStudentsInfo[studentObj.id] = paperStudentObj;
+                    }
+                    paperStudentObj.score = paperStudentObj.score + studentObj.score;
+                    paperStudentObj.papers.push({id: studentObj.id, paperid: paperObj.id, paperObjectId: paperObj._id, score: studentObj.score, 'class_name': studentObj.class});
+                    paperStudentObj.questionScores.push({paperid: paperObj.id, scores: matrix[index], answers: answers[index]});
+                });
+            });
+            resolve({
+                examStudentsInfo: examStudentsInfo,
+                examPapersInfo: examPapersInfo
+            })
+        } catch(e) {
+            reject(new errors.Error('generateZoubanPaperStudentsInfo(Format) Error'));
+        }
+    });
+}
+
+function formatZoubanLessonInstance(paperObj) {
+    var result = _.pick(paperObj, ['id', 'subject', 'grade']);
+    result.objectId = paperObj._id;
+    result.fullMark = paperObj.manfen;
+    result.questions = paperObj['[questions]'];
+    // var paperStudents = paperObj['[students]'];
+    // var paperStudentsByClass = _.groupBy(paperStudents, 'class');
+
+    // result.realClasses = _.keys(paperStudentsByClass);
+    // result.realStudentsCount = paperStudents.length;
+
+    // var paperClassCountInfo = {};
+    // _.each(paperStudentsByClass, (pcStudents, className) => {
+    //     paperClassCountInfo[className] = pcStudents.length;
+    // });
+    // result.classes = paperClassCountInfo;
+    return result;
+}
+
 
 // function getMockExamGrade(scoresInfo, gradeName) {
 //     var classes = _.map(scoresInfo, (studentObjs, className) => {

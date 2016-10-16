@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-08 17:02:04
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-13 21:16:02
+* @Last Modified time: 2016-10-15 11:59:07
 */
 
 'use strict';
@@ -16,6 +16,7 @@ import classReportState from './class-report-state';
 import customAnalysisState from './custom-analysis-state';
 import examsCacheState from './exams-cache-state';
 import helperState from './helper-state';
+import zoubanState from './zouban-state';
 
 // import liankaoState from './liankao-report-state';
 // liankaoReport: new liankaoState,
@@ -32,6 +33,7 @@ var _initState = {
     customAnalysis: new customAnalysisState,
     examsCache: new examsCacheState,
     helper: new helperState,
+    zouban:new zoubanState,
     //设计成使用嵌套的reducer
     test: {
         one: initOne,
