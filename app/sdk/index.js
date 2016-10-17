@@ -1,7 +1,7 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-10-16 13:21:43
+* @Last Modified time: 2016-10-16 20:22:57
 */
 
 'use strict';
@@ -162,7 +162,7 @@ function makeSubjectMean(students, examPapersInfo) {
     return result;
 }
 
-export function insertRankInfo(studentObjs) {
+export function insertRankInfo(studentObjs, rankKey='rank') {
     var rankIndex = 1;
     var orderedStudentScoreInfo = _.orderBy(_.map(_.groupBy(studentObjs, 'score'), (v, k) => {
         return {
@@ -172,7 +172,7 @@ export function insertRankInfo(studentObjs) {
     }), ['score'], ['desc']);
     _.each(orderedStudentScoreInfo, (theObj, theRank) => {
         _.each(theObj.students, (stuObj) => {
-            stuObj.rank = rankIndex;
+            stuObj[rankKey] = rankIndex;
             return stuObj;
         });
         rankIndex += theObj.students.length;
@@ -399,10 +399,6 @@ export function formatNewBaseline(examId, grade, levels, subjectLevels, levelBuf
     return result;
 }
 
-export function getQuestionInfo(questions, baseStudents, targetStudents) {
-
-}
-
 //各个维度--studnetsMap的key--上每道题目的平均分
 //每个群体里，每道题目的平均分
 /*
@@ -413,7 +409,7 @@ export function getQuestionInfo(questions, baseStudents, targetStudents) {
 
  */
 
-function getQuestionGroupScoreMatrix(groupStudents, key) {
+export function getQuestionGroupScoreMatrix(groupStudents, key='questionScores') {
     var groupQuestionsScoreMatrix = _.map(groupStudents, (studentObj) => studentObj[key]);
     var questionsGroupScoreMatrix = [];
     _.each(groupQuestionsScoreMatrix, (studentQuestonsScore, i) => {
@@ -425,12 +421,12 @@ function getQuestionGroupScoreMatrix(groupStudents, key) {
     return questionsGroupScoreMatrix;
 }
 
-function getGroupQuestionMean(questionsGroupScoreMatrix) {
+export function getGroupQuestionMean(questionsGroupScoreMatrix) {
     return _.map(questionsGroupScoreMatrix, (questionGroupScores) => _.round(_.mean(questionGroupScores), 2));
 }
 
 export function getGroupQuestionScoreRate(questions, groupQuestionMean) {
-    return _.map(groupQuestionMean, (currentGroupQuestionMean, index) => _.round(_.divide(currentGroupQuestionMean, questions[index]), 2));
+    return _.map(groupQuestionMean, (currentGroupQuestionMean, index) => _.round(_.divide(currentGroupQuestionMean, questions[index].score), 2));
 }
 
 export function getQuestionSeparation(questionGradeScoreMatrix, paperGradeScores) {

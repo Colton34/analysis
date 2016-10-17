@@ -3,15 +3,16 @@ import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Radium from 'radium';
-import {Link} from 'react-router';
+import {Link, browserHistory} from 'react-router';
 
 import {fetchExamListAction} from '../../reducers/helper/actions';
+import {startLoadingAction, stopLoadingAction, throwErrorAction} from '../../reducers/global-app/actions';
 import {initParams, isNumber} from '../../lib/util';
 
 import CommonErrorView from '../../common/ErrorView';
 import Spinkit from '../../common/Spinkit';
 import {SUBJECTS_WEIGHT as subjectWeight} from '../../lib/constants';
-import {saveEquivalentScoreInfo} from '../../api/exam';
+import {setEquivalentScoreInfo} from '../../api/exam';
 
 /*
 TODO: a.计算lessonName  b.使得重要的科目在前面
@@ -150,11 +151,22 @@ class EquivalentLessonScore extends React.Component {
         var obj = {};
         obj.examId = this.props.exam.id;
         obj.exanName = this.props.exam.name;
-        obj['[papers]'] = this.state.papers;
+        obj['[lessons]'] = this.state.papers;
         debugger;
         // call api
-        // var params = initParams({'request': window.request, equivalentScoreInfo: obj}, this.props.params, this.props.location);
-        // saveEquivalentScoreInfo(params);
+        var params = initParams({'request': window.request, equivalentScoreInfo: obj}, this.props.params, this.props.location);
+        //TODO：出现loading
+        this.props.startLoading();
+        setEquivalentScoreInfo(params).then(function(result) {
+            debugger;
+            this.props.stopLoading();
+            //【Mock】TODO: 跳转到dashboard
+            browserHistory.push('/');
+            // browserHistory.push('/dashboard?examid=' + res.data.examId+'&grade='+res.data.grade);
+        }).catch(function(err) {
+            //show error
+            this.props.throwError();
+        })
     }
 
     render() {
@@ -191,7 +203,7 @@ class EquivalentLessonScoreItem extends React.Component {
         // var currentValue = (isProps) ? this.props.paperItem
         return (
             <div>
-                <span>{this.props.paperItem.lessonName}</span>
+                <span>{this.props.paperItem.name}</span>
                 <span>{this.props.paperItem.fullMark}</span>
                 <input placeholder='如：1.25' type='text' defaultValue={this.props.paperItem.percentage} onBlur={this.onBlurListener.bind(this)} />
                 <span>{this.props.paperItem.equivalentScore || '- - -'}</span>
@@ -212,7 +224,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        fetchExamList: bindActionCreators(fetchExamListAction, dispatch)
+        fetchExamList: bindActionCreators(fetchExamListAction, dispatch),
+        startLoading: bindActionCreators(startLoadingAction, dispatch),
+        stopLoading: bindActionCreators(stopLoadingAction, dispatch),
+        throwError: bindActionCreators(throwErrorAction, dispatch)
     }
 }
 
@@ -228,7 +243,7 @@ function validation(inputValue) {
 function getOrderPapers(papersMap) {
     var highWeight = [], lowWeight = [];
     _.each(papersMap, (paperItem, paperObjectId) => {
-        var index = _.findIndex(subjectWeight, (s) => ((s == paperItem.lessonName) || (_.includes(paperItem.lessonName, s))));
+        var index = _.findIndex(subjectWeight, (s) => ((s == paperItem.name) || (_.includes(paperItem.name, s))));
         (index >= 0) ? highWeight.push({index: index, value: paperItem}) : lowWeight.push(paperItem);
     });
     highWeight = _.chain(highWeight).sortBy('index').map((obj) => obj.value).value();

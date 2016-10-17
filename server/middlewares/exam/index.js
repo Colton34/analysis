@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-16 17:36:29
+* @Last Modified time: 2016-10-17 10:53:44
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -534,18 +534,29 @@ TODO: 接口过滤出走班考试；如果有必要则还需要对grade进行过
 @EquivalentScoreInfo: {  -- 估计不能save到自己的数据库，因为要共用，所以要走service--公共的service
     examId: String,
     examName: String,
-    id: String,
-    objectId: String,
-    name: String,
-    fullMark: Integer,
-    percentage: Integer,
-    equivalentScore: Integer
+    [lessons]: [
+        {
+            id: String,
+            objectId: String,
+            name: String,
+            fullMark: Integer,
+            percentage: Integer,
+            equivalentScore: Integer
+        },
+        ...
+    ]
+}
 }
 */
-exports.saveEquivalentScoreInfo = function(req, res, next) {
+exports.setEquivalentScoreInfo = function(req, res, next) {
     if(!req.body.equivalentScoreInfo) return next(new errors.HttpStatusError(400, "没有equivalentScoreInfo属性数据"));
     //TODO: 实现存储
-    res.status(200).json({msg: 'ok'});
+    var postData = req.body.equivalentScoreInfo;
+    peterFX.set(postData._id, {'[lessons]': postData['[lessons]']}, function(err, result) {
+        if(err) return next(new errors.data.MongoDBError('setEquivalentScoreInfo Error: ', err));
+        console.log('set return : ', result);
+        res.status(200).json({message: 'ok'});
+    });
 }
 
 exports.zoubanDS = function(req, res, next) {

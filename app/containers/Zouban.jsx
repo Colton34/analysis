@@ -22,7 +22,6 @@ export default class Zouban extends React.Component {
 
     componentWillMount() {
         var params = initParams({'request': window.request}, this.props.params, this.props.location);
-        debugger;
         this.props.initZoubanDS(params);
     }
 

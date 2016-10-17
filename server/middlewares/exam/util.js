@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-16 17:38:14
+* @Last Modified time: 2016-10-17 10:42:12
 */
 'use strict';
 var _ = require('lodash');
@@ -386,25 +386,49 @@ function generateExamClassesInfo(examStudentsInfo) {
 }
  */
 
-exports.getEquivalentScoreInfoById = function(examid) {
-    return fetchEquivalentScoreInfoById(examid).then(function(equivalentScoreInfo) {
-        return (!equivalentScoreInfo) ? getDefaultEquivalentScoreInfo(examid) : when.resolve(equivalentScoreInfo);
-    })
-}
+// exports.getEquivalentScoreInfoById = function(examid) {
+//     return fetchEquivalentScoreInfoById(examid).then(function(equivalentScoreInfo) {
+//         return (!equivalentScoreInfo) ? getDefaultEquivalentScoreInfo(examid) : when.resolve(equivalentScoreInfo);
+//     })
+// }
 
-function fetchEquivalentScoreInfoById(examid) {
-    return when.resolve(null);
+exports.getEquivalentScoreInfoById = function(examid) {
+    //1.去query，找到返回  找不到 获取default，然后save，然后返回带有objectId的实例数据结构
+    return when.promise(function(resolve, reject) {
+        peterFX.query('@EquivalentScoreInfo', {examId: examid}, function(err, results) {
+            if(err) return reject(new errors.data.MongoDBError('fetchEquivalentScoreInfoById Error', err));
+            if(results.length > 1) reject(new errors.Error('fetchEquivalentScoreInfoById Error: 重复的exam equivalent score设置'));
+            resolve(results[0]);
+        });
+    }).then(function(equivalentScoreInfo) {
+        if(equivalentScoreInfo) return when.resolve(equivalentScoreInfo);
+        return getDefaultEquivalentScoreInfo(examid);
+    });
 }
 
 function getDefaultEquivalentScoreInfo(examid) {
     return getExamById(examid, '50').then(function(examInstance) {
                 //TODO: 需要过滤grade？？？
-        var result = _.map(examInstance['[papers]'], (paperItem) => {
-            if(_.includes(paperItem.name, '文科')) return {examId: examid, examName: examInstance.name, id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(文科)`, fullMark: paperItem.manfen};
-            if(_.includes(paperItem.name, '理科')) return {examId: examid, examName: examInstance.name, id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(理科)`, fullMark: paperItem.manfen};
-            return {examId: examid, examName: examInstance.name, id: paperItem.id, objectId: paperItem.paper, name: paperItem.subject, fullMark: paperItem.manfen};
+        var lessons = _.map(examInstance['[papers]'], (paperItem) => {
+            if(_.includes(paperItem.name, '文科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(文科)`, fullMark: paperItem.manfen};
+            if(_.includes(paperItem.name, '理科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(理科)`, fullMark: paperItem.manfen};
+            return {id: paperItem.id, objectId: paperItem.paper, name: paperItem.subject, fullMark: paperItem.manfen};
         });
-        return when.resolve(result);
+        return saveEquivalentScoreInfo({
+            examId: examid,
+            examName: examInstance.name,
+            '[lessons]': lessons
+        });
+    });
+}
+
+function saveEquivalentScoreInfo(equivalentScoreInfoObj) {
+    return when.promise(function(resolve, reject) {
+        peterFX.create('@EquivalentScoreInfo', equivalentScoreInfoObj, function(err, objectId) {
+            if(err) return reject(new errors.data.MongoDBError('saveEquivalentScoreInfo Error: ', err));
+            equivalentScoreInfoObj._id = objectId;
+            resolve(equivalentScoreInfoObj);
+        });
     });
 }
 
@@ -425,13 +449,14 @@ function generateZoubanPaperStudentsInfo(papers) {
                 _.each(students, (studentObj, index) => {
                     paperStudentObj = examStudentsInfo[studentObj.id];
                     if(!paperStudentObj) {
-                        paperStudentObj = _.pick(studentObj, ['id', 'name', 'class', 'school']);
-                        paperStudentObj.papers = [], paperStudentObj.questionScores = [], paperStudentObj.score = 0;
+                        paperStudentObj = _.pick(studentObj, ['id', 'name', 'class', 'xuehao', 'kaohao']);
+                        paperStudentObj.papers = [], paperStudentObj.score = 0;//paperStudentObj.questionScores = []
                         examStudentsInfo[studentObj.id] = paperStudentObj;
                     }
                     paperStudentObj.score = paperStudentObj.score + studentObj.score;
-                    paperStudentObj.papers.push({id: studentObj.id, paperid: paperObj.id, paperObjectId: paperObj._id, score: studentObj.score, 'class_name': studentObj.class});
-                    paperStudentObj.questionScores.push({paperid: paperObj.id, scores: matrix[index], answers: answers[index]});
+                    paperStudentObj.papers.push({id: studentObj.id, paperid: paperObj.id, paperObjectId: paperObj._id, score: studentObj.score, 'class_name': studentObj.class, questionScores: matrix[index], questionAnswers: answers[index]});
+                    // paperStudentObj.questionScores = matrix[index], paperStudentObj.questionAnswers = answers[index];
+                    // paperStudentObj.questionScores.push({paperid: paperObj.id, scores: matrix[index], answers: answers[index]});
                 });
             });
             resolve({

@@ -2,13 +2,16 @@
 * @Author: HellMagic
 * @Date:   2016-04-11 19:41:24
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-05-06 18:26:35
+* @Last Modified time: 2016-10-17 11:11:50
 */
 
 'use strict';
 
 import {
     INIT_USER_ME,
+    LOADING_START,
+    LOADING_DONE,
+    THROW_ERROR,
     ALTER_COMMENT_DIALOG_STATUS,
     SHOW_DIALOG,
     HIDE_DIALOG
@@ -23,6 +26,26 @@ export function initUser(params) {
     }
 }
 
+export function startLoadingAction() {
+    return {
+        type: LOADING_START
+    }
+}
+
+export function stopLoadingAction() {
+    return {
+        type: LOADING_DONE
+    }
+}
+
+export function throwErrorAction() {
+    return {
+        type: THROW_ERROR
+    }
+}
+
+
+//=================  确认，清理 =======================
 export function alterCommentDialogStatus(dialogProps) {
     return Object.assign({type: ALTER_COMMENT_DIALOG_STATUS}, dialogProps);
 }

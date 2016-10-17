@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-16 17:55:36
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-10-17 10:54:48
 */
 
 'use strict';
@@ -22,7 +22,7 @@ import {
     DEFAULT_INTENSIVE_LEVELS as defaultIntensiveLevels
 } from '../lib/constants';
 
-import {addRankInfo, getLevelInfo, insertRankInfo, newMakeSubjectLevels, newGetLevelInfo, newGetSubjectLevelInfo} from '../sdk';
+import {addRankInfo, getLevelInfo, insertRankInfo, newMakeSubjectLevels, newGetLevelInfo, newGetSubjectLevelInfo, getQuestionGroupScoreMatrix, getGroupQuestionMean, getGroupQuestionScoreRate, getQuestionSeparation} from '../sdk';
 
 var examPath = "/exam";
 var paperPath = '/papers';
@@ -51,14 +51,15 @@ export function initRankReportdData(params) {
 export function initZoubanDS(params) {
     var url = examPath + '/zouban?examid=' + params.examid + '&grade=' + encodeURI(params.grade);
     return params.request.get(url).then(function(res) {
-        debugger;
         var {equivalentScoreInfo, examStudentsInfo, examPapersInfo} = res.data;
+        var allLessonStudentsMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperObjectId');
         //拿到数据，进行构建需要的DS
-        var examInfo = getZoubanExamInfo(equivalentScoreInfo, examPapersInfo);
+        var zoubanExamInfo = getZoubanExamInfo(equivalentScoreInfo, examPapersInfo);
+        var zoubanExamStudentsInfo = getZoubanExamStudentsInfo(examStudentsInfo);
+        var zoubanLessonStudentsInfo = getZoubanLessonStudentsInfo(allLessonStudentsMap);
+        var zuobanLessonQuestionInfo = getZoubanLessonQuestionInfo(zoubanExamInfo.lessons, allLessonStudentsMap);
         debugger;
-
-
-
+//TODO: review设计；bind到zoubanDS上
 
         return Promise.resolve(res.data);
     });
@@ -66,8 +67,8 @@ export function initZoubanDS(params) {
 
 function getZoubanExamInfo(equivalentScoreInfo, examPapersInfo) {
 //lessons要带有顺序
-    var temp = equivalentScoreInfo[0], result = { id: temp.examId, name: temp.examName, fullMark: 0 };
-    var equivalentScoreInfoMap = _.keyBy(equivalentScoreInfo, 'objectId'), examPapersInfoMap = _.keyBy(examPapersInfo, 'objectId');
+    var result = { id: equivalentScoreInfo.examId, name: equivalentScoreInfo.examName, fullMark: 0 };
+    var equivalentScoreInfoMap = _.keyBy(equivalentScoreInfo['[lessons]'], 'objectId'), examPapersInfoMap = _.keyBy(examPapersInfo, 'objectId');
     var commonLessons = [], otherLessons = [], lesson, lessonWeight;
     _.each(equivalentScoreInfoMap, (infoObj, paperObjectId) => {
         result.fullMark += infoObj.fullMark;
@@ -75,12 +76,120 @@ function getZoubanExamInfo(equivalentScoreInfo, examPapersInfo) {
         lessonWeight = _.findIndex(subjectWeight, (s) => ((s == infoObj.name) || (_.includes(infoObj.name, s))));
         (lessonWeight >= 0) ? commonLessons.push({weight: lessonWeight, value: lesson}) : otherLessons.push(lesson);
     });
-    debugger;
     commonLessons = _.chain(commonLessons).sortBy('weight').map((obj) => obj.value).value();
-    debugger;
     result.lessons = _.concat(commonLessons, otherLessons);
-    debugger;
     return result;
+}
+
+function getZoubanExamStudentsInfo(examStudentsInfo) {
+    var zoubanExamStudentsInfo = _.map(examStudentsInfo, (obj) => _.pick(obj, ['id', 'kaohao', 'xuehao', 'name', 'class', 'score']));
+    insertRankInfo(zoubanExamStudentsInfo);
+    zoubanExamStudentsInfo = _.sortBy(zoubanExamStudentsInfo, 'rank');
+    return zoubanExamStudentsInfo;
+}
+
+
+/*
+
+{
+    lessonObjectId: {
+        <className>: [
+            {
+                id:
+                score:
+                questionScores:
+                questionAnswers:
+                lessonRank:
+                classRank:
+            },
+            ...
+        ],
+        ...
+    },
+    ...
+}
+ */
+
+function getZoubanLessonStudentsInfo(allLessonStudentsMap) {
+    var result = {};
+    _.each(allLessonStudentsMap, (lessonStudents, paperObjectId) => {
+        result[paperObjectId] = {};
+        insertRankInfo(lessonStudents, 'lessonRank');
+        _.each(_.groupBy(lessonStudents, 'class_name'), (lessonClassStudents, className) => {
+            insertRankInfo(lessonClassStudents, 'classRank');
+            result[paperObjectId][className] = lessonClassStudents;
+        });
+    });
+    return result;
+}
+
+
+/*
+
+{
+    lessonObjectId: [
+        {
+            lesson: {
+                scores:
+                means:
+                rates:
+                separations:
+            },
+            <className>: {
+                scores:
+                means:
+                rates:
+            },
+            ...
+        },
+        ...
+    ],
+    ...
+}
+
+
+ */
+
+function getZoubanLessonQuestionInfo(lessons, allLessonStudentsMap) {
+    var result = {}, lessonStudents, allQuestionsLessonInfo, lessonClassStudentsMap, allQuestionsLessonClassInfo, questions, obj;
+    _.each(lessons, (lessonObj) => {
+        lessonStudents = allLessonStudentsMap[lessonObj.objectId], questions = lessonObj.questions;
+        allQuestionsLessonInfo = getQuestionsInfo(lessonStudents, questions, true);
+        lessonClassStudentsMap = _.groupBy(lessonStudents, 'class_name');
+        allQuestionsLessonClassInfo = {};
+        _.each(lessonClassStudentsMap, (lessonClassStudents, className) => {
+            allQuestionsLessonClassInfo[className] = getQuestionsInfo(lessonClassStudents, questions);
+        });
+
+        result[lessonObj.objectId] = _.map(questions, (questionObj, index) => {
+            obj = { lesson: allQuestionsLessonInfo[index] };
+            _.each(allQuestionsLessonClassInfo, (questionLessonClassInfoArr, className) => {
+                obj[className] = questionLessonClassInfoArr[index];
+            });
+            return obj;
+        });
+    });
+    return result;
+}
+
+function getQuestionsInfo(lessonStudents, questions, isAllLesson) {
+    var questionScores, questionMeans, questionRates, questionSeparations;
+    questionScores = getQuestionGroupScoreMatrix(lessonStudents);
+    questionMeans = getGroupQuestionMean(questionScores);
+    questionRates = getGroupQuestionScoreRate(questions, questionMeans);
+    if(isAllLesson) questionSeparations = getQuestionSeparation(questionScores, _.map(lessonStudents, (studentObj) => studentObj.score));
+    var obj;
+    var result = _.map(_.range(questions.length), (i) => {
+        obj = {
+            scores: questionScores[i],
+            means: questionMeans[i],
+            rates: questionRates[i]
+        };
+        if(isAllLesson) obj.separations = questionSeparations[i];
+        return obj;
+    })
+    return result;
+
 }
 
 /*
@@ -104,31 +213,32 @@ examInfo:
 }
 
 examStudentsInfo:
-{
-    <studentId>: {
+[
+    {
         id:
         kaohao:
+        xuehao:
         name:
         class:
-        school:
         score:
         rank:
     },
     ...
-}
+]
 
 lessonStudentsInfo:
 {
     lessonObjectId: {
-        <className>: {
-            <studentId>: {
+        <className>: [
+            {
                 score:,
                 questionScores:
+                questionAnswers:
                 lessonRank:
                 classRank:
             },
             ...
-        },
+        ],
         ...
     },
     ...
@@ -136,8 +246,8 @@ lessonStudentsInfo:
 
 lessonQuestionInfo:
 {
-    lessonObjectId: {
-        <questionId>: {
+    lessonObjectId: [
+        {
             lesson: {
                 scores:
                 mean:
@@ -152,7 +262,7 @@ lessonQuestionInfo:
             ...
         },
         ...
-    },
+    ],
     ...
 }
 
@@ -705,7 +815,7 @@ export function fetchExamList(params) {
     });
 }
 
-export function saveEquivalentScoreInfo(params) {
+export function setEquivalentScoreInfo(params) {
     var url = examPath + '/equivalent/score';
     return params.request.post(url, {equivalentScoreInfo: params.equivalentScoreInfo});
 }
