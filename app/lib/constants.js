@@ -195,11 +195,12 @@ export const HELPER_TITLE_MAP = {
 
 export const ZOUBAN_TITLE_MAP = {
     'question': '试题质量分析',
-    'detail': '成绩明细'
+    'detail': '成绩明细',
+    'personal': '个人'
 }
 
-export const FETCH_EXAM_LIST = 'INIT_EXAM_LIST';
-export const FETCH_EXAM_LIST_SUCCESS = 'INIT_EXAM_LIST_SUCCESS';
+export const FETCH_EQUIVALENT_SCORE_INFO_LIST = 'FETCH_EQUIVALENT_SCORE_INFO_LIST';
+export const FETCH_EQUIVALENT_SCORE_INFO_LIST_SUCCESS = 'FETCH_EQUIVALENT_SCORE_INFO_LIST_SUCCESS';
 
 
 export const INIT_ZOUBAN_DS = 'INIT_ZOUBAN_DS';

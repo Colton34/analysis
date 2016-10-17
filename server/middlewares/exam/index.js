@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-17 10:53:44
+* @Last Modified time: 2016-10-17 14:56:51
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -492,6 +492,32 @@ function getSegmentIndex(segments, target) {
     return high;
 }
 
+
+
+exports.listEquivalentScoreInfo = function(req, res, next) {
+    console.log('========== listEquivalentScoreInfo  =========')
+    //从school exams中筛选出走班的exam，并需要这些考试的papers信息
+    var zoubanExams;//analysis 一个examid的数组或者schoolId；因为后面也需要传递单个examid
+/*
+
+    examUitls.getSchoolById(req.user.schoolId).then(function(data) {
+        zoubanExams = _.filter(data['[exams]'], (obj) => obj.from == '50');
+        var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '50'));
+        return when.all(zoubanExamPromises);
+    }).
+
+TODO: 接口过滤出走班考试；如果有必要则还需要对grade进行过滤
+ */
+    zoubanExams = [{name: "2016.10高二第二次学考模拟考", exam: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '50'}, {name: "2015-2016学年第二学期期末初一年级组", exam: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '50'}];
+    zoubanExams = _.chain(zoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
+    var equivalentScoreInfoPromises = _.map(zoubanExams, (obj) => examUitls.getEquivalentScoreInfoById(obj['exam']));
+    when.all(equivalentScoreInfoPromises).then(function(equivalentScoreInfoList) {
+        res.status(200).json(equivalentScoreInfoList);
+    }).catch(function(err) {
+        next(err);
+    });
+}
+
 exports.listZoubanExams = function(req, res, next) {
     //从school exams中筛选出走班的exam，并需要这些考试的papers信息
     var zoubanExams;//analysis 一个examid的数组或者schoolId；因为后面也需要传递单个examid
@@ -554,7 +580,6 @@ exports.setEquivalentScoreInfo = function(req, res, next) {
     var postData = req.body.equivalentScoreInfo;
     peterFX.set(postData._id, {'[lessons]': postData['[lessons]']}, function(err, result) {
         if(err) return next(new errors.data.MongoDBError('setEquivalentScoreInfo Error: ', err));
-        console.log('set return : ', result);
         res.status(200).json({message: 'ok'});
     });
 }

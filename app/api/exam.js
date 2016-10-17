@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
-* @Last Modified by:   liucong
-* @Last Modified time: 2016-10-17 10:54:48
+* @Last Modified by:   HellMagic
+* @Last Modified time: 2016-10-17 15:20:49
 */
 
 'use strict';
@@ -808,8 +808,8 @@ export function saveBaseline(params) {
     return params.request.put(url, {examId: params.examId, baseline: params.baseline});
 }
 
-export function fetchExamList(params) {
-    var url = examPath + '/list';
+export function fetchEquivalentScoreInfoList(params) {
+    var url = examPath + '/equivalent/list';
     return params.request.get(url).then(function(res) {
         return Promise.resolve(res.data);
     });
@@ -818,6 +818,14 @@ export function fetchExamList(params) {
 export function setEquivalentScoreInfo(params) {
     var url = examPath + '/equivalent/score';
     return params.request.post(url, {equivalentScoreInfo: params.equivalentScoreInfo});
+    // .then(function(res) {
+    //     console.log(res.data);
+    //     debugger;
+    //     return Promise.resolve('ok');
+    // }).catch(function(err) {
+    //     console.log(err);
+    //     debugger;
+    // })
 }
 
 

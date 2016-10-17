@@ -109,7 +109,7 @@ class StudentLevelsDistribution extends React.Component {
                     <div style={{ float: 'right' }}>
                         <span style={{ fontSize: 12 ,marginRight:130}}>对比对象（最多5个）</span>
                     <div style={{width:92,height:32,display:'inline-block',marginRight:30,position:'absolute',right:0, zIndex:10}}>
-                    <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this) } list={classList} fixWidth/>
+                    <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this) } list={classList} fixWidth />
                     </div>
                     </div>
             </div>

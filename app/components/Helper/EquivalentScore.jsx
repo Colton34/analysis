@@ -4,8 +4,8 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Radium from 'radium';
 import {Link, browserHistory} from 'react-router';
-
-import {fetchExamListAction} from '../../reducers/helper/actions';
+import DropdownList from '../../common/DropdownList';
+import {fetchEquivalentScoreInfoListAction} from '../../reducers/helper/actions';
 import {startLoadingAction, stopLoadingAction, throwErrorAction} from '../../reducers/global-app/actions';
 import {initParams, isNumber} from '../../lib/util';
 
@@ -22,7 +22,20 @@ TODO: a.计算lessonName  b.使得重要的科目在前面
 
 //Main
 class EquivalentScore extends React.Component {
-    static need = [fetchExamListAction]
+    static need = [fetchEquivalentScoreInfoListAction];
+    static childContextTypes ={
+        startLoading: PropTypes.func.isRequired,
+        stopLoading: PropTypes.func.isRequired,
+        throwError: PropTypes.func.isRequired
+    };
+
+    getChildContext() {
+        return {
+            startLoading: this.props.startLoading,
+            stopLoading: this.props.stopLoading,
+            throwError: this.props.throwError
+        }
+    }
 
     constructor(props) {
         super(props);
@@ -31,13 +44,14 @@ class EquivalentScore extends React.Component {
 
     componentDidMount() {
         var params = initParams({'request': window.request}, this.props.params, this.props.location);
-        this.props.fetchExamList(params);
+        this.props.fetchEquivalentScoreInfoList(params);
     }
 
     render() {
         return (
-            <div>
-                {this.props.ifError ? (<CommonErrorView />) : ((this.props.isLoading || this.props.examList.size == 0) ? <Spinkit /> : <ContentModule examList={this.props.examList} />)}
+            <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#fff', zIndex: 0}} className='animated fadeIn'>
+
+                {this.props.ifError ? (<CommonErrorView />) : ((this.props.isLoading || this.props.equivalentScoreInfoList.size == 0) ? <Spinkit /> : <ContentModule equivalentScoreInfoList={this.props.equivalentScoreInfoList} />)}
             </div>
         );
     }
@@ -49,56 +63,73 @@ class ContentModule extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentExam: this.props.examList.toJS()[0]
+            currentEquivalentScoreInfo: this.props.equivalentScoreInfoList.toJS()[0]
         }
     }
 
-    selectExam(obj) {
+    selectEquivalentScoreInfo(obj) {
         //obj => {value: <examObj>, key: <examObj.id>} examObj是examList中的一个exam对象
+        var equivalentScoreInfoList = this.props.equivalentScoreInfoList.toJS();
+        var target = _.find(equivalentScoreInfoList, (eobj) => eobj.examId == obj.key);
         debugger;
         this.setState({
-            currentExam: obj.value
+            currentEquivalentScoreInfo: target
         });
     }
 
     render() {
-        if(!this.state.currentExam) return (<div>没有考试内容</div>)
+
+        if(!this.state.currentEquivalentScoreInfo) return (<div>没有考试内容</div>)
         // debugger;
         return (
-            <div>
-                <SelectExam selectExam={this.selectExam.bind(this)} examList={this.props.examList} />
-                <EquivalentLessonScore exam={this.state.currentExam} />
+            <div style={{width:500,margin:'0 auto',padding:'50px 0'}}>
+
+                <SelectEquivalentScoreInfo selectEquivalentScoreInfo={this.selectEquivalentScoreInfo.bind(this)} equivalentScoreInfoList={this.props.equivalentScoreInfoList} />
+                <EquivalentLessonScore equivalentScoreInfo={this.state.currentEquivalentScoreInfo} />
             </div>
         );
     }
 }
 
-class SelectExam extends React.Component {
+class SelectEquivalentScoreInfo extends React.Component {
     constructor(props) {
         super(props);
 
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        var result = !nextProps.examList.equals(this.props.examList);
+        var result = !nextProps.equivalentScoreInfoList.equals(this.props.equivalentScoreInfoList);
         debugger;
         return result;
     }
 
     render() {
-        var examList = this.props.examList.toJS();
-        console.log('selectExam');
+        var equivalentScoreInfoList = this.props.equivalentScoreInfoList.toJS();
+        var dropListData = getDropListData(equivalentScoreInfoList);
+        debugger
+        console.log('selectEquivalentScoreInfo');
         return (
-            <div>使用DropList或者自己的下拉框，已经给了selectExam函数</div>
+            <div style={{position:'relative'}}>
+                <span>选择考试：</span>
+                <div style={{width:'300px',display:'inline-block',position:'absolute',top:-5,right:100,zIndex:10}}>
+                <DropdownList onClickDropdownList={this.props.selectEquivalentScoreInfo} list={dropListData}  surfaceBtnStyle={_.assign({ width:'300px'})} />
+                </div>
+            </div>
         );
     }
 }
 
 class EquivalentLessonScore extends React.Component {
+    static contextTypes = {
+        startLoading: PropTypes.func.isRequired,
+        stopLoading: PropTypes.func.isRequired,
+        throwError: PropTypes.func.isRequired
+    };
+
     constructor(props) {
         super(props);
         //TODO:
-        this.papersMap = _.keyBy(this.props.exam.papers, 'objectId');
+        this.papersMap = _.keyBy(this.props.equivalentScoreInfo['[lessons]'], 'objectId');
         debugger;
         this.childValidate = {};
         _.each(_.keys(this.papersMap), (paperObjectId) => this.childValidate[paperObjectId] = true);
@@ -107,19 +138,21 @@ class EquivalentLessonScore extends React.Component {
         debugger;
         this.state = {
             disable: true,
-            papers: orderPapers,
+            lessons: orderPapers,
             errorMsg: ''
         }
     }
 
+
+
     componentWillReceiveProps(nextProps) {
-        this.papersMap = _.keyBy(nextProps.exam.papers, 'objectId');
+        this.papersMap = _.keyBy(nextProps.equivalentScoreInfo['[lessons]'], 'objectId');
         this.childValidate = {};
         _.each(_.keys(this.papersMap), (paperObjectId) => this.childValidate[paperObjectId] = true);
         var orderPapers = getOrderPapers(this.papersMap);
         this.state = {
             disable: true,
-            papers: orderPapers,
+            lessons: orderPapers,
             errorMsg: ''
         }
     }
@@ -138,47 +171,52 @@ class EquivalentLessonScore extends React.Component {
         var disable = !_.every(this.childValidate, (v) => v);
         var orderPapers = getOrderPapers(this.papersMap);
         debugger;
-
         this.setState({
             disable: disable,
-            papers: orderPapers,
+            lessons: orderPapers,
             errorMsg: errorMsg
         });
     }
 
 //{lessonName: paperItem.subject, objectId: paperItem.paper, id: paperItem.id, fullMark: paperItem.manfen};
     onSubmitListener() {
-        var obj = {};
-        obj.examId = this.props.exam.id;
-        obj.exanName = this.props.exam.name;
-        obj['[lessons]'] = this.state.papers;
+        var obj = _.pick(this.props.equivalentScoreInfo, ['_id', 'examId', 'examName']);
+        // obj.examId = this.props.equivalentScoreInfo.examId;
+        // obj.exanName = this.props.equivalentScoreInfo.examName;
+        obj['[lessons]'] = formatLessons(this.state.lessons);
         debugger;
         // call api
         var params = initParams({'request': window.request, equivalentScoreInfo: obj}, this.props.params, this.props.location);
         //TODO：出现loading
-        this.props.startLoading();
-        setEquivalentScoreInfo(params).then(function(result) {
+        this.context.startLoading();
+        var _this = this;
+        setEquivalentScoreInfo(params).then(function(res) {
+            console.log(res.data);
             debugger;
-            this.props.stopLoading();
+            _this.context.stopLoading();
             //【Mock】TODO: 跳转到dashboard
             browserHistory.push('/');
             // browserHistory.push('/dashboard?examid=' + res.data.examId+'&grade='+res.data.grade);
         }).catch(function(err) {
+            debugger;
             //show error
-            this.props.throwError();
+            _this.context.throwError();
         })
     }
 
     render() {
         return (
             <div>
-                <h5>{this.state.errorMsg}</h5>
-                <div><span>学科</span> <span>原始满分</span> <span>换算比例</span> <span>换算后满分</span></div>
+
+                <div style={{display:'block' ,color:'#ee6b52',margin:'30px auto 0px',paddingLeft:'100px'}}>{this.state.errorMsg}</div>
+
+                <div style={{padding:'20px 0 ',borderBottom:'1px solid #eee'}}><span style={{display:'inline-block',padding:'0 30px 0 0'}}>学科</span> <span style={{display:'inline-block',padding:'0 30px'}}>原始满分</span> <span style={{display:'inline-block',padding:'0 30px'}}>换算比例</span> <span style={{display:'inline-block',padding:'0 30px'}}>换算后满分</span></div>
                 {/* 遍历每个lesson--[学科]列是subjectName???--做不到【数学I】，只有【数学（文科）】*/}
                 {
-                    _.map(this.state.papers, (paperItem) => <EquivalentLessonScoreItem key={paperItem.objectId} paperItem={paperItem} setEquivalentItem={this.setEquivalentItem.bind(this)} />)
+                    _.map(this.state.lessons, (paperItem) => <EquivalentLessonScoreItem key={paperItem.objectId} paperItem={paperItem} setEquivalentItem={this.setEquivalentItem.bind(this)} />)
                 }
-                <button disable={this.state.disable} onClick={this.onSubmitListener.bind(this)}>重新生成新考试报告</button>
+                <div style={{padding:'30px 0',color:'#ee6b52'}}>说明：重新生成新的考试报告，供老师进行查看，若需要以生成后的成绩发布给学生，进入考试下确认后再发布。</div>
+                <button disabled={this.state.disable} onClick={this.onSubmitListener.bind(this)} style={{display:'block', border:'none',backgroundColor:'#1daef8',color:'#fff',padding:'15px 100px',margin:'0 auto'}}>重新生成新考试报告</button>
             </div>
         );
     }
@@ -202,11 +240,11 @@ class EquivalentLessonScoreItem extends React.Component {
     render() {
         // var currentValue = (isProps) ? this.props.paperItem
         return (
-            <div>
-                <span>{this.props.paperItem.name}</span>
-                <span>{this.props.paperItem.fullMark}</span>
-                <input placeholder='如：1.25' type='text' defaultValue={this.props.paperItem.percentage} onBlur={this.onBlurListener.bind(this)} />
-                <span>{this.props.paperItem.equivalentScore || '- - -'}</span>
+            <div style={{padding:'20px 0 ',borderBottom:'1px solid #eee'}}>
+                <span style={{display:'inline-block',padding:'0 30px 0 0'}}>{this.props.paperItem.name}</span>
+                <span style={{display:'inline-block',padding:'0 70px 0 40px'}}>{this.props.paperItem.fullMark}</span>
+                <input placeholder='如：1.25' type='text' defaultValue={this.props.paperItem.percentage} onBlur={this.onBlurListener.bind(this)} style={{width:120}}/>
+                <span style={{display:'inline-block',padding:'0 50px'}}>{this.props.paperItem.equivalentScore || '- - -'}</span>
             </div>
         );
     }
@@ -218,13 +256,13 @@ function mapStateToProps(state) {
     return {
         ifError: state.global.ifError,
         isLoading: state.global.isLoading,
-        examList: state.helper.examList
+        equivalentScoreInfoList: state.helper.equivalentScoreInfoList
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        fetchExamList: bindActionCreators(fetchExamListAction, dispatch),
+        fetchEquivalentScoreInfoList: bindActionCreators(fetchEquivalentScoreInfoListAction, dispatch),
         startLoading: bindActionCreators(startLoadingAction, dispatch),
         stopLoading: bindActionCreators(stopLoadingAction, dispatch),
         throwError: bindActionCreators(throwErrorAction, dispatch)
@@ -248,4 +286,23 @@ function getOrderPapers(papersMap) {
     });
     highWeight = _.chain(highWeight).sortBy('index').map((obj) => obj.value).value();
     return _.concat(highWeight, lowWeight);
+}
+
+function getDropListData(equivalentScoreInfoList){
+    var dropListData = _.map(equivalentScoreInfoList,function(equivalentScoreInfoObj){
+        return {
+            key:equivalentScoreInfoObj.examId,
+            value:equivalentScoreInfoObj.examName
+        }
+    });
+    return dropListData;
+}
+
+function formatLessons(inputLessons) {
+    var obj;
+    return _.map(inputLessons, (lessonObj) => {
+        obj = _.pick(lessonObj, ['id', 'objectId', 'name', 'fullMark', 'equivalentScore']);
+        obj.percentage = parseFloat(lessonObj.percentage);
+        return obj;
+    });
 }

@@ -2,7 +2,7 @@
  * @Author: HellMagic
  * @Date:   2016-04-30 11:14:17
  * @Last Modified by:   HellMagic
- * @Last Modified time: 2016-10-17 10:43:29
+ * @Last Modified time: 2016-10-17 11:46:25
  */
 
 'use strict';
@@ -22,7 +22,7 @@ router.post('/custom/analysis', exam.createCustomAnalysis);
 router.put('/custom/analysis', exam.inValidCustomAnalysis);
 router.put('/levels', exam.updateExamBaseline);
 
-router.get('/list', exam.listZoubanExams);
+router.get('/equivalent/list', exam.listEquivalentScoreInfo);
 router.post('/equivalent/score', exam.setEquivalentScoreInfo);
 router.get('/zouban', exam.zoubanDS);
 
