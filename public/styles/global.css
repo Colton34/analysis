@@ -206,7 +206,7 @@ p, div p {
 
 .slide-down {
     -webkit-animation-name: slideDown;
-    animation-name: slideDown; 
+    animation-name: slideDown;
 }
 
 @-webkit-keyframes slideUp {
@@ -224,7 +224,7 @@ p, div p {
 
 .animated.caret-list-down,
 .animated.caret-list-up,
-.animated.slide-down, 
+.animated.slide-down,
 .animated.slide-up
 {
     -webkit-animation-duration: .2s;
@@ -243,4 +243,12 @@ p, div p {
     left: 125px;
 }
 
-/**/
+/*-------------------------------------分页自定义样式-----------------------------------------------------------*/
+.pageLinkClassName{
+    color:#333 !important;
+}
+.pageLinkClassName .active{
+background-color: #fff !important;
+color:#fff !important;
+}
+/*-------------------------------------分页样式end-----------------------------------------------------------*/

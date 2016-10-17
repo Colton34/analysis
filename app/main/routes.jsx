@@ -20,6 +20,7 @@ import Zouban from '../containers/Zouban';
 import ZoubanQuestionModule from '../components/zouban/QuestionModule';
 import ScoreDetailModule from '../components/zouban/ScoreDetailModule';
 import StudentPersonalModule from '../components/zouban/StudentPersonalModule';
+import ZouBanRankReport from '../components/zouban/ZouBanRankReport';
 // import ZoubanQuestionContainer from '../containers/Zouban/QuestionContainer';
 
 import Test from '../containers/Test';
@@ -42,10 +43,12 @@ export default (store) => {
             <Route path='class/report' component={ClassReport} />
             <Route path='subject/report' component={SubjectReport} />
             <Route path='add/analysis' component={CustomizeAnalysis}/>
+
             <Route path='zouban/:name' component={Zouban}>
                 <Route path="report" component={ZoubanQuestionModule} />
                 <Route path="report" component={ScoreDetailModule} />
-                <Route path="report" component={StudentPersonalModule} />
+                <Route path="report" component={StudentPersonalModule} />            
+                <Route path="rankReport" component={ZouBanRankReport} />
             </Route>
             <Route path='helper/:name' component={HelperBoxContainer}>
                 <Route path="score" component={EquivalentScore} />
