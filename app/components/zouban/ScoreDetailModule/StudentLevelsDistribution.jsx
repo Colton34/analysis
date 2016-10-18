@@ -39,8 +39,9 @@ class StudentLevelsDistribution extends React.Component {
     }
 
     onSetStep(e) {
+        // debugger;
         //校验，修改状态
-        var inputValue = e.taget.value;
+        var inputValue = e.target.value;
         var isStringInt = /^\d+$/.test(inputValue);
         if(!isStringInt) return;
         this.setState({
@@ -140,7 +141,7 @@ class StudentLevelsDistribution extends React.Component {
                 </div>
                 <div style={{display: 'table-cell', paddingLeft: 18,verticalAlign: 'middle', width: 1200, height: 70, lineHeigth: 70, border: '1px solid ' + colorsMap.C05, background: colorsMap.C02, borderRadius: 3,position:'relative'}}>
                     您可以设置
-                    <input defaultValue={this.state.step} onBlur={this.onSetStep.bind(this)} style={{width: 70, height: 30, margin: '0 10px', paddingLeft: 10, border: '1px solid ' + colorsMap.C08}}/>为一个分数段，查看不同分数段的人数分布及详情
+                    <input defaultValue={this.state.currentStep} onBlur={this.onSetStep.bind(this)} style={{width: 70, height: 30, margin: '0 10px', paddingLeft: 10, border: '1px solid ' + colorsMap.C08}}/>为一个分数段，查看不同分数段的人数分布及详情
                         <div style={{ float: 'right' }}>
                             <span style={{ fontSize: 12 ,marginRight:130}}>对比对象（最多5个）</span>
                         <div style={{width:92,height:32,display:'inline-block',marginRight:30,position:'absolute',right:0, zIndex:10}}>
