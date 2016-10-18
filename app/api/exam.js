@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-17 15:20:49
+* @Last Modified time: 2016-10-17 20:41:58
 */
 
 'use strict';
@@ -55,13 +55,17 @@ export function initZoubanDS(params) {
         var allLessonStudentsMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperObjectId');
         //拿到数据，进行构建需要的DS
         var zoubanExamInfo = getZoubanExamInfo(equivalentScoreInfo, examPapersInfo);
-        var zoubanExamStudentsInfo = getZoubanExamStudentsInfo(examStudentsInfo);
+        var zoubanExamStudentsInfo = getZoubanExamStudentsInfo(examStudentsInfo);//TODO:确认通过rank排序！！！
         var zoubanLessonStudentsInfo = getZoubanLessonStudentsInfo(allLessonStudentsMap);
         var zuobanLessonQuestionInfo = getZoubanLessonQuestionInfo(zoubanExamInfo.lessons, allLessonStudentsMap);
-        debugger;
-//TODO: review设计；bind到zoubanDS上
 
-        return Promise.resolve(res.data);
+        return Promise.resolve({
+            zoubanExamInfo: zoubanExamInfo,
+            zoubanExamStudentsInfo: zoubanExamStudentsInfo,
+            zoubanLessonStudentsInfo: zoubanLessonStudentsInfo,
+            zuobanLessonQuestionInfo: zuobanLessonQuestionInfo,
+            haveInit: true
+        });
     });
 }
 
@@ -88,28 +92,6 @@ function getZoubanExamStudentsInfo(examStudentsInfo) {
     return zoubanExamStudentsInfo;
 }
 
-
-/*
-
-{
-    lessonObjectId: {
-        <className>: [
-            {
-                id:
-                score:
-                questionScores:
-                questionAnswers:
-                lessonRank:
-                classRank:
-            },
-            ...
-        ],
-        ...
-    },
-    ...
-}
- */
-
 function getZoubanLessonStudentsInfo(allLessonStudentsMap) {
     var result = {};
     _.each(allLessonStudentsMap, (lessonStudents, paperObjectId) => {
@@ -122,33 +104,6 @@ function getZoubanLessonStudentsInfo(allLessonStudentsMap) {
     });
     return result;
 }
-
-
-/*
-
-{
-    lessonObjectId: [
-        {
-            lesson: {
-                scores:
-                means:
-                rates:
-                separations:
-            },
-            <className>: {
-                scores:
-                means:
-                rates:
-            },
-            ...
-        },
-        ...
-    ],
-    ...
-}
-
-
- */
 
 function getZoubanLessonQuestionInfo(lessons, allLessonStudentsMap) {
     var result = {}, lessonStudents, allQuestionsLessonInfo, lessonClassStudentsMap, allQuestionsLessonClassInfo, questions, obj;
@@ -182,133 +137,14 @@ function getQuestionsInfo(lessonStudents, questions, isAllLesson) {
     var result = _.map(_.range(questions.length), (i) => {
         obj = {
             scores: questionScores[i],
-            means: questionMeans[i],
-            rates: questionRates[i]
+            mean: questionMeans[i],
+            rate: questionRates[i]
         };
         if(isAllLesson) obj.separations = questionSeparations[i];
         return obj;
     })
     return result;
-
 }
-
-/*
-examInfo:
-{
-    id:
-    name:
-    fullMark:
-    lessons: [
-        {
-            id:
-            objectId:
-            name:
-            fullMark:
-            percentage:
-            equivalentScore:
-            questions:
-        },
-        ...
-    ]
-}
-
-examStudentsInfo:
-[
-    {
-        id:
-        kaohao:
-        xuehao:
-        name:
-        class:
-        score:
-        rank:
-    },
-    ...
-]
-
-lessonStudentsInfo:
-{
-    lessonObjectId: {
-        <className>: [
-            {
-                score:,
-                questionScores:
-                questionAnswers:
-                lessonRank:
-                classRank:
-            },
-            ...
-        ],
-        ...
-    },
-    ...
-}
-
-lessonQuestionInfo:
-{
-    lessonObjectId: [
-        {
-            lesson: {
-                scores:
-                mean:
-                rate:
-                separation:
-            },
-            <className>: {
-                scores:
-                mean:
-                rate:
-            },
-            ...
-        },
-        ...
-    ],
-    ...
-}
-
-
-{
-    <lessonObjectId>: {
-        id:
-        objectId:
-        name:
-        fullMark:
-        percentage:
-        equivalentScore:
-        questions:
-        classesInfo: {
-            <className>: {
-                name: ,
-                students:[
-                    {
-                        id:
-                        name:
-                        class:
-                        school:
-                        totalScore:
-                        score:
-                        questionsScore:
-                    }
-                ]
-            }
-        }
-    }
-}
-
-{
-    <lessonObjectId>: {
-        <questionId>: {
-            <...baseInfo>
-            statisticalInfo:
-        }
-        ...
-    },
-    ...
-}
-
-
- */
-
 
 function getZoubanDS({equivalentScoreInfo, examStudentsInfo}) {
     //带有order的课程 (lesson)

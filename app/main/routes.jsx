@@ -43,8 +43,8 @@ export default (store) => {
             <Route path='subject/report' component={SubjectReport} />
             <Route path='add/analysis' component={CustomizeAnalysis}/>
             <Route path='zouban/:name' component={Zouban}>
-                <Route path="report" component={ZoubanQuestionModule} />
-                <Route path="report" component={ScoreDetailModule} />
+                <Route path="quality" component={ZoubanQuestionModule} />
+                <Route path="class" component={ScoreDetailModule} />
                 <Route path="report" component={StudentPersonalModule} />
             </Route>
             <Route path='helper/:name' component={HelperBoxContainer}>

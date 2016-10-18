@@ -1,23 +1,41 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
-import commonClass from '../../../styles/common.css';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
 import QuestionCompare from './QuestionCompare';
 import AverageCompare from './AverageCompare';
 import StudentLevelsDistribution from './StudentLevelsDistribution';
 import LevelsCompare from './LevelsCompare';
-export default class ScoreDetailModule extends React.Component {
+
+import commonClass from '../../../styles/common.css';
+
+class ScoreDetailModule extends React.Component {
     constructor(props) {
         super(props);
 
     }
     render() {
+        var {zoubanExamInfo, zoubanExamStudentsInfo, zoubanLessonStudentsInfo, zuobanLessonQuestionInfo} = this.props;
+        zoubanExamInfo = zoubanExamInfo.toJS(), zoubanExamStudentsInfo = zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = zoubanLessonStudentsInfo.toJS(), zuobanLessonQuestionInfo = zuobanLessonQuestionInfo.toJS();
         return (
             <div>
-                <QuestionCompare></QuestionCompare>
-                <AverageCompare></AverageCompare>
+                <QuestionCompare zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo}></QuestionCompare>
+                <AverageCompare zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo}></AverageCompare>
                 <StudentLevelsDistribution></StudentLevelsDistribution>
                 <LevelsCompare></LevelsCompare>
             </div>
         );
+    }
+}
+
+export default connect(mapStateToProps)(ScoreDetailModule);
+
+function mapStateToProps(state) {
+    return {
+        zoubanExamInfo: state.zouban.zoubanExamInfo,
+        zoubanExamStudentsInfo: state.zouban.zoubanExamStudentsInfo,
+        zoubanLessonStudentsInfo: state.zouban.zoubanLessonStudentsInfo,
+        zuobanLessonQuestionInfo: state.zouban.zuobanLessonQuestionInfo
     }
 }

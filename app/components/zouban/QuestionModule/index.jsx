@@ -53,8 +53,10 @@ export default connect(mapStateToProps)(QuestionModule);
 
 function mapStateToProps(state) {
     return {
-        equivalentScoreInfo: state.zouban.equivalentScoreInfo,
-        examStudentsInfo: state.zouban.examStudentsInfo
+        zoubanExamInfo: state.zouban.zoubanExamInfo,
+        zoubanExamStudentsInfo: state.zouban.zoubanExamStudentsInfo,
+        zoubanLessonStudentsInfo: state.zouban.zoubanLessonStudentsInfo,
+        zuobanLessonQuestionInfo: state.zouban.zuobanLessonQuestionInfo
     }
 }
 

@@ -21,6 +21,7 @@ export default class Zouban extends React.Component {
     }
 
     componentWillMount() {
+        if(this.props.zouban.haveInit) return;
         var params = initParams({'request': window.request}, this.props.params, this.props.location);
         this.props.initZoubanDS(params);
     }
@@ -29,7 +30,7 @@ export default class Zouban extends React.Component {
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
                 <ReportNavHeader examName={'期中考试'} examId={''} grade={'初一'} reportName={zoubanTitleMap[this.props.params.name]}/>
-                {(this.props.ifError) ? (<CommonErrorView />) : ((this.props.isLoading || this.props.zoubanDS.size == 0) ? (<Spinkit />) : (this.props.children))}
+                {(this.props.ifError) ? (<CommonErrorView />) : ((this.props.isLoading || !this.props.zouban.haveInit) ? (<Spinkit />) : (this.props.children))}
             </div>
         );
     }
@@ -41,7 +42,7 @@ function mapStateToProps(state) {
     return {
         ifError: state.global.ifError,
         isLoading: state.global.isLoading,
-        zoubanDS: state.zouban
+        zouban: state.zouban
     }
 }
 

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-17 14:56:51
+* @Last Modified time: 2016-10-17 16:07:37
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -518,62 +518,6 @@ TODO: 接口过滤出走班考试；如果有必要则还需要对grade进行过
     });
 }
 
-exports.listZoubanExams = function(req, res, next) {
-    //从school exams中筛选出走班的exam，并需要这些考试的papers信息
-    var zoubanExams;//analysis 一个examid的数组或者schoolId；因为后面也需要传递单个examid
-/*
-
-    examUitls.getSchoolById(req.user.schoolId).then(function(data) {
-        zoubanExams = _.filter(data['[exams]'], (obj) => obj.from == '50');
-        var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '50'));
-        return when.all(zoubanExamPromises);
-    }).
-
-TODO: 接口过滤出走班考试；如果有必要则还需要对grade进行过滤
- */
-    zoubanExams = [{name: "2016.10高二第二次学考模拟考", exam: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '50'}, {name: "2015-2016学年第二学期期末初一年级组", exam: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '50'}];
-    zoubanExams = _.chain(zoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
-
-    var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '50'));
-    when.all(zoubanExamPromises).then(function(zoubanExamInstances) {
-        //TODO:怎么获取lessonName
-        var temp;
-        var result = _.map(zoubanExams, (obj, index) => {
-
-            temp = _.pick(obj, ['name', 'from']);
-            temp.id = obj['exam'];
-            temp.papers = _.map(zoubanExamInstances[index]['[papers]'], (paperItem) => {
-                if(_.includes(paperItem.name, '文科')) return {lessonName: `${paperItem.subject}(文科)`, objectId: paperItem.paper, id: paperItem.id, fullMark: paperItem.manfen};
-                if(_.includes(paperItem.name, '理科')) return {lessonName: `${paperItem.subject}(理科)`, objectId: paperItem.paper, id: paperItem.id, fullMark: paperItem.manfen};
-                return {lessonName: paperItem.subject, objectId: paperItem.paper, id: paperItem.id, fullMark: paperItem.manfen};
-            });
-            return temp;
-        });
-        //按时间排一下顺序
-        res.status(200).json(result);
-    }).catch(function(err) {
-        next(err);
-    });
-}
-
-/*
-@EquivalentScoreInfo: {  -- 估计不能save到自己的数据库，因为要共用，所以要走service--公共的service
-    examId: String,
-    examName: String,
-    [lessons]: [
-        {
-            id: String,
-            objectId: String,
-            name: String,
-            fullMark: Integer,
-            percentage: Integer,
-            equivalentScore: Integer
-        },
-        ...
-    ]
-}
-}
-*/
 exports.setEquivalentScoreInfo = function(req, res, next) {
     if(!req.body.equivalentScoreInfo) return next(new errors.HttpStatusError(400, "没有equivalentScoreInfo属性数据"));
     //TODO: 实现存储
@@ -594,7 +538,7 @@ exports.zoubanDS = function(req, res, next) {
                                         //【Mock】req.query.examid
     examUitls.getEquivalentScoreInfoById('100532-10172').then(function(equivalentScoreInfo) {
         result.equivalentScoreInfo = equivalentScoreInfo;
-        var paperObjectIds = _.map(equivalentScoreInfo, (obj) => obj.objectId);
+        var paperObjectIds = _.map(equivalentScoreInfo['[lessons]'], (obj) => obj.objectId);
         return examUitls.getZoubanExamInfo(paperObjectIds);
     }).then(function(obj) {
         result.examStudentsInfo = _.sortBy(_.values(obj.examStudentsInfo), 'score');
@@ -604,3 +548,43 @@ exports.zoubanDS = function(req, res, next) {
         next(err);
     });
 }
+
+
+
+// exports.listZoubanExams = function(req, res, next) {
+//     //从school exams中筛选出走班的exam，并需要这些考试的papers信息
+//     var zoubanExams;//analysis 一个examid的数组或者schoolId；因为后面也需要传递单个examid
+// /*
+
+//     examUitls.getSchoolById(req.user.schoolId).then(function(data) {
+//         zoubanExams = _.filter(data['[exams]'], (obj) => obj.from == '50');
+//         var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '50'));
+//         return when.all(zoubanExamPromises);
+//     }).
+
+// TODO: 接口过滤出走班考试；如果有必要则还需要对grade进行过滤
+//  */
+//     zoubanExams = [{name: "2016.10高二第二次学考模拟考", exam: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '50'}, {name: "2015-2016学年第二学期期末初一年级组", exam: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '50'}];
+//     zoubanExams = _.chain(zoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
+
+//     var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '50'));
+//     when.all(zoubanExamPromises).then(function(zoubanExamInstances) {
+//         //TODO:怎么获取lessonName
+//         var temp;
+//         var result = _.map(zoubanExams, (obj, index) => {
+
+//             temp = _.pick(obj, ['name', 'from']);
+//             temp.id = obj['exam'];
+//             temp.papers = _.map(zoubanExamInstances[index]['[papers]'], (paperItem) => {
+//                 if(_.includes(paperItem.name, '文科')) return {lessonName: `${paperItem.subject}(文科)`, objectId: paperItem.paper, id: paperItem.id, fullMark: paperItem.manfen};
+//                 if(_.includes(paperItem.name, '理科')) return {lessonName: `${paperItem.subject}(理科)`, objectId: paperItem.paper, id: paperItem.id, fullMark: paperItem.manfen};
+//                 return {lessonName: paperItem.subject, objectId: paperItem.paper, id: paperItem.id, fullMark: paperItem.manfen};
+//             });
+//             return temp;
+//         });
+//         //按时间排一下顺序
+//         res.status(200).json(result);
+//     }).catch(function(err) {
+//         next(err);
+//     });
+// }

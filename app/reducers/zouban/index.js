@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-10-15 11:38:23
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-15 12:22:31
+* @Last Modified time: 2016-10-17 17:29:19
 */
 
 'use strict';
@@ -20,13 +20,11 @@ export default function reducer(state, action) {
 
     switch(action.type) {
         case INIT_ZOUBAN_DS_SUCCESS:
-        debugger;
             var nextState;
             _.each(action.res, function(value, key) {
                 value = (Map.isMap(initialState[key])) ? Map(value) : (List.isList(initialState[key]) ? List(value): value);
                 nextState = (nextState) ? nextState.set(key, value) : state.set(key, value);
             });
-            debugger;
             return nextState;
     }
     return state;

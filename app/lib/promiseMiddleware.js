@@ -23,11 +23,12 @@ export default function promiseMiddleware() {
 
     return promise
       .then(res => {
+        console.log('SUCCESS = ', SUCCESS);
         next([{ ...rest, res, type: SUCCESS }, {type: LOADING_DONE}, {type: HIDE_ERROR}]);
         return true;
       })
       .catch(error => {
-
+        console.log('FAILURE = ', FAILURE);
 console.log('=========================== 捕获到Promise Error: ', error);
 
         next([{ ...rest, error, type: FAILURE }, {type: LOADING_DONE}, {type: THROW_ERROR, error}]);
