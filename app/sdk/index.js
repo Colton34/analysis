@@ -1,7 +1,7 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-10-16 20:22:57
+* @Last Modified time: 2016-10-18 10:58:59
 */
 
 'use strict';
@@ -19,6 +19,14 @@ export function makeSegments(end, start = 0, step, count = 12) {
     return result;
 }
 
+export function makeSegmentsString(segments) {
+    //左闭右开
+    var lastIndex = _.size(segments) - 2;
+    return _.map(_.range(_.size(segments)-1), (i) => {
+        return '[' + segments[i] + ', ' + segments[i+1] + (i == lastIndex ? ']' : ')') + '分';
+    });
+}
+
 /*
     求某一个群定的xx属性的区间分布:<注意，因为查找的方式使用了二分法，所以群体必须是有序的！！！>
         参数：区间 segments；群体 base；属性 key
@@ -32,7 +40,7 @@ export function makeSegments(end, start = 0, step, count = 12) {
                 }, ...
             ]
 */
-export function makeSegmentsDistribution(segments, base, key) {
+export function makeSegmentsDistribution(segments, base, key='score') {
     var groupCountDistribution = _.groupBy(base, function(item) {
         return getSegmentIndex(segments, item[key]);
     });

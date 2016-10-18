@@ -22,7 +22,7 @@ class ScoreDetailModule extends React.Component {
             <div>
                 <QuestionCompare zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo}></QuestionCompare>
                 <AverageCompare zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo}></AverageCompare>
-                <StudentLevelsDistribution></StudentLevelsDistribution>
+                <StudentLevelsDistribution zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo}></StudentLevelsDistribution>
                 <LevelsCompare></LevelsCompare>
             </div>
         );

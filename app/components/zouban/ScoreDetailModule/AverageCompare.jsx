@@ -10,11 +10,8 @@ class AverageCompare extends React.Component {
     constructor(props) {
         super(props);
         var currentLesson = this.props.zoubanExamInfo.lessons[0];
-        debugger;
         var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[currentLesson.objectId]);
-        debugger;
         var currentLessonGradeMean = _.round(_.mean(_.map(_.union(..._.values(this.props.zoubanLessonStudentsInfo[currentLesson.objectId])), (studentObj) => studentObj.score)), 2);
-        debugger;
         this.state={
             currentLesson: currentLesson,
             currentSelectedClasses: currentLessonClasses,
@@ -23,10 +20,8 @@ class AverageCompare extends React.Component {
     }
 
     onSelectLesson(selectedLesson) {
-        debugger;
         var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[selectedLesson.objectId]);
         var currentLessonGradeMean = _.round(_.mean(_.map(_.union(..._.values(this.props.zoubanLessonStudentsInfo[selectedLesson.objectId])), (studentObj) => studentObj.score)), 2);
-        debugger;
         this.setState({
             currentLesson: selectedLesson,
             currentSelectedClasses: currentLessonClasses,
@@ -63,9 +58,7 @@ class AverageCompare extends React.Component {
             return { key: className, value: className }
         });
 
-
         var classesName = _.keys(classesMeanInfo), classesMean = _.values(classesMeanInfo);
-        debugger;
 
         var config={
             chart: {

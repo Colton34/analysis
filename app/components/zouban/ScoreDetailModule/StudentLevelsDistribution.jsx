@@ -1,25 +1,71 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
-import commonClass from '../../../styles/common.css';
-import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import ReactHighcharts from 'react-highcharts';
+
 import DropdownList from '../../../common/DropdownList';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
+
+import {makeSegments, makeSegmentsString, makeSegmentsDistribution} from '../../../sdk';
+import commonClass from '../../../styles/common.css';
+import {COLORS_MAP as colorsMap} from '../../../lib/constants';
+
 class StudentLevelsDistribution extends React.Component {
     constructor(props) {
         super(props);
+        var currentLesson = this.props.zoubanExamInfo.lessons[0];
+        var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[currentLesson.objectId]);
+        debugger;
         this.state={
-            currentClass:{key:'yuwen',value:'yuwen'}
+            currentLesson: currentLesson,
+            currentStep: 10,
+            currentLessonClasses: currentLessonClasses
         }
     }
-    onClickDropdownList(item) {
+
+    onSelectLesson(selectedLesson) {
+        var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[selectedLesson.objectId]);
+        debugger;
         this.setState({
-            currentClass: item
+            currentLesson: selectedLesson,
+            currentStep: 10,
+            currentLessonClasses: currentLessonClasses
+        });
+    }
+
+    onSelectClasses(selectedClasses) {
+        debugger;
+        //TODO:是否需要做转换
+        this.setState({
+            currentLessonClasses: selectedClasses
         })
     }
 
+    onSetStep(e) {
+        //校验，修改状态
+        var inputValue = e.taget.value;
+        debugger;
+        var isStringInt = /^\d+$/.test(inputValue);
+        debugger;
+        if(!isStringInt) return;
+        this.setState({
+            currentStep: parseInt(inputValue)
+        });
+    }
+
     render(){
+        debugger;
+        var segments = makeSegments(this.state.currentLesson.fullMark, 0, this.state.currentStep);
+        debugger;
+        var segmentsString = makeSegmentsString(segments);
+        debugger;
+        var classSegmentDistribution = getClassSegmentDistribution(this.state.currentLessonClasses, segments, this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId]);
+        debugger;
+        var tableHeader = getTableHeader(segmentsString);
+        debugger;
+        var tableBody = getTableBody(classSegmentDistribution);
+        debugger;
+        tableBody.unshift(tableHeader);
         var config={
             chart: {
                 type: 'column'
@@ -43,7 +89,7 @@ class StudentLevelsDistribution extends React.Component {
                     margin:0,
                     offset:7
                 },
-                categories:categories//x轴数据
+                categories: segmentsString//x轴数据
             },
             yAxis: {
                 allowDecimals:true,//刻度允许小数
@@ -83,47 +129,48 @@ class StudentLevelsDistribution extends React.Component {
                     return this.point.y
                 }
             },
-            series:data
+            series: classSegmentDistribution
         };
-    return (
-        <div className={commonClass['section']} style={{position:'relative'}}>
-            <span className={commonClass['title-bar']}></span>
-            <span className={commonClass['title']}>教学班分数段人数分布</span>
-            <span className={commonClass['title-desc']}></span>
-            <div>
-                <div style={{ padding: '5px 30px 0 30px',marginBottom:0}} className={commonClass['section']}>
-                    <div style={{heigth: 50, lineHeight: '50px'}}>
-                        <span style={{ marginRight: 10}}>学科：</span>
-                            {classes.map((course, index) => {
-                                return (
-                                    <a key={'papers-' + index}    style={ localStyle.subject}>{course}</a>
-                                )
-                            })
-                        }
+        return (
+            <div className={commonClass['section']} style={{position:'relative'}}>
+                <span className={commonClass['title-bar']}></span>
+                <span className={commonClass['title']}>教学班分数段人数分布</span>
+                <span className={commonClass['title-desc']}></span>
+                <div>
+                    <div style={{ padding: '5px 30px 0 30px',marginBottom:0}} className={commonClass['section']}>
+                        <div style={{heigth: 50, lineHeight: '50px'}}>
+                            <span style={{ marginRight: 10}}>学科：</span>
+                            {_.map(this.props.zoubanExamInfo.lessons, (lessonObj, index) => {
+                                    return (
+                                        <a key={'papers-' + index} onClick={this.onSelectLesson.bind(this, lessonObj)} style={ localStyle.subject}>{lessonObj.name}</a>
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
+                <div style={{display: 'table-cell', paddingLeft: 18,verticalAlign: 'middle', width: 1200, height: 70, lineHeigth: 70, border: '1px solid ' + colorsMap.C05, background: colorsMap.C02, borderRadius: 3,position:'relative'}}>
+                    您可以设置
+                    <input defaultValue={this.state.step} onBlur={this.onSetStep.bind(this)} style={{width: 70, height: 30, margin: '0 10px', paddingLeft: 10, border: '1px solid ' + colorsMap.C08}}/>为一个分数段，查看不同分数段的人数分布及详情
+                        <div style={{ float: 'right' }}>
+                            <span style={{ fontSize: 12 ,marginRight:130}}>对比对象（最多5个）</span>
+                        <div style={{width:92,height:32,display:'inline-block',marginRight:30,position:'absolute',right:0, zIndex:10}}>
+                        {/*<DropdownList onClickDropdownList={this.onClickDropdownList.bind(this) } list={classList} fixWidth />*/}
+                        </div>
+                        </div>
+                </div>
+                <div style={{marginTop:30}}>
+                <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
+                </div>
+                <StudentLevelsTable tableData={tableBody} />
             </div>
-            <div style={{display: 'table-cell', paddingLeft: 18,verticalAlign: 'middle', width: 1200, height: 70, lineHeigth: 70, border: '1px solid ' + colorsMap.C05, background: colorsMap.C02, borderRadius: 3,position:'relative'}}>
-                您可以设置
-                <input defaultValue={10}  style={{width: 70, height: 30, margin: '0 10px', paddingLeft: 10, border: '1px solid ' + colorsMap.C08}}/>为一个分数段，查看不同分数段的人数分布及详情
-                    <div style={{ float: 'right' }}>
-                        <span style={{ fontSize: 12 ,marginRight:130}}>对比对象（最多5个）</span>
-                    <div style={{width:92,height:32,display:'inline-block',marginRight:30,position:'absolute',right:0, zIndex:10}}>
-                    <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this) } list={classList} fixWidth />
-                    </div>
-                    </div>
-            </div>
-            <div style={{marginTop:30}}>
-            <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
-            </div>
-            <StudentLevelsTable />
-        </div>
-    )
+        )
     }
 }
 
 export default StudentLevelsDistribution;
-function StudentLevelsTable (){
+
+function StudentLevelsTable ({tableData}){
     return (
         <div className={commonClass['section']}>
             <span className={commonClass['sub-title']}>各分数段教学班详细人数</span>
@@ -175,3 +222,25 @@ var tableData = [
     ['1班',10,10,10,10,10,10]
 
 ];
+
+function getClassSegmentDistribution(classes, segments, currentLessonStudentsInfo) {
+    var info;
+    return _.map(classes, (className) => {
+        info = makeSegmentsDistribution(segments, currentLessonStudentsInfo[className]);
+        info = _.map(info, (obj) => obj.count);
+        return {
+            name: className,
+            data: info
+        }
+    })
+}
+
+function getTableHeader(segmentsString) {
+    return _.concat(['班级'], segmentsString)
+}
+
+function getTableBody(classSegmentDistribution) {
+    return _.map(classSegmentDistribution, (obj) => {
+        return _.concat([obj.name], obj.data);
+    });
+}
