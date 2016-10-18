@@ -2,19 +2,40 @@ import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import ReactHighcharts from 'react-highcharts';
 
-import DropdownList from '../../../common/DropdownList';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
+import Select from '../../../common/Selector/Select';
 
 import {makeSegments, makeSegmentsString, makeSegmentsDistribution} from '../../../sdk';
 import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
+class Selector extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    handleSelectChange (value) {
+        if(value.length > 5) return;
+        this.setState({ value });
+        this.props.handleSelectClasses(value);
+    }
+
+    render() {
+        return (
+            <div>
+                <Select multi value={this.props.initSelected} placeholder="选择班级" options={this.props.options} onChange={this.handleSelectChange.bind(this)} />
+            </div>
+        );
+    }
+}
+
 class StudentLevelsDistribution extends React.Component {
     constructor(props) {
         super(props);
         var currentLesson = this.props.zoubanExamInfo.lessons[0];
-        var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[currentLesson.objectId]);
+        var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[currentLesson.objectId]).slice(0, 3);
+        debugger;
         this.state={
             currentLesson: currentLesson,
             currentStep: 10,
@@ -23,7 +44,7 @@ class StudentLevelsDistribution extends React.Component {
     }
 
     onSelectLesson(selectedLesson) {
-        var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[selectedLesson.objectId]);
+        var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[selectedLesson.objectId]).slice(0, 3);
         this.setState({
             currentLesson: selectedLesson,
             currentStep: 10,
@@ -33,14 +54,13 @@ class StudentLevelsDistribution extends React.Component {
 
     onSelectClasses(selectedClasses) {
         //TODO:是否需要做转换
+        debugger;
         this.setState({
-            currentLessonClasses: selectedClasses
+            currentLessonClasses: _.map(selectedClasses, (obj) => obj.value)
         })
     }
 
     onSetStep(e) {
-        // debugger;
-        //校验，修改状态
         var inputValue = e.target.value;
         var isStringInt = /^\d+$/.test(inputValue);
         if(!isStringInt) return;
@@ -55,6 +75,10 @@ class StudentLevelsDistribution extends React.Component {
         var classSegmentDistribution = getClassSegmentDistribution(this.state.currentLessonClasses, segments, this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId]);
         var tableHeader = getTableHeader(segmentsString);
         var tableBody = getTableBody(classSegmentDistribution);
+        debugger;
+        var selectorOptions = getSelectorFormatValues(_.keys(this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId])), selectorInitSelected = getSelectorFormatValues(this.state.currentLessonClasses);
+        debugger;
+        // var selectorInitSelected = selectorOptions.slice(0, 3);
         tableBody.unshift(tableHeader);
         var config={
             chart: {
@@ -142,12 +166,13 @@ class StudentLevelsDistribution extends React.Component {
                 <div style={{display: 'table-cell', paddingLeft: 18,verticalAlign: 'middle', width: 1200, height: 70, lineHeigth: 70, border: '1px solid ' + colorsMap.C05, background: colorsMap.C02, borderRadius: 3,position:'relative'}}>
                     您可以设置
                     <input defaultValue={this.state.currentStep} onBlur={this.onSetStep.bind(this)} style={{width: 70, height: 30, margin: '0 10px', paddingLeft: 10, border: '1px solid ' + colorsMap.C08}}/>为一个分数段，查看不同分数段的人数分布及详情
-                        <div style={{ float: 'right' }}>
-                            <span style={{ fontSize: 12 ,marginRight:130}}>对比对象（最多5个）</span>
+                    {/*<div style={{ float: 'right' }}>
+                        <span style={{ fontSize: 12 ,marginRight:130}}>对比对象（最多5个）</span>
                         <div style={{width:92,height:32,display:'inline-block',marginRight:30,position:'absolute',right:0, zIndex:10}}>
-                        {/*<DropdownList onClickDropdownList={this.onClickDropdownList.bind(this) } list={classList} fixWidth />*/}
+                        <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this) } list={classList} fixWidth />
                         </div>
-                        </div>
+                    </div>*/}
+                    <Selector options={selectorOptions} initSelected={selectorInitSelected} handleSelectClasses={this.onSelectClasses.bind(this)}  />
                 </div>
                 <div style={{marginTop:30}}>
                 <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
@@ -170,6 +195,7 @@ function StudentLevelsTable ({tableData}){
         </div>
     );
 }
+
 var localStyle = {
     subject: {
         display: 'inline-block', minWidth: 50, height: 22, backgroundColor: '#fff', color: '#333', marginRight: 10, textDecoration: 'none',textAlign: 'center', lineHeight: '22px'
@@ -232,5 +258,15 @@ function getTableHeader(segmentsString) {
 function getTableBody(classSegmentDistribution) {
     return _.map(classSegmentDistribution, (obj) => {
         return _.concat([obj.name], obj.data);
+    });
+}
+
+function getSelectorFormatValues(classes) {
+    return _.map(classes, (className) => {
+        return {
+            value: className,
+            label: className,
+            key: className
+        }
     });
 }
