@@ -15,7 +15,6 @@ class StudentLevelsDistribution extends React.Component {
         super(props);
         var currentLesson = this.props.zoubanExamInfo.lessons[0];
         var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[currentLesson.objectId]);
-        debugger;
         this.state={
             currentLesson: currentLesson,
             currentStep: 10,
@@ -25,7 +24,6 @@ class StudentLevelsDistribution extends React.Component {
 
     onSelectLesson(selectedLesson) {
         var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[selectedLesson.objectId]);
-        debugger;
         this.setState({
             currentLesson: selectedLesson,
             currentStep: 10,
@@ -34,7 +32,6 @@ class StudentLevelsDistribution extends React.Component {
     }
 
     onSelectClasses(selectedClasses) {
-        debugger;
         //TODO:是否需要做转换
         this.setState({
             currentLessonClasses: selectedClasses
@@ -44,9 +41,7 @@ class StudentLevelsDistribution extends React.Component {
     onSetStep(e) {
         //校验，修改状态
         var inputValue = e.taget.value;
-        debugger;
         var isStringInt = /^\d+$/.test(inputValue);
-        debugger;
         if(!isStringInt) return;
         this.setState({
             currentStep: parseInt(inputValue)
@@ -54,17 +49,11 @@ class StudentLevelsDistribution extends React.Component {
     }
 
     render(){
-        debugger;
         var segments = makeSegments(this.state.currentLesson.fullMark, 0, this.state.currentStep);
-        debugger;
         var segmentsString = makeSegmentsString(segments);
-        debugger;
         var classSegmentDistribution = getClassSegmentDistribution(this.state.currentLessonClasses, segments, this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId]);
-        debugger;
         var tableHeader = getTableHeader(segmentsString);
-        debugger;
         var tableBody = getTableBody(classSegmentDistribution);
-        debugger;
         tableBody.unshift(tableHeader);
         var config={
             chart: {

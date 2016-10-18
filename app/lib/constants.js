@@ -101,6 +101,14 @@ export const LETTER_MAP = {
     5: 'F',
     6: 'G'
 };
+export const LETTER_TITLE_MAP = {
+    0: '优秀',
+    1: '良好',
+    2: '及格',
+    3: '不及格'
+};
+
+
 
 //=============== CustomAnalysis =============================
 export const ADD_PAPER_INFO = 'ADD_PAPER_INFO';
