@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-09 15:52:50
+* @Last Modified time: 2016-10-18 20:18:20
 */
 
 'use strict';
@@ -48,6 +48,17 @@ export function saveAs(uri) {
     }
 }
 
+export function downloadData(validColumnKeys, validColumnNames, validStudentInfoMatrix, exportTableName) {
+    debugger;
+    var url = '/api/v1/file/export/rank/report';
+    var inputKeys = "<input type='hidden' name='" + 'keys' + "' value='" + JSON.stringify(validColumnKeys) + "' />";
+    var inputNames = "<input type='hidden' name='" + 'names' + "' value='" + JSON.stringify(validColumnNames) + "' />";
+    var inputMatrix = "<input type='hidden' name='" + 'matrix' + "' value='" + JSON.stringify(validStudentInfoMatrix) + "' />";
+    var tableName = exportTableName ? "<input type='hidden' name='" + 'exportTableName' + "' value='" + exportTableName + "' />" : '';
+    $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + tableName + '</form>')
+        .appendTo('body').submit().remove();
+}
+
 export function downloadTable(headSeq, headSelect, headerMapper, renderRows, exportTableName) {
     var validColumnKeys = [], validColumnNames = [];
     _.each(headSeq, (headKey) => {
@@ -63,13 +74,7 @@ export function downloadTable(headSeq, headSelect, headerMapper, renderRows, exp
     var validStudentInfoMatrix = _.map(renderRows, (studentRowObj) => {
         return _.map(validColumnKeys, (key) => studentRowObj[key]);
     });
-    var url = '/api/v1/file/export/rank/report';
-    var inputKeys = "<input type='hidden' name='" + 'keys' + "' value='" + JSON.stringify(validColumnKeys) + "' />";
-    var inputNames = "<input type='hidden' name='" + 'names' + "' value='" + JSON.stringify(validColumnNames) + "' />";
-    var inputMatrix = "<input type='hidden' name='" + 'matrix' + "' value='" + JSON.stringify(validStudentInfoMatrix) + "' />";
-    var tableName = exportTableName ? "<input type='hidden' name='" + 'exportTableName' + "' value='" + exportTableName + "' />" : '';
-    $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + tableName + '</form>')
-        .appendTo('body').submit().remove();
+    downloadData(validColumnKeys, validColumnNames, validStudentInfoMatrix, exportTableName);
 }
 
 export function isNumber(val) {

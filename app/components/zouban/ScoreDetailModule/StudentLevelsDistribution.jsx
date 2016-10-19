@@ -5,8 +5,10 @@ import ReactHighcharts from 'react-highcharts';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
 import Select from '../../../common/Selector/Select';
+import {Button} from 'react-bootstrap';
 
 import {makeSegments, makeSegmentsString, makeSegmentsDistribution} from '../../../sdk';
+import {downloadData} from '../../../lib/util';
 import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
@@ -70,11 +72,14 @@ class StudentLevelsDistribution extends React.Component {
     }
 
     render(){
+        var currentLessonStudentsInfo = this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId];
         var segments = makeSegments(this.state.currentLesson.fullMark, 0, this.state.currentStep);
         var segmentsString = makeSegmentsString(segments);
-        var classSegmentDistribution = getClassSegmentDistribution(this.state.currentLessonClasses, segments, this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId]);
+        var classSegmentDistribution = getClassSegmentDistribution(this.state.currentLessonClasses, segments, currentLessonStudentsInfo);
         var tableHeader = getTableHeader(segmentsString);
         var tableBody = getTableBody(classSegmentDistribution);
+        var downloadTableData = _.cloneDeep(tableBody);
+        var downloadAllData = getTableBody(getClassSegmentDistribution(_.keys(currentLessonStudentsInfo), segments, currentLessonStudentsInfo));
         debugger;
         var selectorOptions = getSelectorFormatValues(_.keys(this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId])), selectorInitSelected = getSelectorFormatValues(this.state.currentLessonClasses);
         debugger;
@@ -177,7 +182,7 @@ class StudentLevelsDistribution extends React.Component {
                 <div style={{marginTop:30}}>
                 <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
                 </div>
-                <StudentLevelsTable tableData={tableBody} />
+                <StudentLevelsTable tableData={tableBody} downloadKeys={tableHeader} downloadNames={tableHeader} downloadTableData={downloadTableData} downloadAllData={downloadAllData} />
             </div>
         )
     }
@@ -185,15 +190,27 @@ class StudentLevelsDistribution extends React.Component {
 
 export default StudentLevelsDistribution;
 
-function StudentLevelsTable ({tableData}){
-    return (
-        <div className={commonClass['section']}>
-            <span className={commonClass['sub-title']}>各分数段教学班详细人数</span>
-            <div style={{marginTop:30}}>
-            <TableView hover  tableData={tableData}></TableView>
+class StudentLevelsTable extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    clickDownloadTable() {
+        debugger;
+        downloadData(this.props.downloadKeys, this.props.downloadNames, this.props.downloadTableData, '我的表格');
+    }
+
+    render() {
+        return (
+            <div className={commonClass['section']}>
+                <span className={commonClass['sub-title']}>各分数段教学班详细人数</span>
+                <Button onClick={this.clickDownloadTable.bind(this)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
+                <div style={{marginTop:30}}>
+                <TableView hover  tableData={this.props.tableData}></TableView>
+                </div>
             </div>
-        </div>
-    );
+        );
+    }
 }
 
 var localStyle = {
@@ -269,4 +286,11 @@ function getSelectorFormatValues(classes) {
             key: className
         }
     });
+}
+
+//如果需要下载全部数据而不只是表格中的数据那么只需要传入全部的classes即可
+function getValidMatrixData(classes, segments, currentLessonStudentsInfo) {
+    var classSegmentDistribution = getClassSegmentDistribution(this.state.currentLessonClasses, segments, this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId]);
+    var tableBody = getTableBody(classSegmentDistribution);
+    return tableBody;
 }
