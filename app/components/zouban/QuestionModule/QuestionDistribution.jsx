@@ -3,7 +3,8 @@ import React, { PropTypes } from 'react';
 import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import ReactHighcharts from 'react-highcharts';
-export default function QuestionDistribution(){
+export default function QuestionDistribution({currentClass,currentLesson,zoubanLessonStudentsInfo,zoubanExamInfo,zuobanLessonQuestionInfo}){
+    var chartDS = getChartData(currentClass,currentLesson,zoubanLessonStudentsInfo,zoubanExamInfo,zuobanLessonQuestionInfo);
     var config = {
       title: {
         text: '(得分率)',
@@ -81,54 +82,23 @@ export default function QuestionDistribution(){
             <span className={commonClass['title']}>试题难度-区分度分布图</span>
             <span className={commonClass['title-desc']}>将每一个试题的难度，区分度结合起来分析</span>
             <div style={{marginTop:30}}>
-            <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
+            <ReactHighcharts config={config} style={{marginTop: 30, width: '1140px', height: '330px'}}/>
             </div>
         </div>
     )
 }
-//mork 数据
-var chartDS = [{
-    name:'第一题',
-    x:0.26,
-    y:0.45
-},
-{
-    name:'第一题',
-    x:0.34,
-    y:0.45
-},
-{
-    name:'第一题',
-    x:0.12,
-    y:0.23
-},
-{
-    name:'第一题',
-    x:0.56,
-    y:0.12
-},
-{
-    name:'第一题',
-    x:0.23,
-    y:0.78
-},
-{
-    name:'第一题',
-    x:0.78,
-    y:0.9
-},
-{
-    name:'第一题',
-    x:0.78,
-    y:0.9
-},
-{
-    name:'第一题',
-    x:0.67,
-    y:0.78
-},
-{
-    name:'第一题',
-    x:0.56,
-    y:0.34
-}];
+
+function getChartData(currentClass,currentLesson,zoubanLessonStudentsInfo,zoubanExamInfo,zuobanLessonQuestionInfo){
+    var currentLessonQuestions = (_.find(zoubanExamInfo.lessons,function(lesson){
+        return lesson.objectId===currentLesson.key;
+    })).questions;
+    var chartData = _.map(zuobanLessonQuestionInfo[currentLesson.key],function(question,index){
+        var rate = question[currentClass].rate;
+        return {
+            name:currentLessonQuestions[index].name,
+            x:question.lesson.separations,
+            y:rate
+        }
+    });
+    return chartData;
+}

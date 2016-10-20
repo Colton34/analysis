@@ -87,9 +87,7 @@ class SubjectSelect extends React.Component{
 class ClassSelect extends React.Component{
     constructor(props) {
         super(props);
-        this.setState({
-
-        });
+        
 
     }
     render(){

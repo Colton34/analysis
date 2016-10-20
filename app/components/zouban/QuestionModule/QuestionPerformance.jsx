@@ -4,57 +4,49 @@ import React, { PropTypes } from 'react';
 import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import ECharts from 'react-echarts';
-//mork 数据
-var goodQuestion = '第一题第二题';
-var badQuestion = '第三题第四题';
-var currentSubject = '语文';
 
-//K线图数据
-var chartData = [{
-    distinguish:0.12,
-    number:'第14题',
-    value:[0.26,0.12,0.26,0.12]
-},
-{
-    distinguish:0.12,
-    number:'第14题',
-    value:[0.4,0.42,0.4,0.42]
-},
-{
-    distinguish:0.12,
-    number:'第14题',
-    value:[0.35,0.45,0.35,0.45]
-},
-{
-    distinguish:0.12,
-    number:'第14题',
-    value:[0.12,0.32,0.12,0.32]
-},
-{
-    distinguish:0.12,
-    number:'第14题',
-    value:[0.56,0.65,0.56,0.65]
-}
-];
-//雷达图数据
-var classQuestionLevelGroupMeanRate= [0.2, 0.27, 0.44, 0.58, 0.68];
-var gradeQuestionLevelGroupMeanRate = [0.2, 0.31, 0.44, 0.57, 0.7];
-//mork 数据结束
-export default function QuestionPerformance({}) {
+class QuestionPerformance extends React.Component {
+    constructor(props) {
+        super(props);
+        var currentLesson = this.props.currentLesson;
+        this.zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo;
+        this.classes = _.keys(this.zoubanLessonStudentsInfo[currentLesson.key]);
+        this.state={
+            currentClass:this.classes[0]
+        }
+    }
+    componentWillReceiveProps(nextProps){
+        var {currentLesson,zoubanLessonStudentsInfo} = nextProps;
+        this.classes = _.keys(zoubanLessonStudentsInfo[currentLesson.key]);
+        this.state={
+            currentClass:this.classes[0]
+        }
+    }
+    changeClass(newClass){
+        this.setState({
+            currentClass:newClass
+        });
+        console.log(newClass);
+    }
+    render(){
+        var currentClass = this.state.currentClass;
     return (
         <div className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
             <span className={commonClass['title']}>学科试题考试内在表现</span>
             <span className={commonClass['title-desc']}></span>
-            <SummaryCard />
-            <SummaryText />
-            <PerformanceChart />
-            <QuestionMeanRateChart />
+            <PaperClassSelector  classes={this.classes} currentClass={this.state.currentClass} changeClass={this.changeClass.bind(this)}/>
+            <SummaryCard  currentClass={currentClass} currentLesson={this.props.currentLesson} zoubanLessonStudentsInfo={this.zoubanLessonStudentsInfo} zoubanExamInfo={this.props.zoubanExamInfo} zuobanLessonQuestionInfo={this.props.zuobanLessonQuestionInfo}/>
+            <SummaryText currentClass={currentClass}/>
+            <PerformanceChart currentClass={currentClass} currentLesson={this.props.currentLesson} zoubanLessonStudentsInfo={this.zoubanLessonStudentsInfo} zoubanExamInfo={this.props.zoubanExamInfo} zuobanLessonQuestionInfo={this.props.zuobanLessonQuestionInfo} />
+            <QuestionMeanRateChart currentClass={currentClass} currentLesson={this.props.currentLesson} zoubanLessonStudentsInfo={this.zoubanLessonStudentsInfo} zoubanExamInfo={this.props.zoubanExamInfo} zuobanLessonQuestionInfo={this.props.zuobanLessonQuestionInfo}/>
         </div>
     )
+    }
 }
-
-function SummaryCard({}) {
+export default QuestionPerformance;
+function SummaryCard({currentClass,currentLesson,zoubanLessonStudentsInfo,zoubanExamInfo,zuobanLessonQuestionInfo}) {
+    var {goodQuestion,badQuestion} = getCardSummary(zuobanLessonQuestionInfo,currentClass,currentLesson,zoubanExamInfo);
     return (
         <div style={{marginTop:30}}>
             <Card title={goodQuestion} titleStyle={{color: colorsMap.B04,fontSize:'24px'}} desc={'表现较好的题目'} style={{marginRight:20}}></Card>
@@ -63,10 +55,10 @@ function SummaryCard({}) {
     )
 }
 
-function SummaryText({}) {
+function SummaryText({currentClass}) {
     return (
         <div style={{marginTop:30}}>
-          <span>下图是本次考试，{currentSubject}学科所有试题区分度/难度的表现分布情况，其中通过柱形图重点展示出表现较好和表现不足的部分试题。</span>
+          <span>下图是本次考试，{currentClass}学科所有试题区分度/难度的表现分布情况，其中通过柱形图重点展示出表现较好和表现不足的部分试题。</span>
           <ul style={{paddingLeft:15}}>
             <li style={{paddingLeft:0,marginTop:'5px',fontSize:'14px',color:'#6a6a6a'}}>绿色柱形图表示题目表现较好，该题目本班的得分率高于全年级的平均得分率。图形高度表示高于的大小.</li>
             <li style={{paddingLeft:0,fontSize:'14px',color:'#6a6a6a'}}>红色柱形图表示题目表现不足，该题目本班的得分率低于全年级的平均得分率。图形高度表示低于的大小.</li>
@@ -75,7 +67,8 @@ function SummaryText({}) {
     )
 }
 
-function PerformanceChart({}) {
+function PerformanceChart({currentClass,currentLesson,zoubanLessonStudentsInfo,zoubanExamInfo,zuobanLessonQuestionInfo}) {
+    var chartData = getChartData(zuobanLessonQuestionInfo,currentClass,currentLesson,zoubanExamInfo);
     var option = {
         title: {
             text: '',
@@ -131,11 +124,11 @@ function PerformanceChart({}) {
         textStyle:{
                  color:'#000'
                },
-        // tooltip: {
-        //                formatter: function (param) {
-        //                    return param.data.number+'<br/>'+'区分度：'+param.data.distinguish+'<br/>'+'得分率：'+param.data.value[0]+'<br/>'+'高于年级平均：'+(param.data.value[1]-param.data.value[0]).toFixed(2);
-        //                }
-        //            },
+        tooltip: {
+                        formatter: function (param) {
+                            return param.data.number+'<br/>'+'区分度：'+param.data.distinguish+'<br/>'+'得分率：'+param.data.value[0]+'<br/>'+'高于年级平均：'+(param.data.value[1]-param.data.value[0]).toFixed(2);
+                       }
+                    },
         series: [
             {
                 type: 'candlestick',
@@ -160,7 +153,12 @@ function PerformanceChart({}) {
     )
 }
 
-function QuestionMeanRateChart({}) {
+function QuestionMeanRateChart({currentClass,currentLesson,zoubanLessonStudentsInfo,zoubanExamInfo,zuobanLessonQuestionInfo}) {
+    var gradeQuestionScoreRates = getQuestionScoreRates(zuobanLessonQuestionInfo,currentClass,currentLesson);
+    var questions = getQuestions (currentLesson,zuobanLessonQuestionInfo,zoubanExamInfo);
+    var gradeQuestionLevelGroup = getGradeQuestionLevelGroup(questions, gradeQuestionScoreRates);
+    var classQuestionLevelGroupMeanRate = getClassQuestionLevelGroupMeanRate(gradeQuestionLevelGroup,currentClass);
+    var lessonQuestionLevelGroupMeanRate = getLessonQuestionLevelGroupMeanRate(gradeQuestionLevelGroup);
     var questionLevelTitles = ['容易题组', '较容易题组', '中等题组', '较难题组', '最难题组'];
     var indicator = _.map(questionLevelTitles, (qt) => {
         return {
@@ -225,7 +223,7 @@ function QuestionMeanRateChart({}) {
             name: '班级平均得分率'
         },
         {
-            value: _.reverse(gradeQuestionLevelGroupMeanRate),
+            value: _.reverse(lessonQuestionLevelGroupMeanRate),
             name: '年级平均得分率'
         }
     ];
@@ -255,6 +253,33 @@ const Card = ({title, desc, style, titleStyle}) => {
         </span>
     )
 }
+class PaperClassSelector extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        var classes = this.props.classes;
+        var currentClass = this.props.currentClass;
+        return (
+            <div style={{heigth: 50, lineHeight: '50px',marginTop:0,padding:' 0px'}} className={commonClass['section']}>
+                <span style={{ float: 'left', marginRight: 10}}>教学班:</span>
+                <span style={{float: 'left', width: 800}}>
+                    {
+                        classes.map((className, index) => {
+                            return (
+                                <span key={'classNames-' + index} style={{display: 'inline-block', marginRight: 30, minWidth: 50}} >
+                                    <input value={className} onClick={this.props.changeClass.bind(this,className)} style={{ marginRight: 5, cursor: 'pointer' }} type='radio' name={'class'} checked={className===currentClass}/>
+                                    <span>{className}</span>
+                                </span>
+                            )
+                        })
+                    }
+                </span>
+                <div style={{clear: 'both'}}></div>
+            </div>
+        );
+    }
+}
 var localStyle = {
     card: {
         display: 'inline-block', width: 560, height: 112, lineHeight: '112px', border: '1px solid ' + colorsMap.C05, background: colorsMap.C02
@@ -262,4 +287,120 @@ var localStyle = {
     lengthControl: {
         overflow: 'hidden', whiteSpace: 'pre', textOverflow: 'ellipsis'
     }
+}
+
+function getCardSummary(zuobanLessonQuestionInfo,currentClass,currentLesson,zoubanExamInfo){
+    var currentLessonQuestions = (_.find(zoubanExamInfo.lessons,function(lesson){
+        return lesson.objectId===currentLesson.key;
+    })).questions;
+    var questionsPerformArry = _.map(zuobanLessonQuestionInfo[currentLesson.key],function(question,index){
+        var performance = _.subtract(question[currentClass].mean, question.lesson.mean);
+        return {
+            name:currentLessonQuestions[index].name,
+            performance:performance
+        }
+    });
+    var goodQuestion =_.map(_.takeRight(_.sortBy(questionsPerformArry,'performance'),5),function(question){
+        return question.name;
+    });
+    var badQuestion = _.map(_.take(_.sortBy(questionsPerformArry,'performance'),5),function(question){
+        return question.name;
+    });
+    return {goodQuestion,badQuestion};
+}
+function getChartData(zuobanLessonQuestionInfo,currentClass,currentLesson,zoubanExamInfo){
+    var currentLessonQuestions = (_.find(zoubanExamInfo.lessons,function(lesson){
+        return lesson.objectId===currentLesson.key;
+    })).questions;
+    var chartData =_.sortBy( _.map(zuobanLessonQuestionInfo[currentLesson.key],function(question,index){
+        var lessonRate = question.lesson.rate;
+        var classRate = question[currentClass].rate;
+        return {
+            distinguish:question.lesson.separations,
+            number:currentLessonQuestions[index].name,
+            value:[lessonRate,classRate,lessonRate,classRate]
+        }
+    }),'distinguish');
+    return chartData;
+}
+function getQuestionScoreRates(zuobanLessonQuestionInfo,currentClass,currentLesson){
+    var questions = zuobanLessonQuestionInfo[currentLesson.key];
+    var gradeQuestionScoreRates = _.map(questions,function(question){
+        return question.lesson.rate;
+    });
+
+    return gradeQuestionScoreRates;
+}
+
+function getGradeQuestionLevelGroup(questions, gradeQuestionScoreRates) {
+
+    var temp = _.map(questions, (obj, index) => {
+        return {
+            name: obj.name,
+            score: obj.score,
+            gradeRate: gradeQuestionScoreRates[index],
+            qid: obj.qid,
+            scoreInfo:obj.scoreInfo
+        }
+    });
+    temp = _.sortBy(temp, 'gradeRate');
+    var segments = getStepSegments(temp);
+    var gradeQuestionLevelGroup = {};
+    _.each(_.range(segments.length-1), (index) => {
+        var targets = _.filter(temp, (obj) => (index == 0) ? (segments[index] <= obj.gradeRate && obj.gradeRate <= segments[index+1]) : (segments[index] < obj.gradeRate && obj.gradeRate <= segments[index+1]));
+        gradeQuestionLevelGroup[index] = targets;
+    });
+
+    return gradeQuestionLevelGroup;
+}
+function getStepSegments(gradeRateInfo) {
+
+    var step = _.round(_.divide(_.subtract(_.last(gradeRateInfo).gradeRate, _.first(gradeRateInfo).gradeRate), 5), 2);
+    var segments = [];
+    segments.push(_.first(gradeRateInfo).gradeRate);
+    _.each(_.range(4), (index) => {
+        var nextRate = _.round(_.sum([segments[index], step]), 2);
+        segments.push(nextRate);
+    });
+    segments.push(_.last(gradeRateInfo).gradeRate);
+
+    return segments;
+}
+function getQuestions (currentLesson,zuobanLessonQuestionInfo,zoubanExamInfo){
+    var currentLessonQuestions = (_.find(zoubanExamInfo.lessons,function(lesson){
+        return lesson.objectId===currentLesson.key;
+    })).questions;
+     var questionsInfo = _.map(zuobanLessonQuestionInfo[currentLesson.key],function(question,index){
+        var scoreInfo = question;
+        return{
+            name:currentLessonQuestions[index].name,
+            score:currentLessonQuestions[index].score,
+            qid:currentLessonQuestions[index].qid,
+            scoreInfo:scoreInfo
+        }
+    })
+
+    return questionsInfo;
+}
+function getClassQuestionLevelGroupMeanRate(gradeQuestionLevelGroup,currentClass){
+
+     var classQuestionLevelGroupMeanRate = _.map(gradeQuestionLevelGroup,function(questionGroup){
+        var temp = _.round(_.mean(_.map(questionGroup,function(question){
+            return question.scoreInfo[currentClass].rate;
+        })),2);
+        return temp;
+    });
+
+    return classQuestionLevelGroupMeanRate;
+}
+function getLessonQuestionLevelGroupMeanRate(gradeQuestionLevelGroup){
+
+     var lessonQuestionLevelGroupMeanRate = _.map(gradeQuestionLevelGroup,function(questionGroup){
+        var temp = _.round(_.mean(_.map(questionGroup,function(question){
+            return question.scoreInfo.lesson.rate;
+        })),2);
+        return temp;
+    });
+
+    return lessonQuestionLevelGroupMeanRate;
 }
