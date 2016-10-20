@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-17 16:07:37
+* @Last Modified time: 2016-10-19 09:48:44
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -539,7 +539,7 @@ exports.zoubanDS = function(req, res, next) {
     examUitls.getEquivalentScoreInfoById('100532-10172').then(function(equivalentScoreInfo) {
         result.equivalentScoreInfo = equivalentScoreInfo;
         var paperObjectIds = _.map(equivalentScoreInfo['[lessons]'], (obj) => obj.objectId);
-        return examUitls.getZoubanExamInfo(paperObjectIds);
+        return examUitls.getZoubanExamInfo(paperObjectIds, equivalentScoreInfo);
     }).then(function(obj) {
         result.examStudentsInfo = _.sortBy(_.values(obj.examStudentsInfo), 'score');
         result.examPapersInfo = obj.examPapersInfo;

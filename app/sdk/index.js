@@ -1,7 +1,7 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-10-18 10:58:59
+* @Last Modified time: 2016-10-19 11:10:04
 */
 
 'use strict';
@@ -170,9 +170,9 @@ function makeSubjectMean(students, examPapersInfo) {
     return result;
 }
 
-export function insertRankInfo(studentObjs, rankKey='rank') {
+export function insertRankInfo(studentObjs, rankKey='rank', groupKey='score') {
     var rankIndex = 1;
-    var orderedStudentScoreInfo = _.orderBy(_.map(_.groupBy(studentObjs, 'score'), (v, k) => {
+    var orderedStudentScoreInfo = _.orderBy(_.map(_.groupBy(studentObjs, groupKey), (v, k) => {
         return {
             score: parseFloat(k),
             students: v

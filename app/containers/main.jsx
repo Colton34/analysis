@@ -7,6 +7,12 @@ import {Link} from 'react-router';
 import _ from 'lodash';
 
 import Select from '../common/Selector/Select';
+
+var groups = [
+        {label:'Group One',children:[{value:'1-One', selected: true},{value:'1-Two', selected: true},{value:'1-Three', selected: true},{value:'1-Four',label:'Four Label'}]},
+        {label:'Group Two',children:[{value:'2-One', selected: true},{value:'2-Two'},{value:'2-Three'},{value:'2-Four',label:'Four Label'}]},
+        {label:'Group Three',children:[{value:'3-One', selected: true},{value:'3-Two'},{value:'3-Three'},{value:'3-Four',label:'Four Label'}]}
+    ];
 // import Select from 'react-select';
 
 const FLAVOURS = [
@@ -21,6 +27,26 @@ const FLAVOURS = [
 const WHY_WOULD_YOU = [
     { label: 'Chocolate (are you crazy?)', value: 'chocolate', disabled: true },
 ].concat(FLAVOURS.slice(1));
+
+
+class TestSelect2 extends React.Component {
+    constructor(props) {
+        super(props);
+
+    }
+
+    handleChange(v, e) {
+        debugger;
+    }
+
+    render() {
+        return (
+            <div>
+
+            </div>
+        );
+    }
+}
 
 class TestSelect extends React.Component {
     constructor(props) {

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-17 20:41:58
+* @Last Modified time: 2016-10-19 16:08:22
 */
 
 'use strict';
@@ -52,12 +52,15 @@ export function initZoubanDS(params) {
     var url = examPath + '/zouban?examid=' + params.examid + '&grade=' + encodeURI(params.grade);
     return params.request.get(url).then(function(res) {
         var {equivalentScoreInfo, examStudentsInfo, examPapersInfo} = res.data;
+        // debugger;//TODO：通过判断percentage是否为1决定当前lesson是否有转换；全部lesson是否为1决定totalScore是否有转换
         var allLessonStudentsMap = _.groupBy(_.concat(..._.map(examStudentsInfo, (student) => student.papers)), 'paperObjectId');
         //拿到数据，进行构建需要的DS
         var zoubanExamInfo = getZoubanExamInfo(equivalentScoreInfo, examPapersInfo);
         var zoubanExamStudentsInfo = getZoubanExamStudentsInfo(examStudentsInfo);//TODO:确认通过rank排序！！！
         var zoubanLessonStudentsInfo = getZoubanLessonStudentsInfo(allLessonStudentsMap);
         var zuobanLessonQuestionInfo = getZoubanLessonQuestionInfo(zoubanExamInfo.lessons, allLessonStudentsMap);
+        insertClassesToLesson(zoubanExamInfo.lessons, zoubanLessonStudentsInfo);
+        insertClassRankInfoToLessonStudents(zoubanExamStudentsInfo, zoubanLessonStudentsInfo);//确认已经在classes中添加了rankInfo
 
         return Promise.resolve({
             zoubanExamInfo: zoubanExamInfo,
@@ -76,6 +79,7 @@ function getZoubanExamInfo(equivalentScoreInfo, examPapersInfo) {
     var commonLessons = [], otherLessons = [], lesson, lessonWeight;
     _.each(equivalentScoreInfoMap, (infoObj, paperObjectId) => {
         result.fullMark += infoObj.fullMark;
+        //TODO:添加equivalentFullMark？
         lesson = _.assign({}, infoObj, {questions: examPapersInfoMap[paperObjectId].questions});
         lessonWeight = _.findIndex(subjectWeight, (s) => ((s == infoObj.name) || (_.includes(infoObj.name, s))));
         (lessonWeight >= 0) ? commonLessons.push({weight: lessonWeight, value: lesson}) : otherLessons.push(lesson);
@@ -85,10 +89,11 @@ function getZoubanExamInfo(equivalentScoreInfo, examPapersInfo) {
     return result;
 }
 
-function getZoubanExamStudentsInfo(examStudentsInfo) {
-    var zoubanExamStudentsInfo = _.map(examStudentsInfo, (obj) => _.pick(obj, ['id', 'kaohao', 'xuehao', 'name', 'class', 'score']));
+function getZoubanExamStudentsInfo(examStudentsInfo, ifHaveEquivalentInfo) {
+    var zoubanExamStudentsInfo = _.map(examStudentsInfo, (obj) => _.pick(obj, ['id', 'kaohao', 'xuehao', 'name', 'classes', 'score', 'equivalentScore']));
     insertRankInfo(zoubanExamStudentsInfo);
-    zoubanExamStudentsInfo = _.sortBy(zoubanExamStudentsInfo, 'rank');
+    insertRankInfo(zoubanExamStudentsInfo, 'equivalentRank', 'equivalentScore');
+    zoubanExamStudentsInfo = _.sortBy(zoubanExamStudentsInfo, 'equivalentRank');//默认当然按照转换后的分数排名。没有转换的排名本身是没有意义的。
     return zoubanExamStudentsInfo;
 }
 
@@ -97,8 +102,10 @@ function getZoubanLessonStudentsInfo(allLessonStudentsMap) {
     _.each(allLessonStudentsMap, (lessonStudents, paperObjectId) => {
         result[paperObjectId] = {};
         insertRankInfo(lessonStudents, 'lessonRank');
+        insertRankInfo(lessonStudents, 'equivalentLessonRank', 'equivalentScore');
         _.each(_.groupBy(lessonStudents, 'class_name'), (lessonClassStudents, className) => {
             insertRankInfo(lessonClassStudents, 'classRank');
+            insertRankInfo(lessonClassStudents, 'equivalentClassRank', 'equivalentScore');
             result[paperObjectId][className] = lessonClassStudents;
         });
     });
@@ -146,10 +153,30 @@ function getQuestionsInfo(lessonStudents, questions, isAllLesson) {
     return result;
 }
 
-function getZoubanDS({equivalentScoreInfo, examStudentsInfo}) {
-    //带有order的课程 (lesson)
-    //每个学科下的教学班（group）
-    //
+function insertClassesToLesson(lessons, zoubanLessonStudentsInfo) {
+    _.each(lessons, (lessonObj) => {
+        lessonObj.classes = _.keys(zoubanLessonStudentsInfo[lessonObj.objectId]);
+    });
+}
+
+function insertClassRankInfoToLessonStudents(zoubanExamStudentsInfo, zoubanLessonStudentsInfo) {
+    //对zoubanExamStudentsInfo中的obj.classes插入rank和equivalentRank。要先组织班级分数对象然后计算rank，然后插入到对应的班级obj
+    var zoubanExamStudentsInfoMap = _.keyBy(zoubanExamStudentsInfo, 'id');
+    var studentIds, targets, tempTargetScoreInfo, tempTargetScoreInfoMap, targetStudentClassObj;
+    _.each(zoubanLessonStudentsInfo, (currentLessonStudentsInfo, lessonObjectId) => {
+        _.each(currentLessonStudentsInfo, (currentLessonClassStudentsInfo, className) => {
+            studentIds = _.map(currentLessonClassStudentsInfo, (obj) => obj.id);
+            targets = _.pick(zoubanExamStudentsInfoMap, studentIds);
+            tempTargetScoreInfo = _.map(targets, (obj) => _.pick(obj, ['id', 'score', 'equivalentScore']));
+            insertRankInfo(tempTargetScoreInfo);
+            insertRankInfo(tempTargetScoreInfo, 'equivalentRank', 'equivalentScore');
+            tempTargetScoreInfoMap = _.keyBy(tempTargetScoreInfo, 'id');
+            _.each(tempTargetScoreInfoMap, (infoObj, studentId) => {
+                targetStudentClassObj = _.find(targets[studentId].classes, (classObj) => (classObj.name == className && classObj.paperObjectId == lessonObjectId));
+                _.assign(targetStudentClassObj, _.pick(infoObj, ['rank', 'equivalentRank']));
+            });
+        });
+    });
 }
 
 export function initReportBase(params) {

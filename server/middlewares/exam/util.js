@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-17 10:42:12
+* @Last Modified time: 2016-10-19 11:27:21
 */
 'use strict';
 var _ = require('lodash');
@@ -410,9 +410,9 @@ function getDefaultEquivalentScoreInfo(examid) {
     return getExamById(examid, '50').then(function(examInstance) {
                 //TODO: 需要过滤grade？？？
         var lessons = _.map(examInstance['[papers]'], (paperItem) => {
-            if(_.includes(paperItem.name, '文科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(文科)`, fullMark: paperItem.manfen};
-            if(_.includes(paperItem.name, '理科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(理科)`, fullMark: paperItem.manfen};
-            return {id: paperItem.id, objectId: paperItem.paper, name: paperItem.subject, fullMark: paperItem.manfen};
+            // if(_.includes(paperItem.name, '文科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(文科)`, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
+            // if(_.includes(paperItem.name, '理科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(理科)`, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
+            return {id: paperItem.id, objectId: paperItem.paper, name: paperItem.name, subject: paperItem.subject, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
         });
         return saveEquivalentScoreInfo({
             examId: examid,
@@ -432,15 +432,17 @@ function saveEquivalentScoreInfo(equivalentScoreInfoObj) {
     });
 }
 
-exports.getZoubanExamInfo = function(paperObjectIds) {
+exports.getZoubanExamInfo = function(paperObjectIds, equivalentScoreInfo) {
     return when.all(_.map(paperObjectIds, (paperObjectId) => getPaperById(paperObjectId)))
         .then(function(paperInstances) {
-            return generateZoubanPaperStudentsInfo(paperInstances);
+            return generateZoubanPaperStudentsInfo(paperInstances, equivalentScoreInfo);
         });
 }
 
-function generateZoubanPaperStudentsInfo(papers) {
-    var examStudentsInfo = {}, examPapersInfo = {};
+function generateZoubanPaperStudentsInfo(papers, equivalentScoreInfo) {
+    var examStudentsInfo = {}, examPapersInfo = {}, equivalentScoreInfoMap = _.keyBy(equivalentScoreInfo['[lessons]'], 'objectId'), studentCurrentLessonEquivalentScore;
+    // var ifAnyLessonEquivalent = _.some(equivalentScoreInfoMap, (obj) => obj.percentage != 1);
+    // console.log('ifAnyLessonEquivalent ============= ', ifAnyLessonEquivalent);
     return when.promise(function(resolve, reject) {
         try {
             _.each(papers, (paperObj) => {
@@ -449,12 +451,15 @@ function generateZoubanPaperStudentsInfo(papers) {
                 _.each(students, (studentObj, index) => {
                     paperStudentObj = examStudentsInfo[studentObj.id];
                     if(!paperStudentObj) {
-                        paperStudentObj = _.pick(studentObj, ['id', 'name', 'class', 'xuehao', 'kaohao']);
-                        paperStudentObj.papers = [], paperStudentObj.score = 0;//paperStudentObj.questionScores = []
+                        paperStudentObj = _.pick(studentObj, ['id', 'name', 'xuehao', 'kaohao']);
+                        paperStudentObj.papers = [], paperStudentObj.classes = [], paperStudentObj.score = 0, paperStudentObj.equivalentScore = 0; //paperStudentObj.questionScores = []
                         examStudentsInfo[studentObj.id] = paperStudentObj;
                     }
+                    paperStudentObj.classes.push({paperObjectId: paperObj._id, name: studentObj.class});
                     paperStudentObj.score = paperStudentObj.score + studentObj.score;
-                    paperStudentObj.papers.push({id: studentObj.id, paperid: paperObj.id, paperObjectId: paperObj._id, score: studentObj.score, 'class_name': studentObj.class, questionScores: matrix[index], questionAnswers: answers[index]});
+                    studentCurrentLessonEquivalentScore = _.round(_.multiply(studentObj.score, equivalentScoreInfoMap[paperObj._id].percentage), 2);
+                    paperStudentObj.equivalentScore = paperStudentObj.equivalentScore + studentCurrentLessonEquivalentScore;
+                    paperStudentObj.papers.push({id: studentObj.id, paperid: paperObj.id, paperObjectId: paperObj._id, score: studentObj.score, equivalentScore: studentCurrentLessonEquivalentScore, 'class_name': studentObj.class, questionScores: matrix[index], questionAnswers: answers[index]});
                     // paperStudentObj.questionScores = matrix[index], paperStudentObj.questionAnswers = answers[index];
                     // paperStudentObj.questionScores.push({paperid: paperObj.id, scores: matrix[index], answers: answers[index]});
                 });

@@ -1,98 +1,138 @@
+
 import React, { PropTypes } from 'react';
 import _ from 'lodash';
-import {DropdownButton, Button, Table as BootTable, MenuItem} from 'react-bootstrap';
-import TableView from '../../../common/TableView';
-import EnhanceTable from '../../../common/EnhanceTable';
-import commonClass from '../../../styles/common.css';
-import {COLORS_MAP as colorsMap} from '../../../lib/constants';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import Radium from 'radium';
 import ReactPaginate from 'react-paginate';
-class ZouBanRankReport extends React.Component {
-constructor(props) {
-    super(props);
-    var studentInfo = getMorkData (1000);
-    var tableData  =matchTableData (studentInfo);
-    var tableHeaders = getMorkHeaderData (subjects,data);
-    this.state = {
-        pageIndex:0,
-        tableData:tableData,
-        dataSize:25,
-        tableHeaders:tableHeaders
-    }
-}
-onSelectPageSize(event) {
-    var nextPageSize= $(event.target).text();
-    this.setState({
-        dataBegin:0,
-        dataSize: parseInt(nextPageSize)
-    })
-}
-handlePageClick = (data) => {
-    let selected = data.selected;
-    this.setState( {
-    pageIndex:selected,
-    })
-}
-onSeach(searchStr){
-    console.log(searchStr);//补充查询处理
-    this.setState({
-        pageIndex:0,
+import {DropdownButton, Button, Table as BootTable, MenuItem} from 'react-bootstrap';
 
-    })
- }
- render(){
-     var pageIndex = this.state.pageIndex;
-     var dataBegin=this.state.pageIndex*this.state.dataSize+1;
-     var dataSize= this.state.dataSize;
-     var tableData = this.state.tableData;
-     var tableHeaders = this.state.tableHeaders;
-     var dataEnd = (pageIndex + 1) * dataSize < tableData.length ? (pageIndex + 1) * dataSize : tableData.length;
-     var showData = tableData.slice(pageIndex * dataSize, (pageIndex + 1) * dataSize);
-     return (
-         <div style={{ width: 1200, minHeight: 830, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 ,padding:50}}>
-             <SubjectSelect />
-             <ClassSelect />
-             <SeachSortDown  onSeach={this.onSeach.bind(this)} onSelectPageSize={this.onSelectPageSize.bind(this)}/>
-             <TableView hover tableData={showData} reserveRows={26}  tableHeaders={tableHeaders} TableComponent={EnhanceTable}></TableView>
-             <Paginate  tableData={tableData} dataSize={dataSize} pageIndex={pageIndex} handlePageClick={this.handlePageClick.bind(this)} dataBegin={dataBegin} dataEnd={dataEnd}/>
-         </div>
-     )
- }
-}
-export default ZouBanRankReport;
-class SubjectSelect extends React.Component{
+import TableView from '../../../common/TableView';
+import EnhanceTable from '../../../common/EnhanceTable';
+import Select from '../../../common/Selector/Select';
+
+import commonClass from '../../../styles/common.css';
+import {COLORS_MAP as colorsMap} from '../../../lib/constants';
+
+//负责渲染两个模块的表格：原值表格和转换表格；原值表格肯定是呈现的，这里的状态决定是否呈现转换表格--如果没有任何一个有转换的话
+class ZouBanRankReport extends React.Component {
     constructor(props) {
         super(props);
-        this.setState({
+        this.showEquivalentTable = _.some(this.props.zoubanExamInfo.lessons, (obj) => obj.percentage != 1);
+    }
 
-        });
+    render() {
+        var zoubanExamInfo = this.props.zoubanExamInfo.toJS(), zoubanExamStudentsInfo = this.props.zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo.toJS();
+        return (
+            <div>
+                <RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />
+                {this.showEquivalentTable ? (<RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} isEquivalent={true} />) : ('')}
+            </div>
+        );
+    }
+}
+
+export default connect(mapStateToProps)(ZouBanRankReport);
+function mapStateToProps(state) {
+    return {
+        zoubanExamInfo: state.zouban.zoubanExamInfo,
+        zoubanExamStudentsInfo: state.zouban.zoubanExamStudentsInfo,
+        zoubanLessonStudentsInfo: state.zouban.zoubanLessonStudentsInfo
+    }
+}
+
+class RankReportContainer extends React.Component {
+    constructor(props) {
+        super(props);
+        var lessons = this.props.zoubanExamInfo.lessons;
+        var titles = this.props.isEquivalent ? getSubjectTtitles(lessons) : getLessonTitles(lessons);//[{id: , title: }]
+        debugger;
+        var currentTitle = titles[0];
+        var lessonClasses = [];
+        var currentClass = lessonClasses[0];
+        var columns = getColumns(titles, !!currentClass);
+        debugger;
+            //[暂时没有隐藏列]
+            // currentColumns: columns,
+            // selectedColumns: columns,
+        this.state = {
+            titles: titles,
+            currentTitle: currentTitle,
+            lessonClasses: lessonClasses,
+            currentClass: currentClass,
+            searchStr: '',
+            currentPageSize: 25,
+            currentPageValue: 1
+        }
+    }
+
+    handleSelectTitle(selectedTitle) {
 
     }
-    render(){
-        return(
+
+    handleSelectClass(selectedClass) {
+
+    }
+
+    render() {
+        var showClass = (this.state.currentTitle.id != 'all') && (this.state.currentClass == 'all');
+        var showClassRank = (this.state.currentTitle.id != 'all');//在一个lesson中或者一个subject中都不可能有多个班级
+        var tableHeader = getTableHeader(titles, showClass, showClassRank);
+        //TODO:计算tableData，一并得到totalCount
+        var currentColumns = getColumns(titles, showClass, showClassRank);
+        debugger;
+        var tableData = {};
+
+        return (
+            <div>
+                <TitleSelector isEquivalent={this.props.isEquivalent} titles={this.state.titles} handleSelectTitle={this.handleSelectTitle.bind(this)} />
+                {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClasses={this.state.lessonClasses} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
+                <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.hasSearch.bind(this)} />
+                <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={EnhanceTable}></TableView>
+                <Paginate currentPageSize={this.state.currentPageSize} currentPageValue={this.state.currentPageValue} totalCount={0} />
+            </div>
+        );
+    }
+}
+
+//isEquivalent; titles; currentTitle; handleSelectTitle
+class TitleSelector extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    onSelectTitle(selectedTitle) {
+        this.props.handleSelectTitle(selectedTitle);
+    }
+
+    render() {
+        return (
             <div style={{ padding: '5px 30px 0 0px',marginBottom:0}} className={commonClass['section']}>
                 <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
-                    <span style={{ marginRight: 10}}>学科：</span>
-                        {subjects.map((course, index) => {
+                    <span style={{ marginRight: 10}}>{this.props.isEquivalent ? '学科' : '课程'}：</span>
+                        {_.map(this.props.titles, (titleObj, index) => {
                             return (
-                                <a key={'papers-' + index}    style={ localStyle.subject}>{course}</a>
+                                <a key={'title-' + index} onClick={this.onSelectTitle.bind(this, titleObj)} style={ localStyle.subject}>{titleObj.title}{(titleObj.id == this.props.currentTitle.id) ? '(选中)' : ''}</a>
                             )
                         })
                     }
                 </div>
             </div>
-        )
+        );
     }
 }
-class ClassSelect extends React.Component{
+
+//lessonClasses; currentClass; handleSelectClass
+class ClassSelector extends React.Component {
     constructor(props) {
         super(props);
-        this.setState({
-
-        });
-
     }
-    render(){
+
+    onSelectClass(selectedClass) {
+        this.props.handleSelectClass(selectedClass);
+    }
+
+    render() {
         return(
             <div style={{heigth: 50, lineHeight: '50px',marginTop:0,padding:0}} className={commonClass['section']}>
                 <span style={{ float: 'left', marginRight: 10}}>教学班:</span>
@@ -102,14 +142,21 @@ class ClassSelect extends React.Component{
                         <span>全部</span>
                     </span>
                     {
-                        classes.map((className, index) => {
-                            return (
+                        (this.props.lessonClasses.length > 0) ? (
+                                _.map(this.props.lessonClasses, (className, index) => {
+                                    return (
+                                        <span key={'classNames-' + index} style={{display: 'inline-block', marginRight: 30, minWidth: 50}} >
+                                            <input value={className} checked={this.props.currentClass == className} onChange={this.onSelectClass.bind(this, className)} style={{ marginRight: 5, cursor: 'pointer' }} type='checkbox' />
+                                            <span>{className}</span>
+                                        </span>
+                                    )
+                                })
+                            ) : (
                                 <span key={'classNames-' + index} style={{display: 'inline-block', marginRight: 30, minWidth: 50}} >
-                                    <input value={className} style={{ marginRight: 5, cursor: 'pointer' }} type='checkbox' />
-                                    <span>{className}</span>
+                                    <input value={'none'} checked={true} style={{ marginRight: 5, cursor: 'pointer' }} type='checkbox' />
+                                    <span>无</span>
                                 </span>
                             )
-                        })
                     }
                 </span>
                 <div style={{clear: 'both'}}></div>
@@ -117,89 +164,9 @@ class ClassSelect extends React.Component{
         )
     }
 }
-class SeachSortDown extends React.Component{
-    constructor(props) {
-        super(props);
-        this.setState({
 
-        });
-
-    }
-    render(){
-        return(
-            <div style={{marginBottom:30}}>
-            <span className={commonClass['title-bar']}></span>
-            <span className={commonClass['title']} >分数排行榜详情</span>
-            <div style={{float:'right'}}>
-            <InputWidget  placeholder='输入搜索内容' searchIcon triggerFunction={this.props.onSeach.bind(this)}/>
-                <DropdownButton id="head-select" title={'隐藏列'} style={{ margin: '0 2px'}}>
-                <ul style={{maxHeight: 300, maxWidth: 180, listStyleType: 'none', overflowY: 'scroll',padding: 0}}>
-                {
-                    subjects.map((head, index) => {
-
-                        return (
-                            <li key={'headSelect-' + index}>
-                                <input  type='checkbox' style={{ margin: '0 10px', cursor: 'pointer'}}  value={head}/>
-                                <span>{head}</span>
-                            </li>
-                        )
-                    })
-                }
-                </ul>
-                </DropdownButton>
-                <Button  style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
-                </div>
-            </div>
-
-        )
-    }
-}
-class Paginate extends React.Component{
-    constructor(props) {
-        super(props);
-        this.setState({
-
-        });
-
-    }
-    render(){
-        var tableData = this.props.tableData;
-        var dataSize = this.props.dataSize;
-        return(
-            <div>
-            <span style={{margin: '18px 0px 0px 0px', display: 'inline-block'}}>
-                显示第{this.props.dataBegin}到第{this.props.dataEnd}条记录，总共{tableData.length}条记录
-                <span style={this.props.dataEnd < 25 ? {display: 'none'} : {display: 'inline-block'}}>
-                    ，每页显示
-                    <DropdownButton id='pageSize-select' title={this.props.dataSize} dropup style={{ margin: '0 2px' }}>
-                        <MenuItem onClick={this.props.onSelectPageSize } active={dataSize === 25}>25</MenuItem>
-                        <MenuItem style={ tableData.length > 25 ? { display: 'block' } : { display: 'none' }} onClick={this.props.onSelectPageSize } active={dataSize === 50}>50</MenuItem>
-                        <MenuItem style={ tableData.length > 50 ? { display: 'block' } : { display: 'none' }}  onClick={this.props.onSelectPageSize} active={dataSize === 100}>100</MenuItem>
-                        <MenuItem style={tableData.length > 100 ? { display: 'block' } : { display: 'none' }} onClick={this.props.onSelectPageSize} active={dataSize === 1000}>1000</MenuItem>
-                    </DropdownButton>
-                    条记录
-                </span>
-            </span>
-            <div style={{float:'right',marginBottom:'3px'}}>
-            <ReactPaginate previousLabel={"<"}
-                       nextLabel={">"}
-                       breakLabel={<span>...</span>}
-                       breakClassName={"break-me"}
-                       pageNum={_.ceil(_.divide(_.size(tableData),dataSize))}
-                       marginPagesDisplayed={2}
-                       pageRangeDisplayed={5}
-                       forceSelected={this.props.pageIndex}
-                       pageLinkClassName={"pageLinkClassName"}
-                       clickCallback={this.props.handlePageClick}
-                       containerClassName={"pagination"}
-                       subContainerClassName={"pages pagination"}
-                       activeClassName={"active"} />
-            </div>
-        </div>
-        )
-    }
-}
-class InputWidget extends React.Component {
+//searchStr; handleSearch;
+class SearchInput extends React.Component {
     constructor(props) {
         super(props);
         this.start = 0;
@@ -212,7 +179,7 @@ class InputWidget extends React.Component {
         if (this.elapsed > this.MAX_DURATION && !this.hasSearch) {
             // 获取当前input的value，调用搜索的方法
             this.hasSearch = true;
-            this.props.triggerFunction(this.refs.inputWidget.value);
+            this.props.handleSearch(this.refs.searchInput.value);
         }
     }
     handleChange() {
@@ -227,7 +194,7 @@ class InputWidget extends React.Component {
     handleBlur() {
         // 失焦时，如果没有搜索过，则搜索
         if (!this.hasSearch) {
-            this.props.triggerFunction(this.refs.inputWidget.value);
+            this.props.handleSearch(this.refs.searchInput.value);
             this.hasSearch = true;
             clearInterval(this.timer);
         }
@@ -236,20 +203,303 @@ class InputWidget extends React.Component {
         return (
             <span style={{display: 'inline-block', position: 'relative'}}>
                 <input
-                    id='inputWidget'
-                    ref='inputWidget'
+                    id='searchInput'
+                    ref='searchInput'
                     onChange={this.handleChange.bind(this) }
-                    placeholder={this.props.placeholder}
-                    style={this.props.style ? this.props.style : { margin: '0 2px', height: 34, padding: '6px 12px', fontSize: 14, lineHeight: 1.42857143, color: '#555', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 4 }}
+                    placeholder='输入搜索内容'
+                    style={{ margin: '0 2px', height: 34, padding: '6px 12px', fontSize: 14, lineHeight: 1.42857143, color: '#555', backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 4 }}
                     />
-                {
-                    this.props.searchIcon ? <i className='icon-search-2' style={{ position: 'absolute', right: 10, top: '50%', marginTop: -10, color: '#bfbfbf' }}></i> : ''
-                }
-
+                    <i className='icon-search-2' style={{ position: 'absolute', right: 10, top: '50%', marginTop: -10, color: '#bfbfbf' }}></i>
             </span>
         )
     }
 }
+
+//收缩后响应。替换掉好了。
+//columns; selectedColumns; searchStr; handleSearch
+class SearchSortDropSelector extends React.Component {
+    constructor(props) {
+        super(props);
+
+    }
+
+    render() {
+        return(
+            <div style={{marginBottom:30}}>
+                <span className={commonClass['title-bar']}></span>
+                <span className={commonClass['title']} >分数排行榜详情</span>
+                <div style={{float:'right'}}>
+                    <SearchInput searchStr={this.props.searchStr} handleSearch={this.props.handleSearch} />
+                    <Button  style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
+                </div>
+            </div>
+
+        )
+    }
+}
+
+//currentPageSize currentPageValue totalCount
+class Paginate extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            pageSize: this.props.currentPageSize
+        }
+    }
+
+    onSelectPageSize(selectedPageSize) {
+        this.setState({
+            pageSize: selectedPageSize
+        });
+        this.props.handleSelectPageSize(selectedPageSize);
+    }
+
+    render() {
+        var beginCount = currentPageValue * (currentPageSize-1) + 1;
+        var endCount = beginCount + currentPageSize - 1;
+        var options = [];
+        if(this.props.totalCount > 25) options.push({value: 25, label: '25'});
+        if(this.props.totalCount > 50) options.push({value: 50, label: '50'});
+        if(this.props.totalCount > 100) options.push({value: 100, label: '100'});
+        if(this.props.totalCount > 1000) options.push({value: 1000, label: '1000'});
+        return(
+            <div>
+                <span style={{margin: '18px 0px 0px 0px', display: 'inline-block'}}>
+                    显示第{beginCount}到第{endCount}条记录，总共{this.props.totalCount}条记录
+                    <span style={this.props.totalCount < 25 ? {display: 'none'} : {display: 'inline-block'}}>
+                        ，每页显示
+                        <Select
+                            options={options}
+                            onChange={this.onSelectPageSize.bind(this)}
+                        />
+                        条记录
+                    </span>
+                </span>
+                <div style={{float:'right',marginBottom:'3px'}}>
+                    <ReactPaginate previousLabel={"<"}
+                       nextLabel={">"}
+                       breakLabel={<span>...</span>}
+                       breakClassName={"break-me"}
+                       pageNum={_.ceil(_.divide(this.props.totalCount, this.state.pageSize))}
+                       marginPagesDisplayed={2}
+                       pageRangeDisplayed={5}
+                       forceSelected={this.props.currentPageValue}
+                       pageLinkClassName={"pageLinkClassName"}
+                       clickCallback={this.props.handleSelectPageValue}
+                       containerClassName={"pagination"}
+                       subContainerClassName={"pages pagination"}
+                       activeClassName={"active"} />
+                </div>
+            </div>
+        )
+    }
+}
+
+
+/*
+
+负责渲染一个ReportContainer里的所有组件：给出每个孩子组件的当前状态和所有状态，即瀑布。因为这里需要汇总所有孩子状态。
+持有数据结构，作为props数据传递给组件init
+持有计算Table数据的函数，提供给会影响table数据的组件回调使用
+
+ */
+
+function getLessonTitles(lessons) {
+    var lessonTitles = _.map(lessons, (obj) => {
+        return {
+            id: obj.objectId,
+            title: obj.name
+        }
+    });
+    lessonTitles.unshift({ id: 'totalScore', title: '总分'});
+    return lessonTitles;
+}
+
+function getSubjectTtitles(lessons) {
+    //这里id就和title一样就行了。因为就是区分subject的
+    var subjectTitles = _.chain(lessons).groupBy('subject').map((values, subjectName) => {
+        return {
+            id: subjectName,
+            title: subjectName
+        }
+    });
+    subjectTitles.unshift({id: 'totalScore', title: '总分'});
+    return subjectTitles;
+}
+
+function getTableHeader(titles, showClass, showClassRank) {
+    var headerKeys = getTableHeaderKeys(showClass);
+    var header = [
+        headerKeys
+    ];
+    var {subjectHeaderTitles, subjectSubTitles} = getTitleHeader(titles, showClassRank);
+    header[0] = _.concat(header[0], subjectHeaderTitles);
+    header[1] = subjectSubTitles;
+    return {
+        tableHeader: header,
+        subjectHeaderTitles: headerKeys,
+        subjectSubTitles: subjectSubTitles
+    };
+}
+
+//【暂时不支持隐藏列】所以tableHeader可以使用老方法来获取
+function getTableHeaderKeys(showClass) {
+    var headerKeys = [
+        {id: 'kaohao', name: '考号',rowSpan: 2},
+        {id:'name', name: '姓名', rowSpan: 2}
+    ]
+    if(showClass) headerKeys.push({id: 'class', name: '班级', rowSpan: 2});
+    return headerKeys;
+}
+
+//showClassRank: 只有当选择【单科】，并且【选择某个班级】的时候才为true。有没有必要选定一二班级呢？取决于一个学生有没有可能在一个lesson下参加多个班级？当选择一个科目的时候--即在转换表格那里--能否显示【班级排行】：应该是可以的，还是在一个班级内，大家走相同的转换
+//所以【班级排名】应该同原值表格中的班级排名。
+//subjects是有序的--从lessons进行map得到的
+function getTitleHeader(titles, showClassRank) {
+    var subjectHeaderTitles = [], subjectSubTitles = [];
+    _.each(titles, (obj, index) => {
+        subjectHeaderTitles.push({name: obj.title, colSpan: (showClassRank ? 2 : 3), objectId: obj.id});
+        subjectSubTitles.push({id: obj.id+'_score', name: obj.title+(obj.id=='totalScore'? '':'分数'), objectId: obj.id}, {id: obj.id+'_rank', name: obj.title+'排名', objectId: obj.id});
+        if(showClassRank) subjectSubTitles.push({id: obj.id+'_classRank', name: obj.title+'班级排名', objectId: obj.id});
+    });
+    return {
+        subjectHeaderTitles: subjectHeaderTitles,
+        subjectSubTitles: subjectSubTitles
+    }
+}
+
+/*
+有顺序。columns作为DropList的输入。
+subjectId: totalScore, <paperObjectId>...
+fieldKeys: score, rank, classRank
+columns: [
+    {
+        key: <fieldKey>/<subjectId>_<fieldKey>,
+        value:
+    }
+]
+ */
+//当有需要注入关于【班级】的信息的时候，就会注入更改columns，进而改变TableHeader。【假设】学生不会跨层考试。showClass和showClassRank还是不一样，当选择某一个班级的时候不用显示class列但是需要显示classRank列
+function getColumns(titles, showClass, showClassRank) {
+    var columns = [
+        {key: 'kaohao', value: '考号'},
+        {key:'name', value: '姓名'}
+    ];
+    if(showClass) columns.push({key: 'class', value: '班级'});
+
+    _.each(titles, (obj) => {
+        columns.push({key: obj.id+'_score', value: obj.title+(obj.id=='totalScore'? '':'分数'), objectId: obj.id, title: obj.title});
+        columns.push({key: obj.id+'_rank', value: obj.title+'排名', objectId: obj.id, title: obj.title});
+        if(showClassRank) columns.push({key: obj.id+'_classRank', value: obj.title+'班级排名', objectId: obj.id, title: obj.title})
+    });
+    return columns;
+}
+
+
+function getRowDS({currentLesson, currentClass, searchStr}) {
+    var rowDS;
+    if(currentLesson == 'all') {
+        if(searchStr == '') {
+            rowDS = getAllSubjectData();
+        } else {
+            rowDS = getAllSubjectDataBySearch(searchStr);
+        }
+    } else {
+        if(currentClass == 'all') {
+            if(searchStr == '') {
+                rowDS = getSpecificLessonData(currentLesson);
+            } else {
+                rowDS = getSpecificLessonDataBySearch(currentLesson, searchStr);
+            }
+        } else {
+            if(searchStr == '') {
+                rowDS = getSpecificLessonClassData(currentLesson, currentClass);
+            } else {
+                rowDS = getSpecificLessonClassDataBySearch(currentLesson, currentClass, searchStr);
+            }
+        }
+    }
+    //TODO：还需要分页
+    return rowDS;
+}
+
+//旧方法
+function getTableBody({currentLesson, currentClass, searchStr, columns, sortKey}) {
+    //横向扫描得到一行的数据
+    //根据不同的选项组合，调用不同的获取TableBody的方法
+
+
+    //上面都是过滤行数据，下面针对行数据统一过滤列数据
+    //优化：只是排序和隐藏列并不会影响rowDS
+    var tableDS = getTableDS(rowDS, columns, sortKey);
+
+
+}
+
+
+
+function getTableDS(rowDS, columns) {
+
+}
+
+function getTableBody(tableDS, sortKey) {
+
+}
+
+
+function getAllSubjectData(theDS) {
+    return theDS;
+}
+
+function getAllSubjectDataBySearch(theDS, searchStr) {
+    return _.chain(theDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
+}
+
+function getSpecificLessonData(theDS, currentLesson, zoubanLessonStudentsInfo) {
+    var currentLessonAllStudentIds = _.union(..._.map(zoubanLessonStudentsInfo[currentLesson.objectId], (currentLessonClassStudents, className) => _.map(currentLessonClassStudents, (obj) => obj.id)));
+    return _.pick(theDS, currentLessonAllStudentIds);
+}
+
+function getSpecificLessonDataBySearch(theDS, currentLesson, zoubanLessonStudentsInfo, searchStr) {
+    var currentLessonAllStudentIds = _.union(..._.map(zoubanLessonStudentsInfo[currentLesson.objectId], (currentLessonClassStudents, className) => _.map(currentLessonClassStudents, (obj) => obj.id)));
+    var currentLessonStudentDS = _.pick(theDS, currentLessonAllStudentIds);
+    return _.chain(currentLessonStudentDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
+}
+
+function getSpecificLessonClassData(theDS, currentLesson, zoubanLessonStudentsInfo, currentClass) {
+    var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentLesson.objectId][currentClass], (currentLessonClassStudents) => _.map(currentLessonClassStudents, (obj) => obj.id));
+    return _.pick(theDS, currentLessonClassStudentIds);
+}
+
+function getSpecificLessonClassDataBySearch(theDS, currentLesson, zoubanLessonStudentsInfo, currentClass, searchStr) {
+    var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentLesson.objectId][currentClass], (currentLessonClassStudents) => _.map(currentLessonClassStudents, (obj) => obj.id));
+    var currentLessonClassStudentDS =  _.pick(theDS, currentLessonClassStudentIds);
+    return _.chain(currentLessonClassStudentDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
+}
+
+
+function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo, isEquivalent) {
+    var zoubanExamStudentsInfoMap = _.keyBy(zoubanExamStudentsInfo, 'id');
+    var result = {}, tempObj, totalStudentInfoObj;
+    _.each(zoubanLessonStudentsInfo, (currentLessonStudentsInfo, lessonObjectId) => {
+        _.each(currentLessonStudentsInfo, (currentLessonClassStudentsInfo, className) => {
+            tempObj = result[lessonStudentInfoObj.id];
+            if(!tempObj) {
+                totalStudentInfoObj = zoubanExamStudentsInfoMap[lessonStudentInfoObj.id];
+                tempObj = _.pick(totalStudentInfoObj, ['id', 'kaohao', 'name']);
+                tempObj['totalScore_score'] = totalStudentInfoObj.equivalentScore;
+                tempObj['totalScore_rank'] = totalStudentInfoObj.equivalentRank;
+                //班级信息都是补录的--当获取到选择的currentClass
+                result[lessonStudentInfoObj.id] = tempObj;
+            }
+            tempObj[lessonObjectId+'_score'] = (isEquivalent) ? lessonStudentInfoObj.equivalentScore : lessonStudentInfoObj.score;
+            tempObj[lessonObjectId+'_rank'] = (isEquivalent) ? lessonStudentInfoObj.equivalentLessonRank : lessonStudentInfoObj.lessonRank;
+        });
+    });
+    return result;
+}
+
+//当给出交互，得到当前选项后，基于不同给的选项组合，在DS的基础上，过滤，补充数据，组成TableBody
 
  //姓名，学号，总分，语文，数学，英语
  var subjects = [' 语文','数学','英语'];//需提供
@@ -295,7 +545,7 @@ class InputWidget extends React.Component {
  }
  function getMorkData (number,subjects){
      var  studentInfo = [];
-     debugger
+     // debugger
      _.forEach(_.range(number),function(index){
      var student = [];
      student.push('丁'+index);
@@ -310,7 +560,7 @@ class InputWidget extends React.Component {
      studentInfo.push(student);
 
      })
-     debugger
+     // debugger
      return studentInfo;
  }
  function matchTableData (studentInfo){//转化body数据以符合渲染
@@ -353,3 +603,130 @@ class InputWidget extends React.Component {
          ':hover': {color: colorsMap.B03}
      }
  }
+
+
+
+// function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo) {
+// //还是以课程，班级为单位进行组织
+//     var zoubanExamStudentsInfoMap = _.keyBy(zoubanExamStudentsInfo, 'id');
+//     var result = {}, tempObj, totalStudentInfoObj, studentCurrentClassObj;
+//     _.each(zoubanLessonStudentsInfo, (currentLessonStudentsInfo, lessonObjectId) => {
+//         result[lessonObjectId] = {};
+//         _.each(currentLessonStudentsInfo, (currentLessonClassStudentsInfo, className) => {
+//              // debugger;
+//             result[lessonObjectId][className] = _.map(currentLessonClassStudentsInfo, (lessonStudentInfoObj) => {
+//                 // debugger
+//                 totalStudentInfoObj = zoubanExamStudentsInfoMap[lessonStudentInfoObj.id];
+//                 // debugger;
+//                 // if(!totalStudentInfoObj) {
+//                 //     debugger;
+//                 // }
+//                 tempObj = _.pick(totalStudentInfoObj, ['id', 'kaohao', 'name']);
+//                 tempObj.totalScore = totalStudentInfoObj.score;
+//                 tempObj.totalScoreRank = totalStudentInfoObj.rank;
+
+//                 studentCurrentClassObj = _.find(totalStudentInfoObj.classes, (obj) => obj.name == className);
+
+//                 tempObj.totalScoreClassRank = studentCurrentClassObj.rank;
+//                 tempObj.equivalentTotalScore = totalStudentInfoObj.equivalentScore;
+//                 tempObj.equivalentTotalScoreRank = totalStudentInfoObj.equivalentRank;
+//                 tempObj.equivalentTotalScoreClassRank = studentCurrentClassObj.equivalentRank;
+
+//                 _.assign(tempObj, _.pick(lessonStudentInfoObj, ['score', 'lessonRank', 'classRank', 'equivalentScore', 'equivalentLessonRank', 'equivalentClassRank']));
+//                 return tempObj;
+//             });
+//         });
+//     });
+//     return result;
+// }
+
+
+
+// function getTableBody(currentLessonLevelDis, levelHeaderTitles, levelHeaderPercentages) {
+//     var result = [];
+//     result.push(getTableRowItem(currentLessonLevelDis.lesson, levelHeaderTitles, levelHeaderPercentages));
+//     _.each(currentLessonLevelDis, (obj, key) => {
+//         if(key == 'lesson') return;
+//         result.push(getTableRowItem(currentLessonLevelDis[key], levelHeaderTitles, levelHeaderPercentages));
+//     });
+//     return result;
+// }
+
+// function getTableRowItem(levelDisInfo, levelHeaderTitles, levelHeaderPercentages) {
+//     var item = {};
+//     _.each(levelHeaderTitles, (obj) => {
+//         item[obj.id] = levelDisInfo[obj.id]
+//     });
+//     var countsArr = [], percentagesArr = [];
+//     _.each(levelDisInfo.infos, (infoObj, index) => {
+//         item[levelHeaderPercentages[index * 2].id] = infoObj.count;
+//         item[levelHeaderPercentages[index*2+1].id] = infoObj.percentage;
+//     });
+//     return item;
+// }
+
+
+/*
+全科：
+[
+    kaohao, name, totalScore, <paperObjectId>...
+]
+
+
+subjects: 从examInfo.lessons中获取objectId和name
+
+currentLesson:
+    全科（没有班级选项）isAllSubject
+        原值表格：
+            zoubanExamStudentsInfo: kaohao, name,
+
+        if(somePercentage!=1)显示
+        转换表格：
+
+    单科：
+        全班：(没有班级排名)
+            原值表格：
+
+            if(currentPercentage != 1)显示
+            转换表格：
+        某班：（有班级排名）
+            原值表格：
+
+            if(currentPercentage != 1)显示
+ */
+
+//群体；fields
+
+
+//【暂时没有隐藏列】
+// function getTableHeader(columns, showClass, showClassRank) {
+// //从columns中反推出关于subject的东西
+//     //从clolumns中拿出不带有paperObjectId的--就是headerKeys
+//     var headerKeys = _.chain(columns).filter(obj => !obj.paperObjectId).map(obj => {
+//         return {
+//             id: obj.key,
+//             name: obj.value,
+//             rowSpan: 2
+//         }
+//     }).value();
+
+//     var header = [
+//         headerKeys
+//     ];
+
+//     var validTitlesByColumns = _.filter(columns, obj => obj.paperObjectId);
+//     var validTitlesByColumnsMap = _.groupBy(validTitlesByColumns, 'paperObjectId');
+//     var subjectHeaderTitles = [], subjectSubTitles = [];
+//     //不对，这样遍历就没有了顺序了！！！--先确认这样是不是有顺序！！！
+//     _.each(validTitlesByColumnsMap, (validTitles, paperObjectId) => {
+//         subjectHeaderTitles.push({name: validTitles[0].title, colSpan: (showClass ? 2 : 3), objectId: paperObjectId});
+//         //然后就是本身已经有的内容
+//         _.each(validTitles, (obj) => {
+//             subjectSubTitles.push({id: obj.key, name: obj.value, objectId: obj.objectId});
+//             if(showClassRank) subjectSubTitles.push({id: obj.objectId+'_classRank', name: obj.title+'班级排名', objectId: obj.objectId});
+//         });
+//     });
+//     header[0] = _.concat(header[0], subjectHeaderTitles);
+//     header[1] = subjectSubTitles;
+//     return header;
+// }
