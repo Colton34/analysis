@@ -13,6 +13,9 @@ import Select from '../../../common/Selector/Select';
 
 import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
+import {insertRankInfo} from '../../../sdk';
+
+//TODO:title里id为all而不是totalScore，totalScore是都会存在的;
 
 //TODO: 需要一个ZoubanSubjectStudentsInfo
 function getZoubanSubjectStudentsInfo(zoubanLessonStudentsInfo, zoubanExamInfo) {
@@ -61,19 +64,28 @@ class RankReportContainer extends React.Component {
     constructor(props) {
         super(props);
         this.theDS = getRanReportDS(this.props.zoubanExamStudentsInfo, this.props.zoubanLessonStudentsInfo, this.props.isEquivalent);
+        debugger;
 
         var lessons = this.props.zoubanExamInfo.lessons;
-        var titles = this.props.isEquivalent ? getSubjectTtitles(lessons) : getLessonTitles(lessons);//[{id: , title: }]
-        var currentTitle = titles[0];
+        var titleOptions = this.props.isEquivalent ? getSubjectTtitles(lessons) : getLessonTitles(lessons);//[{id: , title: }]
+        var titles = titleOptions.slice(1);
+        titles.unshift({id: 'totalScore', title: '总分'});
+        debugger;
+        var currentTitle = titleOptions[0];
+        var lessonClassesOptions = [];
         var lessonClasses = [];
-        var currentClass = lessonClasses[0];
+        var currentClass = lessonClassesOptions[0];
+        debugger;
         // var columns = getColumns(titles, !!currentClass);
             //[暂时没有隐藏列]
             // currentColumns: columns,
             // selectedColumns: columns,
         this.state = {
+            titleOptions: titleOptions,
+            titles: titles,
             titles: titles,
             currentTitle: currentTitle,
+            lessonClassesOptions: lessonClassesOptions,
             lessonClasses: lessonClasses,
             currentClass: currentClass,
             searchStr: '',
@@ -84,7 +96,21 @@ class RankReportContainer extends React.Component {
     }
 
     handleSelectTitle(selectedTitle) {
-
+        var titles = (selectedTitle.id == 'all') ? getLessonTitles(lessons).slice(1) : [{id: 'totalScore', title: '总分'}, selectedTitle];
+        var lessonClassesOptions = (selectedTitle.id == 'all') ? [] : _.keys(this.props.zoubanLessonStudentsInfo[selectedTitle.id]);
+        var lessonClasses = _.cloneDeep(lessonClassesOptions);
+        if(selectedTitle.id != 'all') lessonClassesOptions.unshift('all');
+        var currentClass = lessonClassesOptions[0];
+        var currentSortKey = (selectedTitle.id == 'all') ? 'totalScore_score' : selectedTitle.id+'_score';
+        debugger;
+        this.setState({
+            titles: titles,
+            currentTitle: selectedTitle,
+            lessonClassesOptions: lessonClassesOptions,
+            lessonClasses: lessonClasses,
+            currentClass: currentClass,
+            currentSortKey: currentSortKey
+        });
     }
 
     handleSelectClass(selectedClass) {
@@ -92,18 +118,22 @@ class RankReportContainer extends React.Component {
     }
 
     render() {
-        var showClassInfo = (this.state.currentTitle.id != 'totalScore');
+        var showClassInfo = (this.state.currentTitle.id != 'all');
+        debugger;
+        // var tableHeader = (this.state.currentTitle.id == 'all') ? getTableHeader(this.state.currentTitle, showClassInfo, this.state.titles) : getTableHeader(this.state.currentTitle, showClassInfo);
         var tableHeader = getTableHeader(this.state.titles, showClassInfo);
+        debugger;
+
         //TODO:计算tableData，一并得到totalCount
-        var currentColumns = getColumns(this.state.titles, showClassInfo);
-        // debugger;
+        // var currentColumns = getColumns(this.state.titles, showClassInfo);
         var theRowDS = getRowDS({theDS: this.theDS, currentTitle:this.state.currentTitle,  currentClass: this.state.currentClass, searchStr: this.state.searchStr, zoubanLessonStudentsInfo: this.props.zoubanLessonStudentsInfo});
-        // debugger;
-        var tableBody = getTableBody({rowDS: theRowDS, currentPageSize: this.state.currentPageSize, currentPageValue: this.state.currentPageValue, columns: currentColumns, currentSortKey: this.state.currentSortKey});
+        debugger;
+        var tableBody = getTableBody({rowDS: theRowDS, currentPageSize: this.state.currentPageSize, currentPageValue: this.state.currentPageValue, currentSortKey: this.state.currentSortKey}); //columns: currentColumns,
         debugger;
 
         return (
             <div>
+                <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
                 <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={EnhanceTable}></TableView>
 
             </div>
@@ -126,7 +156,7 @@ class TitleSelector extends React.Component {
             <div style={{ padding: '5px 30px 0 0px',marginBottom:0}} className={commonClass['section']}>
                 <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
                     <span style={{ marginRight: 10}}>{this.props.isEquivalent ? '学科' : '课程'}：</span>
-                        {_.map(this.props.titles, (titleObj, index) => {
+                        {_.map(this.props.titleOptions, (titleObj, index) => {
                             return (
                                 <a key={'title-' + index} onClick={this.onSelectTitle.bind(this, titleObj)} style={ localStyle.subject}>{titleObj.title}{(titleObj.id == this.props.currentTitle.id) ? '(选中)' : ''}</a>
                             )
@@ -327,7 +357,7 @@ function getLessonTitles(lessons) {
             title: obj.name
         }
     });
-    lessonTitles.unshift({ id: 'totalScore', title: '总分'});
+    lessonTitles.unshift({ id: 'all', title: '全科'});
     return lessonTitles;
 }
 
@@ -339,7 +369,7 @@ function getSubjectTtitles(lessons) {
             title: subjectName
         }
     });
-    subjectTitles.unshift({id: 'totalScore', title: '总分'});
+    subjectTitles.unshift({id: 'all', title: '全科'});
     return subjectTitles;
 }
 
@@ -392,20 +422,20 @@ columns: [
 ]
  */
 //当有需要注入关于【班级】的信息的时候，就会注入更改columns，进而改变TableHeader。【假设】学生不会跨层考试。showClass和showClassRank还是不一样，当选择某一个班级的时候不用显示class列但是需要显示classRank列
-function getColumns(titles, showClassInfo) {
-    var columns = [
-        {key: 'kaohao', value: '考号'},
-        {key:'name', value: '姓名'}
-    ];
-    if(showClassInfo) columns.push({key: 'class', value: '班级'});
+// function getColumns(titles, showClassInfo) {
+//     var columns = [
+//         {key: 'kaohao', value: '考号'},
+//         {key:'name', value: '姓名'}
+//     ];
+//     if(showClassInfo) columns.push({key: 'class', value: '班级'});
 
-    _.each(titles, (obj) => {
-        columns.push({key: obj.id+'_score', value: obj.title+(obj.id=='totalScore'? '':'分数'), objectId: obj.id, title: obj.title});
-        columns.push({key: obj.id+'_rank', value: obj.title+'排名', objectId: obj.id, title: obj.title});
-        if(showClassInfo) columns.push({key: obj.id+'_classRank', value: obj.title+'班级排名', objectId: obj.id, title: obj.title})
-    });
-    return columns;
-}
+//     _.each(titles, (obj) => {
+//         columns.push({key: obj.id+'_score', value: obj.title+(obj.id=='totalScore'? '':'分数'), objectId: obj.id, title: obj.title});
+//         columns.push({key: obj.id+'_rank', value: obj.title+'排名', objectId: obj.id, title: obj.title});
+//         if(showClassInfo) columns.push({key: obj.id+'_classRank', value: obj.title+'班级排名', objectId: obj.id, title: obj.title})
+//     });
+//     return columns;
+// }
 
 function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo, isEquivalent) {
     var zoubanExamStudentsInfoMap = _.keyBy(zoubanExamStudentsInfo, 'id');
@@ -416,7 +446,7 @@ function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo, isEqui
                 tempObj = result[lessonStudentInfoObj.id];
                 if(!tempObj) {
                     totalStudentInfoObj = zoubanExamStudentsInfoMap[lessonStudentInfoObj.id];
-                    tempObj = _.pick(totalStudentInfoObj, ['id', 'kaohao', 'name']);
+                    tempObj = _.pick(totalStudentInfoObj, ['id', 'kaohao', 'name', 'classes']);
                     tempObj['totalScore_score'] = totalStudentInfoObj.equivalentScore;
                     tempObj['totalScore_rank'] = totalStudentInfoObj.equivalentRank;
                     //班级信息都是补录的--当获取到选择的currentClass
@@ -424,6 +454,7 @@ function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo, isEqui
                 }
                 tempObj[lessonObjectId+'_score'] = (isEquivalent) ? lessonStudentInfoObj.equivalentScore : lessonStudentInfoObj.score;
                 tempObj[lessonObjectId+'_rank'] = (isEquivalent) ? lessonStudentInfoObj.equivalentLessonRank : lessonStudentInfoObj.lessonRank;
+                tempObj[lessonObjectId+'_classRank'] = (isEquivalent) ? lessonStudentInfoObj.equivalentClassRank : lessonStudentInfoObj.classRank;
             })
         });
     });
@@ -433,7 +464,8 @@ function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo, isEqui
 
 function getRowDS({theDS, currentTitle, currentClass, searchStr, zoubanLessonStudentsInfo}) {
     var rowDS;
-    if(currentTitle.id == 'totalScore') {
+    debugger;
+    if(currentTitle.id == 'all') {
         if(searchStr == '') {
             rowDS = getAllSubjectData(theDS);
         } else {
@@ -441,7 +473,9 @@ function getRowDS({theDS, currentTitle, currentClass, searchStr, zoubanLessonStu
         }
     } else {
         if(currentClass == 'all') {
+            debugger;//进来
             if(searchStr == '') {
+                debugger;//进来
                 rowDS = getSpecificLessonData(theDS, currentTitle, zoubanLessonStudentsInfo);
             } else {
                 rowDS = getSpecificLessonDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, searchStr);
@@ -469,28 +503,48 @@ function getAllSubjectDataBySearch(theDS, searchStr) {
 
 function getSpecificLessonData(theDS, currentTitle, zoubanLessonStudentsInfo) {
     var currentLessonAllStudentIds = _.union(..._.map(zoubanLessonStudentsInfo[currentTitle.id], (currentLessonClassStudents, className) => _.map(currentLessonClassStudents, (obj) => obj.id)));
-    return _.pick(theDS, currentLessonAllStudentIds);
+    debugger;
+    var currentLessonAllStudentInfo = _.pick(theDS, currentLessonAllStudentIds);
+    insertTotalClassRankInfo(currentLessonAllStudentInfo, currentTitle)
+    debugger;
+    return currentLessonAllStudentInfo;
 }
 
 
 function getSpecificLessonDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, searchStr) {
     var currentLessonAllStudentIds = _.union(..._.map(zoubanLessonStudentsInfo[currentTitle.id], (currentLessonClassStudents, className) => _.map(currentLessonClassStudents, (obj) => obj.id)));
     var currentLessonStudentDS = _.pick(theDS, currentLessonAllStudentIds);
-    return _.chain(currentLessonStudentDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
+    var filterCurrentLessonStudentDS = _.chain(currentLessonStudentDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
+    insertTotalClassRankInfo(filterCurrentLessonStudentDS, currentTitle);
+    return filterCurrentLessonStudentDS;
 }
 
 function getSpecificLessonClassData(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass) {
     var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentTitle.id][currentClass], (currentLessonClassStudents) => _.map(currentLessonClassStudents, (obj) => obj.id));
-    return _.pick(theDS, currentLessonClassStudentIds);
+    var currentLessonClassStudentsInfo = _.pick(theDS, currentLessonClassStudentIds);
+    insertTotalClassRankInfo(currentLessonClassStudentsInfo, currentTitle);
+    return currentLessonClassStudentsInfo;
 }
 
 function getSpecificLessonClassDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass, searchStr) {
     var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentTitle.id][currentClass], (currentLessonClassStudents) => _.map(currentLessonClassStudents, (obj) => obj.id));
     var currentLessonClassStudentDS =  _.pick(theDS, currentLessonClassStudentIds);
-    return _.chain(currentLessonClassStudentDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
+    var filterCurrentLessonClassStudentDS = _.chain(currentLessonClassStudentDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
+    insertTotalClassRankInfo(filterCurrentLessonClassStudentDS, currentTitle);
+    return filterCurrentLessonClassStudentDS;
 }
 
-function getTableBody({rowDS, currentPageSize, currentPageValue, columns, currentSortKey='totalScore_score'}) {
+function insertTotalClassRankInfo(studentsInfo, currentTitle) {
+    var targetClassObj;
+    _.each(studentsInfo, (obj) => {
+        targetClassObj = _.find(obj.classes, (cobj) => cobj.paperObjectId == currentTitle.id)
+        obj['totalScore_classRank'] = targetClassObj.rank;
+        obj['class'] = targetClassObj.name;
+    });
+}
+
+function getTableBody({rowDS, currentPageSize, currentPageValue, currentSortKey='totalScore_score'}) { // columns,
+    debugger;//检查一下sortKey
     rowDS = _.orderBy(rowDS, [currentSortKey], ['desc']);
     var beginCount = currentPageSize * (currentPageValue-1);
     var endCount = beginCount + currentPageSize;
