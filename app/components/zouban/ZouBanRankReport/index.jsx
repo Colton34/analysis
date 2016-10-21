@@ -14,6 +14,7 @@ import Select from '../../../common/Selector/Select';
 import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import {insertRankInfo} from '../../../sdk';
+import {downloadData} from '../../../lib/util';
 
 //TODO:title里id为all而不是totalScore，totalScore是都会存在的;
 
@@ -140,11 +141,16 @@ class RankReportContainer extends React.Component {
         })
     }
 
+    clickDownloadTable() {
+        debugger;
+        downloadData(this.downloadKeys, this.downloadNames, this.downloadTableData, '排行榜');
+    }
+
     render() {
         var showClassInfo = (this.state.currentTitle.id != 'all');
         debugger;
         // var tableHeader = (this.state.currentTitle.id == 'all') ? getTableHeader(this.state.currentTitle, showClassInfo, this.state.titles) : getTableHeader(this.state.currentTitle, showClassInfo);
-        var tableHeader = getTableHeader(this.state.titles, showClassInfo);
+        var {tableHeader, headerKeys, subjectSubTitles} = getTableHeader(this.state.titles, showClassInfo);
         debugger;
 
         //TODO:计算tableData，一并得到totalCount
@@ -157,15 +163,36 @@ class RankReportContainer extends React.Component {
         var totalCount = _.size(theRowDS);
         var options = getPageSelecOptions(totalCount);
 
+        var {downloadKeys, downloadNames} = getDownloadFields(headerKeys, subjectSubTitles);
+        this.downloadKeys = downloadKeys;
+        this.downloadNames = downloadNames;
+        this.downloadTableData = getDownTableData(theRowDS, downloadKeys);//下载全部页数的表格内容
+
         return (
             <div>
                 <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
                 {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
-                <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} />
+                <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} clickDownloadTable={this.clickDownloadTable.bind(this)} />
                 <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={EnhanceTable}></TableView>
                 <Paginate currentPageSize={this.state.currentPageSize} currentPageValue={this.state.currentPageValue} totalCount={totalCount} options={options} handleSelectPageSize={this.handleSelectPageSize.bind(this)} handleSelectPageValue={this.handleSelectPageValue.bind(this)} />
             </div>
         );
+    }
+}
+
+function getDownloadFields(headerKeys, subjectSubTitles) {
+    var downloadKeys = [], downloadNames = [];
+    _.each(headerKeys, (obj) => {
+        downloadKeys.push(obj.id);
+        downloadNames.push(obj.name);
+    });
+    _.each(subjectSubTitles, (obj) => {
+        downloadKeys.push(obj.id);
+        downloadNames.push(obj.name);
+    });
+    return {
+        downloadKeys: downloadKeys,
+        downloadNames: downloadNames
     }
 }
 
@@ -310,7 +337,7 @@ class SearchSortDropSelector extends React.Component {
                 <span className={commonClass['title']} >分数排行榜详情</span>
                 <div style={{float:'right'}}>
                     <SearchInput searchStr={this.props.searchStr} handleSearch={this.props.handleSearch} />
-                    <Button  style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
+                    <Button onClick={this.props.clickDownloadTable} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
                 </div>
             </div>
 
@@ -409,6 +436,11 @@ function getTableHeader(titles, showClassInfo) {
     var {subjectHeaderTitles, subjectSubTitles} = getTitleHeader(titles, showClassInfo);
     header[0] = _.concat(header[0], subjectHeaderTitles);
     header[1] = subjectSubTitles;
+    return {
+        tableHeader: header,
+        headerKeys: headerKeys,
+        subjectSubTitles: subjectSubTitles
+    }
     return header;
 }
 
@@ -591,9 +623,17 @@ function getTableBody({rowDS, currentPageSize, currentPageValue, currentSortKey=
     // });
 }
 
+function getDownTableData(rowDS, downloadKeys) {
+    return _.map(rowDS, (rowItem) => {
+        return _.map(downloadKeys, (key) => {
+            return rowItem[key];
+        });
+    });
+}
 
 
 
+//=================================  Mock ==========================================
 
 
 //当给出交互，得到当前选项后，基于不同给的选项组合，在DS的基础上，过滤，补充数据，组成TableBody
