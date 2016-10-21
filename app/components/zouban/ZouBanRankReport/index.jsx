@@ -90,7 +90,7 @@ class RankReportContainer extends React.Component {
             currentClass: currentClass,
             searchStr: '',
             currentPageSize: 25,
-            currentPageValue: 1,
+            currentPageValue: 0,
             currentSortKey: 'totalScore_score'
         }
     }
@@ -127,6 +127,19 @@ class RankReportContainer extends React.Component {
         })
     }
 
+    handleSelectPageSize(selectedPageSize) {
+        this.setState({
+            currentPageSize: selectedPageSize
+        })
+    }
+
+    handleSelectPageValue(selectedPageObj) {
+        debugger;
+        this.setState({
+            currentPageValue: selectedPageObj.selected
+        })
+    }
+
     render() {
         var showClassInfo = (this.state.currentTitle.id != 'all');
         debugger;
@@ -141,16 +154,28 @@ class RankReportContainer extends React.Component {
         var tableBody = getTableBody({rowDS: theRowDS, currentPageSize: this.state.currentPageSize, currentPageValue: this.state.currentPageValue, currentSortKey: this.state.currentSortKey}); //columns: currentColumns,
         debugger;
 
+        var totalCount = _.size(theRowDS);
+        var options = getPageSelecOptions(totalCount);
+
         return (
             <div>
                 <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
                 {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
                 <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} />
                 <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={EnhanceTable}></TableView>
-
+                <Paginate currentPageSize={this.state.currentPageSize} currentPageValue={this.state.currentPageValue} totalCount={totalCount} options={options} handleSelectPageSize={this.handleSelectPageSize.bind(this)} handleSelectPageValue={this.handleSelectPageValue.bind(this)} />
             </div>
         );
     }
+}
+
+function getPageSelecOptions(totalCount) {
+    var options = [];
+    if(totalCount > 25) options.push({value: 25, label: 25});
+    if(totalCount > 50) options.push({value: 50, label: 50});
+    if(totalCount > 100) options.push({value: 100, label: 100});
+    if(totalCount > 1000) options.push({value: 1000, label: 1000});
+    return options;
 }
 
 //isEquivalent; titles; currentTitle; handleSelectTitle
@@ -297,26 +322,18 @@ class SearchSortDropSelector extends React.Component {
 class Paginate extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            pageSize: this.props.currentPageSize
-        }
     }
 
     onSelectPageSize(selectedPageSize) {
-        this.setState({
-            pageSize: selectedPageSize
-        });
+        debugger;
         this.props.handleSelectPageSize(selectedPageSize);
     }
 
     render() {
-        var beginCount = currentPageValue * (currentPageSize-1) + 1;
-        var endCount = beginCount + currentPageSize - 1;
-        var options = [];
-        if(this.props.totalCount > 25) options.push({value: 25, label: '25'});
-        if(this.props.totalCount > 50) options.push({value: 50, label: '50'});
-        if(this.props.totalCount > 100) options.push({value: 100, label: '100'});
-        if(this.props.totalCount > 1000) options.push({value: 1000, label: '1000'});
+        var beginCount = this.props.currentPageSize * this.props.currentPageValue + 1;
+        var endCount = beginCount + this.props.currentPageSize - 1;
+
+        debugger;
         return(
             <div>
                 <span style={{margin: '18px 0px 0px 0px', display: 'inline-block'}}>
@@ -324,7 +341,9 @@ class Paginate extends React.Component {
                     <span style={this.props.totalCount < 25 ? {display: 'none'} : {display: 'inline-block'}}>
                         ，每页显示
                         <Select
-                            options={options}
+                            simpleValue
+                            options={this.props.options}
+                            value={this.props.currentPageSize}
                             onChange={this.onSelectPageSize.bind(this)}
                         />
                         条记录
@@ -335,7 +354,7 @@ class Paginate extends React.Component {
                        nextLabel={">"}
                        breakLabel={<span>...</span>}
                        breakClassName={"break-me"}
-                       pageNum={_.ceil(_.divide(this.props.totalCount, this.state.pageSize))}
+                       pageNum={_.ceil(_.divide(this.props.totalCount, this.props.currentPageSize))}
                        marginPagesDisplayed={2}
                        pageRangeDisplayed={5}
                        forceSelected={this.props.currentPageValue}
@@ -560,7 +579,7 @@ function insertTotalClassRankInfo(studentsInfo, currentTitle) {
 function getTableBody({rowDS, currentPageSize, currentPageValue, currentSortKey='totalScore_score'}) { // columns,
     debugger;//检查一下sortKey
     rowDS = _.orderBy(rowDS, [currentSortKey], ['desc']);
-    var beginCount = currentPageSize * (currentPageValue-1);
+    var beginCount = currentPageSize * (currentPageValue);
     var endCount = beginCount + currentPageSize;
     var currentPageRowDS = rowDS.slice(beginCount, endCount);
     return currentPageRowDS;
