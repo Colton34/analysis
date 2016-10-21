@@ -96,10 +96,10 @@ class RankReportContainer extends React.Component {
     }
 
     handleSelectTitle(selectedTitle) {
-        var titles = (selectedTitle.id == 'all') ? getLessonTitles(lessons).slice(1) : [{id: 'totalScore', title: '总分'}, selectedTitle];
+        var titles = (selectedTitle.id == 'all') ? getLessonTitles(this.props.zoubanExamInfo.lessons).slice(1) : [{id: 'totalScore', title: '总分'}, selectedTitle];
         var lessonClassesOptions = (selectedTitle.id == 'all') ? [] : _.keys(this.props.zoubanLessonStudentsInfo[selectedTitle.id]);
         var lessonClasses = _.cloneDeep(lessonClassesOptions);
-        if(selectedTitle.id != 'all') lessonClassesOptions.unshift('all');
+        if(selectedTitle.id != 'all') lessonClassesOptions.unshift('全部');
         var currentClass = lessonClassesOptions[0];
         var currentSortKey = (selectedTitle.id == 'all') ? 'totalScore_score' : selectedTitle.id+'_score';
         debugger;
@@ -114,7 +114,10 @@ class RankReportContainer extends React.Component {
     }
 
     handleSelectClass(selectedClass) {
-
+        debugger;
+        this.setState({
+            currentClass: selectedClass
+        })
     }
 
     render() {
@@ -134,6 +137,7 @@ class RankReportContainer extends React.Component {
         return (
             <div>
                 <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
+                {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
                 <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={EnhanceTable}></TableView>
 
             </div>
@@ -175,6 +179,7 @@ class ClassSelector extends React.Component {
     }
 
     onSelectClass(selectedClass) {
+        debugger;
         this.props.handleSelectClass(selectedClass);
     }
 
@@ -183,13 +188,9 @@ class ClassSelector extends React.Component {
             <div style={{heigth: 50, lineHeight: '50px',marginTop:0,padding:0}} className={commonClass['section']}>
                 <span style={{ float: 'left', marginRight: 10}}>教学班:</span>
                 <span style={{float: 'left', width: 800}}>
-                    <span style={{display: 'inline-block', marginRight: 30, minWidth: 50}}>
-                        <input value='全部' style={{ marginRight: 5, cursor: 'pointer'}} type='checkbox' />
-                        <span>全部</span>
-                    </span>
                     {
-                        (this.props.lessonClasses.length > 0) ? (
-                                _.map(this.props.lessonClasses, (className, index) => {
+                        (this.props.lessonClassesOptions.length > 0) ? (
+                                _.map(this.props.lessonClassesOptions, (className, index) => {
                                     return (
                                         <span key={'classNames-' + index} style={{display: 'inline-block', marginRight: 30, minWidth: 50}} >
                                             <input value={className} checked={this.props.currentClass == className} onChange={this.onSelectClass.bind(this, className)} style={{ marginRight: 5, cursor: 'pointer' }} type='checkbox' />
@@ -472,7 +473,7 @@ function getRowDS({theDS, currentTitle, currentClass, searchStr, zoubanLessonStu
             rowDS = getAllSubjectDataBySearch(theDS, searchStr);
         }
     } else {
-        if(currentClass == 'all') {
+        if(currentClass == '全部') {
             debugger;//进来
             if(searchStr == '') {
                 debugger;//进来
@@ -481,6 +482,7 @@ function getRowDS({theDS, currentTitle, currentClass, searchStr, zoubanLessonStu
                 rowDS = getSpecificLessonDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, searchStr);
             }
         } else {
+            debugger;//某个具体班级
             if(searchStr == '') {
                 rowDS = getSpecificLessonClassData(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass);
             } else {
@@ -520,14 +522,18 @@ function getSpecificLessonDataBySearch(theDS, currentTitle, zoubanLessonStudents
 }
 
 function getSpecificLessonClassData(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass) {
-    var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentTitle.id][currentClass], (currentLessonClassStudents) => _.map(currentLessonClassStudents, (obj) => obj.id));
+    debugger;
+    var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentTitle.id][currentClass], (obj) => obj.id);
+    debugger;
     var currentLessonClassStudentsInfo = _.pick(theDS, currentLessonClassStudentIds);
+    debugger;
     insertTotalClassRankInfo(currentLessonClassStudentsInfo, currentTitle);
+    debugger;
     return currentLessonClassStudentsInfo;
 }
 
 function getSpecificLessonClassDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass, searchStr) {
-    var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentTitle.id][currentClass], (currentLessonClassStudents) => _.map(currentLessonClassStudents, (obj) => obj.id));
+    var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentTitle.id][currentClass], (obj) => obj.id);
     var currentLessonClassStudentDS =  _.pick(theDS, currentLessonClassStudentIds);
     var filterCurrentLessonClassStudentDS = _.chain(currentLessonClassStudentDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
     insertTotalClassRankInfo(filterCurrentLessonClassStudentDS, currentTitle);
