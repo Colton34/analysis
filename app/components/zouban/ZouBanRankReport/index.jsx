@@ -120,6 +120,13 @@ class RankReportContainer extends React.Component {
         })
     }
 
+    handleSearch(searchStr) {
+        debugger;
+        this.setState({
+            searchStr: searchStr
+        })
+    }
+
     render() {
         var showClassInfo = (this.state.currentTitle.id != 'all');
         debugger;
@@ -138,6 +145,7 @@ class RankReportContainer extends React.Component {
             <div>
                 <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
                 {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
+                <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} />
                 <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={EnhanceTable}></TableView>
 
             </div>
