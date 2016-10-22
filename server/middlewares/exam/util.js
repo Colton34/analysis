@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-19 11:27:21
+* @Last Modified time: 2016-10-22 11:27:07
 */
 'use strict';
 var _ = require('lodash');
@@ -459,7 +459,7 @@ function generateZoubanPaperStudentsInfo(papers, equivalentScoreInfo) {
                     paperStudentObj.score = paperStudentObj.score + studentObj.score;
                     studentCurrentLessonEquivalentScore = _.round(_.multiply(studentObj.score, equivalentScoreInfoMap[paperObj._id].percentage), 2);
                     paperStudentObj.equivalentScore = paperStudentObj.equivalentScore + studentCurrentLessonEquivalentScore;
-                    paperStudentObj.papers.push({id: studentObj.id, paperid: paperObj.id, paperObjectId: paperObj._id, score: studentObj.score, equivalentScore: studentCurrentLessonEquivalentScore, 'class_name': studentObj.class, questionScores: matrix[index], questionAnswers: answers[index]});
+                    paperStudentObj.papers.push({id: studentObj.id, name: studentObj.name, paperid: paperObj.id, paperObjectId: paperObj._id, score: studentObj.score, equivalentScore: studentCurrentLessonEquivalentScore, 'class_name': studentObj.class, questionScores: matrix[index], questionAnswers: answers[index]});
                     // paperStudentObj.questionScores = matrix[index], paperStudentObj.questionAnswers = answers[index];
                     // paperStudentObj.questionScores.push({paperid: paperObj.id, scores: matrix[index], answers: answers[index]});
                 });

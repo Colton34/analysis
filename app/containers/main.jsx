@@ -93,6 +93,7 @@ class Main extends React.Component {
                 <h4>走班Mock</h4>
                 <div><Link to={{pathname: '/helper'}}>小助手</Link></div>
 
+                <div><Link to={{pathname: '/zouban/dashboard', query: {examid: '101772-10202', grade: '高二'}}}>走班Dashboard</Link></div>
                 <div><Link to={{pathname: '/zouban/question/quality', query: {examid: '101772-10202', grade: '高二'}}}>走班试题质量分析</Link></div>
                 <div><Link to={{pathname: '/zouban/detail/class', query: {examid: '101772-10202', grade: '高二'}}}>班级成绩明细</Link></div>
                 <div><Link to={{pathname: '/zouban/personal/report'}}>走班学生个人分析</Link></div>

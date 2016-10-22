@@ -16,6 +16,7 @@ import HelperBox from '../containers/HelperBox';
 import HelperBoxContainer from '../containers/HelperBoxContainer';
 import EquivalentScore from '../components/Helper/EquivalentScore';
 
+import ZoubanDashboard from '../containers/ZoubanDashboard';
 import Zouban from '../containers/Zouban';
 import ZoubanQuestionModule from '../components/zouban/QuestionModule';
 import ScoreDetailModule from '../components/zouban/ScoreDetailModule';
@@ -44,6 +45,7 @@ export default (store) => {
             <Route path='subject/report' component={SubjectReport} />
             <Route path='add/analysis' component={CustomizeAnalysis}/>
 
+            <Route path='zouban/dashboard' component={ZoubanDashboard} />
             <Route path='zouban/:name' component={Zouban}>
                 <Route path="quality" component={ZoubanQuestionModule} />
                 <Route path="class" component={ScoreDetailModule} />
