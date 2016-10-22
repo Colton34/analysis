@@ -6,6 +6,10 @@ import Radium from 'radium';
 import {Link} from 'react-router';
 import Select from '../../../common/Selector/Select';
 
+import StudentScoreInfo from './StudentScoreInfo';
+import StudentSubjectCompare from './StudentSubjectCompare';
+import StudentLessonQuestion from './StudentLessonQuestion';
+
 class StudentPersonalModule extends React.Component {
     constructor(props) {
         super(props);
@@ -15,7 +19,9 @@ class StudentPersonalModule extends React.Component {
     }
 
     selectStudent(selectedStudent) {
-        debugger;
+        this.setState({
+            currentStudent: selectedStudent
+        })
     }
 
     render() {
@@ -25,6 +31,7 @@ class StudentPersonalModule extends React.Component {
         return (
             <div>
                 <SelectorGroup zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} selectStudent={this.selectStudent.bind(this)} />
+                <StudentScoreInfo zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} currentStudent={this.state.currentStudent} />
             </div>
         );
     }
@@ -145,6 +152,9 @@ class SelectorGroup extends React.Component {
 
     handleSelectStudent(selectedStudent) {
         debugger;
+        this.setState({
+            currentStudent: selectedStudent
+        });
         this.props.selectStudent(selectedStudent);
     }
 
