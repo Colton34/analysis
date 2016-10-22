@@ -20,7 +20,15 @@ import ZoubanDashboard from '../containers/ZoubanDashboard';
 import Zouban from '../containers/Zouban';
 import ZoubanQuestionModule from '../components/zouban/QuestionModule';
 import ScoreDetailModule from '../components/zouban/ScoreDetailModule';
-import StudentPersonalModule from '../components/zouban/StudentPersonalModule';
+
+
+//Mock
+// import StudentPersonalModule from '../components/zouban/StudentPersonalModule';
+import StudentPersonalModule from '../components/zouban/hi';
+
+
+
+
 import ZouBanRankReport from '../components/zouban/ZouBanRankReport';
 // import ZoubanQuestionContainer from '../containers/Zouban/QuestionContainer';
 
