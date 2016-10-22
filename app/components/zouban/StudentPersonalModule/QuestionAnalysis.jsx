@@ -12,18 +12,28 @@ class QuestionAnalysis extends React.Component {
         }
     }
     render(){
+        var currentStudent = this.props.currentStudent;
+        var zoubanExamInfo = this.props.zoubanExamInfo;
+        var zoubanExamStudentsInfo = this.props.zoubanExamStudentsInfo;
+        debugger
+        var studentSubjectsInfo = getStudentSubjectsInfo(currentStudent,zoubanExamStudentsInfo);
     return (
+
         <div className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
             <span className={commonClass['title']}>学生各学科试题分析</span>
             <span className={commonClass['title-desc']}></span>
+            {
+                (JSON.stringify(currentStudent) == "{}")?
+                <div>请先选择学生</div>:
+            (<div>
             <div>
                 <div style={{ padding: '5px 30px 0 30px',marginBottom:0}} className={commonClass['section']}>
                     <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
                         <span style={{ marginRight: 10}}>学科：</span>
-                            {classes.map((course, index) => {
+                            {studentSubjectsInfo.map((course, index) => {
                                 return (
-                                    <a key={'papers-' + index}    style={ localStyle.subject}>{course}</a>
+                                    <a key={'papers-' + index}    style={ localStyle.subject}>{course.name}</a>
                                 )
                             })
                         }
@@ -33,12 +43,22 @@ class QuestionAnalysis extends React.Component {
             <div style={{marginTop:30}}>
             <TableView hover  tableData={tableData}></TableView>
             </div>
+        </div>)
+    }
         </div>
     )
+
     }
 }
 
 export default QuestionAnalysis;
+function getStudentSubjectsInfo(currentStudent,zoubanExamStudentsInfo){
+    if(JSON.stringify(currentStudent) == "{}") return ;
+    var currentStudentInfo = _.find(zoubanExamStudentsInfo,function(studentObj){
+        return studentObj.id===currentStudent.key;
+    });
+    return currentStudentInfo.classes;
+}
 var localStyle = {
     subject: {
         display: 'inline-block', minWidth: 50, height: 22, backgroundColor: '#fff', color: '#333', marginRight: 10, textDecoration: 'none',textAlign: 'center', lineHeight: '22px'

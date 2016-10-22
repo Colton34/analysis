@@ -35,7 +35,7 @@ function getTableData(currentClass,currentLesson,zoubanLessonStudentsInfo,zouban
         rowData.push(_.max(question[currentClass].scores));
         rowData.push(question[currentClass].mean);
         rowData.push(_.round(_.multiply(question[currentClass].rate,100),2)+'%');
-        rowData.push(question[currentClass].rate);//难度 需确认
+        rowData.push(question[currentClass].rate);
         rowData.push(question.lesson.separations);
         rowData.push('查看原题');
     tableData.push(rowData);
