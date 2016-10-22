@@ -1,3 +1,10 @@
+/*
+分层走班的排行榜分为两部分：一个是【原值表格】一个是【转换表格】--转换表格当没有任何一个lesson被转的时候则不会显示
+在原值表格中是lesson，而转换表格中是subject，转换表格中的zoubanSubjectStudentsInfo相当于zoubanLessonStudentsInfo
+
+
+ */
+
 
 import React, { PropTypes } from 'react';
 import _ from 'lodash';
@@ -17,35 +24,24 @@ import {insertRankInfo} from '../../../sdk';
 import {downloadData} from '../../../lib/util';
 
 //TODO:title里id为all而不是totalScore，totalScore是都会存在的;
-
 //TODO: 需要一个ZoubanSubjectStudentsInfo
-function getZoubanSubjectStudentsInfo(zoubanLessonStudentsInfo, zoubanExamInfo) {
-    var lessonsBySubject = _.groupBy(zoubanExamInfo.lessons, 'subject');
-    var result;
-    _.each(lessonsBySubject, (subjectLessons, subjectName) => {
-        var currentSubjectLessonStudentsInfo = _.pick(zoubanLessonStudentsInfo, _.map(subjectLessons, (obj) => obj.objectId));
-        var currentSubjectStudents = [];
-        _.each(currentSubjectLessonStudentsInfo, (lessonStudentInfoObj) => {
-            currentSubjectStudents = _.unionBy(..._.concat([currentSubjectStudents], _.values(lessonStudentInfoObj)), (obj) => obj.id);
-        });
-        result[subjectName] = _.groupBy(currentSubjectStudents, 'class');
-    });
-    return result;
-}
 
 //负责渲染两个模块的表格：原值表格和转换表格；原值表格肯定是呈现的，这里的状态决定是否呈现转换表格--如果没有任何一个有转换的话
 class ZouBanRankReport extends React.Component {
     constructor(props) {
         super(props);
-        this.showEquivalentTable = _.some(this.props.zoubanExamInfo.lessons, (obj) => obj.percentage != 1);
+        var zoubanExamInfo = this.props.zoubanExamInfo.toJS(), zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo.toJS();
+        this.showEquivalentTable = _.some(zoubanExamInfo.lessons, (obj) => obj.percentage != 1);
+        if(this.showEquivalentTable) this.zoubanSubjectStudentsInfo = getZoubanSubjectStudentsInfo(zoubanLessonStudentsInfo, zoubanExamInfo);
+        debugger;
     }
 
     render() {
         var zoubanExamInfo = this.props.zoubanExamInfo.toJS(), zoubanExamStudentsInfo = this.props.zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo.toJS();
         return (
             <div>
-                <RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />
-                {this.showEquivalentTable ? (<RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} isEquivalent={true} />) : ('')}
+                {/*<RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />*/}
+                {this.showEquivalentTable ? (<RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={this.zoubanSubjectStudentsInfo} isEquivalent={true} />) : ('')}
             </div>
         );
     }
@@ -58,6 +54,32 @@ function mapStateToProps(state) {
         zoubanExamStudentsInfo: state.zouban.zoubanExamStudentsInfo,
         zoubanLessonStudentsInfo: state.zouban.zoubanLessonStudentsInfo
     }
+}
+
+function getZoubanSubjectStudentsInfo(zoubanLessonStudentsInfo, zoubanExamInfo) {
+    var cloneZoubanLessonStudentsInfo = _.cloneDeep(zoubanLessonStudentsInfo);
+    var lessonsBySubject = _.groupBy(zoubanExamInfo.lessons, 'subject');
+    var lessonMap = _.keyBy(zoubanExamInfo.lessons, 'objectId');
+    // debugger;
+    var result = {}, currentLessonStudents;
+    _.each(lessonsBySubject, (subjectLessons, subjectName) => {
+        var currentSubjectLessonStudentsInfo = _.pick(cloneZoubanLessonStudentsInfo, _.map(subjectLessons, (obj) => obj.objectId));
+        // debugger;
+        var currentSubjectStudents = [];
+        _.each(currentSubjectLessonStudentsInfo, (lessonStudentInfoObj, lessonObjectId) => {
+            // debugger;
+            currentLessonStudents = _.unionBy(..._.values(lessonStudentInfoObj), (obj) => obj.id);
+            _.each(currentLessonStudents, (obj) => obj['class_name'] = lessonMap[lessonObjectId].name+obj['class_name']);
+            currentSubjectStudents = _.unionBy(currentSubjectStudents, currentLessonStudents, (obj) => obj.id);
+            debugger;
+            // debugger;
+        });
+        // debugger;
+        result[subjectName] = _.groupBy(currentSubjectStudents, 'class_name');
+        debugger;
+    });
+    // debugger;
+    return result;
 }
 
 
@@ -340,7 +362,6 @@ class SearchSortDropSelector extends React.Component {
                     <Button onClick={this.props.clickDownloadTable} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
                 </div>
             </div>
-
         )
     }
 }
@@ -423,7 +444,7 @@ function getSubjectTtitles(lessons) {
             id: subjectName,
             title: subjectName
         }
-    });
+    }).value();
     subjectTitles.unshift({id: 'all', title: '全科'});
     return subjectTitles;
 }
@@ -507,8 +528,8 @@ function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo, isEqui
                 if(!tempObj) {
                     totalStudentInfoObj = zoubanExamStudentsInfoMap[lessonStudentInfoObj.id];
                     tempObj = _.pick(totalStudentInfoObj, ['id', 'kaohao', 'name', 'classes']);
-                    tempObj['totalScore_score'] = totalStudentInfoObj.equivalentScore;
-                    tempObj['totalScore_rank'] = totalStudentInfoObj.equivalentRank;
+                    tempObj['totalScore_score'] = (isEquivalent) ? totalStudentInfoObj.equivalentScore : totalStudentInfoObj.score;
+                    tempObj['totalScore_rank'] = (isEquivalent) ? totalStudentInfoObj.equivalentRank : totalStudentInfoObj.rank;
                     //班级信息都是补录的--当获取到选择的currentClass
                     result[lessonStudentInfoObj.id] = tempObj;
                 }
@@ -564,10 +585,8 @@ function getAllSubjectDataBySearch(theDS, searchStr) {
 
 function getSpecificLessonData(theDS, currentTitle, zoubanLessonStudentsInfo) {
     var currentLessonAllStudentIds = _.union(..._.map(zoubanLessonStudentsInfo[currentTitle.id], (currentLessonClassStudents, className) => _.map(currentLessonClassStudents, (obj) => obj.id)));
-    debugger;
     var currentLessonAllStudentInfo = _.pick(theDS, currentLessonAllStudentIds);
     insertTotalClassRankInfo(currentLessonAllStudentInfo, currentTitle)
-    debugger;
     return currentLessonAllStudentInfo;
 }
 
@@ -581,13 +600,9 @@ function getSpecificLessonDataBySearch(theDS, currentTitle, zoubanLessonStudents
 }
 
 function getSpecificLessonClassData(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass) {
-    debugger;
     var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentTitle.id][currentClass], (obj) => obj.id);
-    debugger;
     var currentLessonClassStudentsInfo = _.pick(theDS, currentLessonClassStudentIds);
-    debugger;
     insertTotalClassRankInfo(currentLessonClassStudentsInfo, currentTitle);
-    debugger;
     return currentLessonClassStudentsInfo;
 }
 
@@ -602,7 +617,8 @@ function getSpecificLessonClassDataBySearch(theDS, currentTitle, zoubanLessonStu
 function insertTotalClassRankInfo(studentsInfo, currentTitle) {
     var targetClassObj;
     _.each(studentsInfo, (obj) => {
-        targetClassObj = _.find(obj.classes, (cobj) => cobj.paperObjectId == currentTitle.id)
+        targetClassObj = _.find(obj.classes, (cobj) => (cobj.paperObjectId == currentTitle.id) || (cobj.subject == currentTitle.id));
+        debugger;
         obj['totalScore_classRank'] = targetClassObj.rank;
         obj['class'] = targetClassObj.name;
     });

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-22 11:27:07
+* @Last Modified time: 2016-10-22 14:12:39
 */
 'use strict';
 var _ = require('lodash');
@@ -13,6 +13,7 @@ var config = require('../../config/env');
 var errors = require('common-errors');
 
 var peterFX = require('peter').getManager('fx');
+const SUBJECTS_WEIGHT = ['语文', '数学', '英语', '理综', '文综', '物理', '化学', '生物', '政治', '历史', '地理'];
 
 var getExamById = exports.getExamById = function(examid, fromType) {
     var url = config.analysisServer + '/exam?id=' + examid;
@@ -440,7 +441,7 @@ exports.getZoubanExamInfo = function(paperObjectIds, equivalentScoreInfo) {
 }
 
 function generateZoubanPaperStudentsInfo(papers, equivalentScoreInfo) {
-    var examStudentsInfo = {}, examPapersInfo = {}, equivalentScoreInfoMap = _.keyBy(equivalentScoreInfo['[lessons]'], 'objectId'), studentCurrentLessonEquivalentScore;
+    var examStudentsInfo = {}, examPapersInfo = {}, equivalentScoreInfoMap = _.keyBy(equivalentScoreInfo['[lessons]'], 'objectId'), studentCurrentLessonEquivalentScore, currentSubjectName;
     // var ifAnyLessonEquivalent = _.some(equivalentScoreInfoMap, (obj) => obj.percentage != 1);
     // console.log('ifAnyLessonEquivalent ============= ', ifAnyLessonEquivalent);
     return when.promise(function(resolve, reject) {
@@ -455,7 +456,8 @@ function generateZoubanPaperStudentsInfo(papers, equivalentScoreInfo) {
                         paperStudentObj.papers = [], paperStudentObj.classes = [], paperStudentObj.score = 0, paperStudentObj.equivalentScore = 0; //paperStudentObj.questionScores = []
                         examStudentsInfo[studentObj.id] = paperStudentObj;
                     }
-                    paperStudentObj.classes.push({paperObjectId: paperObj._id, name: studentObj.class});
+                    currentSubjectName = _.find(SUBJECTS_WEIGHT, (subjectName) => _.includes(paperObj.subject, subjectName));
+                    paperStudentObj.classes.push({paperObjectId: paperObj._id, name: studentObj.class, subject: currentSubjectName});
                     paperStudentObj.score = paperStudentObj.score + studentObj.score;
                     studentCurrentLessonEquivalentScore = _.round(_.multiply(studentObj.score, equivalentScoreInfoMap[paperObj._id].percentage), 2);
                     paperStudentObj.equivalentScore = paperStudentObj.equivalentScore + studentCurrentLessonEquivalentScore;

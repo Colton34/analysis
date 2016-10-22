@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-22 11:28:42
+* @Last Modified time: 2016-10-22 14:16:33
 */
 
 'use strict';
@@ -72,15 +72,18 @@ export function initZoubanDS(params) {
     });
 }
 
+
 function getZoubanExamInfo(equivalentScoreInfo, examPapersInfo) {
 //lessons要带有顺序
-    var result = { id: equivalentScoreInfo.examId, name: equivalentScoreInfo.examName, fullMark: 0 };
+    var result = { id: equivalentScoreInfo.examId, name: equivalentScoreInfo.examName, fullMark: 0, equivalentFullMark: 0 };
     var equivalentScoreInfoMap = _.keyBy(equivalentScoreInfo['[lessons]'], 'objectId'), examPapersInfoMap = _.keyBy(examPapersInfo, 'objectId');
-    var commonLessons = [], otherLessons = [], lesson, lessonWeight;
+    var commonLessons = [], otherLessons = [], lesson, lessonWeight, currentSubjectName;
     _.each(equivalentScoreInfoMap, (infoObj, paperObjectId) => {
         result.fullMark += infoObj.fullMark;
+        result.equivalentFullMark += infoObj.equivalentScore;
         //TODO:添加equivalentFullMark？
-        lesson = _.assign({}, infoObj, {questions: examPapersInfoMap[paperObjectId].questions});
+        currentSubjectName = _.find(subjectWeight, (subjectName) => _.includes(examPapersInfoMap[paperObjectId].subject, subjectName)); //Note:这里暂时先Hack--后续可以在【分值转换那里让用户自己标定各个课程属于哪些科目】
+        lesson = _.assign({}, infoObj, {questions: examPapersInfoMap[paperObjectId].questions, subject: currentSubjectName});
         lessonWeight = _.findIndex(subjectWeight, (s) => ((s == infoObj.name) || (_.includes(infoObj.name, s))));
         (lessonWeight >= 0) ? commonLessons.push({weight: lessonWeight, value: lesson}) : otherLessons.push(lesson);
     });
@@ -89,11 +92,12 @@ function getZoubanExamInfo(equivalentScoreInfo, examPapersInfo) {
     return result;
 }
 
-function getZoubanExamStudentsInfo(examStudentsInfo, ifHaveEquivalentInfo) {
+function getZoubanExamStudentsInfo(examStudentsInfo) {
     var zoubanExamStudentsInfo = _.map(examStudentsInfo, (obj) => _.pick(obj, ['id', 'kaohao', 'xuehao', 'name', 'classes', 'score', 'equivalentScore']));
     insertRankInfo(zoubanExamStudentsInfo);
     insertRankInfo(zoubanExamStudentsInfo, 'equivalentRank', 'equivalentScore');
-    zoubanExamStudentsInfo = _.sortBy(zoubanExamStudentsInfo, 'equivalentRank');//默认当然按照转换后的分数排名。没有转换的排名本身是没有意义的。
+    zoubanExamStudentsInfo = _.sortBy(zoubanExamStudentsInfo, 'equivalentRank');//Note: 默认当然按照转换后的分数排名。如果没有转化那么此排名等价于对原总分数的排名（正好嫁接过去）。感觉总分排名必须是转换后的排名，
+    //否则没有转换的排名本身是没有意义的。
     return zoubanExamStudentsInfo;
 }
 
