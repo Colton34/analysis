@@ -40,7 +40,7 @@ class ZouBanRankReport extends React.Component {
         var zoubanExamInfo = this.props.zoubanExamInfo.toJS(), zoubanExamStudentsInfo = this.props.zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo.toJS();
         return (
             <div>
-                {/*<RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />*/}
+                <RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />
                 {this.showEquivalentTable ? (<RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={this.zoubanSubjectStudentsInfo} isEquivalent={true} />) : ('')}
             </div>
         );
