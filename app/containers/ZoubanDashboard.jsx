@@ -18,7 +18,7 @@ import ZoubanRank from '../components/zoubanDashboard/ZoubanRank';
 import ZoubanScoreDetail from '../components/zoubanDashboard/ZoubanScoreDetail';
 import ZoubanQuestionQuanlity from '../components/zoubanDashboard/ZoubanQuestionQuanlity';
 import ZoubanStudentInfo from '../components/zoubanDashboard/ZoubanStudentInfo';
-
+import KnowledgePointAnalysis from '../components/zoubanDashboard/KnowledgePointAnalysis';
 import {COLORS_MAP as colorsMap} from '../lib/constants';
 
 class ZoubanDashboard extends React.Component {
@@ -69,13 +69,18 @@ class ZoubanDashboardContent extends React.Component {
         var zoubanExamInfo = this.props.zouban.zoubanExamInfo.toJS(), zoubanExamStudentsInfo = this.props.zouban.zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = this.props.zouban.zoubanLessonStudentsInfo.toJS(), zuobanLessonQuestionInfo = this.props.zouban.zuobanLessonQuestionInfo.toJS();
 
         return (
-            <div>
+            <div style={{width: 1200, margin: '0 auto'}} className='container'>
                 <ZoubanNavHeader zoubanExamInfo={zoubanExamInfo} />
                 <ZoubanExamGuide zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} />
+                <div className='row' style={{ marginTop: 20 }}>
                 <ZoubanRank zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} />
                 <ZoubanScoreDetail zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />
+                </div>
+                <div className='row' style={{ marginTop: 20 }}>
                 <ZoubanQuestionQuanlity zoubanExamInfo={zoubanExamInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo} />
+                <KnowledgePointAnalysis />
                 <ZoubanStudentInfo zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zoubanExamInfo={zoubanExamInfo} />
+                </div>
             </div>
         );
     }
