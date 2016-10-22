@@ -27,11 +27,12 @@ class StudentPersonalModule extends React.Component {
     render() {
         var {zoubanExamInfo, zoubanExamStudentsInfo, zoubanLessonStudentsInfo, zuobanLessonQuestionInfo} = this.props;
         zoubanExamInfo = zoubanExamInfo.toJS(), zoubanExamStudentsInfo = zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = zoubanLessonStudentsInfo.toJS(), zuobanLessonQuestionInfo = zuobanLessonQuestionInfo.toJS();
-        debugger;
+        var lessonsByStudent = getLessonsByStudent(zoubanExamInfo, zoubanExamStudentsInfo, this.state.currentStudent);
         return (
             <div>
                 <SelectorGroup zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} selectStudent={this.selectStudent.bind(this)} />
-                <StudentScoreInfo zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} currentStudent={this.state.currentStudent} />
+                <StudentScoreInfo zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} currentStudent={this.state.currentStudent} lessonsByStudent={lessonsByStudent} />
+                <StudentSubjectCompare zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} lessonsByStudent={lessonsByStudent} currentStudent={this.state.currentStudent} />
             </div>
         );
     }
@@ -45,6 +46,13 @@ function mapStateToProps(state) {
         zoubanLessonStudentsInfo: state.zouban.zoubanLessonStudentsInfo,
         zuobanLessonQuestionInfo: state.zouban.zuobanLessonQuestionInfo
     }
+}
+
+function getLessonsByStudent(zoubanExamInfo, zoubanExamStudentsInfo, currentStudent) {
+    if(!currentStudent.value) return [];
+    var targetStudent = _.find(zoubanExamStudentsInfo, (obj) => obj.id == currentStudent.value);
+    var validLessonIds = _.map(targetStudent.classes, (obj) => obj.paperObjectId);
+    return _.filter(zoubanExamInfo.lessons, (obj) => _.includes(validLessonIds, obj.objectId));
 }
 
 
@@ -151,7 +159,6 @@ class SelectorGroup extends React.Component {
     }
 
     handleSelectStudent(selectedStudent) {
-        debugger;
         this.setState({
             currentStudent: selectedStudent
         });

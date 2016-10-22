@@ -22,12 +22,10 @@ export default class StudentScoreInfo extends React.Component {
     render() {
 
         if(_.size(this.props.currentStudent) == 0) return (<h3>请先选择学生</h3>);
-        // var zoubanLessonStudentsInfoByStudent = getZoubanLessonStudentsInfoByStudent(this.props.zoubanExamStudentsInfo, this.props.currentStudent);
-        var lessonsByStudent = getLessonsByStudent(this.props.zoubanExamInfo, this.props.zoubanExamStudentsInfo, this.props.currentStudent);
         var tableRowKeys = getTableRowKeys();
-        var orderedColumnKeys = getOrderColumnKeys(lessonsByStudent);
-        var tableInfo = getTableInfo(lessonsByStudent, this.props.zoubanExamStudentsInfo, this.props.zoubanLessonStudentsInfo, this.props.currentStudent, this.state.isEquivalent);
-        var tableHeader = getTableHeader(lessonsByStudent);
+        var orderedColumnKeys = getOrderColumnKeys(this.props.lessonsByStudent);
+        var tableInfo = getTableInfo(this.props.lessonsByStudent, this.props.zoubanExamStudentsInfo, this.props.zoubanLessonStudentsInfo, this.props.currentStudent, this.state.isEquivalent);
+        var tableHeader = getTableHeader(this.props.lessonsByStudent);
         var tableBody = getTableData(tableRowKeys, orderedColumnKeys, tableInfo);
         tableBody.unshift(tableHeader);
         return (
@@ -44,12 +42,6 @@ export default class StudentScoreInfo extends React.Component {
             </div>
         );
     }
-}
-
-function getLessonsByStudent(zoubanExamInfo, zoubanExamStudentsInfo, currentStudent) {
-    var targetStudent = _.find(zoubanExamStudentsInfo, (obj) => obj.id == currentStudent.value);
-    var validLessonIds = _.map(targetStudent.classes, (obj) => obj.paperObjectId);
-    return _.filter(zoubanExamInfo.lessons, (obj) => _.includes(validLessonIds, obj.objectId));
 }
 
 // function getZoubanLessonStudentsInfoByStudent(zoubanExamStudentsInfo, zoubanLessonStudentsInfo, currentStudent) {
