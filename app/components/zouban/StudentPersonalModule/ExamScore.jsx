@@ -10,12 +10,14 @@ export default class ExamScore extends React.Component {
 
     }
     render(){
+        var currentStudent = this.props.currentStudent;
+        var zoubanExamInfo = this.props.zoubanExamInfo;
     return (
         <div className={commonClass['section']}>
             <span className={commonClass['title-bar']}></span>
             <span className={commonClass['title']}>考试基本成绩分数</span>
             <span className={commonClass['title-desc']}></span>
-            <div style={{width:'1140px',padding:'10px 0',display:'table-cell',textAlign:'center'}}><span>{'张萌同学'}</span></div>
+            <div style={{width:'1140px',padding:'10px 0',display:'table-cell',textAlign:'center'}}><span>{currentStudent.label}</span></div>
             <div style={{marginBottom:20}}>
             <TableView hover  tableData={tableData}></TableView>
             </div>
@@ -26,8 +28,12 @@ export default class ExamScore extends React.Component {
     }
 }
 
+function getTableData(currentStudent,zoubanExamInfo){
+
+}
+
 var tableData = [
-    ['姓名','总分','语文','数学','英语'],
+    ['','总分','语文','数学','英语'],
     ['本人成绩',110,30,30,50],
     ['年级排名',110,30,30,50],
     ['超过年级',110,30,30,50],
