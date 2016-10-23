@@ -137,7 +137,7 @@ class Table extends React.Component {
     }
     render() {
         var headSeq = [];
-        var {id, tableHeaders, tableData, data, bordered, striped, hover, headerStyle, options, tableSortable, style, canDownload} = this.props;
+        var {id, tableHeaders, tableData, data, bordered, striped, hover, headerStyle, options, tableSortable, style, canDownload, ifCanSort} = this.props;
         bordered = bordered === undefined ? true : bordered;
         return (
             <div style={_.assign({}, {position: 'relative'}, style ? style : {})}>
@@ -173,7 +173,7 @@ class Table extends React.Component {
                                                 }
                                                 headerCss = headerCss === undefined ? {} : headerCss;
                                             }
-                                            var sortable = tableSortable === true && header.id !== undefined && header.columnSortable !== false || header.columnSortable === true;
+                                            var sortable = (tableSortable === true && header.id !== undefined && header.columnSortable !== false || header.columnSortable === true) || ifCanSort;
                                             return (
                                                 <th key={'thead-th-' + thindex}
                                                     className={commonClassName['table-unit']}

@@ -15,7 +15,8 @@ import ReactPaginate from 'react-paginate';
 import {DropdownButton, Button, Table as BootTable, MenuItem} from 'react-bootstrap';
 
 import TableView from '../../../common/TableView';
-import EnhanceTable from '../../../common/EnhanceTable';
+// import EnhanceTable from '../../../common/EnhanceTable';
+import SortTablePlugin from '../../../common/SortTablePlugin';
 import Select from '../../../common/Selector/Select';
 
 import commonClass from '../../../styles/common.css';
@@ -33,7 +34,6 @@ class ZouBanRankReport extends React.Component {
         var zoubanExamInfo = this.props.zoubanExamInfo.toJS(), zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo.toJS();
         this.showEquivalentTable = _.some(zoubanExamInfo.lessons, (obj) => obj.percentage != 1);
         if(this.showEquivalentTable) this.zoubanSubjectStudentsInfo = getZoubanSubjectStudentsInfo(zoubanLessonStudentsInfo, zoubanExamInfo);
-        debugger;
     }
 
     render() {
@@ -60,25 +60,17 @@ function getZoubanSubjectStudentsInfo(zoubanLessonStudentsInfo, zoubanExamInfo) 
     var cloneZoubanLessonStudentsInfo = _.cloneDeep(zoubanLessonStudentsInfo);
     var lessonsBySubject = _.groupBy(zoubanExamInfo.lessons, 'subject');
     var lessonMap = _.keyBy(zoubanExamInfo.lessons, 'objectId');
-    // debugger;
     var result = {}, currentLessonStudents;
     _.each(lessonsBySubject, (subjectLessons, subjectName) => {
         var currentSubjectLessonStudentsInfo = _.pick(cloneZoubanLessonStudentsInfo, _.map(subjectLessons, (obj) => obj.objectId));
-        // debugger;
         var currentSubjectStudents = [];
         _.each(currentSubjectLessonStudentsInfo, (lessonStudentInfoObj, lessonObjectId) => {
-            // debugger;
             currentLessonStudents = _.unionBy(..._.values(lessonStudentInfoObj), (obj) => obj.id);
             _.each(currentLessonStudents, (obj) => obj['class_name'] = lessonMap[lessonObjectId].name+obj['class_name']);
             currentSubjectStudents = _.unionBy(currentSubjectStudents, currentLessonStudents, (obj) => obj.id);
-            debugger;
-            // debugger;
         });
-        // debugger;
         result[subjectName] = _.groupBy(currentSubjectStudents, 'class_name');
-        debugger;
     });
-    // debugger;
     return result;
 }
 
@@ -87,18 +79,15 @@ class RankReportContainer extends React.Component {
     constructor(props) {
         super(props);
         this.theDS = getRanReportDS(this.props.zoubanExamStudentsInfo, this.props.zoubanLessonStudentsInfo, this.props.isEquivalent);
-        debugger;
 
         var lessons = this.props.zoubanExamInfo.lessons;
         var titleOptions = this.props.isEquivalent ? getSubjectTtitles(lessons) : getLessonTitles(lessons);//[{id: , title: }]
         var titles = titleOptions.slice(1);
         titles.unshift({id: 'totalScore', title: '总分'});
-        debugger;
         var currentTitle = titleOptions[0];
         var lessonClassesOptions = [];
         var lessonClasses = [];
         var currentClass = lessonClassesOptions[0];
-        debugger;
         // var columns = getColumns(titles, !!currentClass);
             //[暂时没有隐藏列]
             // currentColumns: columns,
@@ -114,7 +103,8 @@ class RankReportContainer extends React.Component {
             searchStr: '',
             currentPageSize: 25,
             currentPageValue: 0,
-            currentSortKey: 'totalScore_score'
+            currentSortKey: 'totalScore_score',
+            currentSortDir: 'desc'
         }
     }
 
@@ -125,26 +115,24 @@ class RankReportContainer extends React.Component {
         if(selectedTitle.id != 'all') lessonClassesOptions.unshift('全部');
         var currentClass = lessonClassesOptions[0];
         var currentSortKey = (selectedTitle.id == 'all') ? 'totalScore_score' : selectedTitle.id+'_score';
-        debugger;
         this.setState({
             titles: titles,
             currentTitle: selectedTitle,
             lessonClassesOptions: lessonClassesOptions,
             lessonClasses: lessonClasses,
             currentClass: currentClass,
-            currentSortKey: currentSortKey
+            currentSortKey: currentSortKey,
+            currentSortDir: 'desc'
         });
     }
 
     handleSelectClass(selectedClass) {
-        debugger;
         this.setState({
             currentClass: selectedClass
         })
     }
 
     handleSearch(searchStr) {
-        debugger;
         this.setState({
             searchStr: searchStr
         })
@@ -157,30 +145,36 @@ class RankReportContainer extends React.Component {
     }
 
     handleSelectPageValue(selectedPageObj) {
-        debugger;
         this.setState({
             currentPageValue: selectedPageObj.selected
         })
     }
 
     clickDownloadTable() {
-        debugger;
         downloadData(this.downloadKeys, this.downloadNames, this.downloadTableData, '排行榜');
+    }
+
+    handleSort(currentSortKey) {
+        debugger;
+        var currentSortDir;// =  (this.state.currentSortDir == 'desc' ? 'asc' : 'desc');
+        if(currentSortKey != this.state.currentSortKey) {
+            currentSortDir = 'desc';
+        } else {
+            currentSortDir = (this.state.currentSortDir == 'desc' ? 'asc' : 'desc');
+        }
+        this.setState({
+            currentSortKey: currentSortKey,
+            currentSortDir: currentSortDir
+        });
     }
 
     render() {
         var showClassInfo = (this.state.currentTitle.id != 'all');
-        debugger;
-        // var tableHeader = (this.state.currentTitle.id == 'all') ? getTableHeader(this.state.currentTitle, showClassInfo, this.state.titles) : getTableHeader(this.state.currentTitle, showClassInfo);
         var {tableHeader, headerKeys, subjectSubTitles} = getTableHeader(this.state.titles, showClassInfo);
-        debugger;
 
-        //TODO:计算tableData，一并得到totalCount
         // var currentColumns = getColumns(this.state.titles, showClassInfo);
         var theRowDS = getRowDS({theDS: this.theDS, currentTitle:this.state.currentTitle,  currentClass: this.state.currentClass, searchStr: this.state.searchStr, zoubanLessonStudentsInfo: this.props.zoubanLessonStudentsInfo});
-        debugger;
-        var tableBody = getTableBody({rowDS: theRowDS, currentPageSize: this.state.currentPageSize, currentPageValue: this.state.currentPageValue, currentSortKey: this.state.currentSortKey}); //columns: currentColumns,
-        debugger;
+        var tableBody = getTableBody({rowDS: theRowDS, currentPageSize: this.state.currentPageSize, currentPageValue: this.state.currentPageValue, currentSortKey: this.state.currentSortKey, currentSortDir: this.state.currentSortDir}); //columns: currentColumns,
 
         var totalCount = _.size(theRowDS);
         var options = getPageSelecOptions(totalCount);
@@ -190,12 +184,15 @@ class RankReportContainer extends React.Component {
         this.downloadNames = downloadNames;
         this.downloadTableData = getDownTableData(theRowDS, downloadKeys);//下载全部页数的表格内容
 
+        var sortInfo = {id: this.state.currentSortKey, order: this.state.currentSortDir};
+        debugger;
+
         return (
             <div style={{ width: 1200, minHeight: 700, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 ,padding:50}}>
                 <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
                 {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
                 <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} clickDownloadTable={this.clickDownloadTable.bind(this)} />
-                <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={EnhanceTable}></TableView>
+                <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={SortTablePlugin} handleSort={this.handleSort.bind(this)} sortInfo={sortInfo}></TableView>
                 <Paginate currentPageSize={this.state.currentPageSize} currentPageValue={this.state.currentPageValue} totalCount={totalCount} options={options} handleSelectPageSize={this.handleSelectPageSize.bind(this)} handleSelectPageValue={this.handleSelectPageValue.bind(this)} />
             </div>
         );
@@ -261,7 +258,6 @@ class ClassSelector extends React.Component {
     }
 
     onSelectClass(selectedClass) {
-        debugger;
         this.props.handleSelectClass(selectedClass);
     }
 
@@ -373,7 +369,6 @@ class Paginate extends React.Component {
     }
 
     onSelectPageSize(selectedPageSize) {
-        debugger;
         this.props.handleSelectPageSize(selectedPageSize);
     }
 
@@ -381,7 +376,6 @@ class Paginate extends React.Component {
         var beginCount = this.props.currentPageSize * this.props.currentPageValue + 1;
         var endCount = beginCount + this.props.currentPageSize - 1;
 
-        debugger;
         return(
             <div>
                 <span style={{margin: '18px 0px 0px 0px', display: 'inline-block'}}>
@@ -547,7 +541,6 @@ function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo, isEqui
 
 function getRowDS({theDS, currentTitle, currentClass, searchStr, zoubanLessonStudentsInfo}) {
     var rowDS;
-    debugger;
     if(currentTitle.id == 'all') {
         if(searchStr == '') {
             rowDS = getAllSubjectData(theDS);
@@ -556,15 +549,12 @@ function getRowDS({theDS, currentTitle, currentClass, searchStr, zoubanLessonStu
         }
     } else {
         if(currentClass == '全部') {
-            debugger;//进来
             if(searchStr == '') {
-                debugger;//进来
                 rowDS = getSpecificLessonData(theDS, currentTitle, zoubanLessonStudentsInfo);
             } else {
                 rowDS = getSpecificLessonDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, searchStr);
             }
         } else {
-            debugger;//某个具体班级
             if(searchStr == '') {
                 rowDS = getSpecificLessonClassData(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass);
             } else {
@@ -620,15 +610,18 @@ function insertTotalClassRankInfo(studentsInfo, currentTitle) {
     var targetClassObj;
     _.each(studentsInfo, (obj) => {
         targetClassObj = _.find(obj.classes, (cobj) => (cobj.paperObjectId == currentTitle.id) || (cobj.subject == currentTitle.id));
-        debugger;
         obj['totalScore_classRank'] = targetClassObj.rank;
         obj['class'] = targetClassObj.name;
     });
 }
 
-function getTableBody({rowDS, currentPageSize, currentPageValue, currentSortKey='totalScore_score'}) { // columns,
-    debugger;//检查一下sortKey
-    rowDS = _.orderBy(rowDS, [currentSortKey], ['desc']);
+function getTableBody({rowDS, currentPageSize, currentPageValue, currentSortKey='totalScore_score', currentSortDir='desc'}) { // columns,
+    debugger;
+    var existLessonStudents = _.filter(rowDS, (obj) => obj[currentSortKey]);
+    var notExistLessonStudents = _.filter(rowDS, (obj) => !obj[currentSortKey]);
+    debugger;
+    rowDS = _.concat(_.orderBy(existLessonStudents, [currentSortKey], currentSortDir), notExistLessonStudents);
+    debugger;
     var beginCount = currentPageSize * (currentPageValue);
     var endCount = beginCount + currentPageSize;
     var currentPageRowDS = rowDS.slice(beginCount, endCount);
@@ -700,7 +693,6 @@ function getDownTableData(rowDS, downloadKeys) {
  }
  function getMorkData (number,subjects){
      var  studentInfo = [];
-     // debugger
      _.forEach(_.range(number),function(index){
      var student = [];
      student.push('丁'+index);
@@ -715,7 +707,6 @@ function getDownTableData(rowDS, downloadKeys) {
      studentInfo.push(student);
 
      })
-     // debugger
      return studentInfo;
  }
  function matchTableData (studentInfo){//转化body数据以符合渲染
@@ -758,100 +749,6 @@ function getDownTableData(rowDS, downloadKeys) {
          ':hover': {color: colorsMap.B03}
      }
  }
-
-
-
-// function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo) {
-// //还是以课程，班级为单位进行组织
-//     var zoubanExamStudentsInfoMap = _.keyBy(zoubanExamStudentsInfo, 'id');
-//     var result = {}, tempObj, totalStudentInfoObj, studentCurrentClassObj;
-//     _.each(zoubanLessonStudentsInfo, (currentLessonStudentsInfo, lessonObjectId) => {
-//         result[lessonObjectId] = {};
-//         _.each(currentLessonStudentsInfo, (currentLessonClassStudentsInfo, className) => {
-//              // debugger;
-//             result[lessonObjectId][className] = _.map(currentLessonClassStudentsInfo, (lessonStudentInfoObj) => {
-//                 // debugger
-//                 totalStudentInfoObj = zoubanExamStudentsInfoMap[lessonStudentInfoObj.id];
-//                 // debugger;
-//                 // if(!totalStudentInfoObj) {
-//                 //     debugger;
-//                 // }
-//                 tempObj = _.pick(totalStudentInfoObj, ['id', 'kaohao', 'name']);
-//                 tempObj.totalScore = totalStudentInfoObj.score;
-//                 tempObj.totalScoreRank = totalStudentInfoObj.rank;
-
-//                 studentCurrentClassObj = _.find(totalStudentInfoObj.classes, (obj) => obj.name == className);
-
-//                 tempObj.totalScoreClassRank = studentCurrentClassObj.rank;
-//                 tempObj.equivalentTotalScore = totalStudentInfoObj.equivalentScore;
-//                 tempObj.equivalentTotalScoreRank = totalStudentInfoObj.equivalentRank;
-//                 tempObj.equivalentTotalScoreClassRank = studentCurrentClassObj.equivalentRank;
-
-//                 _.assign(tempObj, _.pick(lessonStudentInfoObj, ['score', 'lessonRank', 'classRank', 'equivalentScore', 'equivalentLessonRank', 'equivalentClassRank']));
-//                 return tempObj;
-//             });
-//         });
-//     });
-//     return result;
-// }
-
-
-
-// function getTableBody(currentLessonLevelDis, levelHeaderTitles, levelHeaderPercentages) {
-//     var result = [];
-//     result.push(getTableRowItem(currentLessonLevelDis.lesson, levelHeaderTitles, levelHeaderPercentages));
-//     _.each(currentLessonLevelDis, (obj, key) => {
-//         if(key == 'lesson') return;
-//         result.push(getTableRowItem(currentLessonLevelDis[key], levelHeaderTitles, levelHeaderPercentages));
-//     });
-//     return result;
-// }
-
-// function getTableRowItem(levelDisInfo, levelHeaderTitles, levelHeaderPercentages) {
-//     var item = {};
-//     _.each(levelHeaderTitles, (obj) => {
-//         item[obj.id] = levelDisInfo[obj.id]
-//     });
-//     var countsArr = [], percentagesArr = [];
-//     _.each(levelDisInfo.infos, (infoObj, index) => {
-//         item[levelHeaderPercentages[index * 2].id] = infoObj.count;
-//         item[levelHeaderPercentages[index*2+1].id] = infoObj.percentage;
-//     });
-//     return item;
-// }
-
-
-/*
-全科：
-[
-    kaohao, name, totalScore, <paperObjectId>...
-]
-
-
-subjects: 从examInfo.lessons中获取objectId和name
-
-currentTitle:
-    全科（没有班级选项）isAllSubject
-        原值表格：
-            zoubanExamStudentsInfo: kaohao, name,
-
-        if(somePercentage!=1)显示
-        转换表格：
-
-    单科：
-        全班：(没有班级排名)
-            原值表格：
-
-            if(currentPercentage != 1)显示
-            转换表格：
-        某班：（有班级排名）
-            原值表格：
-
-            if(currentPercentage != 1)显示
- */
-
-//群体；fields
-
 
 //【暂时没有隐藏列】
 // function getTableHeader(columns, showClassInfo, showClassInfo) {
