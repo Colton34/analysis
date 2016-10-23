@@ -10,7 +10,16 @@ import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 
 export default function StudentSubjectCompare({zoubanLessonStudentsInfo, lessonsByStudent, currentStudent}) {
-    if(_.size(currentStudent) == 0) return (<h3>请先选择学生</h3>);
+    if(_.size(currentStudent) == 0) return (
+        <div className={commonClass['section']}>
+            <span className={commonClass['title-bar']}></span>
+            <span className={commonClass['title']}>学科强弱对比分析</span>
+            <span className={commonClass['title-desc']}></span>
+            <div style={{display:'tableCell',textAlign:'center',padding:'50px 0px'}}>
+                <span>请先选择学生后查看数据</span>
+            </div>
+        </div>
+    );
     var categories = getCategories(lessonsByStudent);
     var studentRankRateDiff = getStudentLessonRankRateDiff(zoubanLessonStudentsInfo, lessonsByStudent, currentStudent);
     debugger;
