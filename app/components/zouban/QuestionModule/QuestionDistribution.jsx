@@ -47,6 +47,8 @@ export default function QuestionDistribution({currentClass,currentLesson,zoubanL
         minTickInterval: 0.2,//刻度最小间隔
       },
       yAxis: {
+        max: 1,//最大
+        min:0,
         allowDecimals: true,//刻度允许小数
         lineWidth: 1,
         gridLineDashStyle: 'Dash',
