@@ -59,7 +59,7 @@ class AverageCompare extends React.Component {
         });
 
         var classesName = _.keys(classesMeanInfo), classesMean = _.values(classesMeanInfo);
-
+        var currentLessonGradeMean= this.state.currentLessonGradeMean;
         var config={
             chart: {
                 type: 'column'
@@ -94,11 +94,23 @@ class AverageCompare extends React.Component {
                 title: {
                     text: ''
                 },
-                plotLines: [{
+                plotLines: [{//y轴轴线
                     value: 0,
                     width: 1,
-                    color: '#f2f2f3'
-                }],
+                    color: colorsMap.C03
+                }, {
+                        value: currentLessonGradeMean,
+                        color: colorsMap.B03,
+                        dashStyle: 'Dash',
+                        width: 1,
+                        label: {
+                            text: '',
+                            align: 'right',
+                            x: 0,
+                            y: 5
+
+                        }
+                    }],
             },
             credits:{
                 enabled:false
@@ -106,7 +118,9 @@ class AverageCompare extends React.Component {
             legend:{
                 enabled:true,
                 align:'center',
-                verticalAlign:'top'
+                verticalAlign:'top',
+                symbolHeight: 1,
+                symbolWidth: 0
             },
             plotOptions: {
                 column: {
@@ -125,7 +139,7 @@ class AverageCompare extends React.Component {
                 }
             },
             series:[{
-                name:'平均分',
+                name:this.state.currentLesson.name+'      '+'平均分：'+currentLessonGradeMean+'分',
                 data: classesMean
             }]
         };
@@ -140,7 +154,7 @@ class AverageCompare extends React.Component {
                         <span style={{ marginRight: 10}}>学科：</span>
                             {_.map(this.props.zoubanExamInfo.lessons, (lessonObj, index) => {
                                 return (
-                                    <a key={'papers-' + index} onClick={this.onSelectLesson.bind(this, lessonObj)} style={ localStyle.subject}>{lessonObj.name}{(lessonObj.objectId == this.state.currentLesson.objectId) ? '(选中)':''}</a>
+                                    <a key={'papers-' + index} onClick={this.onSelectLesson.bind(this, lessonObj)} style={ lessonObj.objectId == this.state.currentLesson.objectId?localStyle.activeSubject:localStyle.subject}>{lessonObj.name}</a>
                                 )
                             })
                         }

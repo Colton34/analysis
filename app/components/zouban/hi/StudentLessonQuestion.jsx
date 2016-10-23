@@ -15,7 +15,9 @@ export default class StudentLessonQuestion extends React.Component {
         this.tableHeader = getTableHeader();
         this.state = {
             currentLesson: this.props.lessonsByStudent[0]
+
         }
+        debugger
     }
 
     onSelectLesson(selectedLesson) {
@@ -25,10 +27,20 @@ export default class StudentLessonQuestion extends React.Component {
     }
 
     render() {
-        if(_.size(this.props.currentStudent) == 0) return (<h3>请先选择学生</h3>);
+        if(_.size(this.props.currentStudent) == 0) return (
+            <div className={commonClass['section']}>
+                <span className={commonClass['title-bar']}></span>
+                <span className={commonClass['title']}>学生各学科试题分析</span>
+                <span className={commonClass['title-desc']}></span>
+                <div style={{display:'tableCell',textAlign:'center',padding:'50px 0px'}}>
+                    <span>请先选择学生后查看数据</span>
+                </div>
+            </div>
+        );
         var currentLesson = this.state.currentLesson || this.props.lessonsByStudent[0];
         var tableBody = getTableBody(currentLesson, this.props.currentStudent, this.props.zoubanLessonStudentsInfo, this.props.zuobanLessonQuestionInfo);
         tableBody.unshift(this.tableHeader);
+debugger
         return (
             <div className={commonClass['section']}>
                 <span className={commonClass['title-bar']}></span>
@@ -41,7 +53,7 @@ export default class StudentLessonQuestion extends React.Component {
                                 <span style={{ marginRight: 10}}>学科：</span>
                                     {_.map(this.props.lessonsByStudent, (lessonObj, index) => {
                                         return (
-                                            <a key={'papers-' + index}  onClick={this.onSelectLesson.bind(this, lessonObj)} style={localStyle.subject}>{lessonObj.name}</a>
+                                            <a key={'papers-' + index}  onClick={this.onSelectLesson.bind(this, lessonObj)} style={lessonObj.name===currentLesson.name?localStyle.activeSubject: localStyle.subject}>{lessonObj.name}</a>
                                         )
                                     })
                                 }

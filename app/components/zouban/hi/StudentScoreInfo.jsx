@@ -18,10 +18,23 @@ export default class StudentScoreInfo extends React.Component {
             isEquivalent: false
         }
     }
-
+    changeIsEquivalent(){
+        this.setState({
+            isEquivalent:!this.state.isEquivalent
+        })
+    }
     render() {
 
-        if(_.size(this.props.currentStudent) == 0) return (<h3>请先选择学生</h3>);
+        if(_.size(this.props.currentStudent) == 0) return (
+            <div className={commonClass['section']}>
+                <span className={commonClass['title-bar']}></span>
+                <span className={commonClass['title']}>考试基本成绩分数</span>
+                <span className={commonClass['title-desc']}></span>
+                <div style={{display:'tableCell',textAlign:'center',padding:'50px 0px'}}>
+                    <span>请先选择学生后查看数据</span>
+                </div>
+            </div>
+        );
         var tableRowKeys = getTableRowKeys();
         var orderedColumnKeys = getOrderColumnKeys(this.props.lessonsByStudent);
         var tableInfo = getTableInfo(this.props.lessonsByStudent, this.props.zoubanExamStudentsInfo, this.props.zoubanLessonStudentsInfo, this.props.currentStudent, this.state.isEquivalent);
@@ -33,7 +46,16 @@ export default class StudentScoreInfo extends React.Component {
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']}>考试基本成绩分数</span>
                 <span className={commonClass['title-desc']}></span>
-                <div style={{width:'1140px',padding:'10px 0',display:'table-cell',textAlign:'center'}}><span>{this.props.currentStudent.label}同学</span></div>
+                <div style={{position:'relative',width:'1140px',padding:'10px 0',display:'table-cell',textAlign:'center'}}><span>{this.props.currentStudent.label}同学</span>
+                <div style={{position:'absolute',right:'30px',top:'10px'}}>
+                    <span style={{marginRight:'50px'}}>
+                    <input value={'原始分'} onClick={this.changeIsEquivalent.bind(this)} style={{ marginRight: 5, cursor: 'pointer' }} type='radio' name='score' checked={!this.state.isEquivalent}/>
+                    <span>原始分</span>
+                    </span>
+                    <input value={'折合分'} onClick={this.changeIsEquivalent.bind(this)} style={{ marginRight: 5, cursor: 'pointer' }} type='radio' name='score' checked={this.state.isEquivalent}/>
+                    <span>折合分</span>
+                </div>
+                </div>
                 <div style={{marginBottom:20}}>
                 <TableView hover  tableData={tableBody}></TableView>
                 </div>
@@ -120,4 +142,3 @@ function getTableData(rowKeys, orderedColumnKeys, tableInfo) {
         return rowData;
     });
 }
-

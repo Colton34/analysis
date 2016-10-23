@@ -161,7 +161,7 @@ class StudentLevelsDistribution extends React.Component {
                             <span style={{ marginRight: 10}}>学科：</span>
                             {_.map(this.props.zoubanExamInfo.lessons, (lessonObj, index) => {
                                     return (
-                                        <a key={'papers-' + index} onClick={this.onSelectLesson.bind(this, lessonObj)} style={ localStyle.subject}>{lessonObj.name}</a>
+                                        <a key={'papers-' + index} onClick={this.onSelectLesson.bind(this, lessonObj)} style={(lessonObj.objectId == this.state.currentLesson.objectId) ?localStyle.activeSubject: localStyle.subject}>{lessonObj.name}</a>
                                     )
                                 })
                             }
@@ -177,7 +177,9 @@ class StudentLevelsDistribution extends React.Component {
                         <DropdownList onClickDropdownList={this.onClickDropdownList.bind(this) } list={classList} fixWidth />
                         </div>
                     </div>*/}
+                    <div style={{minWidth:'200px',float:'right'}}>
                     <Selector options={selectorOptions} initSelected={selectorInitSelected} handleSelectClasses={this.onSelectClasses.bind(this)}  />
+                    </div>
                 </div>
                 <div style={{marginTop:30}}>
                 <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
@@ -204,7 +206,7 @@ class StudentLevelsTable extends React.Component {
         return (
             <div className={commonClass['section']}>
                 <span className={commonClass['sub-title']}>各分数段教学班详细人数</span>
-                <Button onClick={this.clickDownloadTable.bind(this)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
+                <Button onClick={this.clickDownloadTable.bind(this)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0,float:'right'}}>下载表格</Button>
                 <div style={{marginTop:30}}>
                 <TableView hover  tableData={this.props.tableData}></TableView>
                 </div>
