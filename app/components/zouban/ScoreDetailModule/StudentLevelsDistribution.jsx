@@ -85,9 +85,11 @@ class StudentLevelsDistribution extends React.Component {
         debugger;
         // var selectorInitSelected = selectorOptions.slice(0, 3);
         tableBody.unshift(tableHeader);
+        var chartWidth = (segmentsString.length)*(classSegmentDistribution.length)>=50?((segmentsString.length)*(classSegmentDistribution.length)*21)+60*(classSegmentDistribution.length):1140;
         var config={
             chart: {
-                type: 'column'
+                type: 'column',
+                width:chartWidth
             },
             title: {
                 text: '人数',
@@ -181,7 +183,7 @@ class StudentLevelsDistribution extends React.Component {
                     <Selector options={selectorOptions} initSelected={selectorInitSelected} handleSelectClasses={this.onSelectClasses.bind(this)}  />
                     </div>
                 </div>
-                <div style={{marginTop:30}}>
+                <div style={{marginTop:30,width:'1140px',height:'420px',overflow:'auto',paddingLeft:10}}>
                 <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
                 </div>
                 <StudentLevelsTable tableData={tableBody} downloadKeys={tableHeader} downloadNames={tableHeader} downloadTableData={downloadTableData} downloadAllData={downloadAllData} />
