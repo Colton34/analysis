@@ -3,13 +3,13 @@ import React, { PropTypes } from 'react';
 import {Link, browserHistory} from 'react-router';
 import dashboardStyle from '../dashboard/dashboard.css';
 
-export default function ZoubanQuestionQuanlity({zoubanExamInfo, zuobanLessonQuestionInfo}) {
+export default function ZoubanQuestionQuanlity({zoubanExamInfo, zuobanLessonQuestionInfo, goNext}) {
     var simpleLesson = zoubanExamInfo.lessons[0];
     var simpleClass = simpleLesson.classes[0];
     var {goodQuestion,badQuestion} = getCardSummary(zuobanLessonQuestionInfo, simpleClass, simpleLesson);
     debugger;
     return (
-        <div style={{display: 'inline-block', height: 317, padding: '0px 10px 0px 0px', cursor: 'pointer'}}  className='col-lg-4'>
+        <div style={{display: 'inline-block', height: 317, padding: '0px 10px 0px 0px', cursor: 'pointer'}}  className='col-lg-4' onClick={goNext}>
             <div className='dashboard-card' style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
                 <CardHeader  />
                 <div>

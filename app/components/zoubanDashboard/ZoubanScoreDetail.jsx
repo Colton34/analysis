@@ -5,7 +5,7 @@ import {Link, browserHistory} from 'react-router';
 import dashboardStyle from '../dashboard/dashboard.css';
 import {makeSegments, makeSegmentsString, makeSegmentsDistribution} from '../../sdk';
 
-export default function ZoubanScoreDetail({zoubanLessonStudentsInfo, zoubanExamInfo}) {
+export default function ZoubanScoreDetail({zoubanLessonStudentsInfo, zoubanExamInfo, goNext}) {
     var simpleLesson = zoubanExamInfo.lessons[0];
     var currentLessonStudentsInfo = zoubanLessonStudentsInfo[simpleLesson.objectId];
     var segments = makeSegments(simpleLesson.fullMark, 0, 10);
@@ -55,7 +55,7 @@ export default function ZoubanScoreDetail({zoubanLessonStudentsInfo, zoubanExamI
         }
     }
     return (
-        <div style={{ display: 'inline-block', height: 388, padding: '0 0 0 10px', cursor: 'pointer'}}  className='col-md-6'>
+        <div style={{ display: 'inline-block', height: 388, padding: '0 0 0 10px', cursor: 'pointer'}}  className='col-md-6' onClick={goNext}>
             <div className='dashboard-card' style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
                 <CardHeader />
                 <ReactHighcharts config={config} style={{ width: 535, height: 240, marginTop: 30}}></ReactHighcharts>

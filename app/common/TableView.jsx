@@ -4,7 +4,7 @@ import {COLORS_MAP as colorsMap} from '../lib/constants';
 import classNames from 'classnames';
 
 let localStyle = {
-    tableShowAllBtn: { 
+    tableShowAllBtn: {
         color: colorsMap.C12, textDecoration: 'none', width: '100%', height: 40, display: 'inline-block', textAlign: 'center', backgroundColor: '#fff', lineHeight: '40px',
         border: '1px solid ' + colorsMap.C04, borderTop: 0
     }
@@ -18,7 +18,7 @@ let localStyle = {
  */
 class TableView extends React.Component {
     //static reserveRows = this.props.reserveRows || this.props.reserveRows <= 0 ? this.props.reserveRows : 5;
-     
+
     constructor(props) {
         super(props);
         var {tableData, reserveRows} = this.props;
@@ -26,7 +26,7 @@ class TableView extends React.Component {
         this.state ={
             showAllEnable: tableData.length > reserveRows ? true : false,
             showAll: false,
-            showData: tableData.length > reserveRows ? tableData.slice(0,reserveRows) : tableData 
+            showData: tableData.length > reserveRows ? tableData.slice(0,reserveRows) : tableData
         }
     }
     componentWillReceiveProps(nextProps){
@@ -35,7 +35,7 @@ class TableView extends React.Component {
         this.setState({
             showAllEnable: tableData.length > reserveRows? true :  false,
             showData: this.state.showAll ? tableData : tableData.slice(0,reserveRows)
-        })        
+        })
     }
     onClickShowAllBtn(event) {
         var {reserveRows} = this.props;
@@ -66,7 +66,7 @@ class TableView extends React.Component {
                 {
                     showAllEnable ?
                         <a  onClick={this.onClickShowAllBtn.bind(this) } href="javascript: void(0)" style={localStyle.tableShowAllBtn}>
-                            {showAll ? '点击收缩表格数据' : '点击查看更多数据'} 
+                            {showAll ? '点击收缩表格数据' : '点击查看更多数据'}
                             <i style={{color: colorsMap.B03}} className={classNames('animated', 'icon-down-open-2', {'caret-list-down': showAll, 'caret-list-up': !showAll})} style={{display: 'inline-block', color: colorsMap.B03}}></i>
                         </a> : ''
                 }

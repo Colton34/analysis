@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-22 14:12:39
+* @Last Modified time: 2016-10-23 12:51:22
 */
 'use strict';
 var _ = require('lodash');
@@ -215,7 +215,7 @@ exports.inValidCustomExamInfo = function(customExamInfoId) {
 function filterValidExams(originalExams, userId, schoolId, isLianKaoManager) {
     var temp = {};
     var validNotCustomExams = _.chain(originalExams).filter((examItem) => {
-        return (isLianKaoManager) ? (examItem.from == '20') : (examItem.from != '20' && examItem.from != '40');
+        return (isLianKaoManager) ? (examItem.from == '20') : (examItem.from != '20' && examItem.from != '40');//Note:这里倒是过滤掉自定义了，但是【走班】考试的from是什么？反正无论是什么，就算是undefined也会被选中的
     }).map((examItem) => {
         return {
             id: examItem['exam'],

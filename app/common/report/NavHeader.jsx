@@ -14,14 +14,15 @@ var localStyle = {
     }
 };
 
-export default function NavHeader({examName, examId, grade,reportName}) {
-    var queries = grade ? {examid: examId, grade: grade} : {examid: examId};
+export default function NavHeader({examName, examId, grade,reportName, isZouban}) {
+    var queries = {examid: examId, grade: grade};
+    var pathname = (isZouban) ? '/zouban/dashboard' : '/dashboard';
     return (
         <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}}>
             <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: colorsMap.C12 }}>
                 <Link to={{ pathname: '/dashboard',  query: queries}} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
                 <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}>
-                    <Link to={{ pathname: '/dashboard',  query: queries}} style={{color: '#b4b4b4'}}>{examName}</Link>
+                    <Link to={{ pathname: pathname,  query: queries}} style={{color: '#b4b4b4'}}>{examName}</Link>
                     <span><i className='icon-right-open-2'></i>{reportName}</span>
               </span>
             </div>

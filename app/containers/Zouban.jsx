@@ -27,10 +27,17 @@ export default class Zouban extends React.Component {
     }
 
     render() {
+        var {examid, grade} = this.props.location.query;
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                <ReportNavHeader examName={'期中考试'} examId={''} grade={'初一'} reportName={zoubanTitleMap[this.props.params.name]}/>
-                {(this.props.ifError) ? (<CommonErrorView />) : ((this.props.isLoading || !this.props.zouban.haveInit) ? (<Spinkit />) : (this.props.children))}
+                {
+                    (this.props.ifError) ? (<CommonErrorView />) : ((this.props.isLoading || !this.props.zouban.haveInit) ? (<Spinkit />) : (
+                        <div>
+                            <ReportNavHeader examName={this.props.zouban.zoubanExamInfo.toJS().name} examid={examid} grade={grade} isZouban={true} reportName={zoubanTitleMap[this.props.params.name]}/>
+                            {this.props.children}
+                        </div>
+                    ))
+                }
             </div>
         );
     }

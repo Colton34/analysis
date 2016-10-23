@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Radium from 'radium';
-import {Link} from 'react-router';
+import {Link, browserHistory, withRouter} from 'react-router';
 
 import Spinkit from '../common/Spinkit';
 import CommonErrorView from '../common/ErrorView';
@@ -21,6 +21,13 @@ import ZoubanStudentInfo from '../components/zoubanDashboard/ZoubanStudentInfo';
 import KnowledgePointAnalysis from '../components/zoubanDashboard/KnowledgePointAnalysis';
 import {COLORS_MAP as colorsMap} from '../lib/constants';
 
+const nextPathMap = {
+    rank: '/zouban/rank/score',
+    question: '/zouban/question/quality',
+    class: '/zouban/detail/class',
+    personal: '/zouban/personal/report'
+};
+
 class ZoubanDashboard extends React.Component {
     static need = [initZoubanDSAction]
 
@@ -35,16 +42,17 @@ class ZoubanDashboard extends React.Component {
     }
 
     render() {
+        var {examid, grade} = this.props.location.query;
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                {(this.props.ifError) ? (<CommonErrorView />) : ((this.props.isLoading || !this.props.zouban.haveInit) ? (<Spinkit />) : (<ZoubanDashboardContent zouban={this.props.zouban} />))}
+                {(this.props.ifError) ? (<CommonErrorView />) : ((this.props.isLoading || !this.props.zouban.haveInit) ? (<Spinkit />) : (<ZoubanDashboardContent examid={examid} grade={grade} zouban={this.props.zouban} />))}
             </div>
         );
     }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ZoubanDashboard);
-function mapStateToProps(state) {
+function mapStateToProps(state, props) {
     return {
         ifError: state.global.ifError,
         isLoading: state.global.isLoading,
@@ -65,37 +73,34 @@ class ZoubanDashboardContent extends React.Component {
 
     }
 
+    goNext(pathKey, queryString) {
+        debugger;
+        var targetUrl = nextPathMap[pathKey] + queryString;
+        debugger;
+        browserHistory.push(targetUrl);
+    }
+
     render() {
         var zoubanExamInfo = this.props.zouban.zoubanExamInfo.toJS(), zoubanExamStudentsInfo = this.props.zouban.zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = this.props.zouban.zoubanLessonStudentsInfo.toJS(), zuobanLessonQuestionInfo = this.props.zouban.zuobanLessonQuestionInfo.toJS();
+        debugger;
+        var queryString = `?examid=${this.props.examid}&grade=${this.props.grade}`;
+        debugger;
 
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
                 <ZoubanNavHeader zoubanExamInfo={zoubanExamInfo} />
                 <ZoubanExamGuide zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} />
                 <div className='row' style={{ marginTop: 20 }}>
-                <ZoubanRank zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} />
-                <ZoubanScoreDetail zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />
+                <ZoubanRank zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} goNext={this.goNext.bind(this, 'rank', queryString)} />
+                <ZoubanScoreDetail zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} goNext={this.goNext.bind(this, 'class', queryString)} />
                 </div>
                 <div className='row' style={{ marginTop: 20 }}>
-                <ZoubanQuestionQuanlity zoubanExamInfo={zoubanExamInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo} />
+                <ZoubanQuestionQuanlity zoubanExamInfo={zoubanExamInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo} goNext={this.goNext.bind(this, 'question', queryString)} />
                 <KnowledgePointAnalysis />
-                <ZoubanStudentInfo zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zoubanExamInfo={zoubanExamInfo} />
+                <ZoubanStudentInfo zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zoubanExamInfo={zoubanExamInfo} goNext={this.goNext.bind(this, 'personal', queryString)} />
                 </div>
             </div>
         );
     }
 }
 
-
-/*
-
-
-                <ZoubanNavHeader zoubanExamInfo={zoubanExamInfo} />
-                <ZoubanExamGuide zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} />
-                <ZoubanRank zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} />
-                <ZoubanScoreDetail zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />
-                <ZoubanQuestionQuanlity zoubanExamInfo={zoubanExamInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo} />
-                <ZoubanStudentInfo zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zoubanExamInfo={zoubanExamInfo} />
-
-
- */

@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react';
 import {Link, browserHistory} from 'react-router';
 import dashboardStyle from '../dashboard/dashboard.css';
 
-export default function ZoubanStudentInfo({zoubanLessonStudentsInfo, zoubanExamInfo}) {
+export default function ZoubanStudentInfo({zoubanLessonStudentsInfo, zoubanExamInfo, goNext}) {
     debugger;
     var lessonMap = _.keyBy(zoubanExamInfo.lessons, 'objectId');
     var simpleLessonObjectId = _.keys(zoubanLessonStudentsInfo)[0];
@@ -20,7 +20,7 @@ export default function ZoubanStudentInfo({zoubanLessonStudentsInfo, zoubanExamI
     }
     debugger;
     return (
-        <div style={{display: 'inline-block', height: 317, padding: '0px 0px 0px 10px', cursor: 'pointer'}}  className='col-lg-4'>
+        <div style={{display: 'inline-block', height: 317, padding: '0px 0px 0px 10px', cursor: 'pointer'}}  className='col-lg-4' onClick={goNext}>
             <div className='dashboard-card' style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
                 <CardHeader  />
                 <div style={{width:'320px'}}>

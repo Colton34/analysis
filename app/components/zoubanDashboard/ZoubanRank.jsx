@@ -11,11 +11,11 @@ import {NUMBER_MAP} from '../../lib/constants';
 import TableView from '../../common/TableView';
 import EnhanceTable from '../../common/EnhanceTable';
 
-export default function ZoubanRank({zoubanLessonStudentsInfo, zoubanExamStudentsInfo}) {
+export default function ZoubanRank({zoubanLessonStudentsInfo, zoubanExamStudentsInfo, goNext}) {
     //取任意一个科目的前六名
     var dataMatrix = getDataMatrix(zoubanLessonStudentsInfo, zoubanExamStudentsInfo);//排名为什么没有见到第二名！！！
     return (
-        <div style={_.assign({ display: 'inline-block', minHeight: 340, cursor: 'pointer',padding:'0px 10px 0px 0px'})} className={'col-md-6'}>
+        <div style={_.assign({ display: 'inline-block', minHeight: 340, cursor: 'pointer',padding:'0px 10px 0px 0px'})} className={'col-md-6'} onClick={goNext}>
             <div className='dashboard-card' style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
                <CardHeader />
                 <Table id='topRankTable' responsive style={{ width: '100%', height: '100%', margin: '20px 0 30px 0' }}>

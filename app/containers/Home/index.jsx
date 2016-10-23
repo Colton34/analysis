@@ -174,6 +174,7 @@ class ExamItem extends React.Component {
     }
     render() {
         var {timeKey, item} = this.props;
+        var pathname = (item.from == '50') ? '/zouban/dashboard' : '/dashboard';
         var queryOptions = {examid: item.id, grade: item.grade};
 
         return (
@@ -198,7 +199,7 @@ class ExamItem extends React.Component {
                             </span>
                             </div>
                         </div>
-                        <Link to={{ pathname: '/dashboard', query: queryOptions }}
+                        <Link to={{ pathname: pathname, query: queryOptions }}
                               style={this.state.hoverLink ? localStyle.linkAnalysisBtnHover : localStyle.linkAnalysisBtn}
                               onMouseEnter={this.handleMouseEnter.bind(this)}
                               onMouseLeave={this.handleMouseLeave.bind(this)}>
