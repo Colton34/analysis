@@ -191,7 +191,7 @@ class RankReportContainer extends React.Component {
         this.downloadTableData = getDownTableData(theRowDS, downloadKeys);//下载全部页数的表格内容
 
         return (
-            <div>
+            <div style={{ width: 1200, minHeight: 700, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 ,padding:50}}>
                 <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
                 {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
                 <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} clickDownloadTable={this.clickDownloadTable.bind(this)} />
@@ -244,7 +244,7 @@ class TitleSelector extends React.Component {
                     <span style={{ marginRight: 10}}>{this.props.isEquivalent ? '学科' : '课程'}：</span>
                         {_.map(this.props.titleOptions, (titleObj, index) => {
                             return (
-                                <a key={'title-' + index} onClick={this.onSelectTitle.bind(this, titleObj)} style={ localStyle.subject}>{titleObj.title}{(titleObj.id == this.props.currentTitle.id) ? '(选中)' : ''}</a>
+                                <a key={'title-' + index} onClick={this.onSelectTitle.bind(this, titleObj)} style={ (titleObj.id == this.props.currentTitle.id)?localStyle.activeSubject:localStyle.subject}>{titleObj.title}</a>
                             )
                         })
                     }
@@ -267,9 +267,9 @@ class ClassSelector extends React.Component {
 
     render() {
         return(
-            <div style={{heigth: 50, lineHeight: '50px',marginTop:0,padding:0}} className={commonClass['section']}>
+            <div style={{heigth: 50, lineHeight: '50px',marginTop:0,padding:0,marginBottom:0}} className={commonClass['section']}>
                 <span style={{ float: 'left', marginRight: 10}}>教学班:</span>
-                <span style={{float: 'left', width: 800}}>
+                <span style={{float: 'left', width: 1000}}>
                     {
                         (this.props.lessonClassesOptions.length > 0) ? (
                                 _.map(this.props.lessonClassesOptions, (className, index) => {
@@ -354,7 +354,7 @@ class SearchSortDropSelector extends React.Component {
 
     render() {
         return(
-            <div style={{marginBottom:30}}>
+            <div style={{marginBottom:30,marginTop:30}}>
                 <span className={commonClass['title-bar']}></span>
                 <span className={commonClass['title']} >分数排行榜详情</span>
                 <div style={{float:'right'}}>
@@ -388,12 +388,14 @@ class Paginate extends React.Component {
                     显示第{beginCount}到第{endCount}条记录，总共{this.props.totalCount}条记录
                     <span style={this.props.totalCount < 25 ? {display: 'none'} : {display: 'inline-block'}}>
                         ，每页显示
+                        <div style={{display:'inline-block'}}>
                         <Select
                             simpleValue
                             options={this.props.options}
                             value={this.props.currentPageSize}
                             onChange={this.onSelectPageSize.bind(this)}
                         />
+                        </div>
                         条记录
                     </span>
                 </span>
