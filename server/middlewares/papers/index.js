@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-30 19:57:47
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-24 20:29:05
+* @Last Modified time: 2016-10-24 21:24:56
 */
 
 'use strict';
@@ -92,7 +92,10 @@ function fetchQuestionPic(questionId, examObjectId) {
 
 //TODO:待测试1.5的试卷
 function getPicByExid(examObjectId, response) {
-    if(!response.pic) return '';
+    if(!response.pic) {
+        console.log('没有pic ====================================');
+        return '';
+    }
     if(!examObjectId > 100000) return questionPicPrefix + response.pic;
     var picInfo = response.pic;
     var tempParams = picInfo.split(':');

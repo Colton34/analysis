@@ -42,7 +42,7 @@ class StudentPersonalModule extends React.Component {
                 <SelectorGroup zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} selectStudent={this.selectStudent.bind(this)} />
                 <StudentScoreInfo zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} currentStudent={this.state.currentStudent} lessonsByStudent={lessonsByStudent} />
                 <StudentSubjectCompare zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} lessonsByStudent={lessonsByStudent} currentStudent={this.state.currentStudent} />
-                <StudentLessonQuestion currentStudent={this.state.currentStudent} lessonsByStudent={lessonsByStudent} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo} />
+                <StudentLessonQuestion currentStudent={this.state.currentStudent} lessonsByStudent={lessonsByStudent} zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo} />
             </div>
         );
     }
