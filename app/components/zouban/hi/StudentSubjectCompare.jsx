@@ -38,6 +38,7 @@ export default function StudentSubjectCompare({zoubanLessonStudentsInfo, lessons
                "fontSize": "12px"
             }
         },
+        colors:['rgb(47,152,251)'],
         xAxis:{
             tickWidth:'0px',
             categories: categories,
@@ -126,7 +127,11 @@ function getStudentLessonRankRateDiff(zoubanLessonStudentsInfo, lessonsByStudent
             }
         }).sortBy('diff').first().value().value;
         var gradeRankRate = _.round(_.divide(gradeTargetStudent.lessonRank, currentLessonStudents.length), 2);
-        return _.round(_.subtract(studentRankRate, gradeRankRate), 2);
+        var temp = _.round(_.subtract(studentRankRate, gradeRankRate), 2);
+        return {
+            y:temp,
+            color:temp>=0?'rgb(47,152,251)':'rgb(233,63,51)'
+        };
     });
 }
 
