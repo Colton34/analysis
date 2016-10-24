@@ -77,6 +77,7 @@ class LessonSelector extends React.Component {
                 <span style={{lineHeight:'34px'}}>选择学科：</span>
                 <div style={{width:200,display:'inline-block',position:'absolute',zIndex:100}}>
                 <Select
+                    clearable={false}
                     options={this.props.lessons}
                     value={this.props.currentLesson}
                     onChange={this.props.handleSelectLesson}
@@ -97,6 +98,7 @@ class ClassSelector extends React.Component {
             <div>
                 <Select
                     simpleValue
+                    clearable={false}
                     options={this.props.classes}
                     value={this.props.currentClass}
                     onChange={this.props.handleSelectClass}
@@ -116,6 +118,7 @@ class StudentSelector extends React.Component {
         return (
             <div>
                 <Select
+                    clearable={false}
                     options={this.props.currentClassStudents}
                     value={this.props.currentStudent}
                     onChange={this.props.handleSelectStudent}
