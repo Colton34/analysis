@@ -98,6 +98,8 @@ class Main extends React.Component {
                 <div><Link to={{pathname: '/zouban/detail/class', query: {examid: '101772-10202', grade: '高二'}}}>班级成绩明细</Link></div>
                 <div><Link to={{pathname: '/zouban/personal/report'}}>走班学生个人分析</Link></div>
                 <div><Link to={{pathname: '/zouban/rank/score'}}>排行榜</Link></div>
+
+                <div><Link to={{pathname: '/zouban/personal', query: {examid: '101772-10202', grade: '高二'}}}>学生个人</Link></div>
                 <TestSelect />
 
                 <h5>=========== 走班分割线========================</h5>

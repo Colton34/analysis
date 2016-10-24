@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-14 12:24:17
+* @Last Modified time: 2016-10-24 10:09:07
 */
 
 'use strict';
@@ -53,7 +53,7 @@ exports.authenticate = function(req, res, next) {
     var password = req.body.password;
 
     authUitls.getUserInfo(value).then(function(user) {
-        // if(user) console.log('来自1.5 pwd - ', user.pwd);
+        if(user) console.log('来自1.5 pwd - ', user.pwd);
 
         if(user && (_.eq(user.pwd, password))) return when.resolve(user);//确认是1.5的账号
         return authUitls.getUserInfo2(value, password);//可能是1.5的账号，但是密码不正确；可能是2.0的账号  1.5的账号，但是使用2.0的密码--其实还是2.0的账号
