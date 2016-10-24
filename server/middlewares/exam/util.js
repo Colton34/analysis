@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-23 12:51:22
+* @Last Modified time: 2016-10-24 17:47:12
 */
 'use strict';
 var _ = require('lodash');
@@ -417,6 +417,7 @@ function getDefaultEquivalentScoreInfo(examid) {
         });
         return saveEquivalentScoreInfo({
             examId: examid,
+            examObjectId: examInstance._id,
             examName: examInstance.name,
             '[lessons]': lessons
         });

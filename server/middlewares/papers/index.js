@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-30 19:57:47
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-24 16:12:16
+* @Last Modified time: 2016-10-24 20:29:05
 */
 
 'use strict';
@@ -18,7 +18,10 @@ var AK = "LUKEBCQ32C6AVUK2TCHA";
 var SK = "5Qixn339yiXUBtiP67XPCB14TRHnoqq8cVPWVdM9";
 var bucket = 'kaoshi2';
 var expireTime = 100;
-var client = new KS3(AK, SK, bucket);
+var KS3client = new KS3(AK, SK, bucket);
+var questionPicPrefix = "http://haofenshu.kssws.ks-cdn.com/file/vs/";
+
+var when = require('when');
 
 exports.fetchPaper = function (req, res, next) {
     req.checkParams('paperId', '无效的paperId').notEmpty();
@@ -52,45 +55,45 @@ exports.fetchCustomPaper = function(req, res, next) {
     });
 }
 
-exports.mockFetchQuestionPic = function(req, res, next) {
+exports.mockFetchLessonQuestionPic = function(req, res, next) {
     //TODO:检查要有两个必要的参数
-    res.status(200).json({
-        picUrl: 'http://haofenshu.kssws.ks-cdn.com/file/vs/53595/1.png'
-    });
+    res.status(200).json(['http://haofenshu.kssws.ks-cdn.com/file/vs/53595/1.png', 'http://haofenshu.kssws.ks-cdn.com/file/vs/53595/1.png', 'http://haofenshu.kssws.ks-cdn.com/file/vs/53595/1.png']);
 }
 
 //保证拿到了exam_objectid
-exports.fetchQuestionPic = function(req, res, next) {
-    req.checkQuery('question_id', '没有question_id').notEmpty();
-    req.checkQuery('exam_objectid', '没有exam_objectid').notEmpty();
-    if (req.validationErrors()) return next(req.validationErrors());
+exports.fetchLessonQuestionPic = function(req, res, next) {
+    if(!req.body.questionIds || !req.body.examObjectId) return next(new errors.Error('没有questionIds或者examObjectId参数'));
+
+    var fetchQuestionPicPromises = _.map(req.body.questionIds, (questionId) => fetchQuestionPic(questionId, req.body.examObjectId));
+    when.all(fetchQuestionPicPromises).then(function(picUrls) {
+        res.status(200).json(picUrls);
+    }).catch(function(err) {
+        next(err);
+    })
+}
+
+function fetchQuestionPic(questionId, examObjectId) {
     var url = config.analysisServer + '/getOriPicOfQues';
-
-console.log('url = ', url);
-
-    var postData = {question_id : req.query.question_id};
-    when.promise(function(resolve, reject) {
+    var postData = {question_id : questionId};
+    return when.promise(function(resolve, reject) {
         client.post(url, {body: postData, json: true}, function(err, response, body) {
             if (err) return reject(new errors.URIError('查询analysis server(fetchQuestionPic) Error: ', err));
-            var data = JSON.parse(body);
-            if(data.error) return reject(new errors.Error('查询analysis server(fetchQuestionPic)失败'));
             resolve(body);
         });
     }).then(function(response) {
         try{
-            var picUrl = getPicByExid(req.query.exam_objectid, response);
-            res.status(200).json({ picUrl: picUrl });
+            var picUrl = getPicByExid(examObjectId, response);
+            return when.resolve(picUrl);
         } catch(e) {
-            next(errors.data.Error('转换pic url Error : ', e));
+            return when.reject(errors.Error('转换pic url Error questionId = : ' + questionId, e));
         }
-    }).catch(function(err) {
-        next(err)
-    })
+    });
 }
 
+//TODO:待测试1.5的试卷
 function getPicByExid(examObjectId, response) {
-console.log('response ===========  ', JSON.stringify(response));
-    if(!(examObjectId > 100000 && response.pic)) return response;
+    if(!response.pic) return '';
+    if(!examObjectId > 100000) return questionPicPrefix + response.pic;
     var picInfo = response.pic;
     var tempParams = picInfo.split(':');
     var attachmentId = tempParams[0];
@@ -106,7 +109,7 @@ console.log('response ===========  ', JSON.stringify(response));
 }
 
 function genScaleKS3Url(attachmentId, x, y, w, h) {
-    return client.object.genUrl({
+    return KS3client.object.genUrl({
         key : attachmentId,
         expires : expireTime,
         x : x,

@@ -46,7 +46,6 @@ class QuestionModule extends React.Component {
         var zoubanExamStudentsInfo = this.props.zoubanExamStudentsInfo.toJS();
         var zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo.toJS();
         var zuobanLessonQuestionInfo = this.props.zuobanLessonQuestionInfo.toJS();
-        debugger
         return (
             <div>
                 <SubjectSelector  lessons={this.lessons} currentLesson={this.state.currentLesson} changeLesson={this.changeLesson.bind(this)}/>
