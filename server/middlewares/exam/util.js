@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-23 12:51:22
+* @Last Modified time: 2016-10-24 15:07:52
 */
 'use strict';
 var _ = require('lodash');
@@ -71,6 +71,34 @@ function getValidAuthExams(validExams, userAuth) {
     if(userAuth.isSchoolManager) return validExams;
     return _.filter(validExams, (examItem) => {
         return _.intersection(_.keys(userAuth.gradeAuth), _.keys(_.groupBy(examItem['[papers]'], 'grade'))).length > 0;
+    });
+}
+
+//【临时Mock】
+exports.getMockValidExamsBySchoolId = function(schoolId, userId, userAuth) {
+    var ifSchoolHaveExams = true, errorInfo = {msg: ''};
+    return mockFilterValidExams().then(function(validExams) {
+        if(!ifSchoolHaveExams) errorInfo.msg = '此学校没有考试';
+        var existPapersExams = _.filter(validExams, (obj) => (obj['[papers]'] && obj['[papers]'].length > 0));
+        if(ifSchoolHaveExams && existPapersExams.length == 0) errorInfo.msg = '此学校下考试都没有科目';
+        if(ifSchoolHaveExams && userAuth.isLianKaoManager && validExams.length == 0) errorInfo.msg = '暂无联考考试内容可供查看';
+        var validAuthExams = getValidAuthExams(validExams, userAuth);
+        if(ifSchoolHaveExams && !userAuth.isLianKaoManager && validAuthExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
+        return when.resolve({
+            validAuthExams: validAuthExams,
+            errorInfo: errorInfo
+        });
+    });
+}
+
+
+function mockFilterValidExams() {
+    var mockZoubanExams = [{name: "2016.10高二第二次学考模拟考", id: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '50'}, {name: "2015-2016学年第二学期期末初一年级组", id: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '50'}];
+    mockZoubanExams = _.chain(mockZoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
+
+    var getExamInstancePromises = _.map(mockZoubanExams, (validExam) => getExamById(validExam.id));
+    return when.all(getExamInstancePromises).then(function(examInstances) {
+        return when.resolve(_.map(examInstances, (examItem, index) => _.assign({}, examItem, mockZoubanExams[index])));
     });
 }
 
