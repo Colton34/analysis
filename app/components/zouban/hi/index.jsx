@@ -140,12 +140,12 @@ class SelectorGroup extends React.Component {
     }
 
     handleSelectLesson(selectedLesson) {
-        var currentLessonClasses = _.map(selectedLesson.classes, (className) => {
+        var currentLessonClasses = (selectedLesson) ? _.map(selectedLesson.classes, (className) => {
             return {
                 label: className,
                 value: className
             }
-        });
+        }) : [];
         this.setState({
             currentLesson: selectedLesson,
             currentLessonClasses: currentLessonClasses,
