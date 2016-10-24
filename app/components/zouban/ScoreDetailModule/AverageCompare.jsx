@@ -60,9 +60,12 @@ class AverageCompare extends React.Component {
 
         var classesName = _.keys(classesMeanInfo), classesMean = _.values(classesMeanInfo);
         var currentLessonGradeMean= this.state.currentLessonGradeMean;
+        var chartWidth = classesName.length >=15? classesName.length*80:1140;
+        debugger
         var config={
             chart: {
-                type: 'column'
+                type: 'column',
+                width:chartWidth
             },
             colors:['#0099ff'],
             title: {
@@ -166,7 +169,7 @@ class AverageCompare extends React.Component {
             {/*设置 multi  设置开始的时候所有的班级都是选中状态  因为是多选，所以当不是下拉状态那么总是显示“选择班级” */}
             {/*<DropdownList isMultiChoice={true} needRefresh={true} initSelected={currentLessonClassesList} onClickDropdownList={this.onSelectClasses.bind(this) } list={currentLessonClassesList} fixWidth/>*/}
             </div>
-            <div style={{marginTop:30}}>
+            <div style={{marginTop:30,width:'1140px',height:'420px',overflow:'auto',paddingLeft:10,marginTop:30}}>
             <ReactHighcharts config={config} style={{marginTop: 30, width: '100%', height: 330}}/>
             </div>
         </div>
