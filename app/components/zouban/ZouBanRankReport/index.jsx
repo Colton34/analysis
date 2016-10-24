@@ -368,11 +368,6 @@ class Paginate extends React.Component {
     constructor(props) {
         super(props);
     }
-
-    onSelectPageSize(selectedPageSize) {
-        this.props.handleSelectPageSize(selectedPageSize);
-    }
-
     render() {
         var beginCount = this.props.currentPageSize * this.props.currentPageValue + 1;
         var endCount = beginCount + this.props.currentPageSize - 1;
@@ -384,13 +379,7 @@ class Paginate extends React.Component {
                     <span style={this.props.totalCount < 25 ? {display: 'none'} : {display: 'inline-block'}}>
                         ，每页显示
                         <div style={{display:'inline-block'}}>
-                        <Select
-                            simpleValue
-                            clearable={false}
-                            options={this.props.options}
-                            value={this.props.currentPageSize}
-                            onChange={this.onSelectPageSize.bind(this)}
-                        />
+                        <SelectPaperSize totalCount={this.props.totalCount} currentPageSize={this.props.currentPageSize} handleSelectPageSize={this.props.handleSelectPageSize}/>
                         </div>
                         条记录
                     </span>
@@ -415,7 +404,24 @@ class Paginate extends React.Component {
     }
 }
 
+class SelectPaperSize extends React.Component{
+    constructor(props){
+        super(props);
+    }
+    render(){
+        var totalCount = this.props.totalCount;
+        var currentPageSize = this.props.currentPageSize;
 
+        return(
+            <DropdownButton id='pageSize-select' title={currentPageSize} dropup style={{ margin: '0 2px' }}>
+                <MenuItem onClick={this.props.handleSelectPageSize.bind(this,25) } active={currentPageSize === 25}>25</MenuItem>
+                <MenuItem style={ totalCount > 25 ? { display: 'block' } : { display: 'none' }} onClick={this.props.handleSelectPageSize.bind(this,50) } active={currentPageSize === 50}>50</MenuItem>
+                <MenuItem style={ totalCount > 50 ? { display: 'block' } : { display: 'none' }}  onClick={this.props.handleSelectPageSize.bind(this,100) } active={currentPageSize === 100}>100</MenuItem>
+                <MenuItem style={ totalCount > 100 ? { display: 'block' } : { display: 'none' }} onClick={this.props.handleSelectPageSize.bind(this,1000)} active={currentPageSize === 1000}>1000</MenuItem>
+            </DropdownButton>
+        )
+    }
+}
 /*
 
 负责渲染一个ReportContainer里的所有组件：给出每个孩子组件的当前状态和所有状态，即瀑布。因为这里需要汇总所有孩子状态。
