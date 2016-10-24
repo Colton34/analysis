@@ -28,7 +28,7 @@ const Table = ({tableData, tipConfig, colorCallback}) => {
     var tableBodyData = _.slice(tableData, 1);
     var tipNames = tipConfig ? _.keys(tipConfig) : [];
     return (
-        
+
         <BootTable bordered  hover responsive style={{marginBottom: 0}}>
             <tbody>
                 <tr style={{ backgroundColor: '#fafafa'}}>
@@ -80,6 +80,22 @@ const Table = ({tableData, tipConfig, colorCallback}) => {
 }
 
 export default Table;
+
+class Go extends React.Component {
+    constructor(props) {
+        super(props);
+
+    }
+
+    render() {
+        return (
+            <div>
+                <a href="">查看</a>
+            </div>
+        );
+    }
+}
+
 
 /*
 Mock Data:

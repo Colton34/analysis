@@ -29,6 +29,63 @@ const WHY_WOULD_YOU = [
 ].concat(FLAVOURS.slice(1));
 
 
+
+
+
+class TestImageDialog extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isDisplay: false
+        }
+    }
+
+    showModal() {
+        this.setState({
+            isDisplay: true
+        })
+    }
+
+    hideModal() {
+        this.setState({
+            isDisplay: false
+        })
+    }
+
+    render() {
+        return (
+            <div>
+                <h4>我是图片</h4>
+                <Modal show={ this.state.isDisplay } ref="dialog"  onHide={this.hideModal.bind(this)}>
+                    <Header closeButton={false} style={{position: 'relative', textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
+                        <button className={commonClass['dialog-close']} onClick={this.hideModal.bind(this)}>
+                            <i className='icon-cancel-3'></i>
+                        </button>
+                        设置分档线
+                    </Header>
+                    <LevelForm reportDS={this.props.reportDS} examId={this.props.examId} grade={this.props.grade} hideModal={this.hideModal.bind(this)}
+                        changeLevels={this.props.changeLevels.bind(this)} saveBaseline={this.props.saveBaseline.bind(this)} />
+                </Modal>
+            </div>
+        );
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class TestSelect2 extends React.Component {
     constructor(props) {
         super(props);

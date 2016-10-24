@@ -104,6 +104,7 @@
     "json-loader": "0.5.4",
     "jsonwebtoken": "5.7.0",
     "kerberos": "0.0.19",
+    "ks3": "git+ssh://git@code.iyunxiao.com:commonsgroup/ks3-nodejs-sdk.git#master",
     "less": "2.6.1",
     "less-loader": "2.2.3",
     "lodash": "4.8.2",
