@@ -42,14 +42,17 @@ export default class QuestionDetail extends React.Component {
         //如果lessonid没有变则找的图片也没有变，否则获取新的lesson的图片--暂时不做任何缓存
         if(nextProps.currentLesson.key == this.props.currentLesson.key) return;
         debugger;
+        this.setState({
+            isPicReady: false
+        });
         this.lessonQuestions = _.keyBy(nextProps.zoubanExamInfo.lessons, 'objectId')[nextProps.currentLesson.key].questions
         var questionIds = _.map(this.lessonQuestions, (obj) => obj.qid);
         var examObjectId = nextProps.zoubanExamInfo.objectId;
         var _this = this;
         fetchLessonQuestionPic({request: window.request, questionIds: questionIds, examObjectId: examObjectId}).then(function(picUrls) {
-            this.setState({
-                currentLessonPics: picUrls,
-                isPicReady: true
+            _this.setState({
+                isPicReady: true,
+                currentLessonPics: picUrls
             });
         });
     }
