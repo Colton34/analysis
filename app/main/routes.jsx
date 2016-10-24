@@ -53,8 +53,8 @@ export default (store) => {
             <Route path='subject/report' component={SubjectReport} />
             <Route path='add/analysis' component={CustomizeAnalysis} />
 
-            <Route path='zouban/personal' component={StudentPersonal} />
 
+            <Route path='helper/score' component={EquivalentScore} />
             <Route path='zouban/dashboard' component={ZoubanDashboard} />
             <Route path='zouban/:name' component={Zouban}>
                 <Route path="quality" component={ZoubanQuestionModule} />
@@ -62,9 +62,20 @@ export default (store) => {
                 <Route path="report" component={StudentPersonalModule} />
                 <Route path="score" component={ZouBanRankReport} />
             </Route>
-            <Route path='helper/:name' component={HelperBoxContainer}>
-                <Route path="score" component={EquivalentScore} />
-            </Route>
+
         </Route>
     );
 };
+
+
+/*
+
+<Route path='zouban/personal' component={StudentPersonal} />
+
+            <Route path='helper/:name' component={HelperBoxContainer}>
+                <Route path="score" component={EquivalentScore} />
+            </Route>
+
+
+
+ */

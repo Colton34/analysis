@@ -20,6 +20,16 @@ TODO: a.计算lessonName  b.使得重要的科目在前面
  */
 
 
+function HelperBoxNav({title}) {
+    return (
+        <div style={{ width: 1200,height:50, margin: '0 auto', marginTop: 20, backgroundColor: '#fff', zIndex: 0,paddingTop:20}} className='animated fadeIn'>
+            <Link to={{pathname: '/dashboard'}} style={{color:'#333'}}>返回</Link>
+            <span style={{color:'#000',marginLeft:'500px',fontSize:'18px'}}>等值转换</span>
+        </div>
+    )
+}
+
+
 //Main
 class EquivalentScore extends React.Component {
     static need = [fetchEquivalentScoreInfoListAction];
@@ -50,7 +60,7 @@ class EquivalentScore extends React.Component {
     render() {
         return (
             <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#fff', zIndex: 0}} className='animated fadeIn'>
-
+                <HelperBoxNav />
                 {this.props.ifError ? (<CommonErrorView />) : ((this.props.isLoading || this.props.equivalentScoreInfoList.size == 0) ? <Spinkit /> : <ContentModule equivalentScoreInfoList={this.props.equivalentScoreInfoList} />)}
             </div>
         );
