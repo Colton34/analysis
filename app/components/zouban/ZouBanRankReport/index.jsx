@@ -385,6 +385,7 @@ class Paginate extends React.Component {
                         <div style={{display:'inline-block'}}>
                         <Select
                             simpleValue
+                            clearable={false}
                             options={this.props.options}
                             value={this.props.currentPageSize}
                             onChange={this.onSelectPageSize.bind(this)}
