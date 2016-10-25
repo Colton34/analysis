@@ -24,23 +24,13 @@ export default class StudentScoreInfo extends React.Component {
         })
     }
     render() {
-
-        if(_.size(this.props.currentStudent) == 0) return (
-            <div className={commonClass['section']}>
-                <span className={commonClass['title-bar']}></span>
-                <span className={commonClass['title']}>考试基本成绩分数</span>
-                <span className={commonClass['title-desc']}></span>
-                <div style={{display:'tableCell',textAlign:'center',padding:'50px 0px'}}>
-                    <span>请先选择学生后查看数据</span>
-                </div>
-            </div>
-        );
         var tableRowKeys = getTableRowKeys();
         var orderedColumnKeys = getOrderColumnKeys(this.props.lessonsByStudent);
         var tableInfo = getTableInfo(this.props.lessonsByStudent, this.props.zoubanExamStudentsInfo, this.props.zoubanLessonStudentsInfo, this.props.currentStudent, this.state.isEquivalent);
         var tableHeader = getTableHeader(this.props.lessonsByStudent);
         var tableBody = getTableData(tableRowKeys, orderedColumnKeys, tableInfo);
         tableBody.unshift(tableHeader);
+        debugger;
         return (
             <div className={commonClass['section']}>
                 <span className={commonClass['title-bar']}></span>

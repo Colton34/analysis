@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-24 15:07:52
+* @Last Modified time: 2016-10-25 21:41:42
 */
 'use strict';
 var _ = require('lodash');
@@ -13,6 +13,8 @@ var config = require('../../config/env');
 var errors = require('common-errors');
 
 var peterFX = require('peter').getManager('fx');
+var peterHFS = require('peter').getManager('hfs');
+
 const SUBJECTS_WEIGHT = ['语文', '数学', '英语', '理综', '文综', '物理', '化学', '生物', '政治', '历史', '地理'];
 
 var getExamById = exports.getExamById = function(examid, fromType) {
@@ -74,31 +76,49 @@ function getValidAuthExams(validExams, userAuth) {
     });
 }
 
-//【临时Mock】
-exports.getMockValidExamsBySchoolId = function(schoolId, userId, userAuth) {
-    var ifSchoolHaveExams = true, errorInfo = {msg: ''};
-    return mockFilterValidExams().then(function(validExams) {
-        if(!ifSchoolHaveExams) errorInfo.msg = '此学校没有考试';
-        var existPapersExams = _.filter(validExams, (obj) => (obj['[papers]'] && obj['[papers]'].length > 0));
-        if(ifSchoolHaveExams && existPapersExams.length == 0) errorInfo.msg = '此学校下考试都没有科目';
-        if(ifSchoolHaveExams && userAuth.isLianKaoManager && validExams.length == 0) errorInfo.msg = '暂无联考考试内容可供查看';
-        var validAuthExams = getValidAuthExams(validExams, userAuth);
-        if(ifSchoolHaveExams && !userAuth.isLianKaoManager && validAuthExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
-        return when.resolve({
-            validAuthExams: validAuthExams,
-            errorInfo: errorInfo
+exports.getValidExamsByStudent = function(student) {
+    //从student.papers中获取此学生参加过的考试，从school的exams中过滤
+    var temp = {};
+    return getStudentById(student.studentId).then(function(studentInstance) {
+
+console.log('studentInstance._id === ', studentInstance._id);
+
+
+        temp.studentInstance = studentInstance;
+        return getSchoolById(student.schoolId);
+    }).then(function(school) {
+        var allZoubanExams = _.filter(school['[exams]'], (obj) => obj.from == '25');
+        return filterStudentZoubanExams(allZoubanExams, temp.studentInstance['[papers]'], student.schoolId);
+    }).then(function(studentZoubanExams) {
+        return (studentZoubanExams.length > 0) ? {validAuthExams: studentZoubanExams, errorInfo: {msg: ''}} : {validAuthExams: [], errorInfo: {msg: '没有查询到你参加的考试，请找相关老师确认'}};
+    });
+}
+
+function getStudentById(studentId) {
+    return when.promise(function(resolve, reject) {
+        peterHFS.get('@Student.' + studentId, function(err, studentInstance) {
+            if(err) return reject(new errors.data.MongoDBError('getStudentById Error: ', err));
+            resolve(studentInstance);
         });
     });
 }
 
-
-function mockFilterValidExams() {
-    var mockZoubanExams = [{name: "2016.10高二第二次学考模拟考", id: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '50'}, {name: "2015-2016学年第二学期期末初一年级组", id: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '50'}];
-    mockZoubanExams = _.chain(mockZoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
-
-    var getExamInstancePromises = _.map(mockZoubanExams, (validExam) => getExamById(validExam.id));
-    return when.all(getExamInstancePromises).then(function(examInstances) {
-        return when.resolve(_.map(examInstances, (examItem, index) => _.assign({}, examItem, mockZoubanExams[index])));
+function filterStudentZoubanExams(allZoubanExams, studentPapers, schoolId) {
+    //把studentExams中存在于allZoubanExams的考试过滤出来
+    var allZoubanExamIds = _.map(allZoubanExams, (obj) => obj['exam']);
+    var studentPapersByExamid = _.groupBy(studentPapers, (obj) => {
+        console.log('obj.examid = ', obj.examid);
+        return obj.examid;
+    });
+    var studentExamIds = _.map(studentPapersByExamid, (v, examid) => {
+        var temp = examid + '-' + schoolId;
+        return temp;
+    });
+    var studentZoubanExamIds = _.intersection(allZoubanExamIds, studentExamIds);
+    if(studentZoubanExamIds.length == 0) return when.resolve([]);
+    var examPromises = _.map(studentZoubanExamIds, (examId) => getExamById(examId, '25'));
+    return when.all(examPromises).then(function(examInstances) {
+        return when.resolve(_.map(examInstances, (examInstanceObj, index) => _.assign({}, examInstanceObj, {id: studentZoubanExamIds[index]})));
     });
 }
 
@@ -180,7 +200,7 @@ exports.saveCustomExam = function(customExam) {
             if (err) return reject(new errors.URIError('查询analysis server(save exam) Error: ', err));
             var data = JSON.parse(body);
             if(data.error) return reject(new errors.Error('查询analysis server(save exam)失败'));
-            resolve(body);
+            resolve(body);//TODO: 这里应该是data吧？？？
         });
     });
 }
@@ -239,6 +259,7 @@ exports.inValidCustomExamInfo = function(customExamInfoId) {
         });
     });
 }
+
 
 function filterValidExams(originalExams, userId, schoolId, isLianKaoManager) {
     var temp = {};
@@ -436,7 +457,7 @@ exports.getEquivalentScoreInfoById = function(examid) {
 }
 
 function getDefaultEquivalentScoreInfo(examid) {
-    return getExamById(examid, '50').then(function(examInstance) {
+    return getExamById(examid, '25').then(function(examInstance) {
                 //TODO: 需要过滤grade？？？
         var lessons = _.map(examInstance['[papers]'], (paperItem) => {
             // if(_.includes(paperItem.name, '文科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(文科)`, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
@@ -445,6 +466,7 @@ function getDefaultEquivalentScoreInfo(examid) {
         });
         return saveEquivalentScoreInfo({
             examId: examid,
+            examObjectId: examInstance._id,
             examName: examInstance.name,
             '[lessons]': lessons
         });
@@ -537,3 +559,31 @@ function formatZoubanLessonInstance(paperObj) {
 //         '[classes]': classes
 //     }
 // }
+
+
+//【临时Mock】
+exports.getMockValidExamsBySchoolId = function(schoolId, userId, userAuth) {
+    var ifSchoolHaveExams = true, errorInfo = {msg: ''};
+    return mockFilterValidExams().then(function(validExams) {
+        if(!ifSchoolHaveExams) errorInfo.msg = '此学校没有考试';
+        var existPapersExams = _.filter(validExams, (obj) => (obj['[papers]'] && obj['[papers]'].length > 0));
+        if(ifSchoolHaveExams && existPapersExams.length == 0) errorInfo.msg = '此学校下考试都没有科目';
+        if(ifSchoolHaveExams && userAuth.isLianKaoManager && validExams.length == 0) errorInfo.msg = '暂无联考考试内容可供查看';
+        var validAuthExams = getValidAuthExams(validExams, userAuth);
+        if(ifSchoolHaveExams && !userAuth.isLianKaoManager && validAuthExams.length == 0) errorInfo.msg = '您的权限下没有可查阅的考试';
+        return when.resolve({
+            validAuthExams: validAuthExams,
+            errorInfo: errorInfo
+        });
+    });
+}
+
+function mockFilterValidExams() {
+    var mockZoubanExams = [{name: "北京十一学校2016年期中考试（走班测试）", id: '102494-384103', event_time: "2016-10-31T00:00:00.000Z", from: '25'}];
+    mockZoubanExams = _.chain(mockZoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
+
+    var getExamInstancePromises = _.map(mockZoubanExams, (validExam) => getExamById(validExam.id));
+    return when.all(getExamInstancePromises).then(function(examInstances) {
+        return when.resolve(_.map(examInstances, (examItem, index) => _.assign({}, examItem, mockZoubanExams[index])));
+    })
+}

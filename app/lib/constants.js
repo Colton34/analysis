@@ -55,12 +55,14 @@ export const FROM_YUJUAN_TWO_TEXT = '阅卷';//阅卷2.x
 export const FROM_UPLOAD_TEXT = '上传';
 export const FROM_LIANKAO_TEXT = '联考';
 export const FROM_CUSTOM_TEXT = '自定义';
+export const FROM_ZOUBAN_TEXT = '走班';
 export const FROM_FLAG = {
     '1': FROM_YUJUAN_ONE_TEXT,
     '10': FROM_YUJUAN_TWO_TEXT,
     '30': FROM_UPLOAD_TEXT,
     '20': FROM_LIANKAO_TEXT,
-    '40': FROM_CUSTOM_TEXT
+    '40': FROM_CUSTOM_TEXT,
+    '25': FROM_ZOUBAN_TEXT
 };
 
 export const  PAPER_ORIGIN = {

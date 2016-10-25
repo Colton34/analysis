@@ -49,8 +49,8 @@ function SummaryCard({currentClass,currentLesson,zoubanLessonStudentsInfo,zouban
     var {goodQuestion,badQuestion} = getCardSummary(zuobanLessonQuestionInfo,currentClass,currentLesson,zoubanExamInfo);
     return (
         <div style={{marginTop:30}}>
-            <Card title={goodQuestion} titleStyle={{color: colorsMap.B04,fontSize:'24px'}} desc={'表现较好的题目'} style={{marginRight:20}}></Card>
-            <Card title={badQuestion} titleStyle={{color: colorsMap.B08,fontSize:'24px'}} desc={'表现不足的题目'} ></Card>
+            <Card title={goodQuestion.join('   ')} titleStyle={{color: colorsMap.B04,fontSize:'24px'}} desc={'表现较好的题目'} style={{marginRight:20}}></Card>
+            <Card title={badQuestion.join('   ')} titleStyle={{color: colorsMap.B08,fontSize:'24px'}} desc={'表现不足的题目'} ></Card>
         </div>
     )
 }

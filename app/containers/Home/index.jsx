@@ -173,8 +173,9 @@ class ExamItem extends React.Component {
         })
     }
     render() {
-        var {timeKey, item} = this.props;
-        var pathname = (item.from == '50') ? '/zouban/dashboard' : '/dashboard';
+        var {timeKey, item, user} = this.props;
+        var pathname = (item.from == '25') ? (user.type && user.type == 'student' ? ('/zouban/personal') : ('/zouban/dashboard')) : '/dashboard';
+        debugger;
         var queryOptions = {examid: item.id, grade: item.grade};
 
         return (
@@ -273,7 +274,7 @@ class ExamList extends React.Component {
     $('body').scrollTop(0);
     }
     render() {
-        var {examList, errorInfo} = this.props;
+        var {examList, errorInfo, user} = this.props;
         debugger;
         var {pageIndex, pageSize} = this.state;
         return (
@@ -292,11 +293,11 @@ class ExamList extends React.Component {
                     examList.length && _.isEmpty(errorInfo.msg) ? _.map(examList.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize), (obj) => {
                         return _.map(obj.values, (exam, index) => {
                             if (index === 0) {
-                                return <ExamItem key={index} timeKey={obj.timeKey} item={exam}/>
+                                return <ExamItem key={index} timeKey={obj.timeKey} item={exam} user={user} />
                             } else if (index === obj.values.length - 1){
-                                return <ExamItem key={index} item={exam} isLast/>
+                                return <ExamItem key={index} item={exam} user={user} isLast/>
                             } else {
-                                return <ExamItem key={index} item={exam}/>
+                                return <ExamItem key={index} item={exam} user={user} />
                             }
                         })
                     }) : ''
@@ -336,10 +337,10 @@ class ExamList extends React.Component {
 
 }
 
-const Content = ({examList, errorInfo}) => {
+const Content = ({examList, errorInfo, user}) => {
     return (
         <div style={{ width: 1200, margin: '0 auto', minHeight: 900, backgroundColor: '#eff1f4', position:'relative', paddingBottom: 80}}>
-            <ExamList examList={examList} errorInfo={errorInfo}/>
+            <ExamList examList={examList} errorInfo={errorInfo} user={user} />
             <Sidebar/>
             <div style={{clear:'both'}}></div>
         </div>
@@ -360,10 +361,10 @@ class Home extends React.Component {
     render() {
         var examList = (List.isList(this.props.home.examList)) ? this.props.home.examList.toJS() : this.props.home.examList;
         var errorInfo = (Map.isMap(this.props.home.errorInfo)) ? this.props.home.errorInfo.toJS() : this.props.home.errorInfo;
-
+        var user = (Map.isMap(this.props.user)) ? this.props.user.toJS() : this.props.user;
         return (
             <div >
-                <Content examList={examList} errorInfo={errorInfo}/>
+                <Content examList={examList} errorInfo={errorInfo} user={user} />
             </div>
         );
     }
@@ -390,6 +391,7 @@ var localStyle= {
 }
 function mapStateToProps(state) {
     return {
+        user: state.global.user,
         home: state.home
     }
 }

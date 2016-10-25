@@ -57,7 +57,6 @@ class HeaderComponent extends React.Component {
     }
     render() {
         var _this = this;
-        var temp = this.props.user.auth.isLianKaoManager;
         return (
             <div className={style.header}>
                 <div className={style.wrapper}>
@@ -76,7 +75,7 @@ class HeaderComponent extends React.Component {
                     <a href='javascript:;' onClick={this.onClickAvatar.bind(this)} style={localStyle.userInfo}>
                         <div className={style['user-avatar']}> </div>
                         <div className='dropdown' style={{marginLeft: 48}}>
-                            {this.props.user.realName}
+                            {this.props.user.realName || this.props.user.name}
                             <span className='caret' style={{color: '#e1e1e1'}}></span>
                         </div>
                     </a>

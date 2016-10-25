@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-22 14:16:33
+* @Last Modified time: 2016-10-24 18:48:54
 */
 
 'use strict';
@@ -75,7 +75,7 @@ export function initZoubanDS(params) {
 
 function getZoubanExamInfo(equivalentScoreInfo, examPapersInfo) {
 //lessons要带有顺序
-    var result = { id: equivalentScoreInfo.examId, name: equivalentScoreInfo.examName, fullMark: 0, equivalentFullMark: 0 };
+    var result = { id: equivalentScoreInfo.examId, name: equivalentScoreInfo.examName, objectId: equivalentScoreInfo.examObjectId, fullMark: 0, equivalentFullMark: 0 };
     var equivalentScoreInfoMap = _.keyBy(equivalentScoreInfo['[lessons]'], 'objectId'), examPapersInfoMap = _.keyBy(examPapersInfo, 'objectId');
     var commonLessons = [], otherLessons = [], lesson, lessonWeight, currentSubjectName;
     _.each(equivalentScoreInfoMap, (infoObj, paperObjectId) => {
@@ -181,6 +181,19 @@ function insertClassRankInfoToLessonStudents(zoubanExamStudentsInfo, zoubanLesso
             });
         });
     });
+}
+
+export function fetchLessonQuestionPic(params) {
+    var url = paperPath + '/question';
+    debugger;
+    return params.request.post(url, {questionIds: params.questionIds, examObjectId: params.examObjectId}).then(function(res) {
+        debugger;
+        return Promise.resolve(res.data);
+    });
+    // return params.request.get(url).then(function(res) {
+    //     debugger;
+    //     return Promise.resolve(res.data);
+    // });
 }
 
 export function initReportBase(params) {

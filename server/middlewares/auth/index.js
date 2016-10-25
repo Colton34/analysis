@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-24 10:09:07
+* @Last Modified time: 2016-10-25 17:28:18
 */
 
 'use strict';
@@ -44,6 +44,7 @@ req.user 接口：
 }
  */
 
+
 exports.authenticate = function(req, res, next) {
     req.checkBody('value', '无效的value').notEmpty();
     req.checkBody('password', '无效的password').notEmpty();
@@ -53,15 +54,14 @@ exports.authenticate = function(req, res, next) {
     var password = req.body.password;
 
     authUitls.getUserInfo(value).then(function(user) {
-        if(user) console.log('来自1.5 pwd - ', user.pwd);
-
+        // if(user) console.log('来自1.5 pwd - ', user.pwd);
         if(user && (_.eq(user.pwd, password))) return when.resolve(user);//确认是1.5的账号
         return authUitls.getUserInfo2(value, password);//可能是1.5的账号，但是密码不正确；可能是2.0的账号  1.5的账号，但是使用2.0的密码--其实还是2.0的账号
     }).then(function(user) {
-        if(user) console.log('来自2.0 pwd 2 - ', user.pwd);
-        if(!user) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '用户不存在或密码不正确'}));//可能是1.5的账号但是密码不正确，也可能确实是个无效的账号
+        // if(user) console.log('来自2.0 pwd 2 - ', user.pwd);
+        // if(!user) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '用户不存在或密码不正确'}));//可能是1.5的账号但是密码不正确，也可能确实是个无效的账号
+        if(!user) return authenticateStudent(value, password);
         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '密码不正确'}));//2.0的账号但是密码不正确
-
         // console.log('school_id = ', user.schoolId);
 
         //Mock !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -72,14 +72,18 @@ exports.authenticate = function(req, res, next) {
         delete user.pwd;
         req.user = user;
         return getUserAuthorization(user.id, user.name);
-    }).then(function(auth) {
-        //console.log('auth = ', JSON.stringify(auth));
-        var authInfo = getUserAuthInfo(auth);
+    }).then(function(result) {
+        if(result.type && result.type == 'student') return when.resolve(result);
+        var authInfo = getUserAuthInfo(result);
         req.user.auth = authInfo;
         return getSchoolById(req.user.schoolId)
-    }).then(function(school) {
-        var isLianKaoSchool = _.includes(school.name, '联考');
-        req.user.auth.isLianKaoManager = (isLianKaoSchool) && (req.user.auth.isSchoolManager);
+    }).then(function(result) {
+        if(!result.type) {
+            var isLianKaoSchool = _.includes(result.name, '联考');
+            req.user.auth.isLianKaoManager = (isLianKaoSchool) && (req.user.auth.isSchoolManager);
+        } else {
+            req.user = result;
+        }
         var token = jsonwebtoken.sign({ user: req.user }, config.secret);
         req.user.token = token;
         next();
@@ -87,6 +91,73 @@ exports.authenticate = function(req, res, next) {
         next(err);
     })
 }
+
+
+
+function authenticateStudent(value, password) {
+    var temp = {}, studentId = '';
+    return authUitls.authStudent(value, password).then(function(resultObj) {
+        temp.userId = resultObj.userId;
+        return authUitls.getUserById(temp.userId);
+    }).then(function(userInstance) {
+        studentId = userInstance['~student'][0].peer + '';
+        studentId = studentId.slice(_.findIndex(studentId, (s) => s != '0'));
+        return authUitls.getStudentById(studentId);
+    }).then(function(studentInstance) {
+        var user = {
+            type: 'student',
+            userId: temp.userId,
+            studentId: studentId,
+            name: studentInstance.name,
+            schoolId: studentInstance.schoolid
+        };
+        return when.resolve(user);
+    });
+}
+
+
+// exports.authenticate = function(req, res, next) {
+//     req.checkBody('value', '无效的value').notEmpty();
+//     req.checkBody('password', '无效的password').notEmpty();
+//     if(req.validationErrors()) return next(new errors.HttpStatusError(401, {errorCode: 1, message: '无效的用户名或密码'}));
+
+//     var value = req.body.value.toLowerCase();
+//     var password = req.body.password;
+
+//     authUitls.getUserInfo(value).then(function(user) {
+//         // if(user) console.log('来自1.5 pwd - ', user.pwd);
+//         if(user && (_.eq(user.pwd, password))) return when.resolve(user);//确认是1.5的账号
+//         return authUitls.getUserInfo2(value, password);//可能是1.5的账号，但是密码不正确；可能是2.0的账号  1.5的账号，但是使用2.0的密码--其实还是2.0的账号
+//     }).then(function(user) {
+//         // if(user) console.log('来自2.0 pwd 2 - ', user.pwd);
+//         if(!user) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '用户不存在或密码不正确'}));//可能是1.5的账号但是密码不正确，也可能确实是个无效的账号
+//         if(user && (!_.eq(user.pwd, password))) return when.reject(new errors.HttpStatusError(401, {errorCode: 1, message: '密码不正确'}));//2.0的账号但是密码不正确
+
+//         // console.log('school_id = ', user.schoolId);
+
+//         //Mock !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//         // if(user.name == 'cssyllkadmin' && user.pwd == 'yllk1906') {
+//         //     user.schoolId = 828;
+//         // }
+
+//         delete user.pwd;
+//         req.user = user;
+//         return getUserAuthorization(user.id, user.name);
+//     }).then(function(auth) {
+//         //console.log('auth = ', JSON.stringify(auth));
+//         var authInfo = getUserAuthInfo(auth);
+//         req.user.auth = authInfo;
+//         return getSchoolById(req.user.schoolId)
+//     }).then(function(school) {
+//         var isLianKaoSchool = _.includes(school.name, '联考');
+//         req.user.auth.isLianKaoManager = (isLianKaoSchool) && (req.user.auth.isSchoolManager);
+//         var token = jsonwebtoken.sign({ user: req.user }, config.secret);
+//         req.user.token = token;
+//         next();
+//     }).catch(function(err) {
+//         next(err);
+//     })
+// }
 
 function getSchoolById(schoolId) {
     var url = config.analysisServer + '/school?id=' + schoolId;

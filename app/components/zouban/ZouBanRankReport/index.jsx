@@ -15,6 +15,7 @@ import ReactPaginate from 'react-paginate';
 import {DropdownButton, Button, Table as BootTable, MenuItem} from 'react-bootstrap';
 
 import TableView from '../../../common/TableView';
+
 // import EnhanceTable from '../../../common/EnhanceTable';
 import SortTablePlugin from '../../../common/SortTablePlugin';
 import Select from '../../../common/Selector/Select';
@@ -79,7 +80,6 @@ class RankReportContainer extends React.Component {
     constructor(props) {
         super(props);
         this.theDS = getRanReportDS(this.props.zoubanExamStudentsInfo, this.props.zoubanLessonStudentsInfo, this.props.isEquivalent);
-
         var lessons = this.props.zoubanExamInfo.lessons;
         var titleOptions = this.props.isEquivalent ? getSubjectTtitles(lessons) : getLessonTitles(lessons);//[{id: , title: }]
         var titles = titleOptions.slice(1);
@@ -109,7 +109,8 @@ class RankReportContainer extends React.Component {
     }
 
     handleSelectTitle(selectedTitle) {
-        var titles = (selectedTitle.id == 'all') ? getLessonTitles(this.props.zoubanExamInfo.lessons).slice(1) : [{id: 'totalScore', title: '总分'}, selectedTitle];
+        var titles = (selectedTitle.id == 'all') ? getLessonTitles(this.props.zoubanExamInfo.lessons).slice(1) : [selectedTitle];
+        titles.unshift({id: 'totalScore', title: '总分'});
         var lessonClassesOptions = (selectedTitle.id == 'all') ? [] : _.keys(this.props.zoubanLessonStudentsInfo[selectedTitle.id]);
         var lessonClasses = _.cloneDeep(lessonClassesOptions);
         if(selectedTitle.id != 'all') lessonClassesOptions.unshift('全部');
@@ -155,7 +156,7 @@ class RankReportContainer extends React.Component {
     }
 
     handleSort(currentSortKey) {
-        debugger;
+
         var currentSortDir;// =  (this.state.currentSortDir == 'desc' ? 'asc' : 'desc');
         if(currentSortKey != this.state.currentSortKey) {
             currentSortDir = 'desc';
@@ -185,7 +186,7 @@ class RankReportContainer extends React.Component {
         this.downloadTableData = getDownTableData(theRowDS, downloadKeys);//下载全部页数的表格内容
 
         var sortInfo = {id: this.state.currentSortKey, order: this.state.currentSortDir};
-        debugger;
+
 
         return (
             <div style={{ width: 1200, minHeight: 700, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 ,padding:50}}>
@@ -367,11 +368,6 @@ class Paginate extends React.Component {
     constructor(props) {
         super(props);
     }
-
-    onSelectPageSize(selectedPageSize) {
-        this.props.handleSelectPageSize(selectedPageSize);
-    }
-
     render() {
         var beginCount = this.props.currentPageSize * this.props.currentPageValue + 1;
         var endCount = beginCount + this.props.currentPageSize - 1;
@@ -383,13 +379,7 @@ class Paginate extends React.Component {
                     <span style={this.props.totalCount < 25 ? {display: 'none'} : {display: 'inline-block'}}>
                         ，每页显示
                         <div style={{display:'inline-block'}}>
-                        <Select
-                            simpleValue
-                            clearable={false}
-                            options={this.props.options}
-                            value={this.props.currentPageSize}
-                            onChange={this.onSelectPageSize.bind(this)}
-                        />
+                        <SelectPaperSize totalCount={this.props.totalCount} currentPageSize={this.props.currentPageSize} handleSelectPageSize={this.props.handleSelectPageSize}/>
                         </div>
                         条记录
                     </span>
@@ -414,7 +404,24 @@ class Paginate extends React.Component {
     }
 }
 
+class SelectPaperSize extends React.Component{
+    constructor(props){
+        super(props);
+    }
+    render(){
+        var totalCount = this.props.totalCount;
+        var currentPageSize = this.props.currentPageSize;
 
+        return(
+            <DropdownButton id='pageSize-select' title={currentPageSize} dropup style={{ margin: '0 2px' }}>
+                <MenuItem onClick={this.props.handleSelectPageSize.bind(this,25) } active={currentPageSize === 25}>25</MenuItem>
+                <MenuItem style={ totalCount > 25 ? { display: 'block' } : { display: 'none' }} onClick={this.props.handleSelectPageSize.bind(this,50) } active={currentPageSize === 50}>50</MenuItem>
+                <MenuItem style={ totalCount > 50 ? { display: 'block' } : { display: 'none' }}  onClick={this.props.handleSelectPageSize.bind(this,100) } active={currentPageSize === 100}>100</MenuItem>
+                <MenuItem style={ totalCount > 100 ? { display: 'block' } : { display: 'none' }} onClick={this.props.handleSelectPageSize.bind(this,1000)} active={currentPageSize === 1000}>1000</MenuItem>
+            </DropdownButton>
+        )
+    }
+}
 /*
 
 负责渲染一个ReportContainer里的所有组件：给出每个孩子组件的当前状态和所有状态，即瀑布。因为这里需要汇总所有孩子状态。
@@ -454,12 +461,13 @@ function getTableHeader(titles, showClassInfo) {
     var {subjectHeaderTitles, subjectSubTitles} = getTitleHeader(titles, showClassInfo);
     header[0] = _.concat(header[0], subjectHeaderTitles);
     header[1] = subjectSubTitles;
+    debugger
     return {
         tableHeader: header,
         headerKeys: headerKeys,
         subjectSubTitles: subjectSubTitles
     }
-    return header;
+
 }
 
 //【暂时不支持隐藏列】所以tableHeader可以使用老方法来获取
@@ -617,10 +625,10 @@ function insertTotalClassRankInfo(studentsInfo, currentTitle) {
 }
 
 function getTableBody({rowDS, currentPageSize, currentPageValue, currentSortKey='totalScore_score', currentSortDir='desc'}) { // columns,
-    debugger;
+
     var existLessonStudents = _.filter(rowDS, (obj) => obj[currentSortKey]);
     var notExistLessonStudents = _.filter(rowDS, (obj) => !obj[currentSortKey]);
-    debugger;
+
     rowDS = _.concat(_.orderBy(existLessonStudents, [currentSortKey], currentSortDir), notExistLessonStudents);
     debugger;
     var beginCount = currentPageSize * (currentPageValue);
