@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-11 19:19:03
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-17 17:29:15
+* @Last Modified time: 2016-10-25 16:59:04
 */
 
 'use strict';
@@ -43,6 +43,7 @@ export default function reducer(state, action) {
             return state.set('isLoading', false);
 
         case INIT_USER_ME_SUCCESS:
+            debugger;
             return state.set('user', Map(action.res.data)).set('haveInit', true);
         case ALTER_COMMENT_DIALOG_STATUS:
             var needShow = state.get('dialog').show;
