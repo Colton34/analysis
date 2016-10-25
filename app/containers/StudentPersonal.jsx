@@ -15,6 +15,8 @@ import commonClass from '../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../lib/constants';
 import {initZoubanDSAction} from '../reducers/zouban/actions';
 
+import CommonErrorView from '../common/ErrorView';
+
 class StudentPersonalContent extends React.Component {
     constructor(props) {
         super(props);
