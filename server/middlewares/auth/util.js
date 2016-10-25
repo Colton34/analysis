@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-03 19:03:53
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-14 12:22:15
+* @Last Modified time: 2016-10-25 16:55:20
 */
 
 'use strict';
@@ -29,6 +29,7 @@ var apiAccessRange = `${yjServer}/api/user/fenxi_range.do`;
 var apiAccessRange2 = `${yj2Server}/anno/getUserAccess`;
 
 var tokenKey = new Buffer('462fd506cf7c463caa4bdfa94fad5ea3', 'base64');
+var peterHFS = require('peter').getManager('hfs');
 
 exports.getUserInfo = function(name) {
     var url = buildGetUrl(apiUser, {username : name});
@@ -122,7 +123,8 @@ function getUserId(url) {
             if(err) return reject(new errors.URIError('请求登录用户接口II失败', err));
             if(res.statusCode != 200) return reject(new errors.Error('请求登录用户接口II不成功'));
             body = JSON.parse(body);
-            if(!(body.code == 1 && body.msg == 'ok')) return reject(new errors.Error('请求登录用户接口II Error: body.code != 1 or body.msg != ok'));
+            // if(!(body.code == 1 && body.msg == 'ok')) return reject(new errors.Error('请求登录用户接口II Error: body.code != 1 or body.msg != ok'));
+            if(!(body.code == 1 && body.msg == 'ok')) return resolve('');
             resolve(body.userId);
         });
     })
@@ -172,4 +174,43 @@ function getGradeName(grade){
     }else {
         return grade;
     }
+}
+
+exports.authStudent = function(loginName, password) {
+    var url = config.hfsServer + '/v2/users/sessions';
+    var postData = {
+        loginName: loginName,
+        password: password,
+        roleType: 1,
+        rememberMe: 2
+    };
+    return when.promise(function(resolve, reject) {
+        client.post(url, {body: postData, json: true}, function(err, response, body) {
+            if(err) return reject(new errors.URIError('查询好分数server--login student Error: ', err));
+            if(body.code != 0 && body.data == null) return reject(new errors.Error('查询好分数server--login student 失败'));
+            resolve(body.data);
+        });
+    });
+}
+
+exports.getUserById = function(userId) {
+    return when.promise(function(resolve, reject) {
+        peterHFS.get(userId, function(err, userInstance) {
+            if(err) return reject(new errors.data.MongoDBError('getStudentIdByUserId Error: ', err));
+            if(userInstance['~student'].length == 0 || userInstance['~student'].length > 1) return when.reject(new errors.Error('user实例绑定的学生等于0或大于1'));
+            resolve(userInstance);
+        });
+    });
+}
+
+exports.getStudentById = function(studentId) {
+    studentId = studentId + '';
+    var studentFindId = '@Student.' + studentId.slice(_.find(studentId, (s) => s != '0'));
+    return when.promise(function(resolve, reject) {
+        //TODO: 好奇怪，不知道为什么不能直接用ObjectId，而需要用这种@的形式
+        peterHFS.get(studentFindId, function(err, studentInstance) {
+            if(err) return reject(new errors.data.MongoDBError('getStudentById Error: ', err));
+            resolve(studentInstance);
+        })
+    })
 }

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-24 17:47:12
+* @Last Modified time: 2016-10-25 15:48:03
 */
 'use strict';
 var _ = require('lodash');
@@ -71,6 +71,48 @@ function getValidAuthExams(validExams, userAuth) {
     if(userAuth.isSchoolManager) return validExams;
     return _.filter(validExams, (examItem) => {
         return _.intersection(_.keys(userAuth.gradeAuth), _.keys(_.groupBy(examItem['[papers]'], 'grade'))).length > 0;
+    });
+}
+
+exports.getValidExamsByStudent = function(student) {
+    //从student.papers中获取此学生参加过的考试，从school的exams中过滤
+    var temp = {};
+    getStudentById(student.studentId).then(function(studentInstance) {
+        temp.studentInstance = studentInstance;
+
+console.log('studentInstance.name === ', studentInstance.name);
+
+        return getSchoolById(student.schoolId);
+    }).then(function(school) {
+        var allZoubanExams = _.filter(school['[exams]'], (obj) => obj.from == '25');
+
+console.log('allZoubanExams.length == ', allZoubanExams.length);
+
+
+        return filterStudentZoubanExams(allZoubanExams, studentInstance['[papers]'], student.schoolId);
+    }).then(function(studentZoubanExams) {
+        return (studentZoubanExams.length > 0) ? {validAuthExams: studentZoubanExams, errorInfo: {msg: ''}} : {validAuthExams: [], errorInfo: {msg: '没有查询到你参加的考试，请找相关老师确认'}};
+    });
+}
+
+function filterStudentZoubanExams(allZoubanExams, studentPapers, schoolId) {
+    //把studentExams中存在于allZoubanExams的考试过滤出来
+    var allZoubanExamIds = _.map(allZoubanExams, (obj) => obj['exam']);
+    var studentExamIds = _.map(studentPapers, (obj) => {
+        return obj['examid'] + schoolId;
+    });
+    var studentZoubanExamIds = _.intersection(allZoubanExamIds, studentExamIds);
+    if(studentZoubanExamIds.length == 0) return when.resolve([]);
+    var examPromises = _.map(studentZoubanExamIds, (examId) => getExamById(examId, '25'));
+    return when.all(examPromises);
+}
+
+function getStudentById(studentId) {
+    return when.promise(function(resolve, reject) {
+        peterHFS.get(studentId, function(err, studentInstance) {
+            if(err) return reject(new errors.data.MongoDBError('getStudentById Error: ', err));
+            resolve(studentInstance);
+        });
     });
 }
 
@@ -152,7 +194,7 @@ exports.saveCustomExam = function(customExam) {
             if (err) return reject(new errors.URIError('查询analysis server(save exam) Error: ', err));
             var data = JSON.parse(body);
             if(data.error) return reject(new errors.Error('查询analysis server(save exam)失败'));
-            resolve(body);
+            resolve(body);//TODO: 这里应该是data吧？？？
         });
     });
 }
@@ -211,6 +253,7 @@ exports.inValidCustomExamInfo = function(customExamInfoId) {
         });
     });
 }
+
 
 function filterValidExams(originalExams, userId, schoolId, isLianKaoManager) {
     var temp = {};
