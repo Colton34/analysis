@@ -15,9 +15,9 @@ export default function ZoubanQuestionQuanlity({zoubanExamInfo, zuobanLessonQues
                 <div>
                     <div style={{padding:'20px 0px'}}> <span>学科：</span><span>{simpleLesson.name}</span>,<span>班级：</span><span>{simpleClass}</span></div>
                     <div style={{padding:'10px 0px'}}><span>表现好的题目：</span></div>
-                    <div style={{padding:'10px 0px 10px 30px',color: 'rgb(105, 193, 112)'}}><span>{goodQuestion}</span></div>
+                    <div style={{padding:'10px 0px 10px 30px',color: 'rgb(105, 193, 112)'}}><span>{goodQuestion.join('  ')}</span></div>
                     <div style={{padding:'10px 0px'}}><span>表现不足的题目：</span></div>
-                    <div style={{padding:'10px 0px 10px 30px',}}><span>{badQuestion}</span></div>
+                    <div style={{padding:'10px 0px 10px 30px',}}><span>{badQuestion.join('     ')}</span></div>
                 </div>
             </div>
         </div>
