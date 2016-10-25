@@ -121,7 +121,7 @@ class Table extends React.Component {
                                             }
 
                                             var dataFormat = rowData[id]; //dataFormat有可能是一个对象，若是，则数值应该从value属性获取；
-                                            if (dataFormat === undefined)return(<td >---</td>);
+                                            if (dataFormat === undefined)return(<td style={{textAlign:'center',minWidth: 100, borderColor: colorsMap.C04, whiteSpace: 'nowrap'}}>---</td>);
                                             if (this.dataFormats[id] !== undefined) {
                                                 dataFormat = this.dataFormats[id](dataFormat, rowData);
                                             } else {
