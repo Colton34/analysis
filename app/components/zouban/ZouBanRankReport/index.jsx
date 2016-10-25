@@ -741,7 +741,7 @@ function getDownTableData(rowDS, downloadKeys) {
          display: 'inline-block', cursor: 'pointer',minWidth: 50, height: 22, backgroundColor: '#fff', color: '#333', marginRight: 10, textDecoration: 'none',textAlign: 'center', lineHeight: '22px'
      },
      activeSubject: {
-         display: 'inline-block', cursor: 'pointer',minWidth: 50, height: 22, backgroundColor: '#2ea8eb', color: '#fff',  marginRight: 10,  textDecoration: 'none', textAlign: 'center', lineHeight: '22px'
+         display: 'inline-block', cursor: 'pointer',minWidth: 50, height: 22, backgroundColor: '#2ea8eb', color: '#fff',  marginRight: 10,  textDecoration: 'none', textAlign: 'center', lineHeight: '22px',padding:'0px 10px'
      },
      pageBtn: {
          display: 'inline-block', width: 96, height: 30, lineHeight: '30px', padding: '0 8px 0 12px', border: '1px solid #e7e7e7', color: '#333', position:'relative', cursor: 'pointer'

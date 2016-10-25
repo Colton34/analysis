@@ -76,8 +76,8 @@ class SubjectSelector extends React.Component {
         var lessons = this.props.lessons;
         var currentLesson = this.props.currentLesson;
         return (
-            <div style={{ padding: '5px 30px 0 30px',marginBottom:0}} className={commonClass['section']}>
-                <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
+            <div style={{ padding: '5px 30px 0 30px'}} className={commonClass['section']}>
+                <div style={{heigth: 50, lineHeight: '50px'}}>
                     <span style={{ marginRight: 10}}>学科：</span>
                         {lessons.map((lessonObj, index) => {
                             return (
@@ -98,7 +98,7 @@ var localStyle = {
         cursor: 'pointer',display: 'inline-block', minWidth: 50, height: 22, backgroundColor: '#fff', color: '#333', marginRight: 10, textDecoration: 'none',textAlign: 'center', lineHeight: '22px'
     },
     activeSubject: {
-        cursor: 'pointer',display: 'inline-block', minWidth: 50, height: 22, backgroundColor: '#2ea8eb', color: '#fff',  marginRight: 10,  textDecoration: 'none', textAlign: 'center', lineHeight: '22px'
+        cursor: 'pointer',display: 'inline-block', minWidth: 50, height: 22, backgroundColor: '#2ea8eb', color: '#fff',  marginRight: 10,  textDecoration: 'none', textAlign: 'center', lineHeight: '22px',padding:'0px 10px'
     },
 
 }
