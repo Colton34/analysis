@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-03 19:03:53
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-25 16:55:20
+* @Last Modified time: 2016-10-25 17:28:24
 */
 
 'use strict';
@@ -204,8 +204,7 @@ exports.getUserById = function(userId) {
 }
 
 exports.getStudentById = function(studentId) {
-    studentId = studentId + '';
-    var studentFindId = '@Student.' + studentId.slice(_.find(studentId, (s) => s != '0'));
+    var studentFindId = '@Student.' + studentId;//Note: 好像这里没必要使用短id，经验证。
     return when.promise(function(resolve, reject) {
         //TODO: 好奇怪，不知道为什么不能直接用ObjectId，而需要用这种@的形式
         peterHFS.get(studentFindId, function(err, studentInstance) {

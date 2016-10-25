@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-25 15:48:03
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-10-25 18:02:02
 */
 'use strict';
 var _ = require('lodash');
@@ -77,7 +77,7 @@ function getValidAuthExams(validExams, userAuth) {
 exports.getValidExamsByStudent = function(student) {
     //从student.papers中获取此学生参加过的考试，从school的exams中过滤
     var temp = {};
-    getStudentById(student.studentId).then(function(studentInstance) {
+    return getStudentById(student.studentId).then(function(studentInstance) {
         temp.studentInstance = studentInstance;
 
 console.log('studentInstance.name === ', studentInstance.name);
@@ -451,7 +451,7 @@ exports.getEquivalentScoreInfoById = function(examid) {
 }
 
 function getDefaultEquivalentScoreInfo(examid) {
-    return getExamById(examid, '50').then(function(examInstance) {
+    return getExamById(examid, '25').then(function(examInstance) {
                 //TODO: 需要过滤grade？？？
         var lessons = _.map(examInstance['[papers]'], (paperItem) => {
             // if(_.includes(paperItem.name, '文科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(文科)`, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};

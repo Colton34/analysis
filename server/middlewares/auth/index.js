@@ -2,7 +2,7 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:59:40
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-25 16:58:11
+* @Last Modified time: 2016-10-25 17:28:18
 */
 
 'use strict';
@@ -95,18 +95,19 @@ exports.authenticate = function(req, res, next) {
 
 
 function authenticateStudent(value, password) {
-    var temp = {};
+    var temp = {}, studentId = '';
     return authUitls.authStudent(value, password).then(function(resultObj) {
         temp.userId = resultObj.userId;
         return authUitls.getUserById(temp.userId);
     }).then(function(userInstance) {
-        var studentId = userInstance['~student'][0].peer;
+        studentId = userInstance['~student'][0].peer + '';
+        studentId = studentId.slice(_.findIndex(studentId, (s) => s != '0'));
         return authUitls.getStudentById(studentId);
     }).then(function(studentInstance) {
         var user = {
             type: 'student',
             userId: temp.userId,
-            studentId: studentInstance._id,
+            studentId: studentId,
             name: studentInstance.name,
             schoolId: studentInstance.schoolid
         };

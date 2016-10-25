@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-25 15:45:41
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-10-25 17:46:08
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -508,14 +508,14 @@ exports.listEquivalentScoreInfo = function(req, res, next) {
 /*
 
     examUitls.getSchoolById(req.user.schoolId).then(function(data) {
-        zoubanExams = _.filter(data['[exams]'], (obj) => obj.from == '50');
-        var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '50'));
+        zoubanExams = _.filter(data['[exams]'], (obj) => obj.from == '25');
+        var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '25'));
         return when.all(zoubanExamPromises);
     }).
 
 TODO: 接口过滤出走班考试；如果有必要则还需要对grade进行过滤
  */
-    zoubanExams = [{name: "2016.10高二第二次学考模拟考", exam: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '50'}, {name: "2015-2016学年第二学期期末初一年级组", exam: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '50'}];
+    zoubanExams = [{name: "2016.10高二第二次学考模拟考", exam: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '25'}, {name: "2015-2016学年第二学期期末初一年级组", exam: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '25'}];
     zoubanExams = _.chain(zoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
     var equivalentScoreInfoPromises = _.map(zoubanExams, (obj) => examUitls.getEquivalentScoreInfoById(obj['exam']));
     when.all(equivalentScoreInfoPromises).then(function(equivalentScoreInfoList) {
@@ -564,17 +564,17 @@ exports.zoubanDS = function(req, res, next) {
 // /*
 
 //     examUitls.getSchoolById(req.user.schoolId).then(function(data) {
-//         zoubanExams = _.filter(data['[exams]'], (obj) => obj.from == '50');
-//         var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '50'));
+//         zoubanExams = _.filter(data['[exams]'], (obj) => obj.from == '25');
+//         var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '25'));
 //         return when.all(zoubanExamPromises);
 //     }).
 
 // TODO: 接口过滤出走班考试；如果有必要则还需要对grade进行过滤
 //  */
-//     zoubanExams = [{name: "2016.10高二第二次学考模拟考", exam: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '50'}, {name: "2015-2016学年第二学期期末初一年级组", exam: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '50'}];
+//     zoubanExams = [{name: "2016.10高二第二次学考模拟考", exam: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '25'}, {name: "2015-2016学年第二学期期末初一年级组", exam: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '25'}];
 //     zoubanExams = _.chain(zoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
 
-//     var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '50'));
+//     var zoubanExamPromises = _.map(zoubanExams, (obj) => examUitls.getExamById(obj['exam'], '25'));
 //     when.all(zoubanExamPromises).then(function(zoubanExamInstances) {
 //         //TODO:怎么获取lessonName
 //         var temp;
