@@ -56,10 +56,12 @@ class LevelsCompare extends React.Component {
                                     )
                                 })
                             }
+                            <Button onClick={this.clickDownloadTable.bind(this, levelHeaderTitles, levelHeaderPercentages, tableBody)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0,float:'right'}}>下载表格</Button>
                         </div>
                     </div>
+
                 </div>
-                <Button onClick={this.clickDownloadTable.bind(this, levelHeaderTitles, levelHeaderPercentages, tableBody)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0,float:'right'}}>下载表格</Button>
+
                 <div style={{marginTop:30}}>
                     <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={EnhanceTable}></TableView>
                 </div>
