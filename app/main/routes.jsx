@@ -24,7 +24,7 @@ import ScoreDetailModule from '../components/zouban/ScoreDetailModule';
 
 //Mock
 // import StudentPersonalModule from '../components/zouban/StudentPersonalModule';
-import StudentPersonalModule from '../components/zouban/hi';
+import StudentPersonalModule from '../components/zouban/StudentPersonalModule';
 import ZoubanStudent from '../containers/ZoubanStudent';
 
 

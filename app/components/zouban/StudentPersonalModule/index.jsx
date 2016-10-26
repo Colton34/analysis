@@ -2,153 +2,53 @@ import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import commonClass from '../../../styles/common.css';
-
-import ExamScore from './ExamScore';
-import SubjectCompare from './SubjectCompare';
-import QuestionAnalysis from './QuestionAnalysis';
-import KnowledgePointAnalysis from './KnowledgePointAnalysis';
-
+import Radium from 'radium';
+import {Link} from 'react-router';
 import Select from '../../../common/Selector/Select';
+import commonClass from '../../../styles/common.css';
+import StudentScoreInfo from './StudentScoreInfo';
+import StudentSubjectCompare from './StudentSubjectCompare';
+import StudentLessonQuestion from './StudentLessonQuestion';
 
 class StudentPersonalModule extends React.Component {
     constructor(props) {
         super(props);
-        this.zoubanExamInfo = this.props.zoubanExamInfo.toJS();
-        this.zoubanExamStudentsInfo = this.props.zoubanExamStudentsInfo.toJS();
-        this.zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo.toJS();
-        this.zuobanLessonQuestionInfo = this.props.zuobanLessonQuestionInfo.toJS();
-        debugger
-        this.lessons = getLessons(this.zoubanExamInfo);
-        this.state={
-            currentLesson:this.lessons[1],
-            currentClass:{},
-            currentStudent:{}
+        this.state = {
+            currentStudent: {}
         }
     }
 
-
-    changeLesson(value){
-    this.setState({
-        currentLesson:value
-    });
-    }
-    transforStudentInfo(currentStudent,currentClass){
-
+    selectStudent(selectedStudent) {
         this.setState({
-            currentClass:currentClass,
-            currentStudent:currentStudent
+            currentStudent: selectedStudent
         })
-
     }
+
+/*
+
+                <StudentScoreInfo zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} currentStudent={this.state.currentStudent} lessonsByStudent={lessonsByStudent} />
+                <StudentSubjectCompare zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} lessonsByStudent={lessonsByStudent} currentStudent={this.state.currentStudent} />
+
+ */
+
+
     render() {
-
-        var currentClass = this.state.currentClass;
-        var currentStudent = this.state.currentStudent;
-
+        var {zoubanExamInfo, zoubanExamStudentsInfo, zoubanLessonStudentsInfo, zuobanLessonQuestionInfo} = this.props;
+        zoubanExamInfo = zoubanExamInfo.toJS(), zoubanExamStudentsInfo = zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = zoubanLessonStudentsInfo.toJS(), zuobanLessonQuestionInfo = zuobanLessonQuestionInfo.toJS();
+        var lessonsByStudent = getLessonsByStudent(zoubanExamInfo, zoubanExamStudentsInfo, this.state.currentStudent);
+        debugger;
         return (
             <div>
-                <div className={commonClass['section']}>
-                <div style={{height:34}}>
-                    <span style={{lineHeight:'34px'}}>选择学科：</span>
-                    <div style={{width:200,display:'inline-block',position:'absolute',zIndex:100}}>
-                        <Select value={this.state.currentLesson} placeholder="选择学科" options={this.lessons} onChange={this.changeLesson.bind(this)}></Select>
-                    </div>
-                </div>
-                <SelectClass  transforStudentInfo={this.transforStudentInfo.bind(this)} currentLesson={this.state.currentLesson} zoubanExamInfo={this.zoubanExamInfo} zoubanExamStudentsInfo={this.zoubanExamStudentsInfo} zoubanLessonStudentsInfo={this.zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={this.zuobanLessonQuestionInfo}/>
-
-                </div>
-                <ExamScore currentLesson={this.state.currentLesson} currentClass={this.state.currentClass} currentStudent={this.state.currentStudent} zoubanExamInfo={this.zoubanExamInfo} zoubanExamStudentsInfo={this.zoubanExamStudentsInfo} zoubanLessonStudentsInfo={this.zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={this.zuobanLessonQuestionInfo}></ExamScore>
-                <SubjectCompare currentLesson={this.state.currentLesson} currentClass={this.state.currentClass} currentStudent={this.state.currentStudent} zoubanExamInfo={this.zoubanExamInfo} zoubanExamStudentsInfo={this.zoubanExamStudentsInfo} zoubanLessonStudentsInfo={this.zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={this.zuobanLessonQuestionInfo}></SubjectCompare>
-                <QuestionAnalysis currentLesson={this.state.currentLesson} currentClass={this.state.currentClass} currentStudent={this.state.currentStudent} zoubanExamInfo={this.zoubanExamInfo} zoubanExamStudentsInfo={this.zoubanExamStudentsInfo} zoubanLessonStudentsInfo={this.zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={this.zuobanLessonQuestionInfo}></QuestionAnalysis>
-                {/*<KnowledgePointAnalysis></KnowledgePointAnalysis>*/}
+                <SelectorGroup zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} selectStudent={this.selectStudent.bind(this)} />
+                <StudentScoreInfo zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} currentStudent={this.state.currentStudent} lessonsByStudent={lessonsByStudent} />
+                <StudentSubjectCompare zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} lessonsByStudent={lessonsByStudent} currentStudent={this.state.currentStudent} />
+                <StudentLessonQuestion currentStudent={this.state.currentStudent} lessonsByStudent={lessonsByStudent} zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo} />
             </div>
         );
     }
 }
 
 export default connect(mapStateToProps)(StudentPersonalModule);
-
-class SelectClass extends React.Component{
-    constructor(props) {
-        super(props);
-        this.currentLesson = this.props.currentLesson;
-        this.zoubanExamInfo = this.props.zoubanExamInfo;
-        this.classes = getClasses(this.currentLesson,this.zoubanExamInfo);
-        this.state={
-            currentClass:this.classes[0]
-        }
-    }
-    componentWillReceiveProps(nextProps){
-        var {currentLesson,zoubanExamInfo} = nextProps;
-        this.currentLesson = currentLesson;
-        this.zoubanExamInfo = zoubanExamInfo;
-        this.classes = getClasses(this.currentLesson,this.zoubanExamInfo);
-        this.setState({
-            currentClass:this.classes[0]
-        })
-    }
-    changeClass(value){
-        this.setState({
-            currentClass:value
-        })
-    }
-    render(){
-
-        var zoubanExamStudentsInfo = this.props.zoubanExamStudentsInfo;
-        var zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo;
-        var zuobanLessonQuestionInfo = this.props.zuobanLessonQuestionInfo;
-        return (
-            <div style={{marginTop:20,position:'relative',height:'34px'}}>
-                <span style={{lineHeight:'34px'}}>选择学生：</span>
-                <div style={{width:200,display:'inline-block',position:'absolute',zIndex:10,left:68}}>
-                    <Select value={this.state.currentClass} placeholder="选择班级" options={this.classes} onChange={this.changeClass.bind(this)}></Select>
-                </div>
-                <SelectStudent  transforStudentInfo={this.props.transforStudentInfo} currentLesson={this.currentLesson} currentClass={this.state.currentClass} zoubanExamInfo={this.zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo}zuobanLessonQuestionInfo={zuobanLessonQuestionInfo} />
-            </div>
-        )
-    }
-}
-class SelectStudent extends React.Component{
-    constructor(props) {
-        super(props);
-    this.currentClass = this.props.currentClass;
-    this.currentLesson = this.props.currentLesson;
-    this.zoubanExamStudentsInfo = this.props.zoubanExamStudentsInfo;
-    this.zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo;
-    this.students = getStudents(this.currentLesson,this.currentClass,this.zoubanExamStudentsInfo,this.zoubanLessonStudentsInfo);
-    this.state = {
-        currentStudent:this.students[0]
-    }
-    }
-    componentWillReceiveProps(nextProps){
-        this.currentClass = nextProps.currentClass;
-        this.currentLesson = nextProps.currentLesson;
-        this.zoubanExamStudentsInfo = nextProps.zoubanExamStudentsInfo;
-        this.zoubanLessonStudentsInfo = nextProps.zoubanLessonStudentsInfo;
-        this.students = getStudents(this.currentLesson,this.currentClass,this.zoubanExamStudentsInfo,this.zoubanLessonStudentsInfo);
-        this.setState ({
-            currentStudent:this.students[0]
-        })
-    }
-    changeStudent(newStudent){
-        this.setState({
-            currentStudent:newStudent
-        })
-        console.log(newStudent);
-        this.props.transforStudentInfo(this.state.currentStudent,this.currentClass);
-    }
-    render(){
-        var zoubanExamInfo = this.props.zoubanExamInfo;
-        var zuobanLessonQuestionInfo = this.props.zuobanLessonQuestionInfo;
-
-        return (
-            <div style={{width:200,display:'inline-block',position:'absolute',zIndex:10,top:0,left:300}}>
-                <Select value={this.state.currentStudent} placeholder="选择学生" options={this.students} onChange={this.changeStudent.bind(this)}></Select>
-            </div>
-        )
-    }
-}
 function mapStateToProps(state) {
     return {
         zoubanExamInfo: state.zouban.zoubanExamInfo,
@@ -158,37 +58,158 @@ function mapStateToProps(state) {
     }
 }
 
-function getLessons(zoubanExamInfo){
-    var lessons = _.map(zoubanExamInfo.lessons,function(lesson){
-        return {
-            key:lesson.objectId,
-            label:lesson.name
-        }
-    });
-    return lessons;
+function getLessonsByStudent(zoubanExamInfo, zoubanExamStudentsInfo, currentStudent) {
+    if(!currentStudent.value) return [];
+    var targetStudent = _.find(zoubanExamStudentsInfo, (obj) => obj.id == currentStudent.value);
+    var validLessonIds = _.map(targetStudent.classes, (obj) => obj.paperObjectId);
+    return _.filter(zoubanExamInfo.lessons, (obj) => _.includes(validLessonIds, obj.objectId));
 }
-function getClasses(currentLesson,zoubanExamInfo){
-    var temp = (_.find(zoubanExamInfo.lessons,function(lesson){
-        return lesson.objectId===currentLesson.key;
-    })).classes;
-    var classes = _.map(temp,(obj)=>{
-        return {
-            key:obj,
-            label:obj
-        }
-    });
-    return classes;
-}
-function getStudents(currentLesson,currentClass,zoubanExamStudentsInfo,zoubanLessonStudentsInfo){
-     var students = _.map(zoubanLessonStudentsInfo[currentLesson.key][currentClass.key],function(student){
 
-        var studentName = (_.find(zoubanExamStudentsInfo,function(obj){
-            return obj.id===student.id;
-        })).name;
-        return {
-            key:student.id,
-            label:studentName
+
+class LessonSelector extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div style={{height:34}}>
+                <span style={{lineHeight:'34px'}}>选择学科：</span>
+                <div style={{width:200,display:'inline-block',position:'absolute',zIndex:100}}>
+                <Select
+                    clearable={false}
+                    options={this.props.lessons}
+                    value={this.props.currentLesson}
+                    onChange={this.props.handleSelectLesson}
+                />
+                </div>
+            </div>
+        );
+    }
+}
+
+class ClassSelector extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div>
+                <Select
+                    simpleValue
+                    clearable={false}
+                    options={this.props.classes}
+                    value={this.props.currentClass}
+                    onChange={this.props.handleSelectClass}
+                />
+            </div>
+        );
+    }
+}
+
+class StudentSelector extends React.Component {
+    constructor(props) {
+        super(props);
+
+    }
+
+    render() {
+        return (
+            <div>
+                <Select
+                    clearable={false}
+                    options={this.props.currentClassStudents}
+                    value={this.props.currentStudent}
+                    onChange={this.props.handleSelectStudent}
+                />
+            </div>
+        );
+    }
+}
+
+
+class SelectorGroup extends React.Component {
+    constructor(props) {
+        super(props);
+        this.lessons = _.map(this.props.zoubanExamInfo.lessons, (obj) => _.assign({}, obj, {value: obj.objectId, label: obj.name}));
+        this.state = {
+            currentLesson: {},
+            currentLessonClasses: [],
+            currentClass: '',
+            currentClassStudents: [],
+            currentStudent: {}
         }
-    });
-    return students;
+    }
+
+    handleSelectLesson(selectedLesson) {
+        var currentLessonClasses = (selectedLesson) ? _.map(selectedLesson.classes, (className) => {
+            return {
+                label: className,
+                value: className
+            }
+        }) : [];
+        this.setState({
+            currentLesson: selectedLesson,
+            currentLessonClasses: currentLessonClasses,
+            currentClass: '',
+            currentClassStudents: [],
+            currentStudent: {}
+        });
+    }
+
+    handleSelectClass(selectedClass) {
+        debugger;
+        var currentClassStudents = _.map(this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId][selectedClass], (obj) => {
+            return {
+                value: obj.id,
+                label: obj.name
+            }
+        });
+        debugger;
+        this.setState({
+            currentClass: selectedClass,
+            currentClassStudents: currentClassStudents,
+            currentStudent: {}
+        })
+    }
+
+    handleSelectStudent(selectedStudent) {
+        this.setState({
+            currentStudent: selectedStudent
+        });
+        this.props.selectStudent(selectedStudent);
+    }
+
+    render() {
+        return (
+            <div className={commonClass['section']}>
+                <LessonSelector placeholder='请选择年级' lessons={this.lessons} currentLesson={this.state.currentLesson} handleSelectLesson={this.handleSelectLesson.bind(this)} />
+                <div style={{marginTop:20,position:'relative',height:'34px'}}>
+                <span style={{lineHeight:'34px'}}>选择班级：</span>
+                <div style={{width:200,display:'inline-block',position:'absolute',zIndex:10,left:68}}>
+                    <ClassSelector placeholder='请选择班级' classes={this.state.currentLessonClasses} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />
+                </div>
+                <span style={{lineHeight:'34px',paddingLeft:'290px'}}>选择学生：</span>
+                <div style={{width:'200px',display:'inline-block',marginLeft:'5px',position:'absolute',top:'0px'}}>
+                    <StudentSelector placeholder='请选择学生' currentClassStudents={this.state.currentClassStudents} currentStudent={this.state.currentStudent} handleSelectStudent={this.handleSelectStudent.bind(this)} />
+                    </div>
+                </div>
+
+            </div>
+        );
+    }
+}
+
+class PersonalReportContent extends React.Component {
+    constructor(props) {
+        super(props);
+
+    }
+
+    render() {
+        return (
+            <div></div>
+        );
+    }
 }
