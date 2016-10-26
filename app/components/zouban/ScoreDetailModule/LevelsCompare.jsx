@@ -18,14 +18,14 @@ class LevelsCompare extends React.Component {
         super(props);
         this.state = {
             currentLesson: this.props.zoubanExamInfo.lessons[0],
-            segmentPercentages: [0, 0.6, 0.7, 0.85, 1]
+            segmentPercentages: [0.6, 0.6, 0.7, 0.85, 1]
         }
     }
 
     selectedLesson(selectedLesson) {
         this.setState({
             currentLesson: selectedLesson,
-            segmentPercentages: [0, 0.6, 0.7, 0.85, 1]
+            segmentPercentages: [0.6, 0.6, 0.7, 0.85, 1]
         });
     }
 
@@ -47,7 +47,7 @@ class LevelsCompare extends React.Component {
                 <span className={commonClass['title']}>各班学科等级对比</span>
                 <span className={commonClass['title-desc']}></span>
                 <div>
-                    <div style={{ padding: '5px 30px 0 30px',marginBottom:0}} className={commonClass['section']}>
+                    <div style={{ padding: '5px 30px 0 0px',marginBottom:0}} className={commonClass['section']}>
                         <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
                             <span style={{ marginRight: 10}}>学科：</span>
                                 {_.map(this.props.zoubanExamInfo.lessons, (lessonObj, index) => {

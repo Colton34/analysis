@@ -39,7 +39,7 @@ class QuestionCompare extends React.Component {
                 <span className={commonClass['title']}>教学班试题得分率对比</span>
                 <span className={commonClass['title-desc']}></span>
                 <div>
-                    <div style={{ padding: '5px 30px 0 30px',marginBottom:0}} className={commonClass['section']}>
+                    <div style={{ padding: '5px 30px 0 0px',marginBottom:0}} className={commonClass['section']}>
                         <div style={{heigth: 50, lineHeight: '50px', borderBottom: '1px dashed #eeeeee'}}>
                             <span style={{ marginRight: 10}}>学科：</span>
                                 {_.map(this.props.zoubanExamInfo.lessons, (lessonObj, index) => {

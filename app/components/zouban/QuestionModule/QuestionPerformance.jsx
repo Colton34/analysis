@@ -263,7 +263,7 @@ class PaperClassSelector extends React.Component {
         return (
             <div style={{heigth: 50, lineHeight: '50px',marginTop:0,padding:' 0px'}} className={commonClass['section']}>
                 <span style={{ float: 'left', marginRight: 10}}>教学班:</span>
-                <span style={{float: 'left', width: 800}}>
+                <span style={{float: 'left', width: 1000}}>
                     {
                         classes.map((className, index) => {
                             return (

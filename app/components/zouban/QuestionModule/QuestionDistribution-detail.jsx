@@ -64,7 +64,7 @@ class PaperClassSelector extends React.Component {
         return (
             <div style={{height: 50, lineHeight: '50px',marginTop:0,padding:'0 0 0 30px',marginBottom:0}} className={commonClass['section']}>
                 <span style={{ float: 'left', marginRight: 10}}>教学班:</span>
-                <span style={{float: 'left', width: 800}}>
+                <span style={{float: 'left', width: 1100}}>
                     <span style={{display: 'inline-block', marginRight: 30, minWidth: 50}}>
                         <input value='lesson' onClick={this.props.changeClass.bind(this,'lesson')} style={{ marginRight: 5, cursor: 'pointer'}} type='radio' name='classes' checked={currentClass==='lesson'}/>
                         <span>全部</span>

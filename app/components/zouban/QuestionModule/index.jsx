@@ -32,7 +32,7 @@ class QuestionModule extends React.Component {
         var zoubanExamInfo = this.props.zoubanExamInfo.toJS();
         this.lessons = getLessons(zoubanExamInfo);
         this.state={
-            currentLesson:this.lessons[1]
+            currentLesson:this.lessons[0]
         }
     }
     changeLesson(selectedLesson){
