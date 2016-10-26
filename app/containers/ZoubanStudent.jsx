@@ -26,9 +26,10 @@ class StudentPersonalContent extends React.Component {
         var {zoubanExamInfo, zoubanExamStudentsInfo, zoubanLessonStudentsInfo, zuobanLessonQuestionInfo} = this.props.zouban;
         var user = this.props.user.toJS();
         var currentStudent = {value: user.studentId, label: user.name}
-        // var currentStudent = {value: '1234', label: '小明'};
+        debugger;
         zoubanExamInfo = zoubanExamInfo.toJS(), zoubanExamStudentsInfo = zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = zoubanLessonStudentsInfo.toJS(), zuobanLessonQuestionInfo = zuobanLessonQuestionInfo.toJS();
         var lessonsByStudent = getLessonsByStudent(zoubanExamInfo, zoubanExamStudentsInfo, currentStudent);
+        debugger;
         debugger;
         return (
             <div>
@@ -88,6 +89,7 @@ function mapDispatchToProps(dispatch) {
 function getLessonsByStudent(zoubanExamInfo, zoubanExamStudentsInfo, currentStudent) {
     if(!currentStudent.value) return [];
     var targetStudent = _.find(zoubanExamStudentsInfo, (obj) => obj.id == currentStudent.value);
+    debugger;
     var validLessonIds = _.map(targetStudent.classes, (obj) => obj.paperObjectId);
     return _.filter(zoubanExamInfo.lessons, (obj) => _.includes(validLessonIds, obj.objectId));
 }

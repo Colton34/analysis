@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-25 20:00:16
+* @Last Modified time: 2016-10-26 10:01:08
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -496,9 +496,7 @@ function getSegmentIndex(segments, target) {
 
 
 exports.listEquivalentScoreInfo = function(req, res, next) {
-    console.log('========== listEquivalentScoreInfo  =========')
-    //从school exams中筛选出走班的exam，并需要这些考试的papers信息
-    var zoubanExams;//analysis 一个examid的数组或者schoolId；因为后面也需要传递单个examid
+    // var zoubanExams;//analysis 一个examid的数组或者schoolId；因为后面也需要传递单个examid
 /*
 
     examUitls.getSchoolById(req.user.schoolId).then(function(data) {
@@ -509,14 +507,26 @@ exports.listEquivalentScoreInfo = function(req, res, next) {
 
 TODO: 接口过滤出走班考试；如果有必要则还需要对grade进行过滤
  */
-    zoubanExams = [{name: "2016.10高二第二次学考模拟考", exam: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '25'}, {name: "2015-2016学年第二学期期末初一年级组", exam: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '25'}];
-    zoubanExams = _.chain(zoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
-    var equivalentScoreInfoPromises = _.map(zoubanExams, (obj) => examUitls.getEquivalentScoreInfoById(obj['exam']));
-    when.all(equivalentScoreInfoPromises).then(function(equivalentScoreInfoList) {
+    examUitls.getSchoolById(req.user.schoolId).then(function(school) {
+        var zoubanExams = _.chain(school['exams']).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
+        var equivalentScoreInfoPromises = _.map(zoubanExams, (obj) => examUitls.getEquivalentScoreInfoById(obj['exam']));
+        return when.all(equivalentScoreInfoPromises);
+    }).then(function(equivalentScoreInfoList) {
         res.status(200).json(equivalentScoreInfoList);
     }).catch(function(err) {
         next(err);
     });
+
+
+//For Mock
+    // zoubanExams = [{name: "2016.10高二第二次学考模拟考", exam: '101772-10202', event_time: "2016-10-04T00:00:00.000Z", from: '25'}, {name: "2015-2016学年第二学期期末初一年级组", exam: '100532-10172', event_time: "2016-07-02T04:57:46.000Z", from: '25'}];
+    // zoubanExams = _.chain(zoubanExams).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
+    // var equivalentScoreInfoPromises = _.map(zoubanExams, (obj) => examUitls.getEquivalentScoreInfoById(obj['exam']));
+    // when.all(equivalentScoreInfoPromises).then(function(equivalentScoreInfoList) {
+    //     res.status(200).json(equivalentScoreInfoList);
+    // }).catch(function(err) {
+    //     next(err);
+    // });
 }
 
 exports.setEquivalentScoreInfo = function(req, res, next) {
@@ -532,12 +542,11 @@ exports.setEquivalentScoreInfo = function(req, res, next) {
 exports.zoubanDS = function(req, res, next) {
 //1.EquivalentScoreInfo  2.ExamStudentsInfo
 //【暂时】需要打开
-    // req.checkQuery('examid', '无效的examids').notEmpty();//是否还需要grade？？？
-    // if (req.validationErrors()) return next(req.validationErrors());
+    req.checkQuery('examid', '无效的examids').notEmpty();//是否还需要grade？？？
+    if (req.validationErrors()) return next(req.validationErrors());
 
     var result = {};
-                                        //【Mock】req.query.examid
-    examUitls.getEquivalentScoreInfoById('100532-10172').then(function(equivalentScoreInfo) {
+    examUitls.getEquivalentScoreInfoById(req.query.examid).then(function(equivalentScoreInfo) {
         result.equivalentScoreInfo = equivalentScoreInfo;
         var paperObjectIds = _.map(equivalentScoreInfo['[lessons]'], (obj) => obj.objectId);
         return examUitls.getZoubanExamInfo(paperObjectIds, equivalentScoreInfo);

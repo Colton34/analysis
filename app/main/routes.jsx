@@ -25,7 +25,7 @@ import ScoreDetailModule from '../components/zouban/ScoreDetailModule';
 //Mock
 // import StudentPersonalModule from '../components/zouban/StudentPersonalModule';
 import StudentPersonalModule from '../components/zouban/hi';
-import StudentPersonal from '../containers/StudentPersonal';
+import ZoubanStudent from '../containers/ZoubanStudent';
 
 
 
@@ -53,7 +53,7 @@ export default (store) => {
             <Route path='subject/report' component={SubjectReport} />
             <Route path='add/analysis' component={CustomizeAnalysis} />
 
-            <Route path='zouban/personal' component={StudentPersonal} />
+            <Route path='zouban/personal' component={ZoubanStudent} />
             <Route path='helper/score' component={EquivalentScore} />
             <Route path='zouban/dashboard' component={ZoubanDashboard} />
             <Route path='zouban/:name' component={Zouban}>

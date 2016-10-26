@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-25 21:41:42
+* @Last Modified time: 2016-10-26 10:06:50
 */
 'use strict';
 var _ = require('lodash');
@@ -80,10 +80,6 @@ exports.getValidExamsByStudent = function(student) {
     //从student.papers中获取此学生参加过的考试，从school的exams中过滤
     var temp = {};
     return getStudentById(student.studentId).then(function(studentInstance) {
-
-console.log('studentInstance._id === ', studentInstance._id);
-
-
         temp.studentInstance = studentInstance;
         return getSchoolById(student.schoolId);
     }).then(function(school) {
@@ -107,7 +103,6 @@ function filterStudentZoubanExams(allZoubanExams, studentPapers, schoolId) {
     //把studentExams中存在于allZoubanExams的考试过滤出来
     var allZoubanExamIds = _.map(allZoubanExams, (obj) => obj['exam']);
     var studentPapersByExamid = _.groupBy(studentPapers, (obj) => {
-        console.log('obj.examid = ', obj.examid);
         return obj.examid;
     });
     var studentExamIds = _.map(studentPapersByExamid, (v, examid) => {

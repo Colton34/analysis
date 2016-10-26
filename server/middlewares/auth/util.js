@@ -1,8 +1,8 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-05-03 19:03:53
-* @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-25 20:46:58
+* @Last Modified by:   liucong
+* @Last Modified time: 2016-10-26 10:05:21
 */
 
 'use strict';
@@ -194,8 +194,6 @@ exports.authStudent = function(loginName, password) {
 }
 
 exports.getUserById = function(userId) {
-console.log('userId = ', userId);
-
     return when.promise(function(resolve, reject) {
         peterHFS.get(userId, function(err, userInstance) {
             if(err) return reject(new errors.data.MongoDBError('getUserById Error: ', err));
