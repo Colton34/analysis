@@ -226,7 +226,7 @@ class EquivalentLessonScore extends React.Component {
                 {
                     _.map(this.state.lessons, (paperItem) => <EquivalentLessonScoreItem key={paperItem.objectId} paperItem={paperItem} setEquivalentItem={this.setEquivalentItem.bind(this)} />)
                 }
-                <div style={{padding:'30px 0',color:'#ee6b52'}}>说明：重新生成新的考试报告，供老师进行查看，若需要以生成后的成绩发布给学生，进入考试下确认后再发布。</div>
+                <div style={{padding:'30px 0',color:'#ee6b52'}}>说明：重新生成新的考试报告，供老师进行查看。</div>
                 <button disabled={this.state.disable} onClick={this.onSubmitListener.bind(this)} style={{display:'block', border:'none',backgroundColor:'#1daef8',color:'#fff',padding:'15px 100px',margin:'0 auto'}}>重新生成新考试报告</button>
             </div>
         );
@@ -252,12 +252,12 @@ class EquivalentLessonScoreItem extends React.Component {
         // var currentValue = (isProps) ? this.props.paperItem
         return (
             <div style={{width:'600px',borderBottom:'1px solid #eee'}}>
-                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'30px 0px'}}>{this.props.paperItem.name}</span>
-                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'30px 0px'}}>{this.props.paperItem.fullMark}</span>
-                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'30px 0px'}}>
+                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'20px 0px'}}>{this.props.paperItem.name}</span>
+                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'20px 0px'}}>{this.props.paperItem.fullMark}</span>
+                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'20px 0px'}}>
                 <input placeholder='如：1.25' type='text' defaultValue={this.props.paperItem.percentage} onBlur={this.onBlurListener.bind(this)} style={{width:120}}/>
                 </span>
-                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'30px 0px'}}>{this.props.paperItem.equivalentScore || '- - -'}</span>
+                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'20px 0px'}}>{this.props.paperItem.equivalentScore || '- - -'}</span>
             </div>
         );
     }

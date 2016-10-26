@@ -263,6 +263,8 @@ class ClassSelector extends React.Component {
     }
 
     render() {
+        var lessonClassesOptions = this.props.lessonClassesOptions;
+        debugger
         return(
             <div style={{heigth: 50, lineHeight: '50px',marginTop:0,padding:0,marginBottom:0}} className={commonClass['section']}>
                 <span style={{ float: 'left', marginRight: 10}}>教学班:</span>
@@ -272,7 +274,7 @@ class ClassSelector extends React.Component {
                                 _.map(this.props.lessonClassesOptions, (className, index) => {
                                     return (
                                         <span key={'classNames-' + index} style={{display: 'inline-block', marginRight: 30, minWidth: 50}} >
-                                            <input value={className} checked={this.props.currentClass == className} onChange={this.onSelectClass.bind(this, className)} style={{ marginRight: 5, cursor: 'pointer' }} type='checkbox' />
+                                            <input value={className} checked={this.props.currentClass == className||this.props.currentClass =='全部'} onChange={this.onSelectClass.bind(this, className)} style={{ marginRight: 5, cursor: 'pointer' }} type='checkbox' />
                                             <span>{className}</span>
                                         </span>
                                     )

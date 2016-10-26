@@ -206,7 +206,7 @@ export const HELPER_TITLE_MAP = {
 export const ZOUBAN_TITLE_MAP = {
     'question': '试题质量分析',
     'detail': '成绩明细',
-    'personal': '个人',
+    'personal': '学生成绩查询',
     'rank': '排行榜'
 }
 
