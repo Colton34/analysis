@@ -149,6 +149,39 @@ const NoExamList = () => {
     )
 }
 
+class ItemLink extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            hoverLink: false
+        }
+    }
+
+    handleMouseEnter() {
+        this.setState({
+            hoverLink: true
+        })
+    }
+    handleMouseLeave() {
+        this.setState({
+            hoverLink: false
+        })
+    }
+
+    render() {
+        return (
+            <div>
+                <Link to={{ pathname: this.props.pathname, query: this.props.queryOptions }}
+                      style={this.state.hoverLink ? localStyle.linkAnalysisBtnHover : localStyle.linkAnalysisBtn}
+                      onMouseEnter={this.handleMouseEnter.bind(this)}
+                      onMouseLeave={this.handleMouseLeave.bind(this)}>
+                    查看分析
+                </Link>
+            </div>
+        );
+    }
+}
+
 /**
  * props:
  * timeKey:
@@ -162,16 +195,7 @@ class ExamItem extends React.Component {
             hoverLink: false
         }
     }
-    handleMouseEnter() {
-        this.setState({
-            hoverLink: true
-        })
-    }
-    handleMouseLeave() {
-        this.setState({
-            hoverLink: false
-        })
-    }
+
     render() {
         var {timeKey, item, user} = this.props;
         var pathname = (item.from == '25') ? (user.type && user.type == 'student' ? ('/zouban/personal') : ('/zouban/dashboard')) : '/dashboard';
@@ -200,12 +224,7 @@ class ExamItem extends React.Component {
                             </span>
                             </div>
                         </div>
-                        <Link to={{ pathname: pathname, query: queryOptions }}
-                              style={this.state.hoverLink ? localStyle.linkAnalysisBtnHover : localStyle.linkAnalysisBtn}
-                              onMouseEnter={this.handleMouseEnter.bind(this)}
-                              onMouseLeave={this.handleMouseLeave.bind(this)}>
-                            查看分析
-                        </Link>
+                        <ItemLink pathname={pathname} queryOptions={queryOptions} />
                     </div>
                 </div>
             </div>

@@ -8,9 +8,7 @@ import {Link} from 'react-router';
 import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import TableView from '../../../common/TableView';
-
 import { Modal } from 'react-bootstrap';
-
 import {fetchLessonQuestionPic} from '../../../api/exam';
 var {Header, Title, Body, Footer} = Modal;
 
@@ -27,28 +25,6 @@ export default class StudentLessonQuestion extends React.Component {
             currentQuestionName: ''
         };
         this.showPicDialog = this.showPicDialog.bind(this);
-    }
-
-    // componentDidMount() {
-    //     //初始化加载图片
-    //     debugger;
-    //     var questionIds = _.map(this.currentLesson.questions, (obj) => obj.qid);
-    //     debugger;
-    //     var examObjectId = this.props.zoubanExamInfo.objectId;
-    //     var _this = this;
-    //     debugger;
-    //     fetchLessonQuestionPic({request: window.request, questionIds: questionIds, examObjectId: examObjectId}).then(function(picUrls) {
-    //         debugger;
-    //         _this.setState({
-    //             currentLessonPics: picUrls,
-    //             isPicReady: true
-    //         });
-    //     });
-    // }
-
-    componentDidMount() {
-        var currentLesson = this.state.currentLesson || this.props.lessonsByStudent[0];
-        debugger;
     }
 
     componentWillReceiveProps(nextProps) {

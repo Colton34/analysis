@@ -8,22 +8,80 @@ import {Link} from 'react-router';
 import commonClass from '../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../lib/constants';
 import TableView from '../../common/TableView';
+import { Modal } from 'react-bootstrap';
+import {fetchLessonQuestionPic} from '../../api/exam';
+var {Header, Title, Body, Footer} = Modal;
 
 export default class StudentLessonQuestion extends React.Component {
     constructor(props) {
         super(props);
         this.tableHeader = getTableHeader();
         this.state = {
-            currentLesson: this.props.lessonsByStudent[0]
-
+            currentLesson: this.props.lessonsByStudent[0],
+            isDisplay: false,
+            isPicReady: false,
+            currentLessonPics: [],
+            currentQuestionPic: '',
+            currentQuestionName: ''
         }
-        debugger
+        this.showPicDialog = this.showPicDialog.bind(this);
     }
 
+    componentDidMount() {
+        debugger;
+        this.lessonQuestions = this.state.currentLesson.questions;
+        debugger;
+        var questionIds = _.map(this.lessonQuestions, (obj) => obj.qid);
+        debugger;
+        var examObjectId = this.props.zoubanExamInfo.objectId;
+        debugger;
+        var _this = this;
+        fetchLessonQuestionPic({request: window.request, questionIds: questionIds, examObjectId: examObjectId}).then(function(picUrls) {
+            _this.setState({
+                isPicReady: true,
+                currentLessonPics: picUrls
+            });
+        });
+    }
+
+    // componentWillReceiveProps(nextProps) {
+
+    // }
+
     onSelectLesson(selectedLesson) {
+        //TODO:切换lesson，重新获取对应的question pics
+        debugger;
         this.setState({
+            isPicReady: false,
             currentLesson: selectedLesson
         });
+        this.lessonQuestions = selectedLesson.questions;
+        debugger;
+        var questionIds = _.map(this.lessonQuestions, (obj) => obj.qid);
+        var examObjectId = this.props.zoubanExamInfo.objectId;
+        debugger;
+        var _this = this;
+        fetchLessonQuestionPic({request: window.request, questionIds: questionIds, examObjectId: examObjectId}).then(function(picUrls) {
+            debugger;
+            _this.setState({
+                isPicReady: true,
+                currentLessonPics: picUrls
+            });
+        });
+    }
+
+    showPicDialog(index) {
+        this.setState({
+            isDisplay: true,
+            currentQuestionPic: this.state.currentLessonPics[index],
+            currentQuestionName: this.lessonQuestions[index].name
+        })
+    }
+
+    hideModal() {
+        this.setState({
+            isDisplay: false
+        })
     }
 
     render() {
@@ -38,7 +96,7 @@ export default class StudentLessonQuestion extends React.Component {
             </div>
         );
         var currentLesson = this.state.currentLesson || this.props.lessonsByStudent[0];
-        var tableBody = getTableBody(currentLesson, this.props.currentStudent, this.props.zoubanLessonStudentsInfo, this.props.zuobanLessonQuestionInfo);
+        var tableBody = getTableBody(currentLesson, this.props.currentStudent, this.props.zoubanLessonStudentsInfo, this.props.zuobanLessonQuestionInfo, this.showPicDialog);
         tableBody.unshift(this.tableHeader);
 debugger
         return (
@@ -61,9 +119,50 @@ debugger
                         </div>
                     </div>
                     <div style={{marginTop:30}}>
-                    <TableView hover  tableData={tableBody}></TableView>
+
+                    {(this.state.isPicReady) ? (
+                        <div style={{marginTop:30}}>
+                            <TableView hover tableData={tableBody}></TableView>
+                            <CheckQuestionImageDialog isDisplay={this.state.isDisplay} hideModal={this.hideModal.bind(this)} currentQuestionPic={this.state.currentQuestionPic} currentQuestionName={this.state.currentQuestionName} />
+                        </div>
+                        ) : (<h4>正在加载，请稍后...</h4>)}
                     </div>
                 </div>
+            </div>
+        );
+    }
+}
+
+class CheckQuestionImageLink extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    showPicDialog() {
+        this.props.showPicDialog(this.props.index);
+    }
+
+    render() {
+        return (
+            <div>
+                <a onClick={this.showPicDialog.bind(this)}>查看原题</a>
+            </div>
+        );
+    }
+}
+
+class CheckQuestionImageDialog extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        debugger;
+        return (
+            <div >
+                <Modal show={ this.props.isDisplay } onHide={this.props.hideModal} dialogClassName={'ModalDialog'}>
+                    <img src={this.props.currentQuestionPic} alt={this.props.currentQuestionName} />
+                </Modal>
             </div>
         );
     }
@@ -73,7 +172,7 @@ function getTableHeader() {
     return ['题号', '试题满分', '自己得分', '试题得分率', '试题平均分', '查看原题'];
 }
 
-function getTableBody(currentLesson, currentStudent, zoubanLessonStudentsInfo, zuobanLessonQuestionInfo) {
+function getTableBody(currentLesson, currentStudent, zoubanLessonStudentsInfo, zuobanLessonQuestionInfo, showPicDialog) {
     var currentLessonStudents = _.unionBy(..._.values(zoubanLessonStudentsInfo[currentLesson.objectId]), (obj) => obj.id);
     var row, currentStudentInfo = _.find(currentLessonStudents, (obj) => obj.id), currentQuestionLessonInfo;
     return _.map(currentLesson.questions, (questionObj, index) => {
@@ -83,16 +182,16 @@ function getTableBody(currentLesson, currentStudent, zoubanLessonStudentsInfo, z
         currentQuestionLessonInfo = zuobanLessonQuestionInfo[currentLesson.objectId][index].lesson;
         row.push(currentQuestionLessonInfo.rate);
         row.push(currentQuestionLessonInfo.mean);
-        row.push('查看题目');
+        row.push(<CheckQuestionImageLink index={index} showPicDialog={showPicDialog} />);
         return row;
     });
 }
 
 var localStyle = {
     subject: {
-        display: 'inline-block', minWidth: 50, height: 22, backgroundColor: '#fff', color: '#333', marginRight: 10, textDecoration: 'none',textAlign: 'center', lineHeight: '22px'
+        cursor: 'pointer',display: 'inline-block', minWidth: 50, height: 22, backgroundColor: '#fff', color: '#333', marginRight: 10, textDecoration: 'none',textAlign: 'center', lineHeight: '22px'
     },
     activeSubject: {
-        display: 'inline-block', minWidth: 50, height: 22, backgroundColor: '#2ea8eb', color: '#fff',  marginRight: 10,  textDecoration: 'none', textAlign: 'center', lineHeight: '22px'
+        cursor: 'pointer',display: 'inline-block', minWidth: 50, height: 22, backgroundColor: '#2ea8eb', color: '#fff',  marginRight: 10,  textDecoration: 'none', textAlign: 'center', lineHeight: '22px',padding:'0px 10px'
     }
 }
