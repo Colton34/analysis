@@ -158,7 +158,7 @@ class CheckQuestionImageDialog extends React.Component {
         debugger;
         return (
             <div>
-                <Modal show={ this.props.isDisplay } onHide={this.props.hideModal}>
+                <Modal show={ this.props.isDisplay } onHide={this.props.hideModal} dialogClassName={'ModalDialog'}>
                     <img src={this.props.currentQuestionPic} alt={this.props.currentQuestionName} />
                 </Modal>
             </div>
