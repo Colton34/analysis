@@ -24,7 +24,7 @@ function HelperBoxNav({title}) {
     return (
         <div style={{display:'tableCell',textAlign:'center', width: 1200,margin: '0 auto', marginTop: 20, backgroundColor: '#fff', zIndex: 0,padding:'20px 0px',borderBottom:'1px solid #eee'}} className='animated fadeIn'>
             {/*<Link to={{pathname: '/dashboard'}} style={{color:'#333'}}>返回</Link>*/}
-            <span style={{color:'#000',fontSize:'18px'}}>等值转换</span>
+            <span style={{color:'#000',fontSize:'18px'}}>分数转换</span>
         </div>
     )
 }
@@ -92,7 +92,7 @@ class ContentModule extends React.Component {
         if(!this.state.currentEquivalentScoreInfo) return (<div>没有考试内容</div>)
         // debugger;
         return (
-            <div style={{width:500,margin:'0 auto',padding:'50px 0'}}>
+            <div style={{width:600,margin:'0 auto',padding:'50px 0'}}>
 
                 <SelectEquivalentScoreInfo selectEquivalentScoreInfo={this.selectEquivalentScoreInfo.bind(this)} equivalentScoreInfoList={this.props.equivalentScoreInfoList} />
                 <EquivalentLessonScore equivalentScoreInfo={this.state.currentEquivalentScoreInfo} />
@@ -120,9 +120,9 @@ class SelectEquivalentScoreInfo extends React.Component {
         console.log('selectEquivalentScoreInfo');
         return (
             <div style={{position:'relative'}}>
-                <span>选择考试：</span>
-                <div style={{width:'300px',display:'inline-block',position:'absolute',top:-5,right:100,zIndex:10}}>
-                <DropdownList onClickDropdownList={this.props.selectEquivalentScoreInfo} list={dropListData}  surfaceBtnStyle={_.assign({ width:'300px'})} />
+                <span style={{paddingLeft:'50px'}}>选择考试：</span>
+                <div style={{width:'400px',display:'inline-block',position:'absolute',top:-5,right:0,zIndex:10}}>
+                <DropdownList onClickDropdownList={this.props.selectEquivalentScoreInfo} list={dropListData}  surfaceBtnStyle={_.assign({ width:'400px'})} />
                 </div>
             </div>
         );
@@ -220,7 +220,7 @@ class EquivalentLessonScore extends React.Component {
 
                 <div style={{display:'block' ,color:'#ee6b52',margin:'30px auto 0px',paddingLeft:'100px'}}>{this.state.errorMsg}</div>
 
-                <div style={{padding:'20px 0 ',borderBottom:'1px solid #eee'}}><span style={{display:'inline-block',padding:'0 30px 0 0'}}>学科</span> <span style={{display:'inline-block',padding:'0 40px'}}>原始满分</span> <span style={{display:'inline-block',padding:'0 40px'}}>换算比例</span> <span style={{display:'inline-block',padding:'0 30px'}}>换算后满分</span></div>
+                <div style={{padding:'20px 0 ',borderBottom:'1px solid #eee'}}><span style={{display:'inline-block',textAlign:'center',width:'150px'}}>学科</span> <span style={{display:'inline-block',textAlign:'center',width:'150px'}}>原始满分</span> <span style={{display:'inline-block',textAlign:'center',width:'150px'}}>换算比例</span> <span style={{display:'inline-block',padding:'0 30px'}}>换算后满分</span></div>
                 {/* 遍历每个lesson--[学科]列是subjectName???--做不到【数学I】，只有【数学（文科）】*/}
                 {
                     _.map(this.state.lessons, (paperItem) => <EquivalentLessonScoreItem key={paperItem.objectId} paperItem={paperItem} setEquivalentItem={this.setEquivalentItem.bind(this)} />)
@@ -250,11 +250,13 @@ class EquivalentLessonScoreItem extends React.Component {
     render() {
         // var currentValue = (isProps) ? this.props.paperItem
         return (
-            <div style={{padding:'20px 0 ',borderBottom:'1px solid #eee'}}>
-                <span style={{display:'inline-block',padding:'0 30px 0 0'}}>{this.props.paperItem.name}</span>
-                <span style={{display:'inline-block',padding:'0 70px 0 50px'}}>{this.props.paperItem.fullMark}</span>
+            <div style={{width:'600px',borderBottom:'1px solid #eee'}}>
+                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'30px 0px'}}>{this.props.paperItem.name}</span>
+                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'30px 0px'}}>{this.props.paperItem.fullMark}</span>
+                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'30px 0px'}}>
                 <input placeholder='如：1.25' type='text' defaultValue={this.props.paperItem.percentage} onBlur={this.onBlurListener.bind(this)} style={{width:120}}/>
-                <span style={{display:'inline-block',padding:'0 60px'}}>{this.props.paperItem.equivalentScore || '- - -'}</span>
+                </span>
+                <span style={{display:'inline-block',width:'150px',textAlign:'center',margin:'30px 0px'}}>{this.props.paperItem.equivalentScore || '- - -'}</span>
             </div>
         );
     }
