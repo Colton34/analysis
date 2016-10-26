@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-24 18:48:54
+* @Last Modified time: 2016-10-26 12:43:21
 */
 
 'use strict';
@@ -690,7 +690,9 @@ export function saveBaseline(params) {
 
 export function fetchEquivalentScoreInfoList(params) {
     var url = examPath + '/equivalent/list';
+    debugger;
     return params.request.get(url).then(function(res) {
+        debugger;
         return Promise.resolve(res.data);
     });
 }

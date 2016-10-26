@@ -42,10 +42,10 @@ class ZoubanDashboard extends React.Component {
     }
 
     render() {
-        var {examid, grade} = this.props.location.query;
+        var {examid} = this.props.location.query;
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                {(this.props.ifError) ? (<CommonErrorView />) : ((this.props.isLoading || !this.props.zouban.haveInit) ? (<Spinkit />) : (<ZoubanDashboardContent examid={examid} grade={grade} zouban={this.props.zouban} />))}
+                {(this.props.ifError) ? (<CommonErrorView />) : ((this.props.isLoading || !this.props.zouban.haveInit) ? (<Spinkit />) : (<ZoubanDashboardContent examid={examid} zouban={this.props.zouban} />))}
             </div>
         );
     }
@@ -83,7 +83,7 @@ class ZoubanDashboardContent extends React.Component {
     render() {
         var zoubanExamInfo = this.props.zouban.zoubanExamInfo.toJS(), zoubanExamStudentsInfo = this.props.zouban.zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = this.props.zouban.zoubanLessonStudentsInfo.toJS(), zuobanLessonQuestionInfo = this.props.zouban.zuobanLessonQuestionInfo.toJS();
         debugger;
-        var queryString = `?examid=${this.props.examid}&grade=${this.props.grade}`;
+        var queryString = `?examid=${this.props.examid}`;
         debugger;
 
         return (

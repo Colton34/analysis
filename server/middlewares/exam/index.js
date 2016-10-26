@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-26 10:01:08
+* @Last Modified time: 2016-10-26 13:03:24
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -508,7 +508,7 @@ exports.listEquivalentScoreInfo = function(req, res, next) {
 TODO: 接口过滤出走班考试；如果有必要则还需要对grade进行过滤
  */
     examUitls.getSchoolById(req.user.schoolId).then(function(school) {
-        var zoubanExams = _.chain(school['exams']).map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
+        var zoubanExams = _.chain(school['[exams]']).filter(obj => obj.from == '25').map((obj) => _.assign({}, obj, {timestamp: moment(obj['event_time']).valueOf()})).orderBy(['timestamp'], ['desc']).value();
         var equivalentScoreInfoPromises = _.map(zoubanExams, (obj) => examUitls.getEquivalentScoreInfoById(obj['exam']));
         return when.all(equivalentScoreInfoPromises);
     }).then(function(equivalentScoreInfoList) {
@@ -535,7 +535,7 @@ exports.setEquivalentScoreInfo = function(req, res, next) {
     var postData = req.body.equivalentScoreInfo;
     peterFX.set(postData._id, {'[lessons]': postData['[lessons]']}, function(err, result) {
         if(err) return next(new errors.data.MongoDBError('setEquivalentScoreInfo Error: ', err));
-        res.status(200).json({message: 'ok'});
+        res.status(200).json({examid: req.body.equivalentScoreInfo.examId});
     });
 }
 

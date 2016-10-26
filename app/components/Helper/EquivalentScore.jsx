@@ -53,6 +53,7 @@ class EquivalentScore extends React.Component {
     }
 
     componentDidMount() {
+        debugger;
         var params = initParams({'request': window.request}, this.props.params, this.props.location);
         this.props.fetchEquivalentScoreInfoList(params);
     }
@@ -205,7 +206,7 @@ class EquivalentLessonScore extends React.Component {
             debugger;
             _this.context.stopLoading();
             //【Mock】TODO: 跳转到dashboard
-            browserHistory.push('/');
+            browserHistory.push('/zouban/dashboard?examid='+res.data.examid);
             // browserHistory.push('/dashboard?examid=' + res.data.examId+'&grade='+res.data.grade);
         }).catch(function(err) {
             debugger;

@@ -200,7 +200,7 @@ class ExamItem extends React.Component {
         var {timeKey, item, user} = this.props;
         var pathname = (item.from == '25') ? (user.type && user.type == 'student' ? ('/zouban/personal') : ('/zouban/dashboard')) : '/dashboard';
         debugger;
-        var queryOptions = {examid: item.id, grade: item.grade};
+        var queryOptions = (item.from == '25' && user.type) ? {examid: item.id} : {examid: item.id, grade: item.grade};
 
         return (
             <div style={this.props.isLast ? {marginBottom: 15} : {}}>

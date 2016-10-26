@@ -14,9 +14,10 @@ var localStyle = {
     }
 };
 
-export default function NavHeader({examName, examId, grade,reportName, isZouban}) {
+export default function NavHeader({examName, examId, grade, reportName, isZouban}) {
     var queries = {examid: examId, grade: grade};
-    var pathname = (isZouban) ? '/zouban/dashboard' : '/dashboard';
+    var pathname = (isZouban) ? '/zouban/dashboard?examid='+examId : '/dashboard?examid='+examId+'&grade='+grade;
+    debugger;//需要测试在普通报告中点击回退到dashboard的地址栏里参数是否正确
     return (
         <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}}>
             <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: colorsMap.C12 }}>
