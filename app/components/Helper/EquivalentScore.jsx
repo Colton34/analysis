@@ -122,7 +122,7 @@ class SelectEquivalentScoreInfo extends React.Component {
         return (
             <div style={{position:'relative'}}>
                 <span style={{paddingLeft:'50px'}}>选择考试：</span>
-                <div style={{width:'400px',display:'inline-block',position:'absolute',top:-5,right:0,zIndex:10}}>
+                <div style={{width:'400px',display:'inline-block',position:'absolute',top:-5,right:50,zIndex:10}}>
                 <DropdownList onClickDropdownList={this.props.selectEquivalentScoreInfo} list={dropListData}  surfaceBtnStyle={_.assign({ width:'400px'})} />
                 </div>
             </div>
@@ -226,7 +226,7 @@ class EquivalentLessonScore extends React.Component {
                 {
                     _.map(this.state.lessons, (paperItem) => <EquivalentLessonScoreItem key={paperItem.objectId} paperItem={paperItem} setEquivalentItem={this.setEquivalentItem.bind(this)} />)
                 }
-                <div style={{padding:'30px 0',color:'#ee6b52'}}>说明：重新生成新的考试报告，供老师进行查看。</div>
+                <div style={{padding:'30px 0',color:'#ee6b52',display:'tableCell',textAlign:'center'}}>说明：重新生成新的考试报告，供老师进行查看。</div>
                 <button disabled={this.state.disable} onClick={this.onSubmitListener.bind(this)} style={{display:'block', border:'none',backgroundColor:'#1daef8',color:'#fff',padding:'15px 100px',margin:'0 auto'}}>重新生成新考试报告</button>
             </div>
         );

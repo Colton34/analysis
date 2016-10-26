@@ -79,7 +79,7 @@ class Table extends React.Component {
                                                     className={commonClassName['table-unit']}
                                                     rowSpan={header.rowSpan ? header.rowSpan : 1}
                                                     colSpan={header.colSpan ? header.colSpan : 1}
-                                                    style={_.assign({}, { minWidth: 100, borderColor: colorsMap.C04, position: 'relative', whiteSpace: 'nowrap', fontWeight: 'normal'}, headerCss, {cursor: 'pointer'}, bordered ? {}:{border: 'none'})}
+                                                    style={_.assign({}, { padding:'0px 30px', borderColor: colorsMap.C04, position: 'relative', whiteSpace: 'nowrap', fontWeight: 'normal'}, headerCss, {cursor: 'pointer'}, bordered ? {}:{border: 'none'})}
                                                     onClick={(header.id) ? this.handleSort.bind(this, header.id) : this.emptyFn.bind(this)}
                                                     >
                                                     <span style={header.tipContent !== undefined ? {marginRight: 5} : {}}>{header.name}</span>
@@ -135,7 +135,7 @@ class Table extends React.Component {
                                                     className={commonClassName['table-unit']}
                                                     colSpan={rowData[id].colSpan ? rowData[id].colSpan : 1}
                                                     rowSpan={rowData[id].rowSpan ? rowData[id].rowSpan : 1}
-                                                    style={_.assign({}, { minWidth: 100, borderColor: colorsMap.C04, whiteSpace: 'nowrap'}, tdStyle, bordered ? {}:{border: 'none'}) }
+                                                    style={_.assign({}, {padding:'0px 30px', textAlign:'center', borderColor: colorsMap.C04, whiteSpace: 'nowrap'}, tdStyle, bordered ? {}:{border: 'none'}) }
                                                     >
                                                     {
                                                         rowData[id]['overlayData'] !== undefined ? (
