@@ -48,10 +48,11 @@ class QuestionCompare extends React.Component {
                                     )
                                 })
                             }
+                            <Button onClick={this.clickDownloadTable.bind(this, tableHeader, tableBody)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0,float:'right'}}>下载表格</Button>
                         </div>
                     </div>
                 </div>
-                <Button onClick={this.clickDownloadTable.bind(this, tableHeader, tableBody)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0,float:'right'}}>下载表格</Button>
+
                 <div style={{marginTop:30}}>
                     <TableView hover  tableData={tableBody}></TableView>
                 </div>
