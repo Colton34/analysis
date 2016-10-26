@@ -30,18 +30,13 @@ class StudentPersonalContent extends React.Component {
         var lessonsByStudent = getLessonsByStudent(zoubanExamInfo, zoubanExamStudentsInfo, currentStudent);
         return (
             <div>
+                <StudentScoreInfo zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} currentStudent={currentStudent} lessonsByStudent={lessonsByStudent} />
+                <StudentSubjectCompare zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} lessonsByStudent={lessonsByStudent} currentStudent={currentStudent} />
                 <StudentLessonQuestion currentStudent={currentStudent} lessonsByStudent={lessonsByStudent} zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} zuobanLessonQuestionInfo={zuobanLessonQuestionInfo} />
             </div>
         );
     }
 }
-
-/*
-
-                <StudentScoreInfo zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} currentStudent={currentStudent} lessonsByStudent={lessonsByStudent} />
-                <StudentSubjectCompare zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} lessonsByStudent={lessonsByStudent} currentStudent={currentStudent} />
-
- */
 
 class StudentPersonal extends React.Component {
     static need = [initZoubanDSAction]

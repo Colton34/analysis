@@ -37,7 +37,6 @@ class StudentLevelsDistribution extends React.Component {
         super(props);
         var currentLesson = this.props.zoubanExamInfo.lessons[0];
         var currentLessonClasses = _.keys(this.props.zoubanLessonStudentsInfo[currentLesson.objectId]).slice(0, 3);
-        debugger;
         this.state={
             currentLesson: currentLesson,
             currentStep: 10,
@@ -56,7 +55,6 @@ class StudentLevelsDistribution extends React.Component {
 
     onSelectClasses(selectedClasses) {
         //TODO:是否需要做转换
-        debugger;
         this.setState({
             currentLessonClasses: _.map(selectedClasses, (obj) => obj.value)
         })
@@ -80,9 +78,7 @@ class StudentLevelsDistribution extends React.Component {
         var tableBody = getTableBody(classSegmentDistribution);
         var downloadTableData = _.cloneDeep(tableBody);
         var downloadAllData = getTableBody(getClassSegmentDistribution(_.keys(currentLessonStudentsInfo), segments, currentLessonStudentsInfo));
-        debugger;
         var selectorOptions = getSelectorFormatValues(_.keys(this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId])), selectorInitSelected = getSelectorFormatValues(this.state.currentLessonClasses);
-        debugger;
         // var selectorInitSelected = selectorOptions.slice(0, 3);
         tableBody.unshift(tableHeader);
         var chartWidth = (segmentsString.length)*(classSegmentDistribution.length)>=50?((segmentsString.length)*(classSegmentDistribution.length)*21)+60*(classSegmentDistribution.length):1140;
@@ -200,8 +196,7 @@ class StudentLevelsTable extends React.Component {
     }
 
     clickDownloadTable() {
-        debugger;
-        downloadData(this.props.downloadKeys, this.props.downloadNames, this.props.downloadTableData, '我的表格');
+        downloadData(this.props.downloadKeys, this.props.downloadNames, this.props.downloadTableData, '各分数段教学班详细人数');
     }
 
     render() {
@@ -210,7 +205,7 @@ class StudentLevelsTable extends React.Component {
                 <span className={commonClass['sub-title']}>各分数段教学班详细人数</span>
                 <Button onClick={this.clickDownloadTable.bind(this)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0,float:'right'}}>下载表格</Button>
                 <div style={{marginTop:30}}>
-                <TableView hover  tableData={this.props.tableData}></TableView>
+                    <TableView hover  tableData={this.props.tableData}></TableView>
                 </div>
             </div>
         );

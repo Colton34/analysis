@@ -298,7 +298,7 @@ class ExamList extends React.Component {
         var {pageIndex, pageSize} = this.state;
         return (
             <div style={{ display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 25, backgroundColor: '#fff' }}>
-                <div className={styles['banner-img']}></div>
+                {user.type ? (<h4>考试列表</h4>) : (<div className={styles['banner-img']}></div>)}
                 {
                     errorInfo && errorInfo.msg ? (
                         <div style={{width: 940, height: 505, display: 'table-cell', textAlign: 'center', verticalAlign: 'middle'}}>
@@ -360,7 +360,7 @@ const Content = ({examList, errorInfo, user}) => {
     return (
         <div style={{ width: 1200, margin: '0 auto', minHeight: 900, backgroundColor: '#eff1f4', position:'relative', paddingBottom: 80}}>
             <ExamList examList={examList} errorInfo={errorInfo} user={user} />
-            <Sidebar/>
+            {user.type ? '' : <Sidebar />}
             <div style={{clear:'both'}}></div>
         </div>
     )

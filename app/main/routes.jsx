@@ -41,8 +41,7 @@ import Main from '../containers/main';
 export default (store) => {
     return (
         <Route path="/" component={App}>
-            <IndexRoute component={Main} />
-            <Route path='home' component={Home}/>
+            <IndexRoute component={Home} />
             <Route path='faq' component={HelpCenter}/>
             <Route path='helper' component={HelperBox} />
             <Route path='dashboard' component={Dashboard} />

@@ -2,11 +2,13 @@ import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import ReactHighcharts from 'react-highcharts';
 
+import {Button} from 'react-bootstrap';
 import DropdownList from '../../../common/DropdownList';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
 
 import {makeSegmentsDistribution} from '../../../sdk';
+import {downloadData} from '../../../lib/util';
 
 import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap, LETTER_MAP as letterMap, LETTER_TITLE_MAP as letterTitleMap} from '../../../lib/constants';
@@ -25,6 +27,13 @@ class LevelsCompare extends React.Component {
             currentLesson: selectedLesson,
             segmentPercentages: [0, 0.6, 0.7, 0.85, 1]
         });
+    }
+
+    clickDownloadTable(levelHeaderTitles, levelHeaderPercentages, tableBody) {
+        var downloadFields = _.concat(_.map(levelHeaderTitles, (obj) => obj.name), _.map(levelHeaderPercentages, (obj, index) => (letterMap[parseInt(index/2)] + obj.name)));
+        var downloadKeys = _.concat(_.map(levelHeaderTitles, (obj) => obj.id), _.map(levelHeaderPercentages, (obj) => obj.id));
+        var downloadTableData = _.map(tableBody, (obj) => _.map(downloadKeys, (fieldKey) => obj[fieldKey]));
+        downloadData(downloadFields, downloadFields, downloadTableData, '各班学科等级对比');
     }
 
     render(){
@@ -50,6 +59,7 @@ class LevelsCompare extends React.Component {
                         </div>
                     </div>
                 </div>
+                <Button onClick={this.clickDownloadTable.bind(this, levelHeaderTitles, levelHeaderPercentages, tableBody)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0,float:'right'}}>下载表格</Button>
                 <div style={{marginTop:30}}>
                     <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={EnhanceTable}></TableView>
                 </div>

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-18 20:18:20
+* @Last Modified time: 2016-10-26 12:24:57
 */
 
 'use strict';
@@ -49,7 +49,6 @@ export function saveAs(uri) {
 }
 
 export function downloadData(validColumnKeys, validColumnNames, validStudentInfoMatrix, exportTableName) {
-    debugger;
     var url = '/api/v1/file/export/rank/report';
     var inputKeys = "<input type='hidden' name='" + 'keys' + "' value='" + JSON.stringify(validColumnKeys) + "' />";
     var inputNames = "<input type='hidden' name='" + 'names' + "' value='" + JSON.stringify(validColumnNames) + "' />";

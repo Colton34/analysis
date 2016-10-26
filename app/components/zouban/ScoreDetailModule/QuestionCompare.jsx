@@ -1,8 +1,11 @@
 import _ from 'lodash';
 import React, { PropTypes } from 'react';
 
+import {Button} from 'react-bootstrap';
 import TableView from '../../../common/TableView';
 import EnhanceTable from '../../../common/EnhanceTable';
+
+import {downloadData} from '../../../lib/util';
 
 import commonClass from '../../../styles/common.css';
 import {COLORS_MAP as colorsMap} from '../../../lib/constants';
@@ -19,6 +22,10 @@ class QuestionCompare extends React.Component {
         this.setState({
             currentLesson: selectedLesson
         })
+    }
+
+    clickDownloadTable(tableHeader, tableBody) {
+        downloadData(tableHeader, tableHeader, tableBody, '教学班试题得分率对比');
     }
 
     render(){
@@ -44,8 +51,9 @@ class QuestionCompare extends React.Component {
                         </div>
                     </div>
                 </div>
+                <Button onClick={this.clickDownloadTable.bind(this, tableHeader, tableBody)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0,float:'right'}}>下载表格</Button>
                 <div style={{marginTop:30}}>
-                <TableView hover  tableData={tableBody}></TableView>
+                    <TableView hover  tableData={tableBody}></TableView>
                 </div>
             </div>
         )

@@ -66,7 +66,7 @@ class HeaderComponent extends React.Component {
                     <ul className={style.menu}>
                         <li className={style['menu-li']}>
                             <a href="/" className={style['menu-nav']} style={localStyle.headerLink} key={'headerLink-0'}>首页</a>
-                            <a href="/helper/score" className={style['menu-nav']} style={_.assign({},localStyle.headerLink,{marginLeft:'50px'})} key={'headerLink-1'}>等值转换</a>
+                            {this.props.user.type ? ('') : (<a href="/helper/score" className={style['menu-nav']} style={_.assign({},localStyle.headerLink,{marginLeft:'50px'})} key={'headerLink-1'}>等值转换</a>)}
                         </li>
                     </ul>
                     {/*{!this.props.user.auth.isLianKaoManager ? (<a key='addAnalysisBtn' href='/add/analysis' style={localStyle.addAnalysisBtn}><i className='icon-add-3'></i>自定义分析</a>) : ''} */}
@@ -79,8 +79,7 @@ class HeaderComponent extends React.Component {
                             <span className='caret' style={{color: '#e1e1e1'}}></span>
                         </div>
                     </a>
-
-                    <a key='versionSwitcher' href="http://fx.yunxiao.com"  style={_.assign({},localStyle.headerLink,{float: 'right', marginRight: 30, color: '#5a5a5a'})}><i className='icon-loop-alt'></i>返回旧版</a>
+                    {this.props.user.type ? '' : (<a key='versionSwitcher' href="http://fx.yunxiao.com"  style={_.assign({},localStyle.headerLink,{float: 'right', marginRight: 30, color: '#5a5a5a'})}><i className='icon-loop-alt'></i>返回旧版</a>)}
                     {/*<a href="javascript:void(0)"  onClick={this.props.actions.bind(_this, dialogProps) } style={{ float: 'right', textDecoration: 'none', color: '#5a5a5a', paddingLeft: 40, paddingTop: 30 }}>我要吐槽</a>*/}
                     { this.state.showDropdown ? <DropdownMenu onLogout={this.onLogout.bind(this)}/> : ''}
                 </div>
