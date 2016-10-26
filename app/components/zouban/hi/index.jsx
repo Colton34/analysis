@@ -186,14 +186,16 @@ class SelectorGroup extends React.Component {
             <div className={commonClass['section']}>
                 <LessonSelector placeholder='请选择年级' lessons={this.lessons} currentLesson={this.state.currentLesson} handleSelectLesson={this.handleSelectLesson.bind(this)} />
                 <div style={{marginTop:20,position:'relative',height:'34px'}}>
-                <span style={{lineHeight:'34px'}}>选择学生：</span>
+                <span style={{lineHeight:'34px'}}>选择班级：</span>
                 <div style={{width:200,display:'inline-block',position:'absolute',zIndex:10,left:68}}>
                     <ClassSelector placeholder='请选择班级' classes={this.state.currentLessonClasses} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />
-                    <div style={{width:'200px',display:'inline-block',marginLeft:'300px',position:'absolute',top:'0px'}}>
+                </div>
+                <span style={{lineHeight:'34px',paddingLeft:'290px'}}>选择学生：</span>
+                <div style={{width:'200px',display:'inline-block',marginLeft:'5px',position:'absolute',top:'0px'}}>
                     <StudentSelector placeholder='请选择学生' currentClassStudents={this.state.currentClassStudents} currentStudent={this.state.currentStudent} handleSelectStudent={this.handleSelectStudent.bind(this)} />
                     </div>
                 </div>
-                </div>
+
             </div>
         );
     }

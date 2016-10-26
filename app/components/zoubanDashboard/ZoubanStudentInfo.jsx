@@ -33,7 +33,7 @@ export default function ZoubanStudentInfo({zoubanLessonStudentsInfo, zoubanExamI
                             <div >优势学科：</div>
                             <div style={{color:'#1daef8',fontSize:'18px'}}>{result.advantage}</div>
                         </div>
-                        <div style={{display:'inline-block',position:'absolute'}}>
+                        <div style={{display:'inline-block',position:'absolute',left:'100px'}}>
                             <div style={{display:'tableCell', textAlign:'center',width:'120px',height:'120px',border:'5px solid #1daef8',borderRadius:'50%',margin:'0 auto',lineHeight:'110px',fontSize:'18px'}}>{result.totalScore}分</div>
                         </div>
                         <div style={{display:'inline-block',width:'80px',float:'right'}}>

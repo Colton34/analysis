@@ -252,3 +252,6 @@ background-color: #fff !important;
 color:#fff !important;
 }
 /*-------------------------------------分页样式end-----------------------------------------------------------*/
+.ModalDialog{
+    width:1200px;
+}
