@@ -170,7 +170,7 @@ class ItemLink extends React.Component {
 
     render() {
         return (
-            <div>
+            <div style={{display:'inline-block',float:'right',paddingRight:'20px'}}>
                 <Link to={{ pathname: this.props.pathname, query: this.props.queryOptions }}
                       style={this.state.hoverLink ? localStyle.linkAnalysisBtnHover : localStyle.linkAnalysisBtn}
                       onMouseEnter={this.handleMouseEnter.bind(this)}
@@ -216,7 +216,7 @@ class ExamItem extends React.Component {
                             <div style={{ fontSize: 16, marginBottom: 8, color: '#3f3f3f',display:'inline' }}>{item.examName}</div>
                             {item.from==20?(<div className={commonStyles['liankao-mark']} style={{width:36,height:18,marginLeft:8,display:'inline-block',marginTop:'2px'}}></div>):''}
                             <div style={{marginTop:8}}>
-                            <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>创建时间: {item.eventTime}</span>
+                            <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>创建时间: {item.formatedTime}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>考试科目： {item.subjectCount}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>试卷满分： {item.fullMark}</span>
                             <span style={{ fontSize: 12, color: '#4d4d4d', marginRight: 15 }}>
