@@ -101,8 +101,7 @@ export default function StudentSubjectCompare({zoubanLessonStudentsInfo, lessons
             <div style={{display: 'inline-block', width: 1140, height: 290, position: 'relative'}}>
                 <ReactHighcharts config={config} style={{width: '100%', height: '100%'}}></ReactHighcharts>
             </div>
-            <span style={{color:'#333'}}>注：个人成绩排名率指自己所在学科成绩分数的名次/总人数，平均成绩排名率，指该学科平均分所在的名次/总人数。上述可表示学生各学科处于年级
-            平均分之上多少或者低于多少。蓝色表示学生学科成绩比较好，高度越高，成绩越好。红色代表学生学科成绩需注意提高，高度越高，越需要学生注意。</span>
+            <span style={{color:'#333'}}>注：个人成绩排名率指自己所在学科成绩分数的名次/总人数，平均成绩排名率，指该学科平均分所在的名次/总人数。上述可表示学生各学科处于年级平均分之上多少或者低于多少。蓝色表示学生学科成绩比较好，高度越高，成绩越好。红色代表学生学科成绩需注意提高，高度越高，越需要学生注意。</span>
         </div>
     )
 }

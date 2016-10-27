@@ -170,7 +170,7 @@ class ItemLink extends React.Component {
 
     render() {
         return (
-            <div>
+            <div style={{display:'inline-block',float:'right',paddingRight:'20px'}}>
                 <Link to={{ pathname: this.props.pathname, query: this.props.queryOptions }}
                       style={this.state.hoverLink ? localStyle.linkAnalysisBtnHover : localStyle.linkAnalysisBtn}
                       onMouseEnter={this.handleMouseEnter.bind(this)}
