@@ -296,8 +296,10 @@ class ExamList extends React.Component {
         var {examList, errorInfo, user} = this.props;
         debugger;
         var {pageIndex, pageSize} = this.state;
+        var styles = { display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 25, backgroundColor: '#fff' };
+        var studentStyle = {display: 'inline-block', width: 940,  padding: 30, margin:'25px 130px 0px', backgroundColor: '#fff' };
         return (
-            <div style={{ display: 'inline-block', width: 940, float: 'left', padding: 30, marginTop: 25, backgroundColor: '#fff' }}>
+            <div style={user.type?studentStyle:styles}>
                 {user.type ? (<h4>考试列表</h4>) : (<div className={styles['banner-img']}></div>)}
                 {
                     errorInfo && errorInfo.msg ? (
