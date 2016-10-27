@@ -14,14 +14,17 @@ var localStyle = {
     }
 };
 
-export default function NavHeader({examName, examid, grade, reportName, isZouban}) {
-    var queries = (isZouban) ? {examid: examid} : {examid: examid, grade: grade};
+export default function NavHeader({examName, examId, grade, reportName, isZouban}) {
+    var queries = (isZouban) ? {examid: examId} : {examid: examId, grade: grade};
     var pathname = (isZouban) ? '/zouban/dashboard' : '/dashboard';
     debugger;//需要测试在普通报告中点击回退到dashboard的地址栏里参数是否正确
+    console.log('queries = ', JSON.stringify(queries));
+    console.log('pathname = ', pathname);
+    console.log('isZouban = ', isZouban);
     return (
         <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}}>
             <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: colorsMap.C12 }}>
-                <Link to={{ pathname: pathname,  query: queries}} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
+                <span style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></span>
                 <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}>
                     <Link to={{ pathname: pathname,  query: queries}} style={{color: '#b4b4b4'}}>{examName}</Link>
                     <span><i className='icon-right-open-2'></i>{reportName}</span>

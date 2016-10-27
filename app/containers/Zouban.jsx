@@ -33,7 +33,7 @@ export default class Zouban extends React.Component {
                 {
                     (this.props.ifError) ? (<CommonErrorView />) : ((this.props.isLoading || !this.props.zouban.haveInit) ? (<Spinkit />) : (
                         <div>
-                            <ReportNavHeader examName={this.props.zouban.zoubanExamInfo.toJS().name} examid={examid} isZouban={true} reportName={zoubanTitleMap[this.props.params.name]}/>
+                            <ReportNavHeader examName={this.props.zouban.zoubanExamInfo.toJS().name} examId={examid} isZouban={true} reportName={zoubanTitleMap[this.props.params.name]}/>
                             {this.props.children}
                         </div>
                     ))
