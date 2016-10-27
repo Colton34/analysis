@@ -97,6 +97,7 @@ class ClassSelector extends React.Component {
             <div>
                 <Select
                     simpleValue
+                    placeholder={''}
                     clearable={false}
                     options={this.props.classes}
                     value={this.props.currentClass}

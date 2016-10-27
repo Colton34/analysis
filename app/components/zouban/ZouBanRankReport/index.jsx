@@ -41,8 +41,9 @@ class ZouBanRankReport extends React.Component {
         var zoubanExamInfo = this.props.zoubanExamInfo.toJS(), zoubanExamStudentsInfo = this.props.zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = this.props.zoubanLessonStudentsInfo.toJS();
         return (
             <div>
-                <RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />
                 {this.showEquivalentTable ? (<RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={this.zoubanSubjectStudentsInfo} isEquivalent={true} />) : ('')}
+                <RankReportContainer zoubanExamInfo={zoubanExamInfo} zoubanExamStudentsInfo={zoubanExamStudentsInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} />
+
             </div>
         );
     }
@@ -202,7 +203,7 @@ class RankReportContainer extends React.Component {
             <div style={{ width: 1200, minHeight: 600, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 ,padding:50}}>
                 <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
                 {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClasses={this.state.currentClasses} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
-                <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} clickDownloadTable={this.clickDownloadTable.bind(this)} />
+                <SearchSortDropSelector isEquivalent={this.props.isEquivalent} searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} clickDownloadTable={this.clickDownloadTable.bind(this)} />
                 <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={SortTablePlugin} handleSort={this.handleSort.bind(this)} sortInfo={sortInfo}></TableView>
                 <Paginate currentPageSize={this.state.currentPageSize} currentPageValue={this.state.currentPageValue} totalCount={totalCount} options={options} handleSelectPageSize={this.handleSelectPageSize.bind(this)} handleSelectPageValue={this.handleSelectPageValue.bind(this)} />
             </div>
@@ -363,6 +364,7 @@ class SearchSortDropSelector extends React.Component {
         return(
             <div style={{marginBottom:30,marginTop:30}}>
                 <span className={commonClass['title']} >分数排行榜详情</span>
+                {this.props.isEquivalent?<span style={{color:'red'}}>(转换后)</span>:''}
                 <div style={{float:'right'}}>
                     <SearchInput searchStr={this.props.searchStr} handleSearch={this.props.handleSearch} />
                     <Button onClick={this.props.clickDownloadTable} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
