@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 11:19:07
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-26 13:03:24
+* @Last Modified time: 2016-10-27 17:11:03
 */
 
 //TODO: 注意联考考试是否有grade属性（需要通过query传递的）
@@ -24,7 +24,7 @@ var peterFX = require('peter').getManager('fx');
 
 exports.home = function(req, res, next) {
     var userAuth = req.user.auth;
-    var getExamsPromise = (req.user.type && req.user.type == 'student') ? examUitls.getValidExamsByStudent(req.user) : examUitls.getMockValidExamsBySchoolId(req.user.schoolId, req.user.id, req.user.auth);//examUitls.getValidExamsBySchoolId(req.user.schoolId, req.user.id, req.user.auth);
+    var getExamsPromise = (req.user.type && req.user.type == 'student') ? examUitls.getValidExamsByStudent(req.user) : examUitls.getValidExamsBySchoolId(req.user.schoolId, req.user.id, req.user.auth);//;  examUitls.getMockValidExamsBySchoolId(req.user.schoolId, req.user.id, req.user.auth)
     getExamsPromise.then(function(result) {
         var validAuthExams = result.validAuthExams, errorInfo = result.errorInfo;
         try {
