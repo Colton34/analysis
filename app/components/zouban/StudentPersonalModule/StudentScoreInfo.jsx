@@ -105,10 +105,10 @@ function getInfoItem(students, currentStudent, scoreKey, rankKey) {
     var over = _.round(_.divide(targetIndex, students.length), 2);
     var mean = _.round(_.mean(_.map(students, (obj) => obj[scoreKey])), 2);
     var top = _.last(orderedStudents)[scoreKey];
-    var overOne = getOverMean(orderedStudents, 0.2, totalCount, scoreKey);
-    var overTwo = getOverMean(orderedStudents, 0.4, totalCount, scoreKey);
-    var overThree = getOverMean(orderedStudents, 0.6, totalCount, scoreKey);
-    var overFour = getOverMean(orderedStudents, 0.8, totalCount, scoreKey);
+    var overOne = getOverScore(orderedStudents, 0.2, totalCount, scoreKey);
+    var overTwo = getOverScore(orderedStudents, 0.4, totalCount, scoreKey);
+    var overThree = getOverScore(orderedStudents, 0.6, totalCount, scoreKey);
+    var overFour = getOverScore(orderedStudents, 0.8, totalCount, scoreKey);
     return {
         score: targetStudent[scoreKey],
         rank: targetStudent[rankKey],
@@ -122,10 +122,10 @@ function getInfoItem(students, currentStudent, scoreKey, rankKey) {
     }
 }
 
-function getOverMean(orderedExamStudentsInfo, percentage, totalCount, scoreKey) {
+function getOverScore(orderedExamStudentsInfo, percentage, totalCount, scoreKey) {
     var tempCount = _.ceil(_.multiply(percentage, totalCount));
     var tempStudents = _.takeRight(orderedExamStudentsInfo, tempCount);
-    return _.round(_.mean(_.map(tempStudents, (obj) => obj[scoreKey])), 2);
+    return tempStudents[0][scoreKey];
 }
 
 function getTableHeader(lessonsByStudent) {

@@ -74,17 +74,13 @@ class ZoubanDashboardContent extends React.Component {
     }
 
     goNext(pathKey, queryString) {
-        debugger;
         var targetUrl = nextPathMap[pathKey] + queryString;
-        debugger;
         browserHistory.push(targetUrl);
     }
 
     render() {
         var zoubanExamInfo = this.props.zouban.zoubanExamInfo.toJS(), zoubanExamStudentsInfo = this.props.zouban.zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = this.props.zouban.zoubanLessonStudentsInfo.toJS(), zuobanLessonQuestionInfo = this.props.zouban.zuobanLessonQuestionInfo.toJS();
-        debugger;
         var queryString = `?examid=${this.props.examid}`;
-        debugger;
 
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>

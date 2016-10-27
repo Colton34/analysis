@@ -22,7 +22,6 @@ export default function StudentSubjectCompare({zoubanLessonStudentsInfo, lessons
     );
     var categories = getCategories(lessonsByStudent);
     var studentRankRateDiff = getStudentLessonRankRateDiff(zoubanLessonStudentsInfo, lessonsByStudent, currentStudent);
-    debugger;
 
     var config={
         chart: {

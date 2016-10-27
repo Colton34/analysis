@@ -28,15 +28,12 @@ export default class StudentLessonQuestion extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        debugger;
         this.setState({
             isPicReady: false
         });
         this.lessonQuestions = nextProps.lessonsByStudent[0].questions;
-        debugger;
         var questionIds = _.map(this.lessonQuestions, (obj) => obj.qid);
         var examObjectId = nextProps.zoubanExamInfo.objectId;
-        debugger;
         var _this = this;
         fetchLessonQuestionPic({request: window.request, questionIds: questionIds, examObjectId: examObjectId}).then(function(picUrls) {
             _this.setState({
@@ -48,19 +45,15 @@ export default class StudentLessonQuestion extends React.Component {
 
     onSelectLesson(selectedLesson) {
         //TODO:切换lesson，重新获取对应的question pics
-        debugger;
         this.setState({
             isPicReady: false,
             currentLesson: selectedLesson
         });
         this.lessonQuestions = selectedLesson.questions;
-        debugger;
         var questionIds = _.map(this.lessonQuestions, (obj) => obj.qid);
         var examObjectId = this.props.zoubanExamInfo.objectId;
-        debugger;
         var _this = this;
         fetchLessonQuestionPic({request: window.request, questionIds: questionIds, examObjectId: examObjectId}).then(function(picUrls) {
-            debugger;
             _this.setState({
                 isPicReady: true,
                 currentLessonPics: picUrls
@@ -96,7 +89,6 @@ export default class StudentLessonQuestion extends React.Component {
         var currentLesson = this.state.currentLesson || this.props.lessonsByStudent[0];
         var tableBody = getTableBody(currentLesson, this.props.currentStudent, this.props.zoubanLessonStudentsInfo, this.props.zuobanLessonQuestionInfo, this.showPicDialog);
         tableBody.unshift(this.tableHeader);
-debugger
         return (
             <div className={commonClass['section']}>
                 <span className={commonClass['title-bar']}></span>
@@ -155,7 +147,6 @@ class CheckQuestionImageDialog extends React.Component {
     }
 
     render() {
-        debugger;
         return (
             <div >
                 <Modal show={ this.props.isDisplay } onHide={this.props.hideModal} dialogClassName={'ModalDialog'}>

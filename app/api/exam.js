@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-26 12:43:21
+* @Last Modified time: 2016-10-27 10:36:47
 */
 
 'use strict';
@@ -185,15 +185,9 @@ function insertClassRankInfoToLessonStudents(zoubanExamStudentsInfo, zoubanLesso
 
 export function fetchLessonQuestionPic(params) {
     var url = paperPath + '/question';
-    debugger;
     return params.request.post(url, {questionIds: params.questionIds, examObjectId: params.examObjectId}).then(function(res) {
-        debugger;
         return Promise.resolve(res.data);
     });
-    // return params.request.get(url).then(function(res) {
-    //     debugger;
-    //     return Promise.resolve(res.data);
-    // });
 }
 
 export function initReportBase(params) {

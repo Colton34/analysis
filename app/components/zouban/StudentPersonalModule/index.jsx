@@ -36,7 +36,6 @@ class StudentPersonalModule extends React.Component {
         var {zoubanExamInfo, zoubanExamStudentsInfo, zoubanLessonStudentsInfo, zuobanLessonQuestionInfo} = this.props;
         zoubanExamInfo = zoubanExamInfo.toJS(), zoubanExamStudentsInfo = zoubanExamStudentsInfo.toJS(), zoubanLessonStudentsInfo = zoubanLessonStudentsInfo.toJS(), zuobanLessonQuestionInfo = zuobanLessonQuestionInfo.toJS();
         var lessonsByStudent = getLessonsByStudent(zoubanExamInfo, zoubanExamStudentsInfo, this.state.currentStudent);
-        debugger;
         return (
             <div>
                 <SelectorGroup zoubanExamInfo={zoubanExamInfo} zoubanLessonStudentsInfo={zoubanLessonStudentsInfo} selectStudent={this.selectStudent.bind(this)} />
@@ -159,14 +158,12 @@ class SelectorGroup extends React.Component {
     }
 
     handleSelectClass(selectedClass) {
-        debugger;
         var currentClassStudents = _.map(this.props.zoubanLessonStudentsInfo[this.state.currentLesson.objectId][selectedClass], (obj) => {
             return {
                 value: obj.id,
                 label: obj.name
             }
         });
-        debugger;
         this.setState({
             currentClass: selectedClass,
             currentClassStudents: currentClassStudents,

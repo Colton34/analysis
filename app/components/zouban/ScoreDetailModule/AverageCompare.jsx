@@ -61,7 +61,7 @@ class AverageCompare extends React.Component {
         var classesName = _.keys(classesMeanInfo), classesMean = _.values(classesMeanInfo);
         var currentLessonGradeMean= this.state.currentLessonGradeMean;
         var chartWidth = classesName.length >=15? classesName.length*80:1140;
-        debugger
+
         var config={
             chart: {
                 type: 'column',
