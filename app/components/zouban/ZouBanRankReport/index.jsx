@@ -80,6 +80,7 @@ class RankReportContainer extends React.Component {
     constructor(props) {
         super(props);
         this.theDS = getRanReportDS(this.props.zoubanExamStudentsInfo, this.props.zoubanLessonStudentsInfo, this.props.isEquivalent);
+        debugger;
         var lessons = this.props.zoubanExamInfo.lessons;
         var titleOptions = this.props.isEquivalent ? getSubjectTtitles(lessons) : getLessonTitles(lessons);//[{id: , title: }]
         var titles = titleOptions.slice(1);
@@ -109,7 +110,9 @@ class RankReportContainer extends React.Component {
     }
 
     handleSelectTitle(selectedTitle) {
-        var titles = (selectedTitle.id == 'all') ? getLessonTitles(this.props.zoubanExamInfo.lessons).slice(1) : [selectedTitle];
+        var lessons = this.props.zoubanExamInfo.lessons;
+        var titleOptions = this.props.isEquivalent ? getSubjectTtitles(lessons) : getLessonTitles(lessons);
+        var titles = (selectedTitle.id == 'all') ? titleOptions.slice(1) : [selectedTitle];
         titles.unshift({id: 'totalScore', title: '总分'});
         var lessonClassesOptions = (selectedTitle.id == 'all') ? [] : _.keys(this.props.zoubanLessonStudentsInfo[selectedTitle.id]);
         // var lessonClasses = _.cloneDeep(lessonClassesOptions);
