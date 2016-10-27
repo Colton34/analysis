@@ -18,7 +18,7 @@ class QuestionDistributionDetail extends React.Component {
         this.zuobanLessonQuestionInfo = this.props.zuobanLessonQuestionInfo;
         this.classes = _.keys(this.zoubanLessonStudentsInfo[currentLesson.key]);
         this.state={
-            currentClass:lesson
+            currentClass:'lesson'
         }
     }
     componentWillReceiveProps(nextProps){
@@ -29,7 +29,7 @@ class QuestionDistributionDetail extends React.Component {
         this.zoubanLessonStudentsInfo = zoubanLessonStudentsInfo;
         this.classes = _.keys(this.zoubanLessonStudentsInfo[currentLesson.key]);
         this.state={
-            currentClass:lesson
+            currentClass:'lesson'
         }
     }
     changeClass(newClass){
@@ -66,14 +66,14 @@ class PaperClassSelector extends React.Component {
                 <span style={{ float: 'left', marginRight: 10}}>教学班:</span>
                 <span style={{float: 'left', width: 1100}}>
                     <span style={{display: 'inline-block', marginRight: 30, minWidth: 50}}>
-                        <input value='lesson' onClick={this.props.changeClass.bind(this,'lesson')} style={{ marginRight: 5, cursor: 'pointer'}} type='radio' name='classes' checked={currentClass==='lesson'}/>
+                        <input value='lesson' onChange={this.props.changeClass.bind(this,'lesson')} style={{ marginRight: 5, cursor: 'pointer'}} type='radio' name='classes' checked={currentClass==='lesson'}/>
                         <span>全部</span>
                     </span>
                     {
                         classes.map((className, index) => {
                             return (
                                 <span key={'classNames-' + index} style={{display: 'inline-block', marginRight: 30, minWidth: 50}} >
-                                    <input value={className} onClick={this.props.changeClass.bind(this,className)} style={{ marginRight: 5, cursor: 'pointer' }} type='radio' name='classes' checked={currentClass===className}/>
+                                    <input value={className} onChange={this.props.changeClass.bind(this,className)} style={{ marginRight: 5, cursor: 'pointer' }} type='radio' name='classes' checked={currentClass===className}/>
                                     <span>{className}</span>
                                 </span>
                             )
