@@ -18,7 +18,7 @@ class QuestionDistributionDetail extends React.Component {
         this.zuobanLessonQuestionInfo = this.props.zuobanLessonQuestionInfo;
         this.classes = _.keys(this.zoubanLessonStudentsInfo[currentLesson.key]);
         this.state={
-            currentClass:this.classes[0]
+            currentClass:lesson
         }
     }
     componentWillReceiveProps(nextProps){
@@ -29,7 +29,7 @@ class QuestionDistributionDetail extends React.Component {
         this.zoubanLessonStudentsInfo = zoubanLessonStudentsInfo;
         this.classes = _.keys(this.zoubanLessonStudentsInfo[currentLesson.key]);
         this.state={
-            currentClass:this.classes[0]
+            currentClass:lesson
         }
     }
     changeClass(newClass){
@@ -41,7 +41,7 @@ class QuestionDistributionDetail extends React.Component {
     render() {
         return (
             <div>
-                <PaperClassSelector currentClass={this.state.currentClass} classes={this.classes} changeClass={this.changeClass.bind(this)}/>
+                {/*<PaperClassSelector currentClass={this.state.currentClass} classes={this.classes} changeClass={this.changeClass.bind(this)}/>*/}
                 <QuestionDistribution currentClass={this.state.currentClass} currentLesson={this.currentLesson} zoubanLessonStudentsInfo={this.zoubanLessonStudentsInfo} zoubanExamInfo={this.zoubanExamInfo} zuobanLessonQuestionInfo={this.zuobanLessonQuestionInfo}/>
                 <QuestionDetail currentClass={this.state.currentClass} currentLesson={this.currentLesson} zoubanLessonStudentsInfo={this.zoubanLessonStudentsInfo} zoubanExamInfo={this.zoubanExamInfo} zuobanLessonQuestionInfo={this.zuobanLessonQuestionInfo}/>
             </div>

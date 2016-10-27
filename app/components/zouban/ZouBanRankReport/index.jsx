@@ -196,7 +196,7 @@ class RankReportContainer extends React.Component {
 
         var sortInfo = {id: this.state.currentSortKey, order: this.state.currentSortDir};
         return (
-            <div style={{ width: 1200, minHeight: 700, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 ,padding:50}}>
+            <div style={{ width: 1200, minHeight: 600, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 ,padding:50}}>
                 <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
                 {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClasses={this.state.currentClasses} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
                 <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} clickDownloadTable={this.clickDownloadTable.bind(this)} />
