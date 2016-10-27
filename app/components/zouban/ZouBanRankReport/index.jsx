@@ -134,10 +134,10 @@ class RankReportContainer extends React.Component {
     handleSelectClass(selectedClass) {
         var newClasses;
 //如果是选择全部，那么包括全部在内的所有其他class自动被选中，如果是其他班级，则判断当前班级是否在，如果在，去掉，如果不在则添加，其他class状态不变--如果之前有全部，则去掉全部
+        var ifHaveExist = _.includes(this.state.currentClasses, selectedClass);
         if(selectedClass == '全部') {
-            newClasses = _.cloneDeep(this.state.lessonClassesOptions);
+            newClasses = (ifHaveExist) ? [] : _.cloneDeep(this.state.lessonClassesOptions);
         } else {
-            var ifHaveExist = _.includes(this.state.currentClasses, selectedClass);
             newClasses = (ifHaveExist) ? _.without(this.state.currentClasses, selectedClass) : _.concat([selectedClass], this.state.currentClasses);
             newClasses = _.without(newClasses, '全部');
         }
