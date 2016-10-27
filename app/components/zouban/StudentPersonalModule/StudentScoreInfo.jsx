@@ -57,9 +57,9 @@ export default class StudentScoreInfo extends React.Component {
                 </div>
                 </div>
                 <div style={{marginBottom:20}}>
-                <TableView hover  tableData={tableBody}></TableView>
+                <TableView hover  tableData={tableBody} reserveRows={11}></TableView>
                 </div>
-                <span style={{color:'#333'}}>说明：比如全校某年级100人，处于年级20%得分的含义是处于第20名的同学，表格中显示该同学的总分及各科分数，方便学生和不同等级的同学进行对比。</span>
+                <span style={{color:'#333'}}>处于年级xx%得分说明：比如年级学生共100人，处于年级 20%得分的含义是处于总分和每个学科排名在第20名的同学分数，方便学生了解不同等级同学考试的情况。</span>
 
             </div>
         );
