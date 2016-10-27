@@ -44,7 +44,14 @@ export default function ZoubanScoreDetail({zoubanLessonStudentsInfo, zoubanExamI
         //     }
         // },
         legend: {
-            enabled: false
+            enabled: true,
+            align:'center',
+            verticalAlign:'top',
+            symbolHeight: 0,
+            symbolWidth: 0,
+
+            labelFormat:simpleLesson.name+'   '+simpleClass,
+            
         },
         series: [{
             name: '人数',
@@ -58,7 +65,7 @@ export default function ZoubanScoreDetail({zoubanLessonStudentsInfo, zoubanExamI
         <div style={{ display: 'inline-block', height: 388, padding: '0 0 0 10px', cursor: 'pointer'}}  className='col-md-6' onClick={goNext}>
             <div className='dashboard-card' style={{ width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 5, padding: '0 30px' }}>
                 <CardHeader />
-                <ReactHighcharts config={config} style={{ width: 535, height: 240, marginTop: 30}}></ReactHighcharts>
+                <ReactHighcharts config={config} style={{ width: 535, height: 330,}}></ReactHighcharts>
             </div>
         </div>
     )
