@@ -439,6 +439,7 @@ class Dialog extends React.Component {
         })
         this.levels = this.props.levels;
         this.props.onHide();
+        debugger;
     }
     render() {
         var _this = this;
@@ -448,6 +449,7 @@ class Dialog extends React.Component {
         // this.levels = this.props.levels;
         this.levLastIndex = _.size(this.levels) - 1;
 //重绘要不要 来自 props
+debugger;
         return (
              <Modal show={ this.props.show } ref="dialog"  onHide={this.onHide.bind(this)}>
                 <Header closeButton={false} style={{position: 'relative', textAlign: 'center', height: 60, lineHeight: 2, color: '#333', fontSize: 16, borderBottom: '1px solid #eee'}}>
@@ -465,7 +467,7 @@ class Dialog extends React.Component {
                         </div>
                         <div>
                             {
-                                _.map(_.range(this.state.levelNum), (index) => {
+                                _.map(_.range(_.size(this.levels)), (index) => {
                                     return (
                                         <div key={'level-' + index} style={{ marginBottom: index === this.state.levelNum - 1 ? 0 : 30, textAlign: 'left' }}>
                                             <div style={{ display: 'inline-block' }}>{numberMap[(index + 1)]}档：
