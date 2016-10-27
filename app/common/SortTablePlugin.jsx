@@ -12,7 +12,6 @@ var defaultSortOrder = 'desc';
 
 // 表格排序时的箭头样式
 const SortDirection = ({sortInfo, id}) => {
-    debugger;
     return (
         <span style={localStyle.sortDirection}>
             <div className='dropup' style={_.assign({}, { width: 8, height: '40%', cursor: 'pointer' }, sortInfo.id !== id ? { visibility: 'visible', color: '#dcdcdc' } : sortInfo.order === 'asc' ? { visibility: 'visible', color: '#333' } : { visibility: 'hidden' }) }>
@@ -44,7 +43,6 @@ class Table extends React.Component {
         var headSeq = [];
         var {tableHeaders, tableData, sortInfo, hover, headerStyle, style, bordered, options} = this.props;
         bordered = (_.isUndefined(bordered)) ? true : bordered;
-        debugger;
         return (
             <div style={_.assign({}, {position: 'relative'}, style ? style : {})}>
                 <BootTable responsive bordered={bordered} hover={hover} style={_.assign({}, {marginBottom: 0, borderCollapse:'collapse'}, bordered ? {}:{border:'none'})}>

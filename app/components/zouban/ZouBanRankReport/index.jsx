@@ -86,9 +86,9 @@ class RankReportContainer extends React.Component {
         titles.unshift({id: 'totalScore', title: '总分'});
         var currentTitle = titleOptions[0];
         var lessonClassesOptions = [];
-        var lessonClasses = [];
-        var currentClass = lessonClassesOptions[0];
-        // var columns = getColumns(titles, !!currentClass);
+        // var lessonClasses = [];
+        var currentClasses = _.cloneDeep(lessonClassesOptions);
+        // var columns = getColumns(titles, !!currentClasses);
             //[暂时没有隐藏列]
             // currentColumns: columns,
             // selectedColumns: columns,
@@ -98,8 +98,8 @@ class RankReportContainer extends React.Component {
             titles: titles,
             currentTitle: currentTitle,
             lessonClassesOptions: lessonClassesOptions,
-            lessonClasses: lessonClasses,
-            currentClass: currentClass,
+            // lessonClasses: lessonClasses,
+            currentClasses: currentClasses,
             searchStr: '',
             currentPageSize: 25,
             currentPageValue: 0,
@@ -112,24 +112,33 @@ class RankReportContainer extends React.Component {
         var titles = (selectedTitle.id == 'all') ? getLessonTitles(this.props.zoubanExamInfo.lessons).slice(1) : [selectedTitle];
         titles.unshift({id: 'totalScore', title: '总分'});
         var lessonClassesOptions = (selectedTitle.id == 'all') ? [] : _.keys(this.props.zoubanLessonStudentsInfo[selectedTitle.id]);
-        var lessonClasses = _.cloneDeep(lessonClassesOptions);
+        // var lessonClasses = _.cloneDeep(lessonClassesOptions);
         if(selectedTitle.id != 'all') lessonClassesOptions.unshift('全部');
-        var currentClass = lessonClassesOptions[0];
+        var currentClasses = _.cloneDeep(lessonClassesOptions);
         var currentSortKey = (selectedTitle.id == 'all') ? 'totalScore_score' : selectedTitle.id+'_score';
         this.setState({
             titles: titles,
             currentTitle: selectedTitle,
             lessonClassesOptions: lessonClassesOptions,
-            lessonClasses: lessonClasses,
-            currentClass: currentClass,
+            // lessonClasses: lessonClasses,
+            currentClasses: currentClasses,
             currentSortKey: currentSortKey,
             currentSortDir: 'desc'
         });
     }
 
     handleSelectClass(selectedClass) {
+        var newClasses;
+//如果是选择全部，那么包括全部在内的所有其他class自动被选中，如果是其他班级，则判断当前班级是否在，如果在，去掉，如果不在则添加，其他class状态不变--如果之前有全部，则去掉全部
+        if(selectedClass == '全部') {
+            newClasses = _.cloneDeep(this.state.lessonClassesOptions);
+        } else {
+            var ifHaveExist = _.includes(this.state.currentClasses, selectedClass);
+            newClasses = (ifHaveExist) ? _.without(this.state.currentClasses, selectedClass) : _.concat([selectedClass], this.state.currentClasses);
+            newClasses = _.without(newClasses, '全部');
+        }
         this.setState({
-            currentClass: selectedClass
+            currentClasses: newClasses
         })
     }
 
@@ -174,7 +183,7 @@ class RankReportContainer extends React.Component {
         var {tableHeader, headerKeys, subjectSubTitles} = getTableHeader(this.state.titles, showClassInfo);
 
         // var currentColumns = getColumns(this.state.titles, showClassInfo);
-        var theRowDS = getRowDS({theDS: this.theDS, currentTitle:this.state.currentTitle,  currentClass: this.state.currentClass, searchStr: this.state.searchStr, zoubanLessonStudentsInfo: this.props.zoubanLessonStudentsInfo});
+        var theRowDS = getRowDS({theDS: this.theDS, currentTitle:this.state.currentTitle,  currentClasses: this.state.currentClasses, searchStr: this.state.searchStr, zoubanLessonStudentsInfo: this.props.zoubanLessonStudentsInfo});
         var tableBody = getTableBody({rowDS: theRowDS, currentPageSize: this.state.currentPageSize, currentPageValue: this.state.currentPageValue, currentSortKey: this.state.currentSortKey, currentSortDir: this.state.currentSortDir}); //columns: currentColumns,
 
         var totalCount = _.size(theRowDS);
@@ -186,12 +195,10 @@ class RankReportContainer extends React.Component {
         this.downloadTableData = getDownTableData(theRowDS, downloadKeys);//下载全部页数的表格内容
 
         var sortInfo = {id: this.state.currentSortKey, order: this.state.currentSortDir};
-
-
         return (
             <div style={{ width: 1200, minHeight: 700, backgroundColor: '#fff', margin: '0 auto', marginTop: 5 ,padding:50}}>
                 <TitleSelector isEquivalent={this.props.isEquivalent} titleOptions={this.state.titleOptions} currentTitle={this.state.currentTitle} handleSelectTitle={this.handleSelectTitle.bind(this)} />
-                {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClass={this.state.currentClass} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
+                {(this.state.currentTitle.id != 'all') ? (<ClassSelector lessonClassesOptions={this.state.lessonClassesOptions} currentClasses={this.state.currentClasses} handleSelectClass={this.handleSelectClass.bind(this)} />) : ''}
                 <SearchSortDropSelector searchStr={this.state.searchStr} handleSearch={this.handleSearch.bind(this)} clickDownloadTable={this.clickDownloadTable.bind(this)} />
                 <TableView tableHeaders={tableHeader} tableData={tableBody} TableComponent={SortTablePlugin} handleSort={this.handleSort.bind(this)} sortInfo={sortInfo}></TableView>
                 <Paginate currentPageSize={this.state.currentPageSize} currentPageValue={this.state.currentPageValue} totalCount={totalCount} options={options} handleSelectPageSize={this.handleSelectPageSize.bind(this)} handleSelectPageValue={this.handleSelectPageValue.bind(this)} />
@@ -252,7 +259,7 @@ class TitleSelector extends React.Component {
     }
 }
 
-//lessonClasses; currentClass; handleSelectClass
+//currentClasses; handleSelectClass
 class ClassSelector extends React.Component {
     constructor(props) {
         super(props);
@@ -263,8 +270,6 @@ class ClassSelector extends React.Component {
     }
 
     render() {
-        var lessonClassesOptions = this.props.lessonClassesOptions;
-        debugger
         return(
             <div style={{heigth: 50, lineHeight: '50px',marginTop:0,padding:0,marginBottom:0}} className={commonClass['section']}>
                 <span style={{ float: 'left', marginRight: 10}}>教学班:</span>
@@ -274,7 +279,7 @@ class ClassSelector extends React.Component {
                                 _.map(this.props.lessonClassesOptions, (className, index) => {
                                     return (
                                         <span key={'classNames-' + index} style={{display: 'inline-block', marginRight: 30, minWidth: 50}} >
-                                            <input value={className} checked={this.props.currentClass == className||this.props.currentClass =='全部'} onChange={this.onSelectClass.bind(this, className)} style={{ marginRight: 5, cursor: 'pointer' }} type='checkbox' />
+                                            <input value={className} checked={_.includes(this.props.currentClasses, className)} onChange={this.onSelectClass.bind(this, className)} style={{ marginRight: 5, cursor: 'pointer' }} type='checkbox' />
                                             <span>{className}</span>
                                         </span>
                                     )
@@ -462,7 +467,6 @@ function getTableHeader(titles, showClassInfo) {
     var {subjectHeaderTitles, subjectSubTitles} = getTitleHeader(titles, showClassInfo);
     header[0] = _.concat(header[0], subjectHeaderTitles);
     header[1] = subjectSubTitles;
-    debugger
     return {
         tableHeader: header,
         headerKeys: headerKeys,
@@ -549,7 +553,7 @@ function getRanReportDS(zoubanExamStudentsInfo, zoubanLessonStudentsInfo, isEqui
 }
 
 
-function getRowDS({theDS, currentTitle, currentClass, searchStr, zoubanLessonStudentsInfo}) {
+function getRowDS({theDS, currentTitle, currentClasses, searchStr, zoubanLessonStudentsInfo}) {
     var rowDS;
     if(currentTitle.id == 'all') {
         if(searchStr == '') {
@@ -558,7 +562,7 @@ function getRowDS({theDS, currentTitle, currentClass, searchStr, zoubanLessonStu
             rowDS = getAllSubjectDataBySearch(theDS, searchStr);
         }
     } else {
-        if(currentClass == '全部') {
+        if(_.includes(currentClasses, '全部')) {
             if(searchStr == '') {
                 rowDS = getSpecificLessonData(theDS, currentTitle, zoubanLessonStudentsInfo);
             } else {
@@ -566,9 +570,9 @@ function getRowDS({theDS, currentTitle, currentClass, searchStr, zoubanLessonStu
             }
         } else {
             if(searchStr == '') {
-                rowDS = getSpecificLessonClassData(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass);
+                rowDS = getSpecificLessonClassesData(theDS, currentTitle, zoubanLessonStudentsInfo, currentClasses);
             } else {
-                rowDS = getSpecificLessonClassDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass, searchStr);
+                rowDS = getSpecificLessonClassesDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, currentClasses, searchStr);
             }
         }
     }
@@ -601,19 +605,19 @@ function getSpecificLessonDataBySearch(theDS, currentTitle, zoubanLessonStudents
     return filterCurrentLessonStudentDS;
 }
 
-function getSpecificLessonClassData(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass) {
-    var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentTitle.id][currentClass], (obj) => obj.id);
-    var currentLessonClassStudentsInfo = _.pick(theDS, currentLessonClassStudentIds);
-    insertTotalClassRankInfo(currentLessonClassStudentsInfo, currentTitle);
-    return currentLessonClassStudentsInfo;
+function getSpecificLessonClassesData(theDS, currentTitle, zoubanLessonStudentsInfo, currentClasses) {
+    var currentLessonClassesStudentIds = _.union(..._.map(_.pick(zoubanLessonStudentsInfo[currentTitle.id], currentClasses), (currentLessonClassStudents, className) => _.map(currentLessonClassStudents, (obj) => obj.id)));
+    var currentLessonClassesStudentsInfo = _.pick(theDS, currentLessonClassesStudentIds);
+    insertTotalClassRankInfo(currentLessonClassesStudentsInfo, currentTitle);
+    return currentLessonClassesStudentsInfo;
 }
 
-function getSpecificLessonClassDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, currentClass, searchStr) {
-    var currentLessonClassStudentIds = _.map(zoubanLessonStudentsInfo[currentTitle.id][currentClass], (obj) => obj.id);
-    var currentLessonClassStudentDS =  _.pick(theDS, currentLessonClassStudentIds);
-    var filterCurrentLessonClassStudentDS = _.chain(currentLessonClassStudentDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
-    insertTotalClassRankInfo(filterCurrentLessonClassStudentDS, currentTitle);
-    return filterCurrentLessonClassStudentDS;
+function getSpecificLessonClassesDataBySearch(theDS, currentTitle, zoubanLessonStudentsInfo, currentClasses, searchStr) {
+    var currentLessonClassesStudentIds = _.union(..._.map(_.pick(zoubanLessonStudentsInfo[currentTitle.id], currentClasses), (currentLessonClassStudents, className) => _.map(currentLessonClassStudents, (obj) => obj.id)));
+    var currentLessonClassesStudentDS =  _.pick(theDS, currentLessonClassesStudentIds);
+    var filterCurrentLessonClassesStudentDS = _.chain(currentLessonClassesStudentDS).values().filter((obj) => _.includes(obj.name, searchStr)).keyBy('id').value();
+    insertTotalClassRankInfo(filterCurrentLessonClassesStudentDS, currentTitle);
+    return filterCurrentLessonClassesStudentDS;
 }
 
 function insertTotalClassRankInfo(studentsInfo, currentTitle) {
@@ -631,7 +635,6 @@ function getTableBody({rowDS, currentPageSize, currentPageValue, currentSortKey=
     var notExistLessonStudents = _.filter(rowDS, (obj) => !obj[currentSortKey]);
 
     rowDS = _.concat(_.orderBy(existLessonStudents, [currentSortKey], currentSortDir), notExistLessonStudents);
-    debugger;
     var beginCount = currentPageSize * (currentPageValue);
     var endCount = beginCount + currentPageSize;
     var currentPageRowDS = rowDS.slice(beginCount, endCount);
