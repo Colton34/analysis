@@ -5,6 +5,7 @@ import {COLORS_MAP as colorsMap} from '../../../lib/constants';
 import ReactHighcharts from 'react-highcharts';
 export default function QuestionDistribution({currentClass,currentLesson,zoubanLessonStudentsInfo,zoubanExamInfo,zuobanLessonQuestionInfo}){
     var chartDS = getChartData(currentClass,currentLesson,zoubanLessonStudentsInfo,zoubanExamInfo,zuobanLessonQuestionInfo);
+    chartDS = _.filter(chartDS, (obj) => !_.isNaN(obj.x));
     var config = {
       title: {
         text: '(得分率)',

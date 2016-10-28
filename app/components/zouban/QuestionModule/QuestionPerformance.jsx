@@ -69,6 +69,7 @@ function SummaryText({currentClass}) {
 
 function PerformanceChart({currentClass,currentLesson,zoubanLessonStudentsInfo,zoubanExamInfo,zuobanLessonQuestionInfo}) {
     var chartData = getChartData(zuobanLessonQuestionInfo,currentClass,currentLesson,zoubanExamInfo);
+    chartData = _.filter(chartData, (obj) => _.isNumber(obj.distinguish) && !_.isNaN(obj.distinguish));
     var option = {
         title: {
             text: '',
