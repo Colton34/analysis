@@ -3,17 +3,12 @@ import React, { PropTypes } from 'react';
 import {Link, browserHistory} from 'react-router';
 import dashboardStyle from '../dashboard/dashboard.css';
 
-export default function KnowledgePointAnalysis() {
+const styles = {
+    linkHeader: {
+        display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer'
+    }
+};
 
-    return (
-        <div style={{display: 'inline-block', height: 317, padding: '0 10px', cursor: 'pointer'}}  className='col-lg-4'>
-            <div  style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
-                <CardHeader  />
-                <div style={{display:'tableCell',textAlign:'center',paddingTop:'110px'}}>正在开发中敬请期待！</div>
-            </div>
-        </div>
-    )
-}
 class CardHeader extends React.Component {
     constructor(props) {
         super(props);
@@ -46,13 +41,22 @@ class CardHeader extends React.Component {
     }
 }
 
+export default function KnowledgePointAnalysis() {
+
+    return (
+        <div style={{display: 'inline-block', height: 317, padding: '0 10px', cursor: 'pointer'}}  className='col-lg-4'>
+            <div  style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
+                <CardHeader  />
+                <div style={{display:'tableCell',textAlign:'center',paddingTop:'110px'}}>正在开发中敬请期待！</div>
+            </div>
+        </div>
+    )
+}
+
+
 var localStyles = {
      linkHeader: {
         display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer'
     }
 }
-const styles = {
-    linkHeader: {
-        display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer'
-    }
-};
+

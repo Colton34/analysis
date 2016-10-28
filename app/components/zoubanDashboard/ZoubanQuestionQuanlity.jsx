@@ -3,26 +3,12 @@ import React, { PropTypes } from 'react';
 import {Link, browserHistory} from 'react-router';
 import dashboardStyle from '../dashboard/dashboard.css';
 
-export default function ZoubanQuestionQuanlity({zoubanExamInfo, zuobanLessonQuestionInfo, goNext}) {
-    var simpleLesson = zoubanExamInfo.lessons[0];
-    var simpleClass = simpleLesson.classes[0];
-    var {goodQuestion,badQuestion} = getCardSummary(zuobanLessonQuestionInfo, simpleClass, simpleLesson);
-    debugger;
-    return (
-        <div style={{display: 'inline-block', height: 317, padding: '0px 10px 0px 0px', cursor: 'pointer'}}  className='col-lg-4' onClick={goNext}>
-            <div className='dashboard-card' style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
-                <CardHeader  />
-                <div>
-                    <div style={{padding:'20px 0px'}}> <span>学科：</span><span>{simpleLesson.name}</span>,<span>班级：</span><span>{simpleClass}</span></div>
-                    <div style={{padding:'10px 0px'}}><span>表现好的题目：</span></div>
-                    <div style={{padding:'10px 0px 10px 30px',color: 'rgb(105, 193, 112)'}}><span>{goodQuestion.join('  ')}</span></div>
-                    <div style={{padding:'10px 0px'}}><span>表现不足的题目：</span></div>
-                    <div style={{padding:'10px 0px 10px 30px',color:'rgb(238, 107, 82)'}}><span>{badQuestion.join('     ')}</span></div>
-                </div>
-            </div>
-        </div>
-    )
-}
+const styles = {
+    linkHeader: {
+        display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer'
+    }
+};
+
 class CardHeader extends React.Component {
     constructor(props) {
         super(props);
@@ -55,16 +41,34 @@ class CardHeader extends React.Component {
     }
 }
 
+export default function ZoubanQuestionQuanlity({zoubanExamInfo, zuobanLessonQuestionInfo, goNext}) {
+    var simpleLesson = zoubanExamInfo.lessons[0];
+    var simpleClass = simpleLesson.classes[0];
+    var {goodQuestion,badQuestion} = getCardSummary(zuobanLessonQuestionInfo, simpleClass, simpleLesson);
+    debugger;
+    return (
+        <div style={{display: 'inline-block', height: 317, padding: '0px 10px 0px 0px', cursor: 'pointer'}}  className='col-lg-4' onClick={goNext}>
+            <div className='dashboard-card' style={{width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 2, padding: '0 30px'}}>
+                <CardHeader  />
+                <div>
+                    <div style={{padding:'20px 0px'}}> <span>学科：</span><span>{simpleLesson.name}</span>,<span>班级：</span><span>{simpleClass}</span></div>
+                    <div style={{padding:'10px 0px'}}><span>表现好的题目：</span></div>
+                    <div style={{padding:'10px 0px 10px 30px',color: 'rgb(105, 193, 112)'}}><span>{goodQuestion.join('  ')}</span></div>
+                    <div style={{padding:'10px 0px'}}><span>表现不足的题目：</span></div>
+                    <div style={{padding:'10px 0px 10px 30px',color:'rgb(238, 107, 82)'}}><span>{badQuestion.join('     ')}</span></div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+
 var localStyles = {
      linkHeader: {
         display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer'
     }
 }
-const styles = {
-    linkHeader: {
-        display: 'block', height: 58, lineHeight: '58px', borderBottom: '1px solid #f2f2f2', cursor: 'pointer'
-    }
-};
+
 function getCardSummary(zuobanLessonQuestionInfo, simpleClass, simpleLesson){
     var simpleQuestions = simpleLesson.questions;
     var questionsPerformArry = _.map(zuobanLessonQuestionInfo[simpleLesson.objectId],function(question,index){
