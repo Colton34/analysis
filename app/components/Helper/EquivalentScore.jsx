@@ -24,7 +24,7 @@ function HelperBoxNav({title}) {
     return (
         <div style={{display:'tableCell',textAlign:'center', width: 1200,margin: '0 auto', marginTop: 20, backgroundColor: '#fff', zIndex: 0,padding:'20px 0px',borderBottom:'1px solid #eee'}} className='animated fadeIn'>
             {/*<Link to={{pathname: '/dashboard'}} style={{color:'#333'}}>返回</Link>*/}
-            <span style={{color:'#000',fontSize:'18px'}}>分数转换</span>
+            <span style={{color:'#000',fontSize:'18px'}}>分数转换</span><span style={{color:'#ee6b52',fontSize:'14px',marginLeft:'5px'}}>（仅走班考试使用）</span>
         </div>
     )
 }
