@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-10-13 21:12:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-17 11:48:31
+* @Last Modified time: 2016-10-28 18:58:04
 */
 
 'use strict';
@@ -20,7 +20,7 @@ export default function reducer(state, action) {
 
     switch(action.type) {
         case FETCH_EQUIVALENT_SCORE_INFO_LIST_SUCCESS:
-            return state.set('equivalentScoreInfoList', List(action.res));
+            return state.set('equivalentScoreInfoList', List(action.res)).set('haveInit', true);
     }
     return state;
 }

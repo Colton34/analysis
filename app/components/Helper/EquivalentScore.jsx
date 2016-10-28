@@ -62,7 +62,7 @@ class EquivalentScore extends React.Component {
         return (
             <div style={{ width: 1200, margin: '0 auto', backgroundColor: '#fff', zIndex: 0}} className='animated fadeIn'>
                 <HelperBoxNav />
-                {this.props.ifError ? (<CommonErrorView />) : ((this.props.isLoading || this.props.equivalentScoreInfoList.size == 0) ? <Spinkit /> : <ContentModule equivalentScoreInfoList={this.props.equivalentScoreInfoList} />)}
+                {this.props.ifError ? (<CommonErrorView />) : ((this.props.isLoading || !this.props.haveInit) ? <Spinkit /> : <ContentModule equivalentScoreInfoList={this.props.equivalentScoreInfoList} />)}
             </div>
         );
     }
@@ -73,6 +73,7 @@ export default  connect(mapStateToProps, mapDispatchToProps)(EquivalentScore);
 class ContentModule extends React.Component {
     constructor(props) {
         super(props);
+        debugger;
         this.state = {
             currentEquivalentScoreInfo: this.props.equivalentScoreInfoList.toJS()[0]
         }
@@ -89,8 +90,8 @@ class ContentModule extends React.Component {
     }
 
     render() {
-
-        if(!this.state.currentEquivalentScoreInfo) return (<div>没有考试内容</div>)
+        debugger;
+        if(!this.state.currentEquivalentScoreInfo) return (<div>没有走班考试内容</div>)
         // debugger;
         return (
             <div style={{width:600,margin:'0 auto',padding:'50px 0'}}>
@@ -269,6 +270,7 @@ function mapStateToProps(state) {
     return {
         ifError: state.global.ifError,
         isLoading: state.global.isLoading,
+        haveInit: state.helper.haveInit,
         equivalentScoreInfoList: state.helper.equivalentScoreInfoList
     }
 }
