@@ -124,7 +124,7 @@ function getTableData(currentClass,currentLesson,zoubanLessonStudentsInfo,zouban
         rowData.push(question[currentClass].mean);
         rowData.push(_.round(_.multiply(question[currentClass].rate,100),2)+'%');
         rowData.push(question[currentClass].rate);
-        rowData.push(question.lesson.separations);
+        rowData.push(isNaN(question.lesson.separations)?'---':question.lesson.separations);
         rowData.push(<CheckQuestionImageLink index={index} showPicDialog={showPicDialog} />);
         tableData.push(rowData);
     });
