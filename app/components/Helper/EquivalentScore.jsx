@@ -91,7 +91,7 @@ class ContentModule extends React.Component {
 
     render() {
         debugger;
-        if(!this.state.currentEquivalentScoreInfo) return (<div>没有走班考试内容</div>)
+        if(!this.state.currentEquivalentScoreInfo) return (<div style={{padding:'100px 0px',display:'tableCell',textAlign:'center',fontSize:'18px'}}>没有走班考试内容</div>)
         // debugger;
         return (
             <div style={{width:600,margin:'0 auto',padding:'50px 0'}}>
