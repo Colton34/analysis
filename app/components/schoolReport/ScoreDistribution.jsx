@@ -141,6 +141,7 @@ class Dialog extends React.Component {
     constructor(props) {
         super(props);
         this.levels = props.levels;
+        debugger;
         // this.isValid = true; //TODO: 修改成数组标记的形式？当修改分档个数的时候 isValid 的个数也要对应修改
         this.state = {
             levelNum: _.size(props.levels),
@@ -431,13 +432,14 @@ class Dialog extends React.Component {
         debugger;
     }
     onHide() {
+        this.levels = this.props.levels;
         this.setState({
+            levelNum: _.size(this.levels),
             levelNumWrong: false,
             levelNumMsg: '',
             hasError: false,
             errorMsg: ''
-        })
-        this.levels = this.props.levels;
+        });
         this.props.onHide();
         debugger;
     }

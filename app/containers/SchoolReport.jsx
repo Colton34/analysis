@@ -23,7 +23,7 @@ import SubjectPerformance from '../components/schoolReport/SubjectPerformance';
 import GroupAnalysis from '../components/schoolReport/GroupAnalysis';
 import StudentPerformance from '../components/schoolReport/StudentPerformance/StudentPerformance';;
 
-import {initReportDSAction, changeLevelAction, updateLevelBuffersAction, saveBaselineAction} from '../reducers/reportDS/actions';
+import {initReportDSAction, changeLevelAction, updateLevelBuffersAction, saveBaselineAction, disableHaveInitAction} from '../reducers/reportDS/actions';
 import {initParams} from '../lib/util';
 import {SUBJECTS_WEIGHT as subjectWeight, COLORS_MAP as colorsMap, BACKGROUND_COLOR} from '../lib/constants';
 import Spinkit from '../common/Spinkit';
@@ -39,7 +39,7 @@ class NavHeader extends React.Component {
         var examInfo = this.props.examInfo.toJS();
         return (
             <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: colorsMap.C12 }}>
-                <Link to={{ pathname: '/dashboard',  query: queries}} style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
+                <span style={localStyle.titleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></span>
                 <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}>
                     <Link to={{ pathname: '/dashboard',  query: queries}} style={{color: '#b4b4b4'}}>{examInfo.name}</Link>
                     <span><i className='icon-right-open-2'></i>校级分析报告</span>
@@ -55,16 +55,35 @@ class SchoolReport extends React.Component {
         initReportDSAction
     ];
 
+    // componentWillMount() {
+    //   console.log(this.props.reportDS.haveInit);
+    //   debugger;
+    // }
+
     componentDidMount() {
+        debugger;
         if(this.props.reportDS.haveInit) return;
         var params = initParams({ 'request': window.request }, this.props.params, this.props.location);
         this.props.initReportDS(params);
+        debugger;
     }
+
+//Hack -- 原则上应该是willUnmount的时候对应状态树会被销毁--从而haveInit会被重置为false，但是并没有，所以在Unmount的时候重置haveInit为false。有点像之前为了解决rerender而设置的forceUpdate---为什么没有触发change？是因为生命周期还是有些没有get到？
+    // componentWillUnmount() {
+    //     // console.log('componentWillUnmount ===================   SchoolReport');
+    //     // this.props.reportDS.set('haveInit', false);
+    //     this.props.disableHaveInit();
+    //     // console.log(this.props.reportDS.haveInit);
+    //     debugger;
+    // }
+
+
 
     render() {
         var examid = this.props.location.query ? this.props.location.query.examid : '';
         if(!examid) return (<CommonErrorView />);
         var grade = this.props.location.query ? this.props.location.query.grade : '';
+        debugger;
         //TOOD:Header那里为什么传入params和location？？？重构
         return (
             <div>
@@ -99,7 +118,8 @@ function mapDispatchToProps(dispatch) {
         initReportDS: bindActionCreators(initReportDSAction, dispatch),
         changeLevels: bindActionCreators(changeLevelAction, dispatch),
         updateLevelBuffers: bindActionCreators(updateLevelBuffersAction, dispatch),
-        saveBaseline: bindActionCreators(saveBaselineAction, dispatch)
+        saveBaseline: bindActionCreators(saveBaselineAction, dispatch),
+        disableHaveInit: bindActionCreators(disableHaveInitAction, dispatch)
     }
 }
 
@@ -107,8 +127,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(SchoolReport);
 
 var localStyle = {
     titleName: {
-        textDecoration: 'none', display: 'inline-block', width: 10, height: 10,
-        ':hover': { textDecoration: 'none', color: '#333' }
+        textDecoration: 'none', display: 'inline-block', width: 10, height: 10
     }
 }
 /*

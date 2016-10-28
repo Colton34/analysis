@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-13 11:44:18
+* @Last Modified time: 2016-10-28 10:08:22
 */
 
 'use strict';
@@ -198,15 +198,18 @@ exports.exportExamStudent = function(req, res, next) {
         var specification = {
             'kaohao': {
                 displayName: '考号',
-                headerStyle: headerDark
+                headerStyle: headerDark,
+                width: 120
             },
             'name': {
                 displayName: '姓名',
-                headerStyle: headerDark
+                headerStyle: headerDark,
+                width: 120
             },
             'class' :{
                 displayName: '班级',
-                headerStyle: headerDark
+                headerStyle: headerDark,
+                width: 120
             }
         };
 

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-08-02 16:38:05
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-08-27 15:11:43
+* @Last Modified time: 2016-10-28 09:12:35
 */
 
 'use strict';
@@ -13,7 +13,8 @@ import {
     CHANGE_LEVEL,
     CHANGE_LEVEL_BUFFERS,
     SAVE_BASELINE,
-    CHANGE_EXAMS
+    CHANGE_EXAMS,
+    DISABLE_HAVE_INIT
 } from '../../lib/constants';
 
 export function initReportDSAction(params) {
@@ -41,5 +42,11 @@ export function saveBaselineAction(params) {
     return {
         type: SAVE_BASELINE,
         promise: saveBaseline(params)
+    }
+}
+
+export function disableHaveInitAction() {
+    return {
+        type: DISABLE_HAVE_INIT
     }
 }

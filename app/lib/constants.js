@@ -14,6 +14,8 @@ export const INIT_REPORT_DS = 'INIT_REPORT_DS';
 export const INIT_REPORT_DS_REQUEST = 'INIT_REPORT_DS_REQUEST';
 export const INIT_REPORT_DS_SUCCESS = 'INIT_REPORT_DS_SUCCESS';
 export const INIT_REPORT_DS_FAILURE = 'INIT_REPORT_DS_FAILURE';
+
+export const DISABLE_HAVE_INIT = 'DISABLE_HAVE_INIT';
 //================= New Save ==============================
 export const SAVE_BASELINE = 'SAVE_BASELINE';
 

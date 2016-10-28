@@ -119,6 +119,7 @@ class Dashboard extends React.Component {
                  </div>
             );
         var user = this.props.user.toJS();
+        debugger;
         return (
             <div style={{width: 1200, margin: '0 auto'}} className='container'>
                 {
@@ -127,7 +128,7 @@ class Dashboard extends React.Component {
                     ) : (
                             <div>
                                 <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px -15px', fontSize: 16, color: '#333' }}>
-                                    <Link to={{ pathname: '/' }} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
+                                    <span style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></span>
                                     <span style={{ fontSize: 14, color: '#333', marginLeft: 20 }}><a style={{ color: '#b4b4b4' }} href='/'>{'首页'}<i className='icon-right-open-2'></i></a> {examInfoGuide.name}</span>
                                     {
                                         FROM_FLAG[this.props.dashboard.examInfoGuide['from']] === FROM_CUSTOM_TEXT ?
@@ -201,8 +202,7 @@ var styles = {
         }
     },
     dashboardTitleName: {
-        textDecoration: 'none',display: 'inline-block', width: 10, height: 10,
-        ':hover': {textDecoration: 'none', color: '#333'}
+        textDecoration: 'none',display: 'inline-block', width: 10, height: 10
     },
     aBtn: {
         textDecoration: 'none', float: 'right', fontSize: 12, color: '#ee6b52',
