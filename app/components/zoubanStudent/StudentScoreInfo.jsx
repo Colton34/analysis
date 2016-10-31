@@ -61,9 +61,10 @@ export default class StudentScoreInfo extends React.Component {
 //     return _.
 // }
 
+//【hot fix】应要求去掉学生年级排名信息
 function getTableRowKeys() {
     return [
-        {id: 'score', value: '本人成绩'}, {id: 'rank', value: '年级排名'}, {id: 'over', value: '超过年级'}, {id: 'mean', value: '年级平均分'}, {id: 'top', value: '年级最高分'}, {id: 'over20%', value: '处于年级20%得分'},
+        {id: 'score', value: '本人成绩'}, {id: 'over', value: '超过年级'}, {id: 'mean', value: '年级平均分'}, {id: 'top', value: '年级最高分'}, {id: 'over20%', value: '处于年级20%得分'},
         {id: 'over40%', value: '处于年级40%得分'}, {id: 'over60%', value: '处于年级60%得分'}, {id: 'over80%', value: '处于年级80%得分'}
     ]
 }
