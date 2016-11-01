@@ -2,12 +2,12 @@
 * @Author: liucong
 * @Date:   2016-03-31 11:23:27
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-01 08:22:10
+* @Last Modified time: 2016-11-01 15:31:33
 */
 
 'use strict';
 
-var production = {
+var development = {
     "analysisServer"    : "http://fx-engine.yunxiao.com", //http://fx-engine.yunxiao.com   http://ct.yunxiao.com:8158
     'fxdb': 'mongodb://fx2:123456@ct.yunxiao.com:19000/fx2',
     "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://fx:fx123456@server4.yunxiao.com:8300/hfs-test',  //mongodb://localhost:27017/hfs-test
@@ -36,7 +36,13 @@ var test = {
     "hfsServer": "http://hfs-be.yunxiao.com"
 };
 
-var development = {
+/*
+    mongodb://read:%3A_3IJon%3Cbb08@server4-ks.yunxiao.com:8300/analy4  -- server4 for production
+    mongodb://hfs:%7B%404LAmx%25cd27@server6.yunxiao.com:8300/analy4  -- server6 for local
+    fxdb去掉"-ks"  for local
+ */
+
+var production = {
     "analysisServer"    : "http://fx-engine.yunxiao.com",
     'fxdb': 'mongodb://hfsfenxi:%5D%237UXrz%5Bjq98@server4-ks.yunxiao.com:8300/hfsfenxi',
     "hfsdb": process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://read:%3A_3IJon%3Cbb08@server4-ks.yunxiao.com:8300/analy4',  //mongodb://localhost:27017/hfs-test

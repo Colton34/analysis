@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-01 09:46:43
+* @Last Modified time: 2016-11-01 14:29:48
 */
 'use strict';
 var _ = require('lodash');
@@ -445,16 +445,16 @@ exports.getEquivalentScoreInfoById = function(examid) {
     }).then(function(examInstance) {
         if(temp.equivalentScoreInfo) {
             //检测是不是需要sync
-            console.log('已存在');
+            // console.log('已存在');
             if(checkIfNeedSync(temp.equivalentScoreInfo, examInstance)) {
-                console.log('需要同步');
-                return syncEquivalentScoreInfo(equivalentScoreInfo, examInstance);
+                // console.log('需要同步');
+                return syncEquivalentScoreInfo(temp.equivalentScoreInfo, examInstance);
             } else {
-                console.log('不需要同步');
+                // console.log('不需要同步');
                 return when.resolve(temp.equivalentScoreInfo);
             }
         } else {
-            console.log('获取默认的');
+            // console.log('获取默认的');
             return getDefaultEquivalentScoreInfo(examInstance, examid);
         }
     })
