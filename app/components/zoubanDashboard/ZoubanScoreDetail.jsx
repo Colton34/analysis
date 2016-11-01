@@ -44,7 +44,9 @@ class CardHeader extends React.Component {
 }
 
 export default function ZoubanScoreDetail({zoubanLessonStudentsInfo, zoubanExamInfo, goNext}) {
+    debugger;
     var simpleLesson = zoubanExamInfo.lessons[0];
+    debugger;
     var currentLessonStudentsInfo = zoubanLessonStudentsInfo[simpleLesson.objectId];
     var segments = makeSegments(simpleLesson.fullMark, 0, 10);
     var segmentsString = makeSegmentsString(segments);

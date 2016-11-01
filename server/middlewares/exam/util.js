@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-26 10:06:50
+* @Last Modified time: 2016-11-01 09:46:43
 */
 'use strict';
 var _ = require('lodash');
@@ -430,15 +430,9 @@ function generateExamClassesInfo(examStudentsInfo) {
     equivalentScore: Integer
 }
  */
-
-// exports.getEquivalentScoreInfoById = function(examid) {
-//     return fetchEquivalentScoreInfoById(examid).then(function(equivalentScoreInfo) {
-//         return (!equivalentScoreInfo) ? getDefaultEquivalentScoreInfo(examid) : when.resolve(equivalentScoreInfo);
-//     })
-// }
-
 exports.getEquivalentScoreInfoById = function(examid) {
     //1.去query，找到返回  找不到 获取default，然后save，然后返回带有objectId的实例数据结构
+    var temp = {};
     return when.promise(function(resolve, reject) {
         peterFX.query('@EquivalentScoreInfo', {examId: examid}, function(err, results) {
             if(err) return reject(new errors.data.MongoDBError('fetchEquivalentScoreInfoById Error', err));
@@ -446,25 +440,63 @@ exports.getEquivalentScoreInfoById = function(examid) {
             resolve(results[0]);
         });
     }).then(function(equivalentScoreInfo) {
-        if(equivalentScoreInfo) return when.resolve(equivalentScoreInfo);
-        return getDefaultEquivalentScoreInfo(examid);
+        temp.equivalentScoreInfo = equivalentScoreInfo;
+        return getExamById(examid);
+    }).then(function(examInstance) {
+        if(temp.equivalentScoreInfo) {
+            //检测是不是需要sync
+            console.log('已存在');
+            if(checkIfNeedSync(temp.equivalentScoreInfo, examInstance)) {
+                console.log('需要同步');
+                return syncEquivalentScoreInfo(equivalentScoreInfo, examInstance);
+            } else {
+                console.log('不需要同步');
+                return when.resolve(temp.equivalentScoreInfo);
+            }
+        } else {
+            console.log('获取默认的');
+            return getDefaultEquivalentScoreInfo(examInstance, examid);
+        }
+    })
+}
+
+function checkIfNeedSync(equivalentScoreInfo, examInstance) {
+    //length是否一样，里面的paperObjectId是不是一样？
+    var targetLessons = equivalentScoreInfo['[lessons]'], targetPapers = examInstance['[papers]'];
+    var needSync = targetLessons.length != targetPapers.length;
+    if(needSync) return needSync;
+    return _.difference(_.map(targetPapers, (paperObj) => paperObj.paper), _.map(targetLessons, (lessonObj) => lessonObj.objectId)).length > 0;
+}
+
+function syncEquivalentScoreInfo(equivalentScoreInfo, examInstance) {
+    //以exam['[papers]']为准！sync newLessons
+    var targetLessons = equivalentScoreInfo['[lessons]'], targetLessonEquivalentObj;
+    var newLessons = _.map(examInstance['[papers]'], (paperItem) => {
+        targetLessonEquivalentObj = _.find(targetLessons, (lessonObj) => lessonObj.objectId == paperItem.paper);
+        if(targetLessonEquivalentObj) return targetLessonEquivalentObj;
+        return {id: paperItem.id, objectId: paperItem.paper, name: paperItem.name, subject: paperItem.subject, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
+    });
+    equivalentScoreInfo['[lessons]'] = newLessons;
+    return when.promise(function(resolve, reject) {
+        peterFX.set(equivalentScoreInfo._id, {'[lessons]': newLessons}, function(err, result) {
+            if(err) return reject(new errors.data.MongoDBError('setEquivalentScoreInfo Error: ', err));
+            resolve(equivalentScoreInfo);
+        });
     });
 }
 
-function getDefaultEquivalentScoreInfo(examid) {
-    return getExamById(examid, '25').then(function(examInstance) {
-                //TODO: 需要过滤grade？？？
-        var lessons = _.map(examInstance['[papers]'], (paperItem) => {
-            // if(_.includes(paperItem.name, '文科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(文科)`, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
-            // if(_.includes(paperItem.name, '理科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(理科)`, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
-            return {id: paperItem.id, objectId: paperItem.paper, name: paperItem.name, subject: paperItem.subject, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
-        });
-        return saveEquivalentScoreInfo({
-            examId: examid,
-            examObjectId: examInstance._id,
-            examName: examInstance.name,
-            '[lessons]': lessons
-        });
+function getDefaultEquivalentScoreInfo(examInstance, examid) {
+            //TODO: 需要过滤grade？？？
+    var lessons = _.map(examInstance['[papers]'], (paperItem) => {
+        // if(_.includes(paperItem.name, '文科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(文科)`, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
+        // if(_.includes(paperItem.name, '理科')) return {id: paperItem.id, objectId: paperItem.paper, name: `${paperItem.subject}(理科)`, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
+        return {id: paperItem.id, objectId: paperItem.paper, name: paperItem.name, subject: paperItem.subject, fullMark: paperItem.manfen, percentage: 1, equivalentScore: paperItem.manfen};
+    });
+    return saveEquivalentScoreInfo({
+        examId: examid,
+        examObjectId: examInstance._id,
+        examName: examInstance.name,
+        '[lessons]': lessons
     });
 }
 

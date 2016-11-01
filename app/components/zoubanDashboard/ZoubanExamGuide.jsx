@@ -3,7 +3,6 @@ import React, { PropTypes } from 'react';
 
 export default function ZoubanExamGuide({zoubanExamInfo, zoubanExamStudentsInfo}) {
     var {lessonCount, classesCount, studentsCount} = getInfo(zoubanExamInfo, zoubanExamStudentsInfo);
-    debugger;//好像有问题：班级个数比学生人数还要多
     return (
         <div className='row'>
             <div style={{ width: '100%', height: 87, lineHeight: '87px', backgroundColor: '#fff', borderRadius: 2, display: 'table-cell', verticalAlign: 'middle'}}>

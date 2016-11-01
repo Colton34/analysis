@@ -4,7 +4,6 @@ import {Link} from 'react-router';
 
 export default function ZoubanNavHeader({zoubanExamInfo}) {
     var examName = zoubanExamInfo.name;
-    debugger;
     return (
         <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px -15px', fontSize: 16, color: '#333' }}>
             <Link to={{ pathname: '/' }} style={styles.dashboardTitleName}><i className='icon-fanhui2' style={{ color: '#59bde5' }}></i></Link>
