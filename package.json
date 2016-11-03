@@ -82,6 +82,7 @@
     "eslint": "2.7.0",
     "eslint-config-airbnb": "6.2.0",
     "eslint-plugin-react": "4.3.0",
+    "excel-export": "0.5.1",
     "express": "4.13.4",
     "express-flash": "0.0.2",
     "express-jwt": "3.3.0",

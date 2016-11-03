@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-26 12:24:57
+* @Last Modified time: 2016-11-03 09:50:17
 */
 
 'use strict';
@@ -59,6 +59,7 @@ export function downloadData(validColumnKeys, validColumnNames, validStudentInfo
 }
 
 export function downloadTable(headSeq, headSelect, headerMapper, renderRows, exportTableName) {
+    debugger;
     var validColumnKeys = [], validColumnNames = [];
     _.each(headSeq, (headKey) => {
         if(headSelect[headKey]) {
@@ -73,6 +74,7 @@ export function downloadTable(headSeq, headSelect, headerMapper, renderRows, exp
     var validStudentInfoMatrix = _.map(renderRows, (studentRowObj) => {
         return _.map(validColumnKeys, (key) => studentRowObj[key]);
     });
+    debugger;
     downloadData(validColumnKeys, validColumnNames, validStudentInfoMatrix, exportTableName);
 }
 
