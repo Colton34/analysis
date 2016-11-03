@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-03 10:43:33
+* @Last Modified time: 2016-11-03 15:22:27
 */
 
 'use strict';
@@ -49,12 +49,14 @@ export function saveAs(uri) {
 }
 
 export function downloadData(validColumnKeys, validColumnNames, validStudentInfoMatrix, exportTableName) {
-    var url = '/api/v1/file/export/rank/report';
-    var inputKeys = "<input type='hidden' name='" + 'keys' + "' value='" + JSON.stringify(validColumnKeys) + "' />";
-    var inputNames = "<input type='hidden' name='" + 'names' + "' value='" + JSON.stringify(validColumnNames) + "' />";
-    var inputMatrix = "<input type='hidden' name='" + 'matrix' + "' value='" + JSON.stringify(validStudentInfoMatrix) + "' />";
-    var tableName = exportTableName ? "<input type='hidden' name='" + 'exportTableName' + "' value='" + exportTableName + "' />" : '';
-    $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + tableName + '</form>')
+    debugger;
+    // var url = '/api/v1/file/export/rank/report';
+    var url = '/api/v1/file/new/export/rank/report';
+    // var inputKeys = "<input type='hidden' name='" + 'keys' + "' value='" + JSON.stringify(validColumnKeys) + "' />";
+    var cols = "<input type='hidden' name='" + 'cols' + "' value='" + JSON.stringify(validColumnNames) + "' />";
+    var rows = "<input type='hidden' name='" + 'rows' + "' value='" + JSON.stringify(validStudentInfoMatrix) + "' />";
+    var filename = exportTableName ? "<input type='hidden' name='" + 'filename' + "' value='" + exportTableName + "' />" : '';
+    $('<form action="' + url + '" method="' + ('post') + '">' + cols + rows + filename + '</form>')
         .appendTo('body').submit().remove();
 }
 

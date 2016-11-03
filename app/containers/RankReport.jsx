@@ -496,8 +496,8 @@ class RankReportTableView extends React.Component {
     }
 
     clickDownloadTable(theRowDatas) {
-        newDownloadData();
-        // downloadTable(this.state.headSeq, this.state.headSelect, headerMapper, theRowDatas);
+        // newDownloadData();
+        downloadTable(this.state.headSeq, this.state.headSelect, headerMapper, theRowDatas, '排行榜');
     }
 
     render() {
@@ -571,7 +571,6 @@ class RankReportTableView extends React.Component {
                         </ul>
                         </DropdownButton>
                         <Button onClick={this.clickDownloadTable.bind(this, this.state.showData)} style={{ margin: '0 2px', backgroundColor: '#2eabeb', color: '#fff', border: 0}}>下载表格</Button>
-                        <a href="http://localhost:3000/api/v1/file/new/export/rank/report">下载表格</a>
                     </div>
                 </div>
 

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-03 10:44:34
+* @Last Modified time: 2016-11-03 15:26:11
 */
 
 'use strict';
@@ -232,53 +232,92 @@ exports.exportExamStudent = function(req, res, next) {
     }
 }
 
+    // // conf.stylesXmlFile = "styles.xml";
+    // conf.cols = [{
+    //     caption:'string',
+    //     type:'string',
+    //     beforeCellWrite:function(row, cellData){
+    //          return cellData.toUpperCase();
+    //     },
+    //     width:28.7109375
+    // },{
+    //     caption:'date',
+    //     type:'date',
+    //     beforeCellWrite:function(){
+    //         var originDate = new Date(Date.UTC(1899,11,30));
+    //         return function(row, cellData, eOpt){
+    //             if (eOpt.rowNum%2){
+    //                 eOpt.styleIndex = 1;
+    //             }
+    //             else{
+    //                 eOpt.styleIndex = 2;
+    //             }
+    //             if (cellData === null){
+    //               eOpt.cellType = 'string';
+    //               return 'N/A';
+    //             } else
+    //               return (cellData - originDate) / (24 * 60 * 60 * 1000);
+    //         }
+    //     }()
+    // },{
+    //     caption:'bool',
+    //     type:'bool'
+    // },{
+    //     caption:'number',
+    //      type:'number'
+    // }];
+    // conf.rows = [
+    //     ['pi', new Date(Date.UTC(2013, 4, 1)), true, 3.14],
+    //     ["e", new Date(2012, 4, 1), false, 2.7182],
+    //     ["M&M<>'", new Date(Date.UTC(2013, 6, 9)), false, 1.61803],
+    //     ["null date", null, true, 1.414]
+    // ];
+
 exports.newExportRankReport = function (req, res, next) {
-    var conf ={};
-    // conf.stylesXmlFile = "styles.xml";
-    conf.name = "mysheet";
-    conf.cols = [{
-        caption:'string',
-        type:'string',
-        beforeCellWrite:function(row, cellData){
-             return cellData.toUpperCase();
-        },
-        width:28.7109375
-    },{
-        caption:'date',
-        type:'date',
-        beforeCellWrite:function(){
-            var originDate = new Date(Date.UTC(1899,11,30));
-            return function(row, cellData, eOpt){
-                if (eOpt.rowNum%2){
-                    eOpt.styleIndex = 1;
-                }
-                else{
-                    eOpt.styleIndex = 2;
-                }
-                if (cellData === null){
-                  eOpt.cellType = 'string';
-                  return 'N/A';
-                } else
-                  return (cellData - originDate) / (24 * 60 * 60 * 1000);
-            }
-        }()
-    },{
-        caption:'bool',
-        type:'bool'
-    },{
-        caption:'number',
-         type:'number'
-    }];
-    conf.rows = [
-        ['pi', new Date(Date.UTC(2013, 4, 1)), true, 3.14],
-        ["e", new Date(2012, 4, 1), false, 2.7182],
-        ["M&M<>'", new Date(Date.UTC(2013, 6, 9)), false, 1.61803],
-        ["null date", null, true, 1.414]
-    ];
-    var result = nodeExcel.execute(conf);
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats');
-    res.setHeader("Content-Disposition", "attachment; filename=" + "Report.xlsx");
-    res.end(result, 'binary');
+    req.checkBody('cols', '无效的cols').notEmpty();
+    req.checkBody('rows', '无效的rows').notEmpty();
+    if(req.validationErrors()) return next(req.validationErrors());
+
+    try {
+        var cols = JSON.parse(req.body.cols);
+        var rows = JSON.parse(req.body.rows);
+        var userAgent = (req.headers['user-agent']||'').toLowerCase();
+
+        var conf ={};
+        conf.name = '啦啦';
+        conf.cols = getFormatCols(cols, rows[0]);
+        conf.rows = rows;
+
+        var result = nodeExcel.execute(conf);
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats');
+        var filename = req.body.filename || '下载';
+
+        if(userAgent.indexOf('msie') >= 0 || userAgent.indexOf('chrome') >= 0) {
+            res.setHeader('Content-Disposition', 'attachment; filename=' + encodeURIComponent(filename)+'.xlsx');
+        } else if(userAgent.indexOf('firefox') >= 0) {
+            res.setHeader('Content-Disposition', 'attachment; filename*="utf8\'\'' + encodeURIComponent(filename)+'"'+'.xlsx');
+        } else {
+            res.setHeader('Content-Disposition', 'attachment; filename=' + new Buffer(filename).toString('binary')+'.xlsx');
+        }
+
+
+        // res.setHeader("Content-Disposition", "attachment; filename=" + 'hello' + ".xlsx");
+        res.end(result, 'binary');
+    } catch(e) {
+        next(new errors.Error('生成表格下载文件错误', e));
+    }
+}
+
+function getFormatCols(cols, rowData) {
+    var type, data;
+    return _.map(cols, (colName, index) => {
+        data = rowData[index];
+        type = (_.isString(data) ? 'string' : (_.isNumber(data) ? 'number' : 'string'));
+        return {
+            caption: colName,
+            type: type
+        }
+    });
 }
 
 /**
