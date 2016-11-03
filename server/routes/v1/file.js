@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:25:26
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-07-13 10:32:55
+* @Last Modified time: 2016-11-03 10:20:02
 */
 
 'use strict';
@@ -33,5 +33,6 @@ router.post('/import/exam/data', upload.single('importData'), dfile.importExamDa
 router.post('/import/exam/student', upload.single('importStudent'), dfile.importExamStudent);
 router.post('/export/exam/student', dfile.exportExamStudent);
 router.post('/export/rank/report', dfile.exportRankReport);
+router.get('/new/export/rank/report', dfile.newExportRankReport);
 
 module.exports = router;

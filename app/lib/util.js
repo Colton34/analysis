@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-03 09:50:17
+* @Last Modified time: 2016-11-03 10:43:33
 */
 
 'use strict';
@@ -56,6 +56,10 @@ export function downloadData(validColumnKeys, validColumnNames, validStudentInfo
     var tableName = exportTableName ? "<input type='hidden' name='" + 'exportTableName' + "' value='" + exportTableName + "' />" : '';
     $('<form action="' + url + '" method="' + ('post') + '">' + inputKeys + inputNames + inputMatrix + tableName + '</form>')
         .appendTo('body').submit().remove();
+}
+
+export function newDownloadData() {
+    window.request.get('/file/new/export/rank/report');
 }
 
 export function downloadTable(headSeq, headSelect, headerMapper, renderRows, exportTableName) {

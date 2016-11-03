@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-10-28 10:08:22
+* @Last Modified time: 2016-11-03 10:44:34
 */
 
 'use strict';
@@ -15,6 +15,8 @@ var errors = require('common-errors');
 var excel = require("node-excel-export");
 var phantom = require('phantomjs-prebuilt');
 var childProcess = require('child_process');
+
+var nodeExcel = require('excel-export');
 
 var tempFileDir = path.join(__dirname, '../../..', 'tempFiles');
 
@@ -228,6 +230,55 @@ exports.exportExamStudent = function(req, res, next) {
     }catch(err){
         next(new errors.Error('生成学生列表错误', err));
     }
+}
+
+exports.newExportRankReport = function (req, res, next) {
+    var conf ={};
+    // conf.stylesXmlFile = "styles.xml";
+    conf.name = "mysheet";
+    conf.cols = [{
+        caption:'string',
+        type:'string',
+        beforeCellWrite:function(row, cellData){
+             return cellData.toUpperCase();
+        },
+        width:28.7109375
+    },{
+        caption:'date',
+        type:'date',
+        beforeCellWrite:function(){
+            var originDate = new Date(Date.UTC(1899,11,30));
+            return function(row, cellData, eOpt){
+                if (eOpt.rowNum%2){
+                    eOpt.styleIndex = 1;
+                }
+                else{
+                    eOpt.styleIndex = 2;
+                }
+                if (cellData === null){
+                  eOpt.cellType = 'string';
+                  return 'N/A';
+                } else
+                  return (cellData - originDate) / (24 * 60 * 60 * 1000);
+            }
+        }()
+    },{
+        caption:'bool',
+        type:'bool'
+    },{
+        caption:'number',
+         type:'number'
+    }];
+    conf.rows = [
+        ['pi', new Date(Date.UTC(2013, 4, 1)), true, 3.14],
+        ["e", new Date(2012, 4, 1), false, 2.7182],
+        ["M&M<>'", new Date(Date.UTC(2013, 6, 9)), false, 1.61803],
+        ["null date", null, true, 1.414]
+    ];
+    var result = nodeExcel.execute(conf);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats');
+    res.setHeader("Content-Disposition", "attachment; filename=" + "Report.xlsx");
+    res.end(result, 'binary');
 }
 
 /**
