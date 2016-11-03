@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-03 15:26:11
+* @Last Modified time: 2016-11-03 16:19:54
 */
 
 'use strict';
@@ -282,15 +282,15 @@ exports.newExportRankReport = function (req, res, next) {
         var cols = JSON.parse(req.body.cols);
         var rows = JSON.parse(req.body.rows);
         var userAgent = (req.headers['user-agent']||'').toLowerCase();
+        var filename = req.body.filename || '下载';
 
         var conf ={};
-        conf.name = '啦啦';
+        conf.name = 'report';
         conf.cols = getFormatCols(cols, rows[0]);
         conf.rows = rows;
 
         var result = nodeExcel.execute(conf);
         res.setHeader('Content-Type', 'application/vnd.openxmlformats');
-        var filename = req.body.filename || '下载';
 
         if(userAgent.indexOf('msie') >= 0 || userAgent.indexOf('chrome') >= 0) {
             res.setHeader('Content-Disposition', 'attachment; filename=' + encodeURIComponent(filename)+'.xlsx');
