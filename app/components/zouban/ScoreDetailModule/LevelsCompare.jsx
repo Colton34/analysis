@@ -18,14 +18,14 @@ class LevelsCompare extends React.Component {
         super(props);
         this.state = {
             currentLesson: this.props.zoubanExamInfo.lessons[0],
-            segmentPercentages: [0.6, 0.6, 0.7, 0.85, 1]
+            segmentPercentages: [0, 0.6, 0.7, 0.85, 1]
         }
     }
 
     selectedLesson(selectedLesson) {
         this.setState({
             currentLesson: selectedLesson,
-            segmentPercentages: [0.6, 0.6, 0.7, 0.85, 1]
+            segmentPercentages: [0, 0.6, 0.7, 0.85, 1]
         });
     }
 
