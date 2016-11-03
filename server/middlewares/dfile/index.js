@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-06-01 14:27:51
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-03 16:19:54
+* @Last Modified time: 2016-11-03 16:56:29
 */
 
 'use strict';
@@ -286,7 +286,7 @@ exports.newExportRankReport = function (req, res, next) {
 
         var conf ={};
         conf.name = 'report';
-        conf.cols = getFormatCols(cols, rows[0]);
+        conf.cols = _.map(cols, (colName) => ({caption: colName, type: 'string'}));
         conf.rows = rows;
 
         var result = nodeExcel.execute(conf);
@@ -299,9 +299,6 @@ exports.newExportRankReport = function (req, res, next) {
         } else {
             res.setHeader('Content-Disposition', 'attachment; filename=' + new Buffer(filename).toString('binary')+'.xlsx');
         }
-
-
-        // res.setHeader("Content-Disposition", "attachment; filename=" + 'hello' + ".xlsx");
         res.end(result, 'binary');
     } catch(e) {
         next(new errors.Error('生成表格下载文件错误', e));

@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-29 15:02:12
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-03 15:22:27
+* @Last Modified time: 2016-11-03 16:51:27
 */
 
 'use strict';
@@ -49,6 +49,11 @@ export function saveAs(uri) {
 }
 
 export function downloadData(validColumnKeys, validColumnNames, validStudentInfoMatrix, exportTableName) {
+    validStudentInfoMatrix = _.map(validStudentInfoMatrix, (rowData) => {
+        return _.map(rowData, (data) => {
+            return (_.isNumber(data) && (!isFinite(data) || _.isNaN(data))) || (_.isString(data) && !(!!data)) ? '--' : data+'';
+        });
+    });
     debugger;
     // var url = '/api/v1/file/export/rank/report';
     var url = '/api/v1/file/new/export/rank/report';
