@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-04-30 13:32:43
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-01 14:29:48
+* @Last Modified time: 2016-11-07 11:45:00
 */
 'use strict';
 var _ = require('lodash');
@@ -33,15 +33,21 @@ var getExamById = exports.getExamById = function(examid, fromType) {
 }
 
 var getPaperById = exports.getPaperById = function(paperId) {//Warning: 不是pid，而是paperId-即mongoID
-    console.time('解析paper');
     var url = config.analysisServer + '/paper?p=' + paperId;
 
+console.time('获取paper:'  + paperId);
     return when.promise(function(resolve, reject) {
         client.get(url, {}, function(err, res, body) {
             if (err) return reject(new errors.URIError('查询analysis server(getPaperById) Error: ', err));
+console.timeEnd('获取paper:' + paperId);
+
+
+
+console.time('解析paper:' + paperId);
             var temp = JSON.parse(body);
+console.timeEnd('解析paper:' + paperId);
+
             if(temp.error) return reject(new errors.Error('查询analysis server(getPaperById)失败, paperId = ' + paperId));
-            console.timeEnd('解析paper');
             resolve(temp);
         });
     })
@@ -168,18 +174,22 @@ exports.generateDashboardInfo = function(exam) {//Note:这里依然没有对auth
 }
 
 exports.generateExamReportInfo = function(exam) {
-    console.time('all');
-    console.time('fetch papers');
+console.time('all');
+
+console.time('fetch papers');
     return getPaperInstancesByExam(exam).then(function(papers) {
-        console.timeEnd('fetch papers');
-        console.time('generate');
+console.timeEnd('fetch papers');
+
+console.time('generate');
         var result = generatePaperStudentsInfo(papers);
-        console.timeEnd('generate');
-        console.time('other');
+console.timeEnd('generate');
+
+console.time('other');
         result.examStudentsInfo = _.sortBy(_.values(result.examStudentsInfo), 'score');
         var examClassesInfo = generateExamClassesInfo(result.examStudentsInfo);//TODO: Warning--这里本意是获取班级的【基本信息】，但是这又依赖于school.grade.class，所以这里【暂时】使用参考信息。
-        console.timeEnd('other');
-        console.timeEnd('all');
+console.timeEnd('other');
+
+console.timeEnd('all');
         return when.resolve({
             examStudentsInfo: result.examStudentsInfo,
             examPapersInfo: result.examPapersInfo,

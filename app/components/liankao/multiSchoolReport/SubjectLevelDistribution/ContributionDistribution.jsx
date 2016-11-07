@@ -196,7 +196,7 @@ function getOriginalMatrixByLevel(paperSchoolLevelMap, studentsPaperMapByGroup, 
                 if(!levelStudentsMap[levelNum] || !studentsPaperMapByGroup[headerInfo.id][schoolName]) {
                     debugger;
                 }
-                var levelRate = levelStudentsMap ? _.round(levelStudentsMap[levelNum].length / studentsPaperMapByGroup[headerInfo.id][schoolName].length, 2) : '--';
+                var levelRate = levelStudentsMap && (levelStudentsMap[levelNum] && studentsPaperMapByGroup[headerInfo.id][schoolName]) ? _.round(levelStudentsMap[levelNum].length / studentsPaperMapByGroup[headerInfo.id][schoolName].length, 2) : '--';
                 //var scoreRate = levelStudentsMap ? _.round(_.meanBy(paperSchoolLevelMap[headerInfo.id][schoolName][levelNum], studentInfo => {return studentInfo.score}) / headerInfo.fullMark, 2) : '--';
                 rowData.push(levelRate);
             })
