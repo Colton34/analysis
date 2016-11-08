@@ -5,19 +5,9 @@ import { connect } from 'react-redux';
 import Radium from 'radium';
 import {Link} from 'react-router';
 
-
-//TODO:拿到原始的reportDS-->新的reportDS
-class SingleSchoolLianKaoReport extends React.Component {
-    constructor(props) {
-        super(props);
-
-    }
-
-    render() {
-        return (
-            <div></div>
-        );
-    }
+export default function SingleSchoolLianKaoReport({examInfo, examStudentsInfo, paperStudentsInfo, paperQuestionsInfo, levels, subjectLevels, levelBuffers}) {
+    debugger;
+    return (
+        <div>待填充</div>
+    )
 }
-
-

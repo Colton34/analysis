@@ -44,6 +44,9 @@ import {getQuestionsInfo, newGetSubjectLevelInfo} from '../sdk';
 class ContentComponent extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            reportType: 'single' //【默认应该是】multi
+        }
     }
 
     changeSchoolReport(item) {
@@ -60,24 +63,16 @@ class ContentComponent extends React.Component {
     }
 
     render() {
-        //1.转换为新的数据结构
         var reportDS = this.props.reportDS.toJS();
         var {examInfo, examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, levels, subjectLevels, levelBuffers} = reportDS;
-        // var user = this.props.user.toJS();
         debugger;
-        var {examInfo, examStudentsInfo, paperStudentsInfo, paperQuestionsInfo, levels, subjectLevels, levelBuffers} = convertNewReportDS({examInfo, examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, levels, subjectLevels, levelBuffers});
+        var propsParams = convertNewReportDS({examInfo, examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, levels, subjectLevels, levelBuffers});
         debugger;
-        //2.构建liankao single report特有的数据结构
-
-
-        var examName = this.props.reportDS.examInfo.toJS().name;
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
-                <ReportNavHeader examName={examName} examId={this.props.examid} grade={this.props.grade} reportName={'联考总体分析报告'}/>
-                {/* {(this.ifCanReviewMultiReport) ? <ReportTabNav changeSchoolReport={this.changeClassReport.bind(this)} schoolList={authSchoolsList} reportDS={this.props.reportDS} /> : ''}  //【暂时】没有单个学校联考报告 */}
-                <MultiSchoolReport user={this.props.user} reportDS={this.props.reportDS} examId={this.props.examid} grade={this.props.grade} />
-                {/* {(this.state.reportType == 'multi') ? <MultiClassReport reportDS={this.props.reportDS} />
-            : <SingleClassReport reportDS={this.props.reportDS} currentClass={currentClass} user={this.props.user} grade={this.props.grade} gradeName={this.props.gradeName} ifCanReviewMultiReport={this.ifCanReviewMultiReport}/>} */}
+                <ReportNavHeader examName={examInfo.name} examId={this.props.examid} grade={this.props.grade} reportName={'联考总体分析报告'}/>
+                {(this.props.user.auth.isLianKaoManager) ? <ReportTabNav schoolList={examInfo.schools} changeSchoolReport={this.changeSchoolReport.bind(this)} /> : ''}
+                {(this.state.reportType == 'multi') ? <MultiSchoolReport user={this.props.user} reportDS={this.props.reportDS} examId={this.props.examid} grade={this.props.grade} /> : <SingleSchoolLianKaoReport {...propsParams} />}
             </div>
         );
     }
@@ -86,7 +81,7 @@ class ContentComponent extends React.Component {
 class LianKaoReport extends React.Component {
     static need = [
         initReportDSAction
-    ]
+    ];
 
     componentDidMount() {
         if (this.props.reportDS.haveInit || this.props.isLoading) return;
@@ -160,15 +155,10 @@ examStudentsInfo: [
 function convertNewReportDS({examInfo, examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, levelBuffers, levels, subjectLevels}) {
     var {paperObjectIdMap, papersFullMark} = getPaperObjectIdMap(examPapersInfo);
     var sutdentsQuestionInfo = getStudentQuestionsInfo(examStudentsInfo);
-    debugger;
     var newExamInfo = makeExamInfo(examInfo, examPapersInfo, headers);
-    debugger;
     var newExamStudentsInfo = makeExamStudentsInfo(examStudentsInfo);
-    debugger;
     var newPaperStudentsInfo = makePaperStudentsInfo(allStudentsPaperMap, sutdentsQuestionInfo, paperObjectIdMap);
-    debugger;
     var newPaperQuestionsInfo = makePaperQuestionsInfo(examPapersInfo, allStudentsPaperMap, paperObjectIdMap);
-    debugger;
     var {newLevels, newSubjectLevels} = makeLevelsInfo(levels, subjectLevels, allStudentsPaperMap, papersFullMark);
     newExamInfo.schools = _.keys(_.groupBy(examStudentsInfo, 'school'));
     return {

@@ -17,10 +17,10 @@ var localStyle = {
 export default function NavHeader({examName, examId, grade, reportName, isZouban}) {
     var queries = (isZouban) ? {examid: examId} : {examid: examId, grade: grade};
     var pathname = (isZouban) ? '/zouban/dashboard' : '/dashboard';
-    debugger;//需要测试在普通报告中点击回退到dashboard的地址栏里参数是否正确
-    console.log('queries = ', JSON.stringify(queries));
-    console.log('pathname = ', pathname);
-    console.log('isZouban = ', isZouban);
+    // debugger;//需要测试在普通报告中点击回退到dashboard的地址栏里参数是否正确
+    // console.log('queries = ', JSON.stringify(queries));
+    // console.log('pathname = ', pathname);
+    // console.log('isZouban = ', isZouban);
     return (
         <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}}>
             <div style={{ height: 40, lineHeight: '40px', backgroundColor: '#EFF1F4', margin: '10px auto 10px 0', fontSize: 16, color: colorsMap.C12 }}>

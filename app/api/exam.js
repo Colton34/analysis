@@ -2,7 +2,7 @@
 * @Author: HellMagic
 * @Date:   2016-05-18 18:57:37
 * @Last Modified by:   HellMagic
-* @Last Modified time: 2016-11-07 19:40:08
+* @Last Modified time: 2016-11-08 09:50:34
 */
 
 'use strict';
@@ -235,7 +235,7 @@ function doubleCheckValidSubjectLevels(subjectLevels) {
     var temp = _.every(result, (subjectLevelScores, pid) => {
         return _.every(_.range(subjectLevelScores.length-1), (i) => subjectLevelScores[i] > subjectLevelScores[i+1]);
     });
-    debugger;
+    // debugger;
     return temp;
 }
 
@@ -544,7 +544,7 @@ function makeDefaultLevles(examInfo, examStudentsInfo) {
     };
 
     var result = getLevelInfo(levels, examStudentsInfo, examInfo.fullMark, false);
-    debugger;
+    // debugger;
     return result;
 
     // _.each(levels, (levelObj, levelKey) => {
