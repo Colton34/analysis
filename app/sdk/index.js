@@ -1,7 +1,7 @@
 /*
 * @Author: HellMagic
 * @Date:   2016-09-05 20:15:12
-* @Last Modified time: 2016-10-19 11:10:04
+* @Last Modified time: 2016-11-07 20:34:39
 */
 
 'use strict';
@@ -443,4 +443,23 @@ export function getQuestionSeparation(questionGradeScoreMatrix, paperGradeScores
 
 export function getGroupQuestionContriFactor(groupQuestionScoreRate, gradeQuestionScoreRate) {
     return _.map(groupQuestionScoreRate, (x, i) => _.round(_.subtract(x, groupQuestionScoreRate[i]), 2));
+}
+
+export function getQuestionsInfo(baseStudents, questions, isAll) {
+    var questionScores, questionMeans, questionRates, questionSeparations;
+    questionScores = getQuestionGroupScoreMatrix(baseStudents);
+    questionMeans = getGroupQuestionMean(questionScores);
+    questionRates = getGroupQuestionScoreRate(questions, questionMeans);
+    if(isAll) questionSeparations = getQuestionSeparation(questionScores, _.map(baseStudents, (studentObj) => studentObj.score));
+    var obj;
+    var result = _.map(_.range(questions.length), (i) => {
+        obj = {
+            scores: questionScores[i],
+            mean: questionMeans[i],
+            rate: questionRates[i]
+        };
+        if(isAll) obj.separations = questionSeparations[i];
+        return obj;
+    })
+    return result;
 }

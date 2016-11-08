@@ -19,7 +19,7 @@
  */
 
 
-
+import _ from 'lodash';
 import React, { PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -39,6 +39,7 @@ import {initReportDSAction} from '../reducers/reportDS/actions';
 import {initParams} from '../lib/util';
 
 import {COLORS_MAP as colorsMap} from '../lib/constants';
+import {getQuestionsInfo, newGetSubjectLevelInfo} from '../sdk';
 
 class ContentComponent extends React.Component {
     constructor(props) {
@@ -59,6 +60,16 @@ class ContentComponent extends React.Component {
     }
 
     render() {
+        //1.转换为新的数据结构
+        var reportDS = this.props.reportDS.toJS();
+        var {examInfo, examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, levels, subjectLevels, levelBuffers} = reportDS;
+        // var user = this.props.user.toJS();
+        debugger;
+        var {examInfo, examStudentsInfo, paperStudentsInfo, paperQuestionsInfo, levels, subjectLevels, levelBuffers} = convertNewReportDS({examInfo, examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, levels, subjectLevels, levelBuffers});
+        debugger;
+        //2.构建liankao single report特有的数据结构
+
+
         var examName = this.props.reportDS.examInfo.toJS().name;
         return (
             <div style={{ width: 1200, margin: '0 auto', marginTop: 20, backgroundColor: colorsMap.A02, zIndex: 0}} className='animated fadeIn'>
@@ -113,3 +124,196 @@ function mapDispatchToProps(dispatch) {
         initReportDS : bindActionCreators(initReportDSAction, dispatch),
     }
 }
+
+
+/*
+examInfo: {
+    id:
+    objectId: 【暂缺】
+    name:
+    fullMark:
+    [from]:<可选>
+    gradeName://原来有些可能是grade
+    eventTime://原来是startTime
+    [schools]: {id: , name: } [只有联考才有]
+    papers: [//原来是subjects。这里数组的顺序和papersInfo的数组顺序一致--都是根据subjectWeight来排序的
+        {id: , objectId: , name: , subject: , fullMark: , questions: },
+        ...
+    ],
+    [classes]: ['classOne', ...] 【只有普通考试才有--联考，走班都没有】
+}
+
+examStudentsInfo: [
+    {
+        id:
+        name:
+        school:
+        class: {name: , rank: }
+        score:
+        rank:
+    }
+]
+
+
+ */
+
+function convertNewReportDS({examInfo, examStudentsInfo, examPapersInfo, allStudentsPaperMap, headers, levelBuffers, levels, subjectLevels}) {
+    var {paperObjectIdMap, papersFullMark} = getPaperObjectIdMap(examPapersInfo);
+    var sutdentsQuestionInfo = getStudentQuestionsInfo(examStudentsInfo);
+    debugger;
+    var newExamInfo = makeExamInfo(examInfo, examPapersInfo, headers);
+    debugger;
+    var newExamStudentsInfo = makeExamStudentsInfo(examStudentsInfo);
+    debugger;
+    var newPaperStudentsInfo = makePaperStudentsInfo(allStudentsPaperMap, sutdentsQuestionInfo, paperObjectIdMap);
+    debugger;
+    var newPaperQuestionsInfo = makePaperQuestionsInfo(examPapersInfo, allStudentsPaperMap, paperObjectIdMap);
+    debugger;
+    var {newLevels, newSubjectLevels} = makeLevelsInfo(levels, subjectLevels, allStudentsPaperMap, papersFullMark);
+    newExamInfo.schools = _.keys(_.groupBy(examStudentsInfo, 'school'));
+    return {
+        examInfo: newExamInfo,
+        examStudentsInfo: newExamStudentsInfo,
+        paperStudentsInfo: newPaperStudentsInfo,
+        paperQuestionsInfo: newPaperQuestionsInfo,
+        levels: newLevels,
+        subjectLevels: newSubjectLevels,
+        levelBuffers: levelBuffers
+    }
+    //设置为null？还是delete -- 采用mark的方式确定可被垃圾回收
+}
+
+function makeExamInfo(examInfo, examPapersInfo, headers) {
+    var result = _.pick(examInfo, ['id', 'name', 'gradeName', 'fullMark']);
+    result.objectId = examInfo._id;
+    result.eventTime = result['event_time'];
+    var paperObj, temp;
+    //注意这里的id都是pid而不是objectId
+    result.papers = _.map(_.slice(headers, 1), (headerObj) => {
+        paperObj = examPapersInfo[headerObj.id];
+        temp = _.pick(paperObj, ['id', 'subject', 'fullMark', 'questions']);
+        temp.objectId = paperObj.paper;
+        //TODO:缺少paper.name
+        return temp;
+    });
+    return result;
+}
+
+function makeExamStudentsInfo(examStudentsInfo) {
+    return _.map(examStudentsInfo, (studentObj) => _.pick(studentObj, ['id', 'name', 'school', 'score', 'rank']));
+}
+
+/*
+paperStudentsInfo: {
+    <objectId>: {
+        <className>: [
+            id:
+            score:
+            gradeRank:
+            classRank:
+            questionScores:
+            questionAnswers:
+        ]
+    }
+}
+
+注意：这里面有一个【rank】--它是开始的时候allPaperStudentsMap添加进入的--即是此学生在此科目的总体排名，就暂时用这个field key，如果群体不是所有学校而是一个学校那么就作为schoolRank，再下面可能还有classRank，缺少questionScores和questionAnswers
+
+ */
+
+function makePaperStudentsInfo(allStudentsPaperMap, sutdentsQuestionInfo, paperObjectIdMap) {
+    var paperStudentsInfo = {};
+    var paperSchoolStudentsGroup, paperSchoolClassStudentsGroup
+    //注意：allStudentsPaperMap的key是paperid而不是paperObjectId
+    _.each(allStudentsPaperMap, (paperStudents, paperid) => {
+        paperStudentsInfo[paperObjectIdMap[paperid]] = {};
+        paperSchoolStudentsGroup = _.groupBy(paperStudents, 'school');
+        _.each(paperSchoolStudentsGroup, (paperSchoolStudents, schoolName) => {
+            paperSchoolClassStudentsGroup = _.groupBy(paperSchoolStudents, 'class_name');
+            _.each(paperSchoolClassStudentsGroup, (paperSchoolClassStudents, className) => {
+                _.each(paperSchoolClassStudents, (studentObj) => {
+                    //TODO:这里没有健壮性判断
+                    studentObj.questionScores = sutdentsQuestionInfo[studentObj.id][paperid].scores;
+                    studentObj.questionAnswers = sutdentsQuestionInfo[studentObj.id][paperid].answers;
+                });
+            });
+            paperStudentsInfo[paperObjectIdMap[paperid]][schoolName] = paperSchoolClassStudentsGroup;
+        });
+        //TODO:这里需要将paperid更换为paperObjectId
+    });
+    return paperStudentsInfo;
+}
+
+function getStudentQuestionsInfo(examStudentsInfo) {
+    var result = {}, temp;
+    _.each(_.keyBy(examStudentsInfo, 'id'), (studentObj, studentId) => result[studentId] = _.keyBy(studentObj.questionScores, 'paperid'));
+    return result;
+}
+
+/*
+
+paperQuestionsInfo: {
+    <objectId>: [
+        {
+            grade: {
+                scores:
+                mean:
+                rate:
+                separation:
+            },
+            <className>: {
+                scores:
+                mean:
+                rate:
+            },
+            ...
+        },
+        ...
+    ],
+    ...
+}
+
+ */
+
+function makePaperQuestionsInfo(examPapersInfo, allStudentsPaperMap, paperObjectIdMap) {
+    var result = {}, paperStudetns, allStudentsQuestionsInfo, schoolStudentsQuestionsInfo, obj;
+    _.each(examPapersInfo, (paperObj) => {
+        allStudentsQuestionsInfo = getQuestionsInfo(allStudentsPaperMap[paperObj.id], paperObj.questions, true);
+        schoolStudentsQuestionsInfo = {};
+        _.each(_.groupBy(allStudentsPaperMap[paperObj.id], 'school'), (paperSchoolStudents, schoolName) => {
+            schoolStudentsQuestionsInfo[schoolName] = getQuestionsInfo(paperSchoolStudents, paperObj.questions);
+        });
+        //TODO:这里修改为paperObjectId
+        result[paperObjectIdMap[paperObj.id]] = _.map(paperObj.questions, (questionObj, index) => {
+            obj = { paper: allStudentsQuestionsInfo[index] };
+            _.each(schoolStudentsQuestionsInfo, (schoolPaperQuestionsInfoArr, schoolName) => {
+                obj[schoolName] = schoolPaperQuestionsInfoArr[index];
+            });
+            return obj;
+        });
+    });
+    return result;
+}
+
+function getPaperObjectIdMap(examPapersInfo) {
+    var paperObjectIdMap = {}, papersFullMark = {};
+    _.each(examPapersInfo, (paperObj, pid) => {paperObjectIdMap[pid] = paperObj.paper, papersFullMark[pid] = paperObj.fullMark});
+    return {paperObjectIdMap, papersFullMark};
+}
+
+//TODO: 1.转换成数组，从高档到低档  2.为sublectLevels补充需要的sum数据已经targets
+function makeLevelsInfo(levels, subjectLevels, allStudentsPaperMap, papersFullMark) {
+    var levelLastIndex = _.size(levels) - 1;
+    var levelsArr = [], subjectLevelsArr = [];
+    _.each(_.range(_.size(levels)), (i) => {
+        levelsArr.push(levels[(levelLastIndex-i)+'']);
+        subjectLevelsArr.push(subjectLevels[(levelLastIndex-i)+'']);
+    });
+    var subjectLevelsInfo = newGetSubjectLevelInfo(subjectLevelsArr, allStudentsPaperMap, papersFullMark);
+    return {
+        newLevels: levelsArr,
+        newSubjectLevels: subjectLevelsInfo
+    }
+}
+
+

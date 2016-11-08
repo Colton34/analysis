@@ -165,7 +165,7 @@ class Main extends React.Component {
                     <input type="text" placeholder="Hello" />
                 </form>
                 <button onClick={this.delCustomExam.bind(this)}>删除自定义</button>
-                <Link to={{pathname: '/liankao/report', query: {examid: '1009016-1647', grade: '初一'}}}>【Mock】联考报告</Link>
+                <Link to={{pathname: '/liankao/report', query: {examid: '1029261-749', grade: '初二'}}}>【Mock】联考报告</Link>
                 <Link to={{pathname: '/home'}}>【正常】首页</Link>
             </div>
         );
